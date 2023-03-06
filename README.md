@@ -20,6 +20,6 @@ npm install
 ```
 
 ### 3. Run configurations
-Configs files are located in respectively:
+Config files are located:
 1. VSCode are in .vscode.
 2. WebStorms are in .idea.
