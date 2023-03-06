@@ -1,0 +1,29 @@
+{
+  "name": "time-reporting-and-accounting-system",
+  "description": "",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Gruppe-106/Time-reporting-and-accounting-system.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Gruppe-106/Time-reporting-and-accounting-system/issues"
+  },
+  "homepage": "https://github.com/Gruppe-106/Time-reporting-and-accounting-system#readme",
+  "devDependencies": {
+    "typescript": "^4.9.5"
+  },
+  "dependencies": {
+    "@types/express": "^4.17.17",
+    "@types/react-bootstrap": "^0.32.32",
+    "bootstrap": "^5.2.3",
+    "express": "^4.18.2",
+    "react-bootstrap": "^2.7.2"
+  }
+}
