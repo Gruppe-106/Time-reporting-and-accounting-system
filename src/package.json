@@ -4,7 +4,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "React Dev": "react-scripts start"
+    "start": "npx ts-node app.ts",
+    "build": "npx tsc"
   },
   "repository": {
     "type": "git",
@@ -21,9 +22,6 @@
   },
   "dependencies": {
     "@types/express": "^4.17.17",
-    "@types/react-bootstrap": "^0.32.32",
-    "bootstrap": "^5.2.3",
-    "express": "^4.18.2",
-    "react-bootstrap": "^2.7.2"
+    "express": "^4.18.2"
   }
 }

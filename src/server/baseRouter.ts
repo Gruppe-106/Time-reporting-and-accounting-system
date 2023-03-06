@@ -1,7 +1,7 @@
 // @ts-ignore
 import express, {Request, Response} from "express";
 
-export class Router {
+export class BaseRouter {
     private router;
     constructor() {
         this.router = express.Router();

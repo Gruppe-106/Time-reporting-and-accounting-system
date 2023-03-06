@@ -1,0 +1,10 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+# Editor-based HTTP Client requests
+/httpRequests/
+
+# Additional ignored files
+/modules.xml
+/Time-reporting-and-accounting-system.iml
+/vcs.xml
