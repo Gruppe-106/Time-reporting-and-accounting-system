@@ -1,0 +1,40 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "React Dev Server",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/src/client",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": ["run-script", "start"]
+        },
+        {
+            "name": "React Build",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/src/client",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": ["run-script", "build"]
+        },
+        {
+            "name": "Node Dev Server",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/src",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": ["run-script", "start"]
+        },
+        {
+            "name": "Node build",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/src",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": ["run-script", "build"]
+        }
+    ]
+}
