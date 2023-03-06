@@ -1,5 +1,7 @@
 # Build output for both back- & frontend
 /src/build/
+.idea/
+.vscode/
 
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 # %----------   Server   ----------%
