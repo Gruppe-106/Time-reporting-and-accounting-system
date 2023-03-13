@@ -2,8 +2,10 @@
     Show a list of projects a user is related to
  */
 
-import {Component} from "react";
+import React, {Component} from "react";
 import ReactDOM from "react-dom/client";
+import BaseNavBar from "../../components/navBar";
+import {Container} from "react-bootstrap";
 
 class ProjectMenu extends Component<any>{
     constructor(props:any) {
@@ -12,16 +14,14 @@ class ProjectMenu extends Component<any>{
 
     render() {
         return (
-            <h1>test</h1>
+            <>
+                <BaseNavBar/>
+                <Container>
+                    <h1>Project Menu</h1>
+                </Container>
+            </>
         );
     }
-
 }
 
-const root = ReactDOM.createRoot(
-    document.getElementById('root') as HTMLElement
-);
-
-root.render(
-    <ProjectMenu></ProjectMenu>
-)
+export default ProjectMenu;
