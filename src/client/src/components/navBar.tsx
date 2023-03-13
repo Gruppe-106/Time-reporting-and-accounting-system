@@ -16,8 +16,8 @@ class BaseNavBar extends Component<any>{
 
     /**
      * Creates an Element for the navbar, sets active if it's the current selected page
-     * @param href url reference to component
-     * @param title the displayed text
+     * @param href String: url reference to component
+     * @param title String: the displayed text in navbar
      * @private
      */
     private linkRender(href:string, title:string):JSX.Element {
@@ -29,8 +29,8 @@ class BaseNavBar extends Component<any>{
 
     /**
      * Creates a dropdown item for the navbar and sets active if any in the dropdown is selected including title
-     * @param title url reference to component
-     * @param links containing a list of {href:string, title:string} used to create links in dropdown
+     * @param title String: the displayed text in navbar
+     * @param links DropDownItem[]: list of {href:String, title:String} used to create links in dropdown
      * @private
      */
     private dropDownRender(title:string, links:DropDownItem[]):JSX.Element {
