@@ -9,7 +9,6 @@ Project by **CS-23-DAT-01**
 ```
 ## Setup React:
 ### 1. Open terminal in '../src/client' 
-### 2. Install React and packages
 ```bash
 npm install
 ```
