@@ -4,14 +4,15 @@
  */
 
 import React, {Component} from "react";
-import ReactDOM from "react-dom/client";
+//import ReactDOM from "react-dom/client";
 import BaseNavBar from "../../components/navBar";
 import {Container} from "react-bootstrap";
+import TimeTableRegister from "./componentsTime/com";
 
 class UserTimeRegister extends Component<any>{
-    constructor(props:any) {
+/*    constructor(props:any) {
         super(props);
-    }
+    }*/
 
     render() {
         return (
@@ -20,6 +21,8 @@ class UserTimeRegister extends Component<any>{
                 <Container>
                     <h1>User Time Register</h1>
                 </Container>
+                <TimeTableRegister tableRows={[{projectName:"", taskName:"", totalTime:0},
+                    {projectName:"", taskName:"", totalTime:0}]}/>
             </>
         );
     }
