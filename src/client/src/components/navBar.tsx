@@ -37,10 +37,10 @@ class BaseNavBar extends Component<any>{
         let active = false;
 
         //Creating an item in the dropdown for each item given
-        let linksElement = links.map((item) => {
+        let linksElement = links.map((item, key) => {
                 let currentActive = false;
                 if (this.currentPage === item.href) { active = true; currentActive = true; }
-                return (<NavDropdown.Item active={currentActive}  href={item.href}>{item.title}</NavDropdown.Item>)
+                return (<NavDropdown.Item active={currentActive} key={key}  href={item.href}>{item.title}</NavDropdown.Item>)
         })
 
         //Return dropdown with all links inside and sets active if any of the links where active

@@ -9,7 +9,7 @@ export class Server {
         this.app = app;
         this.router = new BaseRouter();
 
-        app.use('*', this.router.routes());
+        app.use('/', this.router.routes());
     }
 
     public start(port: number): void {
