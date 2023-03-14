@@ -7,6 +7,7 @@ interface ProjectTableProp{
 
 interface ProjectTableRow{
     projectId:number
+    superProject:number
     projectName:string
     startDate:number
     endDate:number
@@ -21,7 +22,7 @@ class ProjectTable extends Component<ProjectTableProp> {
     private tableRender():JSX.Element[]{
         return this.tableRows.map((row) =>{
 
-            return (<tr><td>{row.projectId}</td><td>{row.projectName}</td><td>{new Date(row.startDate).toLocaleDateString()}</td><td>{new Date(row.endDate).toLocaleDateString()}</td></tr>)
+            return (<tr><td>{row.projectId}</td><td>{row.superProject}</td><td>{row.projectName}</td><td>{new Date(row.startDate).toLocaleDateString()}</td><td>{new Date(row.endDate).toLocaleDateString()}</td></tr>)
         })
     }
 
@@ -31,6 +32,7 @@ class ProjectTable extends Component<ProjectTableProp> {
                 <thead>
                 <tr>
                     <th>Project ID</th>
+                    <th>Parent Project</th>
                     <th>Project Name</th>
                     <th>Start Date</th>
                     <th>End Date</th>
