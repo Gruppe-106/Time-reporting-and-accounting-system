@@ -1,6 +1,6 @@
 import BaseModel from "./baseModel";
 
-interface ProjectData {
+export interface ProjectData {
     id:number;
     superProject:number;
     name:String;
@@ -11,7 +11,7 @@ interface ProjectData {
 class ProjectModel extends BaseModel<ProjectData> {
     public static idCounterDeleteMe:number;
 
-    GetAllModels(): Promise<ProjectData[]> {
+    public GetAllModels(): Promise<ProjectData[]> {
         return new Promise<ProjectData[]>(async (resolve, reject) => {
             let p1: ProjectData = {
                 id: ProjectModel.idCounterDeleteMe++,
