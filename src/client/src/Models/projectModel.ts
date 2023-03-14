@@ -4,12 +4,12 @@ export interface ProjectData {
     id:number;
     superProject:number;
     name:String;
-    startDate:String;
-    endDate:String;
+    startDate:number;
+    endDate:number;
 }
 
 class ProjectModel extends BaseModel<ProjectData> {
-    public static idCounterDeleteMe:number;
+    public static idCounterDeleteMe:number = 0;
 
     public GetAllModels(): Promise<ProjectData[]> {
         return new Promise<ProjectData[]>(async (resolve, reject) => {
@@ -17,37 +17,35 @@ class ProjectModel extends BaseModel<ProjectData> {
                 id: ProjectModel.idCounterDeleteMe++,
                 superProject: -1,
                 name: "P1",
-                endDate: Date.now().toString(),
-                startDate: Date.now().toString(),
+                endDate: Date.now(),
+                startDate: Date.now(),
             }
             let p2: ProjectData = {
                 id: ProjectModel.idCounterDeleteMe++,
                 superProject: p1.id,
                 name: "P2",
-                endDate: Date.now().toString(),
-                startDate: Date.now().toString(),
+                endDate: Date.now(),
+                startDate: Date.now(),
             }
             let p3: ProjectData = {
                 id: ProjectModel.idCounterDeleteMe++,
                 superProject: p2.id,
                 name: "P3",
-                endDate: Date.now().toString(),
-                startDate: Date.now().toString(),
+                endDate: Date.now(),
+                startDate: Date.now(),
             }
             let p4: ProjectData = {
                 id: ProjectModel.idCounterDeleteMe++,
                 superProject: p2.id,
                 name: "P4",
-                endDate: Date.now().toString(),
-                startDate: Date.now().toString(),
+                endDate: Date.now(),
+                startDate: Date.now(),
             }
             let pDataList = [
                 p1, p2, p3, p4
             ]
 
-            await setTimeout(() => {
-            }, 3000);
-            resolve(pDataList);
+            await setTimeout(() => {resolve(pDataList)}, 3000);
         });
     }
 
