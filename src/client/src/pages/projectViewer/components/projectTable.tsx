@@ -7,7 +7,7 @@ interface ProjectTableProp{
 
 interface ProjectTableRow{
     projectId:number
-    projectName:String
+    projectName:string
     startDate:number
     endDate:number
 }
