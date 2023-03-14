@@ -1,5 +1,4 @@
 import BaseModel from "./baseModel";
-import {ProjectData} from "./projectModel";
 
 interface UserData {
     id:number;
@@ -74,5 +73,6 @@ class UserModel extends BaseModel<UserData> {
     GetModelById(id: number): Promise<UserData> {
         throw (new Error("Not implemented"));
     }
-
 }
+
+export default UserModel;
