@@ -25,25 +25,25 @@ class TimeTableRegister extends Component<TimeTableProp> {
             return (<tr><td>{row.projectName}</td>
                         <td>{row.taskName}</td>
                         <td><Form><Form.Group controlId="exampleForm.ControlInput1">
-                            <Form.Control type="number" placeholder="Time in hours" />
+                            <Form.Control type="number" value={0} />
                         </Form.Group></Form></td>
                         <td><Form><Form.Group controlId="exampleForm.ControlInput2">
-                            <Form.Control type="number" placeholder="Time in hours" />
+                            <Form.Control type="number" value={0} />
                         </Form.Group></Form></td>
                         <td><Form><Form.Group controlId="exampleForm.ControlInput3">
-                            <Form.Control type="number" placeholder="Time in hours" />
+                            <Form.Control type="number" value={0} />
                         </Form.Group></Form></td>
                         <td><Form><Form.Group controlId="exampleForm.ControlInput4">
-                            <Form.Control type="number" placeholder="Time in hours" />
+                            <Form.Control type="number" value={0} />
                         </Form.Group></Form></td>
                         <td><Form><Form.Group controlId="exampleForm.ControlInput5">
-                            <Form.Control type="number" placeholder="Time in hours" />
+                            <Form.Control type="number" value={0} />
                         </Form.Group></Form></td>
                         <td><Form><Form.Group controlId="exampleForm.ControlInput6">
-                            <Form.Control type="number" placeholder="Time in hours" />
+                            <Form.Control type="number" value={0} />
                         </Form.Group></Form></td>
                         <td><Form><Form.Group controlId="exampleForm.ControlInput7">
-                            <Form.Control type="number" placeholder="Time in hours" />
+                            <Form.Control type="number" value={0} />
                         </Form.Group></Form></td>
                         <td>{row.totalTime}</td>
                     </tr>)
@@ -70,7 +70,7 @@ class TimeTableRegister extends Component<TimeTableProp> {
                 </thead>
                 <tbody>
                 {this.tableRender()}
-                <tr><td colSpan={2}>Total Time:</td></tr>
+                <tr><th colSpan={2}>Total Time:</th></tr>
                 </tbody>
                 </Table>
             </Container>
