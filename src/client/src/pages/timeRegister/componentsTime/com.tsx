@@ -40,7 +40,13 @@ class TimeTableRegister extends Component<any> {
                     <Dropdown.Item value={15}>15</Dropdown.Item>
                     <Dropdown.Item value={30}>30</Dropdown.Item>
                     <Dropdown.Item value={45}>45</Dropdown.Item>
-                    </DropdownButton>
+                    </DropdownButton> 
+                    {/* <Form.Select>
+                        <option value="0">0</option>
+                        <option value="15">15</option>
+                        <option value="30">30</option>
+                        <option value="45">45</option>
+                    </Form.Select> */}
                 </InputGroup></td>))}
                 <td>0</td> {/* Total time */}
                 </tr>
