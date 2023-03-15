@@ -72,7 +72,6 @@ class BaseNavBar extends Component<any>{
                                     {href:"/project/create", title:"Create Project"},
                                     {href:"/project/manage", title:"Manage Project"},
                                     {href:"/project/menu"  , title:"Project Menu"},
-                                    {href:"/project/viewer", title:"Project Viewer"},
                                 ])}
                                 { this.linkRender("/user-register", "Register time") }
                                 { this.linkRender("/group/manager", "Group Manager") }
