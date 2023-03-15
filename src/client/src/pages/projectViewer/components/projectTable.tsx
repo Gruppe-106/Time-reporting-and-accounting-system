@@ -23,7 +23,7 @@ class ProjectTable extends Component<ProjectTableProp> {
         return this.tableRows.map((row) =>{
 
             return (<tr>
-                <td> <a href={`/projectviewer?id=${row.id}`}>{row.id}</a> </td>
+                <td> <a href={`/project/viewer?id=${row.id}`}>{row.id}</a> </td>
                 <td>{row.superProject}</td>
                 <td>{row.name}</td>
                 <td>{new Date(row.startDate).toLocaleDateString()}</td>
