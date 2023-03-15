@@ -2,9 +2,11 @@ import {Container, Table, Form, Dropdown, DropdownButton, InputGroup} from "reac
 import React, {Component} from "react";
 
 class TimeTableRegister extends Component<any> {
+
+    state = {valueChange: false};
     constructor(props:any) {
         super(props);
-    }
+    }    
 
     render() {
         let arr = ['1', '2', '3', '4', '5', '6', '7'];
@@ -15,7 +17,7 @@ class TimeTableRegister extends Component<any> {
                 <tr>
                     <th>Project Name</th>
                     <th>Task Name</th>
-                    {arr.map((va) => (<th>{va} Date</th>))}
+                    {arr.map((num) => (<th>{num} Date</th>))}
                     <th>Total Time</th>
                 </tr>
                 </thead>
@@ -24,22 +26,29 @@ class TimeTableRegister extends Component<any> {
                 <td>ExampleProject</td>
                 <td>ExampleTask</td>
                 {arr.map(
-                (value) => (
-                <td><InputGroup>
+                (num) => (
+                <td><InputGroup size="sm">
                     <Form.Control type="number" placeholder="0" />
+                    <InputGroup.Text id={`basic-addon-${num}`}>;</InputGroup.Text>
                     <DropdownButton
-                    variant="secondary"
+                    variant="outline-secondary"
                     title="0"
-                    id={`time-input-${value}`}
+                    drop="down-centered"
+                    id={`time-input-${num}`}
                     align="end"
                     >
-                    <Dropdown.Item eventKey={1}>15</Dropdown.Item>
-                    <Dropdown.Item eventKey={2}>30</Dropdown.Item>
-                    <Dropdown.Item eventKey={3}>45</Dropdown.Item>
-                    <Dropdown.Item eventKey={4}>60</Dropdown.Item>
-                    </DropdownButton>
+                    <Dropdown.Item value={15}>15</Dropdown.Item>
+                    <Dropdown.Item value={30}>30</Dropdown.Item>
+                    <Dropdown.Item value={45}>45</Dropdown.Item>
+                    </DropdownButton> 
+                    {/* <Form.Select>
+                        <option value="0">0</option>
+                        <option value="15">15</option>
+                        <option value="30">30</option>
+                        <option value="45">45</option>
+                    </Form.Select> */}
                 </InputGroup></td>))}
-                <td>0</td>
+                <td>0</td> {/* Total time */}
                 </tr>
                 <tr><th colSpan={2}>Total Time:</th></tr>
                 </tbody>
