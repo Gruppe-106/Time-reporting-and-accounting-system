@@ -1,5 +1,3 @@
-import {USERS} from "../database/fakeData/USERS";
-
 export interface User {
     authKey: string;
     id?: number;
@@ -32,7 +30,7 @@ abstract class EndpointBase {
 
     public async processRequest(requestValues: string[], primaryKey:string, keyEqual?:string[]):Promise<object> {
         if (this.ensureAuth()) {
-            return this.getData(requestValues, this.user, primaryKey, keyEqual);
+            return await this.getData(requestValues, this.user, primaryKey, keyEqual);
         }
     }
 
