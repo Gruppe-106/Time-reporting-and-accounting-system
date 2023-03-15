@@ -15,9 +15,9 @@ class UserModel extends BaseModel<UserData> {
         return new Promise<UserData[]>(async (resolve, reject) => {
             let u1: UserData = {
                 id: UserModel.idCounterDeleteMe++,
-                email: "@gmail.com",
-                firstName: "",
-                lastName: "",
+                email: "Andreas@gmail.com",
+                firstName: "Andreas Svanberg",
+                lastName: "Hummelmose",
                 group: 0,
             }
             let u2: UserData = {
