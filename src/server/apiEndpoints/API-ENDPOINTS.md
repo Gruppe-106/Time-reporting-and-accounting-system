@@ -173,3 +173,36 @@ CREATE TABLE TIMETYPE(
     PRIMARY KEY(id)
 )
 ```
+
+## Role : /role/get
+### Params
+```
+Required:
+    ids=number | number,number,... | *
+    * will return all projects
+```
+### Structure Of Object Returned
+
+```
+  [
+      {
+        id?: number,
+        name?: string,
+      }
+  ]
+```
+
+### Example
+[http://localhost:8080/api/role/get?ids=*](http://localhost:8080/api/role/get?ids=*)
+#### Returns:
+```json
+[{"id":0,"name":"normal"},{"id":1,"name":"manager"},{"id":2,"name":"project-leader"},{"id":3,"name":"admin"}]
+```
+### Table
+```
+CREATE TABLE ROLES(
+    id INT UNSIGNED 
+    name CHAR(20)
+    PRIMARY KEY(id)
+)
+```

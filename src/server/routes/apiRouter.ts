@@ -5,6 +5,7 @@ import {projectGetRoute} from "../apiEndpoints/dataEndpoints/projectEndpoint";
 import {userGetRoute} from "../apiEndpoints/dataEndpoints/userEndpoint";
 import {taskGetRoute} from "../apiEndpoints/dataEndpoints/taskEndpoint";
 import {timeTypeGetRoute} from "../apiEndpoints/dataEndpoints/timeTypeEndpoint";
+import {roleGetRoute} from "../apiEndpoints/dataEndpoints/roleEndpoint";
 
 /* Implement this shit and ensure CORS
     res.setHeader("Access-Control-Allow-Origin" , "*");
@@ -26,6 +27,7 @@ export class ApiRouter extends BaseRouter {
         this.router.get("/user/get", (req: Request, res: Response) => userGetRoute(req, res, this.user));
         this.router.get("/task/get", (req: Request, res: Response) => taskGetRoute(req, res, this.user));
         this.router.get("/timetype/get", (req: Request, res: Response) => timeTypeGetRoute(req, res, this.user));
+        this.router.get("/role/get", (req: Request, res: Response) => roleGetRoute(req, res, this.user));
     }
 
     private postRoutes() {
