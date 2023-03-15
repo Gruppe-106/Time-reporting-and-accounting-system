@@ -1,18 +1,27 @@
 import {Router} from "express-serve-static-core";
 import {Request, Response} from "express";
 import {BaseRouter} from "../baseRouter";
+import {projectGetRoute} from "../apiEndpoints/dataEndpoints/projectEndpoint";
+import {userGetRoute} from "../apiEndpoints/dataEndpoints/userEndpoint";
+
+/* Implement this shit and ensure CORS
+    res.setHeader("Access-Control-Allow-Origin" , "*");
+    res.setHeader("Access-Control-Allow-Methods", "GET");
+    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Auth-Key");
+ */
 
 export class ApiRouter extends BaseRouter {
+    //Temporary
+    private user = { authKey: "test", id: 1, role: 3};
+
     private getRoutes() {
         this.router.get("/", (req: Request, res: Response): void => {
-
             res.setHeader('Content-Type'                , 'application/json');
-            res.setHeader("Access-Control-Allow-Origin" , "*");
-            res.setHeader("Access-Control-Allow-Methods", "GET");
-            res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Auth-Key");
+            res.status(200).json(JSON.stringify({message: "Api gotten"}));
+        });
 
-            res.status(200).json(JSON.stringify({message: "Api get"}));
-        })
+        this.router.get("/project/get", (req: Request, res: Response) => projectGetRoute(req, res, this.user));
+        this.router.get("/user/get", (req: Request, res: Response) => userGetRoute(req, res, this.user));
     }
 
     private postRoutes() {
