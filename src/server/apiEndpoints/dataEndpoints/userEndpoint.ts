@@ -2,7 +2,7 @@ import EndpointBase, {User} from "../endpointBase";
 import {USERS} from "../../database/fakeData/USERS";
 import {Request, Response} from "express";
 
-interface ReturnType {
+export interface UserReturnType {
     id?: number,
     email?: string,
     first_name?: string,
@@ -12,7 +12,7 @@ interface ReturnType {
 
 export class UserEndpoint extends EndpointBase {
     table = new USERS().data;
-    data: ReturnType[];
+    data: UserReturnType[];
 
     async getData(requestValues: string[], user: User, primaryKey: string, keyEqual?: string[]):Promise<object> {
         return await this.baseGetData(requestValues, user, primaryKey, keyEqual);
