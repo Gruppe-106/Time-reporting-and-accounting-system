@@ -94,7 +94,7 @@ class UserCreation extends Component<any, CostumTypes>{
      * @param event - The input change event object.
      */
     private HandleEmail(event: any): void {
-        let emailValid = event.target.value ? true : false
+        const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(event.target.value); // check if the email is valid
         let submitValid = this.state.firstNameValid && this.state.lastNameValid && this.state.emailValid && this.state.passwordValid && this.state.rolesValid
 
         this.setState({
@@ -136,7 +136,7 @@ class UserCreation extends Component<any, CostumTypes>{
      * Handles changes to the assigned to manager checkbox field.
      * @param manager - The manager object.
      */
-    private HandleManager(manager: any):void {
+    private HandleManager(manager: any): void {
         this.setState({
             assignedToManager: manager[0]
         })
@@ -146,7 +146,7 @@ class UserCreation extends Component<any, CostumTypes>{
      * Handles the form submission.
      */
     private HandleSubmit() {
-        const user = {
+        const userObject = {
             firstName: this.state.firstName,
             lastName: this.state.lastName,
             email: this.state.email,
@@ -188,7 +188,10 @@ class UserCreation extends Component<any, CostumTypes>{
 
                         <Form.Group className="mb-3" controlId="formBasicEmail">
                             <Form.Label>Email address</Form.Label>
-                            <Form.Control type="email" placeholder="Enter email" onChange={this.HandleEmail} />
+                            <Form.Control type="email" placeholder="Enter email" onChange={this.HandleEmail} isInvalid={!this.state.emailValid} />
+                            <Form.Control.Feedback type="invalid">
+                                Please enter a valid email address.
+                            </Form.Control.Feedback>
                         </Form.Group>
 
                         <Form.Group className="mb-3" controlId="formBasicPassword">
@@ -251,7 +254,7 @@ class UserCreation extends Component<any, CostumTypes>{
                         <Button variant="primary" type="button" disabled={this.state.submitDisabled} onClick={this.HandleSubmit} >
                             {
                                 /**
-                                 * todo: Fix the submit logic error TODO: 
+                                 * todo: Fix the submit logic error TODO:
                                  */
                             }
                             Submit
