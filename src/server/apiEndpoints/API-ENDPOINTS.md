@@ -24,9 +24,7 @@ Optional:
 ```
 
 ### Example
-```
-http://localhost:8080/api/project/get?ids=1&var=id,name
-```
+[http://localhost:8080/api/project/get?ids=1&var=id,name](http://localhost:8080/api/project/get?ids=1&var=id,name)
 #### Returns:
 ```json
 [{"id":1,"name":"Project Alpha"}]
@@ -70,9 +68,7 @@ Optional:
 ```
 
 ### Example
-```
-http://localhost:8080/api/user/get?ids=1,5,7&var=group,first_name
-```
+[http://localhost:8080/api/user/get?ids=1,5,7&var=group,first_name](http://localhost:8080/api/user/get?ids=1,5,7&var=group,first_name)
 #### Returns:
 ```json
 [{"group":1,"first_name":"Sam"},{"group":5,"first_name":"Sarah"},{"group":7,"first_name":"Alex"}]
@@ -114,9 +110,7 @@ Optional:
 ```
 
 ### Example
-```
-http://localhost:8080/api/task/get?ids=1,5,7&var=id,name,time_type
-```
+[http://localhost:8080/api/task/get?ids=1,5,7&var=id,name,time_type](http://localhost:8080/api/task/get?ids=1,5,7&var=id,name,time_type)
 #### Returns:
 ```json
 [{"id":1,"name":"Task X"},{"id":5,"name":"Task B"},{"id":7,"name":"Task D"}]
@@ -134,6 +128,7 @@ CREATE TABLE TASK(
 ```
 
 ## Auth : NULL
+This is not available for through api for obvious reasons!
 ### Table
 ```
 CREATE TABLE AUTH(
@@ -143,5 +138,38 @@ CREATE TABLE AUTH(
     user_id INT UNSIGNED 
     password CHAR(32)
     PRIMARY KEY(email, auth_key)
+)
+```
+
+## Time-type : /timetype/get
+### Params
+```
+Required:
+    ids=number | number,number,... | *
+    * will return all projects
+```
+### Structure Of Object Returned
+
+```
+  [
+      {
+        id?: number,
+        name?: string,
+      }
+  ]
+```
+
+### Example
+[http://localhost:8080/api/timetype/get?ids=*](http://localhost:8080/api/timetype/get?ids=*)
+#### Returns:
+```json
+[{"id":0,"name":"billable"},{"id":1,"name":"non-billable"},{"id":2,"name":"sick"},{"id":3,"name":"vacation"}]
+```
+### Table
+```
+CREATE TABLE TIMETYPE(
+    id INT UNSIGNED 
+    name CHAR(20)
+    PRIMARY KEY(id)
 )
 ```
