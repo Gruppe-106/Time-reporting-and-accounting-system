@@ -31,12 +31,12 @@ class UserCreation extends Component<any, CostumTypes>{
     constructor(props: any) {
         super(props);
         this.state = {
-            selectedRoles: [],
             firstName: "",
             lastName: "",
             email: "",
             password: "",
             assignedToManager: { "id": Infinity, "name": "" },
+            selectedRoles: [],
             firstNameValid: false,
             lastNameValid: false,
             emailValid: false,
@@ -51,16 +51,19 @@ class UserCreation extends Component<any, CostumTypes>{
         this.HandleEmail = this.HandleEmail.bind(this);
         this.HandlePassword = this.HandlePassword.bind(this)
         this.HandleRoles = this.HandleRoles.bind(this)
+        this.HandleManager = this.HandleManager.bind(this)
         this.test = this.test.bind(this)
     }
 
 
-    private HandleSubmit() {
-        console.log(this.state.selectedRoles)
-    }
 
     //TODO: find the types or else i commit the no monster day
 
+
+    /**
+   * Handles changes to the first name input field.
+   * @param event - The input change event object.
+   */
     private HandleFirstName(event: any): void {
         let validFirstName = event.target.value ? true : false
         let submitValid = this.state.firstNameValid && this.state.lastNameValid && this.state.emailValid && this.state.passwordValid && this.state.rolesValid
@@ -72,7 +75,10 @@ class UserCreation extends Component<any, CostumTypes>{
         })
     }
 
-
+    /**
+     * Handles changes to the last name input field.
+     * @param event - The input change event object.
+     */
     private HandleLastName(event: any): void {
         let validLastName = event.target.value ? true : false
         let submitValid = this.state.firstNameValid && this.state.lastNameValid && this.state.emailValid && this.state.passwordValid && this.state.rolesValid
@@ -83,6 +89,10 @@ class UserCreation extends Component<any, CostumTypes>{
         })
     }
 
+    /**
+     * Handles changes to the email input field.
+     * @param event - The input change event object.
+     */
     private HandleEmail(event: any): void {
         let emailValid = event.target.value ? true : false
         let submitValid = this.state.firstNameValid && this.state.lastNameValid && this.state.emailValid && this.state.passwordValid && this.state.rolesValid
@@ -94,6 +104,10 @@ class UserCreation extends Component<any, CostumTypes>{
         })
     }
 
+    /**
+     * Handles changes to the password input field.
+     * @param event - The input change event object.
+     */
     private HandlePassword(event: any): void {
         let passwordValid = event.target.value ? true : false
         let submitValid = this.state.firstNameValid && this.state.lastNameValid && this.state.emailValid && this.state.passwordValid && this.state.rolesValid
@@ -105,15 +119,41 @@ class UserCreation extends Component<any, CostumTypes>{
         })
     }
 
-
+    /**
+     * Handles changes to the roles select field.
+     * @param roles - The selected roles array.
+     */
     private HandleRoles(roles: any): void {
         let rolesValid = roles.length > 0 ? true : false
-
 
         this.setState({
             selectedRoles: roles,
             rolesValid: rolesValid,
         })
+    }
+
+    /**
+     * Handles changes to the assigned to manager checkbox field.
+     * @param manager - The manager object.
+     */
+    private HandleManager(manager: any):void {
+        this.setState({
+            assignedToManager: manager[0]
+        })
+    }
+
+    /**
+     * Handles the form submission.
+     */
+    private HandleSubmit() {
+        const user = {
+            firstName: this.state.firstName,
+            lastName: this.state.lastName,
+            email: this.state.email,
+            password: this.state.password,
+            assignedToManager: this.state.assignedToManager,
+        }
+
     }
 
 
@@ -122,6 +162,10 @@ class UserCreation extends Component<any, CostumTypes>{
         let submitValid = this.state.firstNameValid && this.state.lastNameValid && this.state.emailValid && this.state.passwordValid && this.state.rolesValid
         console.log(submitValid)
     }
+
+
+
+
 
 
     render() {
@@ -152,7 +196,7 @@ class UserCreation extends Component<any, CostumTypes>{
                             <Form.Control type="password" placeholder="Password" onChange={this.HandlePassword} />
                         </Form.Group>
 
-                        {/* TODO: create a search bar instead so you can search for the manager*/}
+
                         <Form.Group className="mb-3" controlId="formBasicAssignManager">
                             <Form.Label>Assign Manager</Form.Label>
                             <Typeahead
@@ -165,14 +209,14 @@ class UserCreation extends Component<any, CostumTypes>{
                                     { id: 4, name: "Alexander 👌" }
                                 ]}
                                 placeholder="Choose Manager..."
-                                onChange={this.HandleRoles}
-                                filterBy={(option:any, props:any):boolean => {
-                                    const query:string = props.text.toLowerCase().trim();
-                                    const name:string = option.name.toLowerCase();
-                                    const id:string = option.id.toString();
+                                onChange={this.HandleManager}
+                                filterBy={(option: any, props: any): boolean => {
+                                    const query: string = props.text.toLowerCase().trim();
+                                    const name: string = option.name.toLowerCase();
+                                    const id: string = option.id.toString();
                                     return name.includes(query) || id.includes(query);
                                 }}
-                                renderMenuItemChildren={(option:any, props:any) => (
+                                renderMenuItemChildren={(option: any, props: any) => (
                                     <>
                                         <Highlighter search={props.text}>
                                             {option.name}
@@ -204,8 +248,12 @@ class UserCreation extends Component<any, CostumTypes>{
                         </Form.Group>
 
 
-
-                        <Button variant="primary" type="button" disabled={this.state.submitDisabled} >
+                        <Button variant="primary" type="button" disabled={this.state.submitDisabled} onClick={this.HandleSubmit} >
+                            {
+                                /**
+                                 * todo: Fix the submit logic error TODO: 
+                                 */
+                            }
                             Submit
                         </Button>
                     </Form>
@@ -214,5 +262,7 @@ class UserCreation extends Component<any, CostumTypes>{
         );
     }
 }
+
+
 
 export default UserCreation;

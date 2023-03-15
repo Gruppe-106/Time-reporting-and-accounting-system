@@ -3,50 +3,51 @@
  */
 
 
-import React, {Component} from "react";
+import React, { Component } from "react";
 import ReactDOM from "react-dom/client";
 import BaseNavBar from "../../components/navBar";
-import {Button, Container, Table} from "react-bootstrap";
-import {useParams} from "react-router-dom";
+import { Button, Container, Table } from "react-bootstrap";
+import { useParams } from "react-router-dom";
 
 interface GroupManagerProp {
 }
 
 interface EmployeeData {
-    id:number;
-    firstName:string;
-    lastName:string;
-    email:string;
+    id: number;
+    firstName: string;
+    lastName: string;
+    email: string;
 }
 
 class GroupManager extends Component<GroupManagerProp>{
-    managerId:number;
-    employees:EmployeeData[];
-    state = {empDataLoaded: false}
+    managerId: number;
+    employees: EmployeeData[];
+    state = { empDataLoaded: false }
 
-    constructor(props:GroupManagerProp) {
+    constructor(props: GroupManagerProp) {
         super(props);
         this.managerId = 0;
         this.employees = [];
     }
 
-    async GetDataAsync():Promise<EmployeeData[]> {
+    async GetDataAsync(): Promise<EmployeeData[]> {
         return new Promise<EmployeeData[]>((resolve, reject) => {
-            let empData:EmployeeData[] = [];
+            let empData: EmployeeData[] = [];
             setTimeout(() => {
                 let JSON_REC_FILE =
-                    { "manager_group":
-                            [
-                                {"manager": 0, "id": 1, "firstName": "Mads", "lastName": "Mads", "email": "madshbyriel@gmail.com"},
-                                {"manager": 0, "id": 2, "firstName": "Alexander", "lastName": "Alexander", "email": "madshbyriel@gmail.com"},
-                                {"manager": 0, "id": 3, "firstName": "Christian", "lastName": "Christian", "email": "madshbyriel@gmail.com"},
-                                {"manager": 0, "id": 4, "firstName": "Mads", "lastName": "Mads", "email": "madshbyriel@gmail.com"},
-                                {"manager": 0, "id": 5, "firstName": "Mikkel", "lastName": "Mikkel", "email": "madshbyriel@gmail.com"},
-                                {"manager": 0, "id": 6, "firstName": "Andreas", "lastName": "Andreas", "email": "madshbyriel@gmail.com"},
-                            ],
-                    };
+                {
+                    "manager_group":
+                        [
+                            { "manager": 0, "id": 1, "firstName": "Mads", "lastName": "Mads", "email": "madshbyriel@gmail.com" },
+                            { "manager": 0, "id": 2, "firstName": "Alexander", "lastName": "Alexander", "email": "madshbyriel@gmail.com" },
+                            { "manager": 0, "id": 3, "firstName": "Christian", "lastName": "Christian", "email": "madshbyriel@gmail.com" },
+                            { "manager": 0, "id": 4, "firstName": "Mads", "lastName": "Mads", "email": "madshbyriel@gmail.com" },
+                            { "manager": 0, "id": 5, "firstName": "Mikkel", "lastName": "Mikkel", "email": "madshbyriel@gmail.com" },
+                            { "manager": 0, "id": 6, "firstName": "Andreas", "lastName": "Andreas", "email": "madshbyriel@gmail.com" },
+                        ],
+                };
                 for (let i = 0; i < 6; i++) {
-                    let emp:EmployeeData = {
+                    let emp: EmployeeData = {
                         firstName: JSON_REC_FILE.manager_group[i].firstName,
                         lastName: JSON_REC_FILE.manager_group[i].lastName,
                         id: JSON_REC_FILE.manager_group[i].id,
@@ -54,7 +55,7 @@ class GroupManager extends Component<GroupManagerProp>{
                     };
                     empData.push(emp);
                 }
-                this.setState({empDataLoaded: true})
+                this.setState({ empDataLoaded: true })
                 resolve(empData);
             }, 3000);
         })
@@ -64,39 +65,44 @@ class GroupManager extends Component<GroupManagerProp>{
         this.GetDataAsync().then(data => {
             this.employees = data;
         });
-        const { id } = useParams();
+        const { id } = useParams(); // ! THIS GIVES ERRORS
+        /**
+         * ! Specific error src\pages\timeApproval\groupManager.tsx
+         * ! Line 67:24:  React Hook "useParams" cannot be called in a class component.
+         * ! React Hooks must be called in a React function component or a custom React Hook function  react-hooks/rules-of-hooks
+         */
         this.managerId = Number(id);
         return (
             <>
-                <BaseNavBar/>
+                <BaseNavBar />
                 <Container className={"py-3"}>
                     <h1>Group Manager</h1>
                     {
-                        (this.state.empDataLoaded)? (
+                        (this.state.empDataLoaded) ? (
                             <>
-                            <h4 className={"col-sm-3"}>{this.managerId}</h4>
-                            <Table striped hover bordered>
-                                <thead>
-                                <tr>
-                                    <th className={"col-sm-3"}>First Name</th>
-                                    <th className={"col-sm-3"}>Last Name</th>
-                                    <th className={"col-sm-4"}>Email</th>
-                                    <th className={"col-sm-2"}></th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                { this.employees.map(e => (
-                                    <tr>
-                                        <td className={"col-sm-3"}>{e.firstName}</td>
-                                        <td className={"col-sm-3"}>{e.lastName}</td>
-                                        <td className={"col-sm-4"}>{e.email}</td>
-                                        <td className={"col-sm-2"}><center><Button href={"/#"} className={"col-sm-12"}>Inspect timesheet</Button></center></td>
-                                    </tr>
-                                )) }
-                                </tbody>
-                            </Table>
+                                <h4 className={"col-sm-3"}>{this.managerId}</h4>
+                                <Table striped hover bordered>
+                                    <thead>
+                                        <tr>
+                                            <th className={"col-sm-3"}>First Name</th>
+                                            <th className={"col-sm-3"}>Last Name</th>
+                                            <th className={"col-sm-4"}>Email</th>
+                                            <th className={"col-sm-2"}></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {this.employees.map(e => (
+                                            <tr>
+                                                <td className={"col-sm-3"}>{e.firstName}</td>
+                                                <td className={"col-sm-3"}>{e.lastName}</td>
+                                                <td className={"col-sm-4"}>{e.email}</td>
+                                                <td className={"col-sm-2"}><center><Button href={"/#"} className={"col-sm-12"}>Inspect timesheet</Button></center></td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </Table>
                             </>
-                        ):(
+                        ) : (
                             <h4>Loading...</h4>
                         )
                     }
