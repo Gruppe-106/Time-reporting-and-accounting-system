@@ -21,8 +21,7 @@ class UserTimeRegister extends Component<any>{
                 <Container>
                     <h1>User Time Register</h1>
                 </Container>
-                <TimeTableRegister tableRows={[{projectName:"", taskName:"", totalTime:0},
-                    {projectName:"", taskName:"", totalTime:0}]}/>
+                <TimeTableRegister/>
             </>
         );
     }
