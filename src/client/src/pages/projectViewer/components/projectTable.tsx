@@ -6,9 +6,9 @@ interface ProjectTableProp{
 }
 
 interface ProjectTableRow{
-    projectId:number
+    id:number
     superProject:number
-    projectName:string
+    name:string
     startDate:number
     endDate:number
 }
@@ -22,7 +22,13 @@ class ProjectTable extends Component<ProjectTableProp> {
     private tableRender():JSX.Element[]{
         return this.tableRows.map((row) =>{
 
-            return (<tr><td>{row.projectId}</td><td>{row.superProject}</td><td>{row.projectName}</td><td>{new Date(row.startDate).toLocaleDateString()}</td><td>{new Date(row.endDate).toLocaleDateString()}</td></tr>)
+            return (<tr>
+                <td> <a href={`/projectviewer?id=${row.id}`}>{row.id}</a> </td>
+                <td>{row.superProject}</td>
+                <td>{row.name}</td>
+                <td>{new Date(row.startDate).toLocaleDateString()}</td>
+                <td>{new Date(row.endDate).toLocaleDateString()}</td>
+            </tr>)
         })
     }
 
@@ -46,4 +52,4 @@ class ProjectTable extends Component<ProjectTableProp> {
     }
 }
 
-export default ProjectTable
+export default ProjectTable;
