@@ -11,8 +11,8 @@ export class RoleEndpoint extends EndpointBase {
     table = new ROLES().data;
     data: ReturnType[];
 
-    getData(requestValues: string[], user: User, primaryKey: string, keyEqual?: string[]): object {
-        return this.baseGetData(requestValues, user, primaryKey, keyEqual);
+    async getData(requestValues: string[], user: User, primaryKey: string, keyEqual?: string[]):Promise<object> {
+        return await this.baseGetData(requestValues, user, primaryKey, keyEqual);
     }
 }
 

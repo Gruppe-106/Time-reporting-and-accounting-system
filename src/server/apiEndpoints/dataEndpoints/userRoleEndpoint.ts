@@ -28,7 +28,7 @@ export class UserRoleEndpoint extends EndpointConnectorBase {
         }
     }
 
-    getData(requestValues: string[], user: User, primaryKey: string, keyEqual?: string[]): object {
+    async getData(requestValues: string[], user: User, primaryKey: string, keyEqual?: string[]): Promise<object> {
         this.data = [];
         let dataIndex = 0;
         for (const entry of this.tableConnector) {

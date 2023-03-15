@@ -34,7 +34,7 @@ abstract class EndpointBase {
         }
     }
 
-    public baseGetData(requestValues: string[], user: User, primaryKey: string, keyEqual?: string[]):object {
+    public async baseGetData(requestValues: string[], user: User, primaryKey: string, keyEqual?: string[]):Promise<object> {
         this.data = [];
         let dataIndex = 0;
         for (const entry of this.table) {
@@ -53,7 +53,7 @@ abstract class EndpointBase {
         return this.data;
     }
 
-    abstract getData(requestValues: string[], user: User, primaryKey: string, keyEqual?: string[]):object;
+    abstract getData(requestValues: string[], user: User, primaryKey: string, keyEqual?: string[]):Promise<object>;
 }
 
 export default EndpointBase;
