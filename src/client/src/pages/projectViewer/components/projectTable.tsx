@@ -19,7 +19,7 @@ class ProjectTable extends Component<ProjectTableProp> {
         super(props);
         this.tableRows = props.tableRows;
     }
-    private tableRender():JSX.Element[]{
+    private tableRender():JSX.Element[] {
         return this.tableRows.map((row) =>{
 
             return (<tr>

@@ -17,6 +17,7 @@
     "react-bootstrap": "^2.7.2",
     "react-bootstrap-typeahead": "^6.0.2",
     "react-dom": "^18.2.0",
+    "react-highlight-words": "^0.20.0",
     "react-router-dom": "^6.9.0",
     "react-scripts": "5.0.1",
     "typescript": "^4.9.5",
@@ -46,5 +47,8 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://127.0.0.1:8080"
+  "proxy": "http://127.0.0.1:8080",
+  "devDependencies": {
+    "@types/react-highlight-words": "^0.16.4"
+  }
 }
