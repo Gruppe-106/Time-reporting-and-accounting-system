@@ -7,6 +7,7 @@ import {taskGetRoute} from "../apiEndpoints/dataEndpoints/taskEndpoint";
 import {timeTypeGetRoute} from "../apiEndpoints/dataEndpoints/timeTypeEndpoint";
 import {roleGetRoute} from "../apiEndpoints/dataEndpoints/roleEndpoint";
 import {userRoleGetRoute} from "../apiEndpoints/dataEndpoints/userRoleEndpoint";
+import {managerGroupRoute} from "../apiEndpoints/dataEndpoints/managerGroupEndpoint";
 
 /* Implement this shit and ensure CORS
     res.setHeader("Access-Control-Allow-Origin" , "*");
@@ -30,6 +31,7 @@ export class ApiRouter extends BaseRouter {
         this.router.get("/timetype/get", (req: Request, res: Response) => timeTypeGetRoute(req, res, this.user));
         this.router.get("/role/get", (req: Request, res: Response) => roleGetRoute(req, res, this.user));
         this.router.get("/role/user/get", (req: Request, res: Response) => userRoleGetRoute(req, res, this.user));
+        this.router.get("/group/manager/get", (req: Request, res: Response) => managerGroupRoute(req, res, this.user));
     }
 
     private postRoutes() {

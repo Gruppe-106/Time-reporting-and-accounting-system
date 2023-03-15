@@ -244,3 +244,10 @@ CREATE TABLE AUTH(
     PRIMARY KEY(email, auth_key)
 )
 ```
+
+# Todo
+1. Projects manager connector
+2. Task project connector
+3. User task time register
+4. Group
+5. Get name of timetype in tasks
