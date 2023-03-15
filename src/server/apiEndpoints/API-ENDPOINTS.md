@@ -1,4 +1,4 @@
-# Api Endpoints
+# Api Data Endpoints
 ## Projects : /project/get
 ### Params
 ```
@@ -127,20 +127,6 @@ CREATE TABLE TASK(
 )
 ```
 
-## Auth : NULL
-This is not available for through api for obvious reasons!
-### Table
-```
-CREATE TABLE AUTH(
-    email CHAR(50)
-    auth_key CHAR(50)
-    auth_key_end_date datetime
-    user_id INT UNSIGNED 
-    password CHAR(32)
-    PRIMARY KEY(email, auth_key)
-)
-```
-
 ## Time-type : /timetype/get
 ### Params
 ```
@@ -204,5 +190,57 @@ CREATE TABLE ROLES(
     id INT UNSIGNED 
     name CHAR(20)
     PRIMARY KEY(id)
+)
+```
+# Api Connector Endpoints
+## User role : /role/user/get
+### Params
+```
+Required:
+    user_ids=number | number,number,... | *
+    * will return all projects
+Optional:
+    val=role_id,role_name,user_id
+    Can be any and/or all
+```
+### Structure Of Object Returned
+
+```
+  [
+      {
+        user_id?: number,
+        role_id?: number,
+        role_name?: string
+      }
+  ]
+```
+
+### Example
+[http://localhost:8080/api/role/user/get?user_ids=1,2&var=role_name,role_id](http://localhost:8080/api/role/user/get?user_ids=1,2&var=role_name,role_id)
+#### Returns:
+```json
+[{"role_name":"project-leader","role_id":2},{"role_name":"project-leader","role_id":2}]
+```
+### Table
+```
+CREATE TABLE USER_ROLES_CONNECTOR(
+    role INT UNSIGNED 
+    user INT UNSIGNED 
+    PRIMARY KEY(id, user)
+)
+```
+
+# Non callable tables
+## Auth : NULL
+This is not available for through api for obvious reasons!
+### Table
+```
+CREATE TABLE AUTH(
+    email CHAR(50)
+    auth_key CHAR(50)
+    auth_key_end_date datetime
+    user_id INT UNSIGNED 
+    password CHAR(32)
+    PRIMARY KEY(email, auth_key)
 )
 ```

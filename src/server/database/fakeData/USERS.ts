@@ -12,63 +12,63 @@ export class USERS {
             "email": "joe@example.com",
             "first_name": "Joe",
             "last_name": "Smith",
-            "group": 2
+            "group": 1
         },
         {
             "id": 3,
             "email": "jane@example.com",
             "first_name": "Jane",
             "last_name": "Doe",
-            "group": 3
+            "group": 1
         },
         {
             "id": 4,
             "email": "tom@example.com",
             "first_name": "Tom",
             "last_name": "Jones",
-            "group": 4
+            "group": 2
         },
         {
             "id": 5,
             "email": "sarah@example.com",
             "first_name": "Sarah",
             "last_name": "Doe",
-            "group": 5
+            "group": 2
         },
         {
             "id": 6,
             "email": "matt@example.com",
             "first_name": "Matt",
             "last_name": "Brown",
-            "group": 6
+            "group": 2
         },
         {
             "id": 7,
             "email": "alex@example.com",
             "first_name": "Alex",
             "last_name": "Johnson",
-            "group": 7
+            "group": 3
         },
         {
             "id": 8,
             "email": "jill@example.com",
             "first_name": "Jill",
             "last_name": "Jones",
-            "group": 8
+            "group": 3
         },
         {
             "id": 9,
             "email": "john@example.com",
             "first_name": "John",
             "last_name": "Adams",
-            "group": 9
+            "group": 3
         },
         {
             "id": 10,
             "email": "dave@example.com",
             "first_name": "Dave",
             "last_name": "Brown",
-            "group": 10
+            "group": 4
         }
     ]
 }
