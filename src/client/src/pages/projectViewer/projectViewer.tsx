@@ -1,16 +1,19 @@
 /*
     Show single project
+
+    TO DO:
+    DEPENDING ON ID FROM OPTIONAL PARAMETER, SHOW DIFFERENT PAGE
  */
 
 import React, {Component} from "react";
 import BaseNavBar from "../../components/navBar";
-import {Container} from "react-bootstrap";
+import {Container, Table} from "react-bootstrap";
 import {Button} from "react-bootstrap";
-import Col from 'react-bootstrap/Col';
-import Nav from 'react-bootstrap/Nav';
-import Row from 'react-bootstrap/Row';
-import Tab from 'react-bootstrap/Tab';
-import {Table} from "react-bootstrap";
+import ProjectInformation from "./components/projectInformation";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+import Nav from "react-bootstrap/Nav";
+import Tab from "react-bootstrap/Tab";
 
 
 class ProjectViewer extends Component<any>{
@@ -25,8 +28,12 @@ class ProjectViewer extends Component<any>{
                 <Container>
                     <h1>Project Viewer</h1>
                     <Button href="/project/menu" variant="outline-secondary">Back</Button>{''}
-                    <Tab.Container id="left-tabs-example" defaultActiveKey="first">
-                       <h2>(Insert project name here)</h2>
+                </Container>
+                <Container>
+                    {
+                        <Tab.Container id="left-tabs-example" defaultActiveKey="first">
+                <h2>Test</h2>
+
       <Row>
         <Col sm={2}>
           <Nav variant="pills" className="flex-column">
@@ -71,7 +78,9 @@ class ProjectViewer extends Component<any>{
           </Tab.Content>
         </Col>
       </Row>
-    </Tab.Container>
+                </Tab.Container>
+                    //insert page here
+                    }
                 </Container>
 
             </>
