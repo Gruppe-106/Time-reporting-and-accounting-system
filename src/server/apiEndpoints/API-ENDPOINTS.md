@@ -132,3 +132,16 @@ CREATE TABLE TASK(
     PRIMARY KEY(id)
 )
 ```
+
+## Auth : NULL
+### Table
+```
+CREATE TABLE AUTH(
+    email CHAR(50)
+    auth_key CHAR(50)
+    auth_key_end_date datetime
+    user_id INT UNSIGNED 
+    password CHAR(32)
+    PRIMARY KEY(email, auth_key)
+)
+```
