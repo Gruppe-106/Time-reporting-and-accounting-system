@@ -1,4 +1,4 @@
-import EndpointBase, {User} from "../endpointBase";
+import {User} from "../endpointBase";
 import {USERS} from "../../database/fakeData/USERS";
 import {Request, Response} from "express";
 import {USER_ROLES_CONNECTOR} from "../../database/fakeData/USER_ROLES_CONNECTOR";
