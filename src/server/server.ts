@@ -1,13 +1,13 @@
 import {Express} from "express";
-import {BaseRouter} from "./baseRouter";
+import {MainRouter} from "./mainRouter";
 
 export class Server {
     private app: Express;
-    private router: BaseRouter
+    private router: MainRouter
 
     constructor(app: Express) {
         this.app = app;
-        this.router = new BaseRouter();
+        this.router = new MainRouter();
 
         app.use('/', this.router.routes());
     }
