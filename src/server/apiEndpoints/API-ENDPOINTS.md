@@ -88,3 +88,47 @@ CREATE TABLE USERS(
     PRIMARY KEY(id, email)
 )
 ```
+
+## Tasks : /task/get
+### Params
+```
+Required:
+    ids=number | number,number,... | *
+    * will return all projects
+Optional:
+    val=id,name,start_date,end_date,time_type
+    Can be any and/or all
+```
+### Structure Of Object Returned
+
+```
+  [
+      {
+        id?: number,
+        name?: string,
+        start_date?: string,
+        end_date?: string,
+        time_type?: number
+      }
+  ]
+```
+
+### Example
+```
+http://localhost:8080/api/task/get?ids=1,5,7&var=id,name,time_type
+```
+#### Returns:
+```json
+[{"id":1,"name":"Task X"},{"id":5,"name":"Task B"},{"id":7,"name":"Task D"}]
+```
+### Table
+```
+CREATE TABLE TASK(
+    id INT UNSIGNED 
+    name CHAR(50)
+    start_date datetime
+    end_date datetime
+    time_type INT UNSIGNED 
+    PRIMARY KEY(id)
+)
+```

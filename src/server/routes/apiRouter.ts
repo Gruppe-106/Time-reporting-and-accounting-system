@@ -3,6 +3,7 @@ import {Request, Response} from "express";
 import {BaseRouter} from "../baseRouter";
 import {projectGetRoute} from "../apiEndpoints/dataEndpoints/projectEndpoint";
 import {userGetRoute} from "../apiEndpoints/dataEndpoints/userEndpoint";
+import {taskGetRoute} from "../apiEndpoints/dataEndpoints/taskEndpoint";
 
 /* Implement this shit and ensure CORS
     res.setHeader("Access-Control-Allow-Origin" , "*");
@@ -22,6 +23,7 @@ export class ApiRouter extends BaseRouter {
 
         this.router.get("/project/get", (req: Request, res: Response) => projectGetRoute(req, res, this.user));
         this.router.get("/user/get", (req: Request, res: Response) => userGetRoute(req, res, this.user));
+        this.router.get("/task/get", (req: Request, res: Response) => taskGetRoute(req, res, this.user));
     }
 
     private postRoutes() {
