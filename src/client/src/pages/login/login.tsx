@@ -3,7 +3,6 @@
  */
 
 import React, {Component} from "react";
-import ReactDOM from "react-dom/client";
 import BaseNavBar from "../../components/navBar";
 import {Alert, Button, Container, Form} from "react-bootstrap";
 
@@ -46,8 +45,8 @@ function BasicLoginForm() {
             <Form.Group className="mb-3" controlId="formBasicCheckbox">
                 <Form.Check type="checkbox" label="Save me?!" />
             </Form.Group>
-            <Button variant="primary" type="submit">
-                Submit
+            <Button variant="success" type="submit">
+                Log in!
             </Button>
         </Form>
     );

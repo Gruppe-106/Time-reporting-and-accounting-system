@@ -1,17 +1,13 @@
 // @ts-ignore
 import express, {Request, Response} from "express";
+import {Router} from "express-serve-static-core";
 
-export class BaseRouter {
-    private router;
+export abstract class BaseRouter {
+    protected router: Router;
+
     constructor() {
         this.router = express.Router();
     }
 
-    public routes() {
-        this.router.get("/", (req: Request, res: Response): void => {
-            res.send("Timesheet");
-        })
-
-        return this.router;
-    }
+    abstract routes():Router;
 }

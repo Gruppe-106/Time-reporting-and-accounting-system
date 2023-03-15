@@ -6,7 +6,8 @@
   "scripts": {
     "start": "npx ts-node app.ts",
     "build": "npx tsc",
-    "test": "jest"
+    "test": "jest",
+    "update-node": "npm install && cd client && npm install"
   },
   "repository": {
     "type": "git",
