@@ -25,7 +25,7 @@ class BaseApiHandler {
      * @param headers Record<string, string>?: Headers for request in key-value pairs
      * @param contentType String?: content type sent to the server
      */
-    public get(urlPath:string, callback?:(value:JSON)=>void, baseUrl?:string, headers?:Record<string, string>, contentType?:string):boolean {
+    public get(urlPath:string, callback?:(value:Object)=>void, baseUrl?:string, headers?:Record<string, string>, contentType?:string):boolean {
         //Check if required authKey is present
         if (this.authKey === "") { return false; }
         this.requester(urlPath, baseUrl, "GET", null, headers, contentType).then(callback);
@@ -41,7 +41,7 @@ class BaseApiHandler {
      * @param headers Record<string, string>?: Headers for request in key-value pairs
      * @param contentType String?: content type sent to the server
      */
-    public post(urlPath:string, callback?:(value:JSON)=>void, baseUrl?:string, message?:object | string, headers?:Record<string, string>, contentType?:string):boolean {
+    public post(urlPath:string, callback?:(value:Object)=>void, baseUrl?:string, message?:object | string, headers?:Record<string, string>, contentType?:string):boolean {
         //Check if required authKey is present
         if (this.authKey === "") { return false; }
         this.requester(urlPath, baseUrl, "POST", message, headers, contentType).then(callback);
@@ -58,7 +58,7 @@ class BaseApiHandler {
      * @param contentType String: content type sent to the server
      * @private
      */
-    private async requester(urlPath:string, baseUrl:string = this.baseUrl, method:string = "GET", message:null | object | string = "", headers:Record<string, string> = {}, contentType:string = "text/plain"):Promise<JSON>{
+    private async requester(urlPath:string, baseUrl:string = this.baseUrl, method:string = "GET", message:null | object | string = "", headers:Record<string, string> = {}, contentType:string = "text/plain"):Promise<Object>{
         let url:string = baseUrl + urlPath;
         //Setup standard headers
         headers["Content-type"] = contentType;
@@ -75,7 +75,8 @@ class BaseApiHandler {
             .then((response) => { return response.json(); })
             //Check the created json
             .then((value) => {
-            if (value) { return value; }
+                //console.log(value)
+            if (value) { return JSON.parse(JSON.stringify(value)); }
             //Throw an error if the response could not be converted to json
             else { throw new Error("Value is void"); }
         })
