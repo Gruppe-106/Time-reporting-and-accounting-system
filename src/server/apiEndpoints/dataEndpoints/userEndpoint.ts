@@ -5,8 +5,8 @@ import {Request, Response} from "express";
 export interface UserReturnType {
     id?: number,
     email?: string,
-    first_name?: string,
-    last_name?: string,
+    firstName?: string,
+    lastName?: string,
     group?: number
 }
 

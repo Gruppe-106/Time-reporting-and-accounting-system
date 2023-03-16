@@ -5,9 +5,9 @@ import {TASKS} from "../../database/fakeData/TASKS";
 interface ReturnType {
     id?: number,
     name?: string,
-    start_date?: string,
-    end_date?: string,
-    time_type?: number
+    startDate?: string,
+    endDate?: string,
+    timeType?: number
 }
 
 export class TaskEndpoint extends EndpointBase {

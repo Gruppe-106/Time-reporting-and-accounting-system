@@ -306,6 +306,22 @@ CREATE TABLE AUTH(
 1. Projects manager connector
 2. Task project connector
 3. User task time register
+I get user id
+return 
+```
+[
+    {
+        task_id?: number,
+        task_name?: string,
+        project_name?: string,
+        date?: number,
+        user_id?: number,
+        time?: int
+        approved?: bool
+        manager_logged?: bool
+    }
+]
+```
 4. Group
 5. Get name of timetype in tasks
 6. Time as a number not string
