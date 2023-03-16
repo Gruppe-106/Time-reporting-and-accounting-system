@@ -1,11 +1,10 @@
-import {User} from "../endpointBase";
+import EndpointBase, {User} from "../endpointBase";
 import {USERS} from "../../database/fakeData/USERS";
 import {Request, Response} from "express";
-import EndpointConnectorBase from "../endpointConnectorBase";
 import {GROUP} from "../../database/fakeData/GROUP";
 import {UserEndpoint, UserReturnType} from "./userEndpoint";
 
-interface ReturnType {
+interface ManagerGroupReturnType {
     manager?: number,
     firstName?: string,
     lastName?: string,
@@ -18,17 +17,19 @@ interface ReturnType {
     }[];
 }
 
-export class ManagerGroupEndpoint extends EndpointConnectorBase {
+/*
     table = USERS.data;
-    tableSecond = null;
     tableConnector = GROUP.data;
-    data: ReturnType[];
+ */
+export class ManagerGroupEndpoint extends EndpointBase {
+    table = GROUP.data;
+    data: ManagerGroupReturnType[];
 
     async getData(requestValues: string[], user: User, primaryKey: string, keyEqual?: string[]): Promise<object[]> {
         let userEndpoint = new UserEndpoint(user);
         this.data = [];
         let dataIndex = 0;
-        for (const entry of this.tableConnector) {
+        for (const entry of this.table) {
             if (keyEqual.indexOf(entry[primaryKey].toString()) !== -1 || keyEqual.indexOf("*") !== -1) {
                 this.data[dataIndex] = {};
                 if (requestValues.indexOf("*") !== -1) {

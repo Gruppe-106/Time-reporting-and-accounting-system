@@ -15,10 +15,10 @@ Optional:
   [
       {
         id?: number,
-        super_project?: number,
+        superProject?: number,
         name?: string,
-        start_date?: string,
-        end_date?: string
+        startDate?: string,
+        endDate?: string
       }
   ]
 ```
@@ -34,11 +34,11 @@ Optional:
 ```
 CREATE TABLE PROJECTS (
     id INT UNSIGNED 
-    super_project INT UNSIGNED 
+    superProject INT UNSIGNED 
     name CHAR(50)
-    start_date datetime
-    end_date datetime
-    PRIMARY KEY(id, super_project)
+    startDate datetime
+    endDate datetime
+    PRIMARY KEY(id, superProject)
 )
 ```
 
@@ -50,7 +50,7 @@ Required:
     emails=string | string,string,... | *
     * will return all projects
 Optional:
-    val=id,email,first_name,last_name,group
+    val=id,email,firstName,lastName,group
     Can be any and/or all
 ```
 ### Structure Of Object Returned
@@ -60,26 +60,26 @@ Optional:
       {
         id?: number,
         email?: string,
-        first_name?: string,
-        last_name?: string,
+        firstName?: string,
+        lastName?: string,
         group?: number
       }
   ]
 ```
 
 ### Example
-[http://localhost:8080/api/user/get?ids=1,5,7&var=group,first_name](http://localhost:8080/api/user/get?ids=1,5,7&var=group,first_name)
+[http://localhost:8080/api/user/get?ids=1,5,7&var=group,firstName](http://localhost:8080/api/user/get?ids=1,5,7&var=group,firstName)
 #### Returns:
 ```json
-[{"group":1,"first_name":"Sam"},{"group":5,"first_name":"Sarah"},{"group":7,"first_name":"Alex"}]
+[{"group":1,"firstName":"Sam"},{"group":5,"firstName":"Sarah"},{"group":7,"firstName":"Alex"}]
 ```
 ### Table
 ```
 CREATE TABLE USERS(
     id INT UNSIGNED 
     email CHAR(50)
-    first_name CHAR(20)
-    last_name CHAR(20)
+    firstName CHAR(20)
+    lastName CHAR(20)
     group INT UNSIGNED 
     PRIMARY KEY(id, email)
 )
@@ -92,7 +92,7 @@ Required:
     ids=number | number,number,... | *
     * will return all projects
 Optional:
-    val=id,name,start_date,end_date,time_type
+    val=id,name,startDate,endDate,timeType
     Can be any and/or all
 ```
 ### Structure Of Object Returned
@@ -102,15 +102,15 @@ Optional:
       {
         id?: number,
         name?: string,
-        start_date?: string,
-        end_date?: string,
-        time_type?: number
+        startDate?: string,
+        endDate?: string,
+        timeType?: number
       }
   ]
 ```
 
 ### Example
-[http://localhost:8080/api/task/get?ids=1,5,7&var=id,name,time_type](http://localhost:8080/api/task/get?ids=1,5,7&var=id,name,time_type)
+[http://localhost:8080/api/task/get?ids=1,5,7&var=id,name,timeType](http://localhost:8080/api/task/get?ids=1,5,7&var=id,name,timeType)
 #### Returns:
 ```json
 [{"id":1,"name":"Task X"},{"id":5,"name":"Task B"},{"id":7,"name":"Task D"}]
@@ -120,9 +120,9 @@ Optional:
 CREATE TABLE TASK(
     id INT UNSIGNED 
     name CHAR(50)
-    start_date datetime
-    end_date datetime
-    time_type INT UNSIGNED 
+    startDate datetime
+    endDate datetime
+    timeType INT UNSIGNED 
     PRIMARY KEY(id)
 )
 ```
@@ -202,7 +202,7 @@ Required:
     role=number | number,number,... | *
     * will return all projects
 Optional:
-    val=role_id,role_name,user_id,first_name,last_name
+    val=roleId,roleName,userId,firstName,lastName
     Can be any and/or all
 ```
 ### Structure Of Object Returned
@@ -210,20 +210,20 @@ Optional:
 ```
   [
       {
-        user_id?: number,
-        first_name?: string,
-        last_name?: string,
-        role_id?: number,
-        role_name?: string
+        userId?: number,
+        firstName?: string,
+        lastName?: string,
+        roleId?: number,
+        roleName?: string
       }
   ]
 ```
 
 ### Example
-[http://localhost:8080/api/role/user/get?user_ids=1,2&var=role_name,role_id](http://localhost:8080/api/role/user/get?user_ids=1,2&var=role_name,role_id)
+[http://localhost:8080/api/role/user/get?user=1,2&var=roleName,roleId](http://localhost:8080/api/role/user/get?user=1,2&var=roleName,roleId)
 #### Returns:
 ```json
-[{"role_name":"project-leader","role_id":2},{"role_name":"project-leader","role_id":2}]
+[{"roleName":"project-leader","roleId":2},{"roleName":"project-leader","roleId":2}]
 ```
 ### Table
 ```
@@ -243,7 +243,7 @@ Required:
     group=number | number,number,... | *
     * will return all projects
 Optional:
-    val=manager,group,first_name,last_name,employees
+    val=manager,group,firstName,lastName,employees
     Can be any and/or all
 ```
 ### Structure Of Object Returned
@@ -252,13 +252,13 @@ Optional:
   [
     {
         manager?: number,
-        first_name?: string,
-        last_name?: string,
+        firstName?: string,
+        lastName?: string,
         group?: number,
         employees?: {
             id?: number,
-            first_name?: string,
-            last_name?: string,
+            firstName?: string,
+            lastName?: string,
             email?: string
         }[];
     }
@@ -271,9 +271,9 @@ Optional:
 ```json
 [
   {"manager":7,"group":1,"employees":[
-      {"id":1,"first_name":"Sam","last_name":"Smith","email":"Smith"},
-      {"id":2,"first_name":"Joe","last_name":"Smith","email":"Smith"},
-      {"id":3,"first_name":"Jane","last_name":"Doe","email":"Doe"}
+      {"id":1,"firstName":"Sam","lastName":"Smith","email":"Smith"},
+      {"id":2,"firstName":"Joe","lastName":"Smith","email":"Smith"},
+      {"id":3,"firstName":"Jane","lastName":"Doe","email":"Doe"}
     ]
   }
 ]
@@ -382,9 +382,9 @@ This is not available for through api for obvious reasons!
 ```
 CREATE TABLE AUTH(
     email CHAR(50)
-    auth_key CHAR(50)
-    auth_key_end_date datetime
-    user_id INT UNSIGNED 
+    authKey CHAR(50)
+    authKeyEndDate datetime
+    userId INT UNSIGNED 
     password CHAR(32)
     PRIMARY KEY(email, auth_key)
 )
@@ -392,8 +392,5 @@ CREATE TABLE AUTH(
 
 # Todo
 1. Projects manager connector
-2. Task project connector WIP
-3. User task time register WIP
-4. Group
-5. Get name of timetype in tasks
-6. Time as a number not string
+2. Get name of timetype in tasks
+3. Time as a number not string

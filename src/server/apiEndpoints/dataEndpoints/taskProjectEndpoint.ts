@@ -1,9 +1,5 @@
 import EndpointBase, {User} from "../endpointBase";
 import {Request, Response} from "express";
-import EndpointConnectorBase from "../endpointConnectorBase";
-import {USER_TASK_TIME_REGISTER} from "../../database/fakeData/USER_TASK_TIME_REGISTER";
-import {TASKS} from "../../database/fakeData/TASKS";
-import {PROJECTS} from "../../database/fakeData/PROJECTS";
 import {TASK_PROJECTS_CONNECTOR} from "../../database/fakeData/TASK_PROJECTS_CONNECTOR";
 import {ProjectEndpoint, ProjectReturnType} from "./projectEndpoint";
 import {TaskEndpoint, TaskReturnType} from "./taskEndpoint";

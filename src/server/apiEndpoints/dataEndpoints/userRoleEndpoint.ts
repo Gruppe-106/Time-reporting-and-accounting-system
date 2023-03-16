@@ -1,11 +1,10 @@
-import {User} from "../endpointBase";
-import {USERS} from "../../database/fakeData/USERS";
+import EndpointBase, {User} from "../endpointBase";
 import {Request, Response} from "express";
 import {USER_ROLES_CONNECTOR} from "../../database/fakeData/USER_ROLES_CONNECTOR";
-import EndpointConnectorBase from "../endpointConnectorBase";
-import {ROLES} from "../../database/fakeData/ROLES";
+import {UserEndpoint, UserReturnType} from "./userEndpoint";
+import {RoleEndpoint, RoleReturnType} from "./roleEndpoint";
 
-interface ReturnType {
+export interface UserRoleReturnType {
     userId?: number,
     firstName?: string,
     lastName?: string,
@@ -13,44 +12,42 @@ interface ReturnType {
     roleName?: string
 }
 
-export class UserRoleEndpoint extends EndpointConnectorBase {
-    table = USERS.data;
-    tableSecond = ROLES.data;
-    tableConnector = USER_ROLES_CONNECTOR.data;
-    data: ReturnType[];
-
-    private getRoleName(entry:{role: number, user: number}, dataIndex:number) {
-        let name:{id: number, name: string}[] = this.tableSecond.filter((value) => {
-            if (value.id === entry.role) {
-                return value;
-            }
-        })
-        if (name.length !== 0) {
-            this.data[dataIndex].roleName = name[0].name;
-        }
-    }
+export class UserRoleEndpoint extends EndpointBase {
+    table = USER_ROLES_CONNECTOR.data;
+    data: UserRoleReturnType[];
 
     async getData(requestValues: string[], user: User, primaryKey: string, keyEqual?: string[]): Promise<object[]> {
         this.data = [];
         let dataIndex = 0;
-        for (const entry of this.tableConnector) {
+        for (const entry of this.table) {
             if (this.table.length >= entry.user) {
                 if (keyEqual.indexOf(entry[primaryKey].toString()) !== -1 || keyEqual.indexOf("*") !== -1) {
                     this.data[dataIndex] = {};
                     if (requestValues.indexOf("*") !== -1) {
-                        this.getRoleName(entry, dataIndex);
-                        this.data[dataIndex].roleId = entry.role;
-                        this.data[dataIndex].userId = entry.user;
-                        this.data[dataIndex].firstName = this.table[entry.user - 1].firstName;
-                        this.data[dataIndex].lastName = this.table[entry.user - 1].lastName;
+                        this.data[dataIndex].userId    = entry.user;
+                        let task: UserReturnType[]     = await new UserEndpoint(user).processRequest(["firstName", "lastName"], "id", [(entry.user - 1).toString()]);
+                        this.data[dataIndex].firstName = task[0].firstName;
+                        this.data[dataIndex].lastName  = task[0].lastName;
+                        this.data[dataIndex].roleId    = entry.role;
+                        let role: RoleReturnType[]     = await new RoleEndpoint(user).processRequest(["name"], "id", [entry.role.toString()]);
+                        this.data[dataIndex].roleName  = role[0].name;
                     } else {
-                        console.log(requestValues)
+                        let userData: UserReturnType[];
+                        let userValues: string[] = [];
+                        if (requestValues.indexOf("firstName") !== -1) userValues.push("firstName");
+                        if (requestValues.indexOf("lastName") !== -1)   userValues.push("lastName");
+                        if (userValues.length > 0) {
+                            userData = await new UserEndpoint(user).processRequest(userValues, "id", [(entry.user - 1).toString()]);
+                        }
                         for (const request of requestValues) {
-                            if (request === "roleId") this.data[dataIndex].roleId = entry.role;
-                            else if (request === "userId") this.data[dataIndex].userId = entry.user;
-                            else if (request === "roleName") this.getRoleName(entry, dataIndex);
-                            else if (request === "firstName") this.data[dataIndex].firstName = this.table[entry.user - 1].firstName;
-                            else if (request === "lastName") this.data[dataIndex].lastName = this.table[entry.user - 1].lastName;
+                            if (request === "userId")         this.data[dataIndex].userId = entry.user;
+                            else if (request === "firstName") this.data[dataIndex].firstName = userData[0].firstName;
+                            else if (request === "lastName")  this.data[dataIndex].lastName  = userData[0].lastName;
+                            else if (request === "roleId")    this.data[dataIndex].roleId = entry.role;
+                            else if (request === "roleName")  {
+                                let role: RoleReturnType[]     = await new RoleEndpoint(user).processRequest(["name"], "id", [entry.role.toString()]);
+                                this.data[dataIndex].roleName  = role[0].name;
+                            }
                         }
                     }
                     dataIndex++;

@@ -2,14 +2,14 @@ import EndpointBase, {User} from "../endpointBase";
 import {Request, Response} from "express";
 import {ROLES} from "../../database/fakeData/ROLES";
 
-interface ReturnType {
+export interface RoleReturnType {
     id?: number,
     name?: string,
 }
 
 export class RoleEndpoint extends EndpointBase {
     table = ROLES.data;
-    data: ReturnType[];
+    data: RoleReturnType[];
 
     async getData(requestValues: string[], user: User, primaryKey: string, keyEqual?: string[]):Promise<object[]> {
         return await this.baseGetData(requestValues, user, primaryKey, keyEqual);
