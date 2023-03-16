@@ -1,5 +1,5 @@
 import {ParsedQs} from "qs";
-import {Response} from "express";
+import {Request, Response} from "express";
 
 export interface User {
     authKey: string;
@@ -42,7 +42,7 @@ abstract class EndpointBase {
         }
     }
 
-    public async baseGetData(requestValues: string[], primaryKey: string, keyEqual?: string[], data?:string[]):Promise<object[]> {
+    public async getData(requestValues: string[], primaryKey: string, keyEqual?: string[], data?:string[]):Promise<object[]> {
         this.data = [];
         let dataIndex = 0;
         for (const entry of this.table) {
@@ -61,14 +61,14 @@ abstract class EndpointBase {
         return this.data;
     }
 
-    abstract getData(requestValues: string[], primaryKey: string, keyEqual?: string[], data?:string[]):Promise<object[]>;
-
-    protected urlParamsConversion(params:string | string[] | ParsedQs | ParsedQs[], allowAll:boolean = true):string[] {
+    protected urlParamsConversion(params:string | string[] | ParsedQs | ParsedQs[], allowAll:boolean = true, throwOnMissing:boolean = false, res?:Response):string[] {
         let paramsList:string[];
         if (typeof params === "string" ) {
             paramsList = params.split(",");
         } else if (allowAll) {
             paramsList = ["*"];
+        } else if (throwOnMissing) {
+            this.badRequest(res);
         }
         return paramsList;
     }
@@ -77,6 +77,18 @@ abstract class EndpointBase {
         res.sendStatus(400)
         res.end();
     }
+
+    public getRoute(req:Request, res:Response, primaryKey:string = "id", requestKeysName:string = "ids") {
+        let requestKeys: string[] = this.urlParamsConversion(req.query[requestKeysName], false, true, res);
+        if (requestKeys === undefined) { return; }
+
+        let requestedValues:string[] = this.urlParamsConversion(req.query.var);
+
+        this.processRequest(requestedValues, primaryKey, requestKeys).then((data) => {
+            res.setHeader('Content-Type', 'application/json');
+            res.status(200).json(data);
+        })
+    };
 }
 
 export default EndpointBase;

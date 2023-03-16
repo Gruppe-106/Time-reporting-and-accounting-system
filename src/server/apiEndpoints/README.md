@@ -6,7 +6,7 @@ Required:
     ids=number | number,number,... | *
     * will return all projects
 Optional:
-    val=id,super_project,name,start_date,end_date
+    var=id,superProject,name,startDate,endDate
     Can be any and/or all
 ```
 ### Structure Of Object Returned
@@ -17,17 +17,17 @@ Optional:
         id?: number,
         superProject?: number,
         name?: string,
-        startDate?: string,
-        endDate?: string
+        startDate?: number,
+        endDate?: number
       }
   ]
 ```
 
 ### Example
-[http://localhost:8080/api/project/get?ids=1&var=id,name](http://localhost:8080/api/project/get?ids=1&var=id,name)
+[http://localhost:8080/api/project/get?ids=1&var=id,name,startDate](http://localhost:8080/api/project/get?ids=1&var=id,name,startDate)
 #### Returns:
 ```json
-[{"id":1,"name":"Project Alpha"}]
+[{"id":1,"name":"Project Alpha","startDate":1679270400}]
 ```
 
 ### Table
@@ -47,10 +47,11 @@ CREATE TABLE PROJECTS (
 ```
 Required:
     ids=number | number,number,... | *
+    or
     emails=string | string,string,... | *
     * will return all projects
 Optional:
-    val=id,email,firstName,lastName,group
+    var=id,email,firstName,lastName,group
     Can be any and/or all
 ```
 ### Structure Of Object Returned
@@ -92,7 +93,7 @@ Required:
     ids=number | number,number,... | *
     * will return all projects
 Optional:
-    val=id,name,startDate,endDate,timeType
+    var=id,name,startDate,endDate,timeType
     Can be any and/or all
 ```
 ### Structure Of Object Returned
@@ -102,8 +103,8 @@ Optional:
       {
         id?: number,
         name?: string,
-        startDate?: string,
-        endDate?: string,
+        startDate?: number,
+        endDate?: number,
         timeType?: number
       }
   ]
@@ -133,6 +134,9 @@ CREATE TABLE TASK(
 Required:
     ids=number | number,number,... | *
     * will return all projects
+Optional:
+    var=id,name
+    Can be any and/or all
 ```
 ### Structure Of Object Returned
 
@@ -166,6 +170,9 @@ CREATE TABLE TIMETYPE(
 Required:
     ids=number | number,number,... | *
     * will return all projects
+Optional:
+    var=id,name
+    Can be any and/or all
 ```
 ### Structure Of Object Returned
 
@@ -202,7 +209,7 @@ Required:
     role=number | number,number,... | *
     * will return all projects
 Optional:
-    val=roleId,roleName,userId,firstName,lastName
+    var=roleId,roleName,userId,firstName,lastName
     Can be any and/or all
 ```
 ### Structure Of Object Returned
@@ -243,7 +250,7 @@ Required:
     group=number | number,number,... | *
     * will return all projects
 Optional:
-    val=manager,group,firstName,lastName,employees
+    var=manager,group,firstName,lastName,employees
     Can be any and/or all
 ```
 ### Structure Of Object Returned
@@ -341,8 +348,9 @@ CREATE TABLE TASK_PROJECTS_CONNECTOR(
 ### Params
 ```
 Required:
-    project =number | number,number,... 
-    task    =number | number,number,...
+    project = number | number,number,... 
+    or
+    task =number | number,number,...
 Optional:
     var=taskId,taskName,projectId,projectName
     Can be any and/or all
@@ -352,9 +360,9 @@ Optional:
 ```
 [
     {
-        taskId?:      number,
-        taskName?:    string,
-        projectId?:   number,
+        taskId?: number,
+        taskName?: string,
+        projectId?: number,
         projectName?: string,
     }
 ] 

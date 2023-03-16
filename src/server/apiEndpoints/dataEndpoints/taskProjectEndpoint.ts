@@ -11,9 +11,48 @@ export interface TaskProjectReturnType {
     projectName?: string
 }
 
+interface EntryType {
+    taskId: number,
+    projectId: number
+}
+
 export class TaskProjectEndpoint extends EndpointBase {
     table = TASK_PROJECTS_CONNECTOR.data;
     data: TaskProjectReturnType[];
+
+    private async getAllDataForKey(dataIndex:number, entry:EntryType) {
+        let projectName: ProjectReturnType[] = await new ProjectEndpoint(this.user).processRequest(["name"], "id", [entry.projectId.toString()]);
+        let taskName:    TaskReturnType[]    = await new TaskEndpoint(this.user).processRequest(["name"], "id", [entry.taskId.toString()]);
+        this.data[dataIndex] = {
+            taskId:      entry.taskId,
+            taskName:    taskName[0].name,
+            projectId:   entry.projectId,
+            projectName: projectName[0].name
+        }
+    }
+
+    private async getSpecificDataForKey(requestValues: string[], dataIndex:number, entry:EntryType) {
+        for (const request of requestValues) {
+            switch (request) {
+                case "taskId":
+                    this.data[dataIndex].taskId = entry.taskId;
+                    break;
+                case "taskName":
+                    let taskName: TaskReturnType[] = await new TaskEndpoint(this.user).processRequest(["name"], "id", [entry.taskId.toString()]);
+                    this.data[dataIndex].taskName  = taskName[0].name;
+                    break;
+                case "projectId":
+                    this.data[dataIndex].projectId = entry.projectId;
+                    break;
+                case "projectName":
+                    let projectName: TaskReturnType[] = await new ProjectEndpoint(this.user).processRequest(["name"], "id", [entry.projectId.toString()]);
+                    this.data[dataIndex].projectName  = projectName[0].name;
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
 
     async getData(requestValues: string[], primaryKey: string, keyEqual: string[]): Promise<object[]> {
         this.data = [];
@@ -22,80 +61,35 @@ export class TaskProjectEndpoint extends EndpointBase {
             if (keyEqual.indexOf(entry[primaryKey].toString()) !== -1) {
                 this.data[dataIndex] = {};
                 if (requestValues.indexOf("*") !== -1) {
-                    let projectName: ProjectReturnType[] = await new ProjectEndpoint(this.user).processRequest(["name"], "id", [entry.projectId.toString()]);
-                    let taskName:    TaskReturnType[]    = await new TaskEndpoint(this.user).processRequest(["name"], "id", [entry.taskId.toString()]);
-                    this.data[dataIndex] = {
-                        taskId:      entry.taskId,
-                        taskName:    taskName[0].name,
-                        projectId:   entry.projectId,
-                        projectName: projectName[0].name
-                    }
+                    await this.getAllDataForKey(dataIndex, entry);
                 } else {
-                    for (const request of requestValues) {
-                        switch (request) {
-                            case "taskId":
-                                this.data[dataIndex].taskId = entry.taskId;
-                                break;
-                            case "taskName":
-                                let taskName: TaskReturnType[] = await new TaskEndpoint(this.user).processRequest(["name"], "id", [entry.taskId.toString()]);
-                                this.data[dataIndex].taskName  = taskName[0].name;
-                                break;
-                            case "projectId":
-                                this.data[dataIndex].projectId = entry.projectId;
-                                break;
-                            case "projectName":
-                                let projectName: TaskReturnType[] = await new ProjectEndpoint(this.user).processRequest(["name"], "id", [entry.projectId.toString()]);
-                                this.data[dataIndex].projectName  = projectName[0].name;
-                                break;
-                            default:
-                                break;
-                        }
-                    }
+                    await this.getSpecificDataForKey(requestValues, dataIndex, entry);
                 }
                 dataIndex++;
             }
         }
         return this.data;
     }
-}
 
-function badRequest(res: Response) {
-    res.sendStatus(400)
-    res.end();
-}
+    getRoute(req: Request, res: Response) {
+        let primaryKey:string = "taskId";
+        let requestKeys: string[] = this.urlParamsConversion(req.query.task, false);
 
-export function taskProjectGetRoute(req:Request, res:Response, user:User) {
-    let taskIds    = req.query.task;
-    let projectIds = req.query.project;
-    let values     = req.query.var;
+        if (requestKeys === undefined) {
+            requestKeys = this.urlParamsConversion(req.query.project, false, true, res);
+            if (requestKeys === undefined) { return; }
+            primaryKey  = "projectId";
+        }
 
-    let requestedValues:string[];
-    let requestKeys:    string[];
-    let primaryKey:     string = "";
+        //Not allowed to get all, so remove that from the list
+        requestKeys = requestKeys.filter((value:string) => { if (value !== "*") return value});
+        if (requestKeys.length === 0) { return this.badRequest(res); }
 
-    if (typeof taskIds === "string") {
-        requestKeys = taskIds.split(",")
-        primaryKey  = "taskId";
-    } if (typeof projectIds === "string") {
-        requestKeys = projectIds.split(",")
-        primaryKey  = "projectId";
+        let requestedValues:string[] = this.urlParamsConversion(req.query.var);
+
+        this.processRequest(requestedValues, primaryKey, requestKeys).then((data) => {
+            res.setHeader('Content-Type', 'application/json');
+            res.status(200).json(data);
+        })
     }
-
-    //Not allowed to get all, so remove that from the list
-    requestKeys = requestKeys.filter((value:string) => { if (value !== "*") return value});
-    if (requestKeys.length === 0) {
-        return badRequest(res);
-    }
-
-    if (typeof values === "string" ) {
-        requestedValues = values.split(",");
-    } else {
-        requestedValues = ["*"];
-    }
-
-    let taskProjectEndpoint = new TaskProjectEndpoint(user);
-    taskProjectEndpoint.processRequest(requestedValues, primaryKey, requestKeys).then((data) => {
-        res.setHeader('Content-Type', 'application/json');
-        res.status(200).json(data);
-    })
 }

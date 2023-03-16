@@ -14,43 +14,20 @@ export class UserEndpoint extends EndpointBase {
     table = USERS.data;
     data: UserReturnType[];
 
-    async getData(requestValues: string[], primaryKey: string, keyEqual?: string[]):Promise<object[]> {
-        return await this.baseGetData(requestValues, primaryKey, keyEqual);
+    getRoute(req: Request, res: Response) {
+        let requestedValues:string[] = this.urlParamsConversion(req.query.var);
+
+        let primaryKey:string = "id";
+        let requestKeys: string[] = this.urlParamsConversion(req.query.ids, false);
+        if (requestKeys === undefined) {
+            requestKeys = this.urlParamsConversion(req.query.emails, false, true, res);
+            if (requestKeys === undefined) { return; }
+            primaryKey = "email";
+        }
+
+        this.processRequest(requestedValues, primaryKey, requestKeys).then((data) => {
+            res.setHeader('Content-Type', 'application/json');
+            res.status(200).json(data);
+        })
     }
-}
-
-export function userGetRoute(req:Request, res:Response, user:User) {
-    let ids = req.query.ids;
-    let emails = req.query.emails;
-    let values = req.query.var;
-
-    let requestedValues:string[];
-    if (typeof values === "string" ) {
-        requestedValues = values.split(",");
-    } else {
-        requestedValues = ["*"];
-    }
-
-    let primaryKey:string = "";
-    let requestKeys: string[];
-
-    if (typeof ids === "string") {
-        requestKeys= ids.split(",");
-        primaryKey = "id";
-    } else if (typeof emails === "string") {
-        requestKeys= emails.split(",");
-        primaryKey = "email";
-    }
-
-    if (primaryKey === "") {
-        res.sendStatus(400)
-        res.end();
-        return;
-    }
-
-    let userEndpoint = new UserEndpoint(user);
-    userEndpoint.processRequest(requestedValues, primaryKey, requestKeys).then((data) => {
-        res.setHeader('Content-Type', 'application/json');
-        res.status(200).json(data);
-    })
 }
