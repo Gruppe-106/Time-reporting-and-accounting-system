@@ -12,7 +12,7 @@ interface TimeSheetState {
   data: TimeSheetData[];
 }
 
-class TableRow extends Component<{ data: TimeSheetData }> {
+class TimeSheetRow extends Component<{ data: TimeSheetData }> {
     render() {
         const { data } = this.props;
         let arr = ['1', '2', '3', '4', '5', '6', '7'];
@@ -38,7 +38,7 @@ class TableRow extends Component<{ data: TimeSheetData }> {
     }
 }
 
-class Tablee extends Component<Props, TimeSheetState> {
+class TimeSheet extends Component<Props, TimeSheetState> {
   constructor(props: Props) {
     super(props);
 
@@ -67,7 +67,7 @@ class Tablee extends Component<Props, TimeSheetState> {
     const { data } = this.state;
 
     return data.map((item, index) => (
-      <TableRow key={index} data={item} />
+      <TimeSheetRow key={index} data={item} />
     ));
   }
 
@@ -94,4 +94,4 @@ class Tablee extends Component<Props, TimeSheetState> {
   }
 }
 
-export default Tablee
+export default TimeSheet
