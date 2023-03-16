@@ -8,15 +8,18 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { Typeahead, Highlighter } from 'react-bootstrap-typeahead';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
+import forge from 'node-forge';
 
-//TODO: fixings the types as this is infact a no no
+
+//TODO: fixings the types as this is infact a no no but it does fix it
 interface CostumTypes {
     selectedRoles: any[],
     firstName: string,
     lastName: string,
     email: string,
     password: string,
-    assignedToManager: { id: number, name: string }
+    assignedToManager: { id: number, name: string } | null,
+    dbRoles: any[],
     firstNameValid: boolean,
     lastNameValid: boolean,
     emailValid: boolean,
@@ -24,8 +27,34 @@ interface CostumTypes {
     rolesValid: boolean,
     submitDisabled: boolean,
 
-
 }
+
+class GetCreationData {
+
+    public static GetAllRoles(): Promise<{ id: number, name: string }[]> {
+        return fetch(`/api/role/get?ids=*`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then((response: Response) => {
+                if (response.status === 400) {
+                    throw new Error("Status 400 bad request")
+                } else if (response.status === 200) {
+                    return response.json()
+                } else {
+                    throw new Error(`Unexpected response status: ${response.status}`)
+                }
+            })
+            .catch(error => {
+                throw new Error(error.Code);
+            });
+
+    }
+}
+
+
 
 class UserCreation extends Component<any, CostumTypes>{
     constructor(props: any) {
@@ -35,8 +64,10 @@ class UserCreation extends Component<any, CostumTypes>{
             lastName: "",
             email: "",
             password: "",
-            assignedToManager: { "id": Infinity, "name": "" },
+            assignedToManager: null,
             selectedRoles: [],
+            dbRoles: [],
+
             firstNameValid: false,
             lastNameValid: false,
             emailValid: false,
@@ -53,6 +84,15 @@ class UserCreation extends Component<any, CostumTypes>{
         this.HandleRoles = this.HandleRoles.bind(this)
         this.HandleManager = this.HandleManager.bind(this)
         this.test = this.test.bind(this)
+    }
+
+    async componentDidMount() {
+        const dbRoles = await GetCreationData.GetAllRoles()
+
+        this.setState({
+            dbRoles: dbRoles
+        })
+
     }
 
 
@@ -101,6 +141,8 @@ class UserCreation extends Component<any, CostumTypes>{
             emailValid: emailValid,
             submitDisabled: !submitValid
         })
+
+        console.log(this.state.dbRoles)
     }
 
     /**
@@ -145,14 +187,25 @@ class UserCreation extends Component<any, CostumTypes>{
      * Handles the form submission.
      */
     private HandleSubmit() {
-        const userObject = {
+        const sha256 = forge.md.sha256.create();
+
+        const userObject: {
+            firstName: string,
+            lastName: string,
+            email: string,
+            password: string,
+            assignedToManager: { id: number, name: string } | null
+            roles: any[]
+        } = {
             firstName: this.state.firstName,
             lastName: this.state.lastName,
             email: this.state.email,
-            password: this.state.password,
+            password: sha256.update(this.state.password).digest().toHex(),
             assignedToManager: this.state.assignedToManager,
             roles: this.state.selectedRoles
         }
+
+        this.SendUser(userObject)
 
     }
 
@@ -206,10 +259,13 @@ class UserCreation extends Component<any, CostumTypes>{
                                 id="assignManager"
                                 labelKey="name"
                                 options={[
-                                    { id: 1, name: "Andreas Monster addict" },
-                                    { id: 2, name: "Mads the OG Mads" },
-                                    { id: 3, name: "Mikkel the mikkelman" },
-                                    { id: 4, name: "Alexander 👌" }
+                                    { id: 1, name: "Andreas F-KLUB villan origin story" },
+                                    { id: 2, name: "Mads OG Mads the one Mads" },
+                                    { id: 3, name: "Mikkel Cykkelmyggen" },
+                                    { id: 5, name: "Name's Bond, Christian Bond" },
+                                    { id: 6, name: "Mads gone like the wind" },
+                                    { id: 7, name: "Simon Simon Simon" },
+                                    { id: 4, name: "Alexander 👌" },
                                 ]}
                                 placeholder="Choose Manager..."
                                 onChange={this.HandleManager}
@@ -235,17 +291,12 @@ class UserCreation extends Component<any, CostumTypes>{
                         <Form.Group className="mb-3" controlId="formBasicAssignRole">
                             <Form.Label>Assign Roles</Form.Label>
                             <Typeahead
+                                labelKey="name"
                                 id="assignRoles"
                                 multiple
-                                options={[
-                                    { id: 1, label: "Admin" },
-                                    { id: 2, label: "Code monkey" },
-                                    { id: 3, label: "Group manager" },
-                                    { id: 4, label: "Slave" }
-                                ]}
+                                options={this.state.dbRoles}
                                 placeholder="Choose roles..."
                                 onChange={this.HandleRoles}
-
 
                             />
                         </Form.Group>
@@ -263,6 +314,24 @@ class UserCreation extends Component<any, CostumTypes>{
                 </Container>
             </>
         );
+    }
+
+
+    /**
+     * Handles the sending of the user object to server
+     * @param UserObject
+     */
+    private SendUser(UserObject: {
+        firstName: string,
+        lastName: string,
+        email: string,
+        password: string,
+        assignedToManager: { id: number, name: string } | null
+        roles: any[]
+    }) {
+
+        console.log(UserObject)
+
     }
 }
 
