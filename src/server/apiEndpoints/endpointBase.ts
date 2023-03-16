@@ -29,8 +29,13 @@ abstract class EndpointBase {
     }
 
     public async processRequest(requestValues: string[], primaryKey:string, keyEqual?:string[], data?:string[]):Promise<object[]> {
-        if (this.ensureAuth()) {
-            return await this.getData(requestValues, this.user, primaryKey, keyEqual);
+        try {
+            if (this.ensureAuth()) {
+                return await this.getData(requestValues, this.user, primaryKey, keyEqual);
+            }
+        } catch (e) {
+            console.error(e);
+            return [{error: "Failed to get data"}];
         }
     }
 

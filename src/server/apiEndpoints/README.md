@@ -315,10 +315,14 @@ Optional:
 ```
 
 ### Example
-[]()
+[http://localhost:8080/api/time/register/get?user=1&var=taskName,taskId,projectName](http://localhost:8080/api/time/register/get?user=1&var=taskName,taskId,projectName)
 #### Returns:
 ```json
-
+[
+  {"taskName":"Task G","taskId":10,"projectName":"Project Epsilon","userId":1,"approved":false},
+  {"taskName":"Task Y","taskId":2,"projectName":"Project Beta","userId":1,"approved":true},
+  {"taskName":"Task Z","taskId":3,"projectName":"Project Gamma","userId":1,"approved":true}
+]
 ```
 ### Table
 ```

@@ -28,7 +28,6 @@ export class TaskProjectEndpoint extends EndpointBase {
                 if (requestValues.indexOf("*") !== -1) {
                     let projectName: ProjectReturnType[] = await new ProjectEndpoint(user).processRequest(["name"], "id", [entry.projectId.toString()]);
                     let taskName:    TaskReturnType[]    = await new TaskEndpoint(user).processRequest(["name"], "id", [entry.taskId.toString()]);
-                    console.log(entry.projectId, projectName, entry.taskId, taskName)
                     this.data[dataIndex] = {
                         taskId:      entry.taskId,
                         taskName:    taskName[0].name,
