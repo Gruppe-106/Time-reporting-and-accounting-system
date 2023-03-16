@@ -93,7 +93,7 @@ export class ManagerGroupEndpoint extends EndpointConnectorBase {
     }
 }
 
-export function managerGroupRoute(req:Request, res:Response, user:User) {
+export function managerGroupGetRoute(req:Request, res:Response, user:User) {
     let managerIds = req.query.manager;
     let groupIds = req.query.group;
     let values = req.query.var;
