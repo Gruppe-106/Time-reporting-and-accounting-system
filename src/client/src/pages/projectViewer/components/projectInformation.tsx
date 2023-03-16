@@ -4,37 +4,62 @@ import Nav from 'react-bootstrap/Nav';
 import Row from 'react-bootstrap/Row';
 import Tab from 'react-bootstrap/Tab';
 import {Table} from "react-bootstrap";
+import BaseApiHandler from "../../../network/baseApiHandler";
 /*
 TO DO HERE
 CHANGE TO CREATE A "PAGE" FROM ID
 THEN SHOW INFORMATION ABOUT PROJECT
 IMPORT MEMBERS AND ROLES
- */
-interface ProjectInformationProp {
-    pageInformation:ProjectInformation[]
+*/
+
+interface Api{
+
+        id?: number,
+        superProject?: number,
+        name?: string,
+        startDate?: string,
+        endDate?: string
+
 }
 
-interface ProjectInformation {
+interface ProjectInformationProp {
     id:number
-    superProject:number
-    name:string
-    startDate:number
-    endDate:number
+    superProject?:number
+    name?:string
+    startDate?:string
+    endDate?:string
 }
 
 class ProjectInformation extends Component<ProjectInformationProp> {
-    pageInformation:ProjectInformation[];
-    constructor(props:ProjectInformationProp) {
-        super(props);
-        this.pageInformation = props.pageInformation;
+    state = {
+        pageInformation: {id: -1, superProject: -1, name: "", startDate: "", endDate: ""}
     }
 
-    private informationRender():JSX.Element[] {
-        return this.pageInformation.map((info) =>{
+    constructor(props:ProjectInformationProp) {
+        super(props);
+        this.state.pageInformation.id = props.id;
+    }
 
+     componentDidMount() {
+        //First make an instance of the api handler, give it the auth key of the user once implemented
+        let apiHandler = new BaseApiHandler("test");
+        //Run the get or post function depending on need only neccesarry argument is the path aka what comes after the hostname
+        //Callbacks can be used to tell what to do with the data once it's been retrieved
+        apiHandler.get(`/api/project/get?ids=${this.state.pageInformation.id}`, (value) => {
+            console.log(value)
+            //Then convert the string to the expected object(eg. )
+            let json:Api[] = JSON.parse(JSON.stringify(value))
+            //Then update states or variables or whatever you want with the information
+            this.setState({pageInformation: json[0]})
+            console.log(json)
+        })
+    }
+
+
+    private informationRender():JSX.Element {
             return (
                 <Tab.Container id="left-tabs-example" defaultActiveKey="first">
-                <h2>{info.name}</h2>
+                    {this.state.pageInformation.name !== "" ? (<h2>{this.state.pageInformation.name}</h2>) : ""}
 
       <Row>
         <Col sm={2}>
@@ -45,19 +70,18 @@ class ProjectInformation extends Component<ProjectInformationProp> {
             <Nav.Item>
               <Nav.Link eventKey="second">Members</Nav.Link>
             </Nav.Item>
+              <Nav.Item>
+              <Nav.Link eventKey="third">Tasks</Nav.Link>
+            </Nav.Item>
           </Nav>
         </Col>
         <Col sm={9}>
           <Tab.Content>
             <Tab.Pane eventKey="first">
-                <p>This project is about yadda yadda and it includes yadda yadda</p>
-                <p>{info.id}</p>
-                <p>{info.superProject}</p>
-                <p>{new Date(info.startDate).toLocaleDateString()}</p>
-                <p>{new Date(info.endDate).toLocaleDateString()}</p>
+                <h3>Project Description</h3>
             </Tab.Pane>
             <Tab.Pane eventKey="second">
-                <p>This here is a list of members LMAO:</p>
+                <h3>Members list</h3>
                 <Table striped bordered hover>
       <thead>
         <tr>
@@ -81,12 +105,36 @@ class ProjectInformation extends Component<ProjectInformationProp> {
       </tbody>
     </Table>
             </Tab.Pane>
+              <Tab.Pane eventKey="third">
+                <h3>Task list</h3>
+                  <Table striped bordered hover>
+      <thead>
+        <tr>
+          <th>Task</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Understand SLIAL</td>
+          <td>FAILED</td>
+        </tr>
+       <tr>
+          <td>Make a cake</td>
+          <td>ONGOING</td>
+        </tr>
+       <tr>
+          <td>Problem analysis</td>
+          <td>DONE</td>
+        </tr>
+      </tbody>
+    </Table>
+            </Tab.Pane>
           </Tab.Content>
         </Col>
       </Row>
                 </Tab.Container>
             )
-        })
     }
 
     render() {
