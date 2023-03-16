@@ -326,7 +326,7 @@ Optional:
 ```
 ### Table
 ```
-CREATE TABLE USER_TASK_TIME_REGISTER(
+CREATE TABLE TASK_PROJECTS_CONNECTOR(
     date date
     taskId INT UNSIGNED
     userId INT UNSIGNED
