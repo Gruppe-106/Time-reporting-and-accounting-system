@@ -197,10 +197,12 @@ CREATE TABLE ROLES(
 ### Params
 ```
 Required:
-    user_ids=number | number,number,... | *
+    user=number | number,number,... | *
+    or
+    role=number | number,number,... | *
     * will return all projects
 Optional:
-    val=role_id,role_name,user_id
+    val=role_id,role_name,user_id,first_name,last_name
     Can be any and/or all
 ```
 ### Structure Of Object Returned
@@ -209,6 +211,8 @@ Optional:
   [
       {
         user_id?: number,
+        first_name?: string,
+        last_name?: string,
         role_id?: number,
         role_name?: string
       }
