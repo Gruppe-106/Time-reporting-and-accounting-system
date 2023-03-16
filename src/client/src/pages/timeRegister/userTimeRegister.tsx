@@ -7,8 +7,7 @@ import React, {Component} from "react";
 //import ReactDOM from "react-dom/client";
 import BaseNavBar from "../../components/navBar";
 import {Container} from "react-bootstrap";
-import TimeTableRegister from "./componentsTime/com";
-import Table from "./componentsTime/com2";
+import Tablee from "./componentsTime/com";
 
 class UserTimeRegister extends Component<any>{
 /*    constructor(props:any) {
@@ -22,8 +21,7 @@ class UserTimeRegister extends Component<any>{
                 <Container>
                     <h1>User Time Register</h1>
                 </Container>
-                <Table/>
-                <TimeTableRegister bTableRows={[{projectName:"Test", taskName:"Test"}]}/>
+                <Tablee/>
             </>
         );
     }
