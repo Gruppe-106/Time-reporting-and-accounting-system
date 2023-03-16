@@ -1,6 +1,51 @@
 import React, { Component } from 'react';
 import {Container, Table, Form, InputGroup, Button} from "react-bootstrap";
 
+interface TableHeaderProps {}
+
+interface TableHeaderState {
+  dates: string[];
+}
+
+class TableHeader extends React.Component<TableHeaderProps, TableHeaderState> {
+  constructor(props: TableHeaderProps) {
+    super(props);
+
+    // Get the current date
+    const today = new Date();
+
+    // Get the start date of the current week (Sunday)
+    const sunday = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay() + 1);
+
+    // Create an array of date strings for each day of the week
+    const dates = [];
+    for (let i = 0; i < 7; i++) {
+      const currentDate = new Date(sunday.getFullYear(), sunday.getMonth(), sunday.getDate() + i);
+      dates.push(currentDate.toLocaleDateString());
+    }
+
+    // Set the initial state
+    this.state = {
+      dates: dates,
+    };
+  }
+
+  render() {
+    return (
+          <thead>
+            <tr>
+              <th>Project Name</th>
+              <th>Task Name</th>
+              {this.state.dates.map((date, index) => (
+                <th key={index}>{date}</th>
+              ))}
+              <th>Total Time</th>
+            </tr>
+          </thead> 
+    );
+  }
+}
+
 interface TimeSheetData {
     projectName:string
     taskName:string
@@ -89,18 +134,10 @@ class TimeSheet extends Component<Props, TimeSheetState> {
   }
 
   render() {
-    let arr = ['1', '2', '3', '4', '5', '6', '7'];
     return (
       <Container fluid>
-        <Table bordered hover size="sm">
-            <thead>
-                <tr>
-                    <th>Project Name</th>
-                    <th>Task Name</th>
-                    {arr.map((num) => (<th>{num} Date</th>))}
-                    <th>Total Time</th>
-                </tr>
-            </thead>
+        <Table bordered size="sm">
+            <TableHeader />
             <tbody>
                 {this.renderRows()}
             </tbody>
