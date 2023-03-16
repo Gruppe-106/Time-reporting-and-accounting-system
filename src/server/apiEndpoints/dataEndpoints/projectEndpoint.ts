@@ -14,7 +14,7 @@ export class ProjectEndpoint extends EndpointBase{
     table = new PROJECTS().data;
     data: ReturnType[];
 
-    async getData(requestValues: string[], user: User, primaryKey: string, keyEqual?: string[]):Promise<object> {
+    async getData(requestValues: string[], user: User, primaryKey: string, keyEqual?: string[]):Promise<object[]> {
         return await this.baseGetData(requestValues, user, primaryKey, keyEqual);
     }
 }

@@ -6,11 +6,16 @@ import {GROUP} from "../../database/fakeData/GROUP";
 import {UserEndpoint, UserReturnType} from "./userEndpoint";
 
 interface ReturnType {
-    manager_id?: number,
-    manager_name?: string,
-    group_id?: number,
-    user_ids?: number[],
-    user_names?: string[]
+    manager?: number,
+    first_name?: string,
+    last_name?: string,
+    group?: number,
+    employees?: {
+        id?: number,
+        first_name?: string,
+        last_name?: string,
+        email?: string
+    }[];
 }
 
 export class ManagerGroupEndpoint extends EndpointConnectorBase {
@@ -19,7 +24,7 @@ export class ManagerGroupEndpoint extends EndpointConnectorBase {
     tableConnector = new GROUP().data;
     data: ReturnType[];
 
-    async getData(requestValues: string[], user: User, primaryKey: string, keyEqual?: string[]): Promise<object> {
+    async getData(requestValues: string[], user: User, primaryKey: string, keyEqual?: string[]): Promise<object[]> {
         let userEndpoint = new UserEndpoint(user);
         this.data = [];
         let dataIndex = 0;
@@ -27,23 +32,58 @@ export class ManagerGroupEndpoint extends EndpointConnectorBase {
             if (keyEqual.indexOf(entry[primaryKey].toString()) !== -1 || keyEqual.indexOf("*") !== -1) {
                 this.data[dataIndex] = {};
                 if (requestValues.indexOf("*") !== -1) {
-                    this.data[dataIndex].user_ids   = [];
-                    this.data[dataIndex].user_names = [];
-                    await userEndpoint.processRequest(["id", "first_name", "last_name", "group"], "id", ["*"]).then((value:UserReturnType) => {
-                        if (value.id === entry.manager) this.data[dataIndex].manager_name = value.first_name + " " + value.last_name;
-                        else if(value.group === entry.id) {
-                            this.data[dataIndex].user_ids.push(value.id);
-                            this.data[dataIndex].user_names.push(value.first_name + " " + value.last_name);
+                    this.data[dataIndex].employees   = [];
+                    let employees:UserReturnType[] = await userEndpoint.processRequest(["id", "first_name", "last_name", "group"], "id", ["*"]);
+                    for (const value of employees) {
+                        if (value.id === entry.manager) {
+                            this.data[dataIndex].first_name = value.first_name;
+                            this.data[dataIndex].last_name = value.last_name;
                         }
-                    });
-                    this.data[dataIndex].manager_id = entry.manager;
-                    this.data[dataIndex].group_id = entry.id;
+                        else if(value.group === entry.id) {
+                            this.data[dataIndex].employees.push({
+                                id: value.id,
+                                first_name: value.first_name,
+                                last_name: value.last_name,
+                                email: value.last_name
+                            })
+                        }
+                    }
+                    this.data[dataIndex].manager = entry.manager;
+                    this.data[dataIndex].group = entry.id;
                 } else {
                     console.log(requestValues)
                     for (const request of requestValues) {
-                        //if      (request === "role_id")   this.data[dataIndex].role_id = entry["role"];
-                        //else if (request === "user_id")   this.data[dataIndex].user_id = entry["user"];
-                        //else if (request === "role_name") this.getRoleName(entry, dataIndex);
+                        switch (request) {
+                            case "manager":
+                                this.data[dataIndex].manager = entry.manager;
+                                break;
+                            case "group":
+                                this.data[dataIndex].group = entry.id;
+                                break;
+                            case "first_name":
+                                let dataFirst:UserReturnType[]  = await userEndpoint.processRequest(["first_name"], "id", [entry.manager.toString()]);
+                                this.data[dataIndex].first_name = dataFirst.pop().first_name;
+                                break;
+                            case "last_name":
+                                let dataLast:UserReturnType[]  = await userEndpoint.processRequest(["last_name"], "id", [entry.manager.toString()]);
+                                this.data[dataIndex].first_name = dataLast.pop().first_name;
+                                break;
+                            case "employees":
+                                this.data[dataIndex].employees   = [];
+                                let employees:UserReturnType[] = await userEndpoint.processRequest(["id", "first_name", "last_name", "group"], "id", ["*"]);
+                                for (const value of employees) {
+                                    if(value.group === entry.id) {
+                                        this.data[dataIndex].employees.push({
+                                            id: value.id,
+                                            first_name: value.first_name,
+                                            last_name: value.last_name,
+                                            email: value.last_name
+                                        })
+                                    }
+                                }
+                                break;
+                            default: break;
+                        }
                     }
                 }
                 dataIndex++;
@@ -54,8 +94,8 @@ export class ManagerGroupEndpoint extends EndpointConnectorBase {
 }
 
 export function managerGroupRoute(req:Request, res:Response, user:User) {
-    let managerIds = req.query.manager_ids;
-    let groupIds = req.query.group_ids;
+    let managerIds = req.query.manager;
+    let groupIds = req.query.group;
     let values = req.query.var;
 
     let requestedValues:string[];
