@@ -152,9 +152,6 @@ class UserCreation extends Component<any, CostumTypes>{
         const dbRoles = await GetCreationData.GetAllRoles()
         const dbManagers = await GetCreationData.GetAllManagers()
 
-        console.log(dbManagers)
-
-
         this.setState({
             dbRoles: dbRoles,
             dbManagers: dbManagers
@@ -217,8 +214,6 @@ class UserCreation extends Component<any, CostumTypes>{
             emailValid: emailValid,
             submitDisabled: !submitValid
         })
-
-        console.log(this.state.dbRoles)
     }
 
     /**
@@ -334,9 +329,9 @@ class UserCreation extends Component<any, CostumTypes>{
 
     /**
      * Handles the sending of the user object to server
-     * @param UserObject
+     * @param uerObject
      */
-    private SendUser(UserObject: {
+    private SendUser(userObject: {
         firstName: string,
         lastName: string,
         email: string,
@@ -345,6 +340,7 @@ class UserCreation extends Component<any, CostumTypes>{
         roles: any[]
     }) {
 
+        console.log(userObject)
         this.HandleShow("Hello world man thing")
 
     }
