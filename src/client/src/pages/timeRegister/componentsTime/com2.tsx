@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 
 interface Person {
   name: string;
-  age: number;
   email: string;
 }
 
@@ -19,7 +18,6 @@ class TableRow extends Component<{ data: Person }> {
     return (
       <tr>
         <td>{data.name}</td>
-        <td>{data.age}</td>
         <td>{data.email}</td>
       </tr>
     );
@@ -32,8 +30,8 @@ class Table extends Component<Props, State> {
 
     this.state = {
       data: [
-        { name: 'John', age: 25, email: 'john@example.com' },
-        { name: 'Jane', age: 30, email: 'jane@example.com' },
+        { name: 'John', email: 'john@example.com' },
+        { name: 'Jane', email: 'jane@example.com' },
       ],
     };
 
@@ -46,7 +44,7 @@ class Table extends Component<Props, State> {
     this.setState({
       data: [
         ...data,
-        { name: 'New Person', age: 0, email: '' },
+        { name: 'New Person', email: '' },
       ],
     });
   }
