@@ -8,6 +8,7 @@ import {timeTypeGetRoute} from "../apiEndpoints/dataEndpoints/timeTypeEndpoint";
 import {roleGetRoute} from "../apiEndpoints/dataEndpoints/roleEndpoint";
 import {userRoleGetRoute} from "../apiEndpoints/dataEndpoints/userRoleEndpoint";
 import {managerGroupGetRoute} from "../apiEndpoints/dataEndpoints/managerGroupEndpoint";
+import {taskProjectGetRoute} from "../apiEndpoints/dataEndpoints/taskProjectEndpoint";
 
 /* Implement this shit and ensure CORS
     res.setHeader("Access-Control-Allow-Origin" , "*");
@@ -21,17 +22,19 @@ export class ApiRouter extends BaseRouter {
 
     private getRoutes() {
         this.router.get("/", (req: Request, res: Response): void => {
-            res.setHeader('Content-Type'                , 'application/json');
+            res.setHeader('Content-Type', 'application/json');
             res.status(200).json(JSON.stringify({message: "Api gotten"}));
         });
 
-        this.router.get("/project/get", (req: Request, res: Response) => projectGetRoute(req, res, this.user));
-        this.router.get("/user/get", (req: Request, res: Response) => userGetRoute(req, res, this.user));
-        this.router.get("/task/get", (req: Request, res: Response) => taskGetRoute(req, res, this.user));
-        this.router.get("/timetype/get", (req: Request, res: Response) => timeTypeGetRoute(req, res, this.user));
-        this.router.get("/role/get", (req: Request, res: Response) => roleGetRoute(req, res, this.user));
-        this.router.get("/role/user/get", (req: Request, res: Response) => userRoleGetRoute(req, res, this.user));
-        this.router.get("/group/manager/get", (req: Request, res: Response) => managerGroupGetRoute(req, res, this.user));
+        this.router.get("/project/get",      (req: Request, res: Response) => projectGetRoute(req, res, this.user));
+        this.router.get("/user/get",         (req: Request, res: Response) => userGetRoute(req, res, this.user));
+        this.router.get("/task/get",         (req: Request, res: Response) => taskGetRoute(req, res, this.user));
+        this.router.get("/task/project/get", (req: Request, res: Response) => taskProjectGetRoute(req, res, this.user));
+        this.router.get("/timetype/get",     (req: Request, res: Response) => timeTypeGetRoute(req, res, this.user));
+        this.router.get("/role/get",         (req: Request, res: Response) => roleGetRoute(req, res, this.user));
+        this.router.get("/role/user/get",    (req: Request, res: Response) => userRoleGetRoute(req, res, this.user));
+        this.router.get("/group/manager/get",(req: Request, res: Response) => managerGroupGetRoute(req, res, this.user));
+        this.router.get("/time/register/get",(req: Request, res: Response) => timeTypeGetRoute(req, res, this.user));
     }
 
     private postRoutes() {

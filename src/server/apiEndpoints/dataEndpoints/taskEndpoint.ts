@@ -2,7 +2,7 @@ import EndpointBase, {User} from "../endpointBase";
 import {Request, Response} from "express";
 import {TASKS} from "../../database/fakeData/TASKS";
 
-interface ReturnType {
+export interface TaskReturnType {
     id?: number,
     name?: string,
     startDate?: string,
@@ -12,7 +12,7 @@ interface ReturnType {
 
 export class TaskEndpoint extends EndpointBase {
     table = new TASKS().data;
-    data: ReturnType[];
+    data: TaskReturnType[];
 
     async getData(requestValues: string[], user: User, primaryKey: string, keyEqual?: string[]):Promise<object[]> {
         return await this.baseGetData(requestValues, user, primaryKey, keyEqual);

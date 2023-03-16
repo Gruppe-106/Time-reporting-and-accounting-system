@@ -287,6 +287,90 @@ CREATE TABLE GROUP(
 )
 ```
 
+## Time task register : /time/register/get
+### Params
+```
+Required:
+    user=number | number,number,...
+Optional:
+    var=taskId,taskName,projectName,projectId,date,userId,time,approved,managerLogged
+    Can be any and/or all
+```
+### Structure Of Object Returned
+
+```
+[
+    {
+        taskId?: number,
+        taskName?: string,
+        projectName?: string,
+        projectId?: number
+        date?: number,
+        userId?: number,
+        time?: number,
+        approved?: boolean,
+        managerLogged?: boolean
+    }
+] 
+```
+
+### Example
+[]()
+#### Returns:
+```json
+
+```
+### Table
+```
+CREATE TABLE USER_TASK_TIME_REGISTER(
+    date date
+    taskId INT UNSIGNED
+    userId INT UNSIGNED
+    time INT UNSIGNED
+    approved BOOLEAN
+    managerLogged BOOLEAN
+    PRIMARY KEY(date, taskId, userId)
+)
+```
+
+## Task project : /task/project/get
+### Params
+```
+Required:
+    project =number | number,number,... 
+    task    =number | number,number,...
+Optional:
+    var=taskId,taskName,projectId,projectName
+    Can be any and/or all
+```
+### Structure Of Object Returned
+
+```
+[
+    {
+        taskId?:      number,
+        taskName?:    string,
+        projectId?:   number,
+        projectName?: string,
+    }
+] 
+```
+
+### Example
+[http://localhost:8080/api/task/project/get?project=1&var=projectName,taskName](http://localhost:8080/api/task/project/get?project=1&var=projectName,taskName)
+#### Returns:
+```json
+[{"projectName":"Project Alpha","taskName":"Task X"},{"projectName":"Project Alpha","taskName":"Task C"}]
+```
+### Table
+```
+CREATE TABLE USER_TASK_TIME_REGISTER(
+    taskId INT UNSIGNED
+    projectId INT UNSIGNED
+    PRIMARY KEY(taskId, projectId)
+)
+```
+
 # Non callable tables
 ## Auth : NULL
 This is not available for through api for obvious reasons!
@@ -304,25 +388,8 @@ CREATE TABLE AUTH(
 
 # Todo
 1. Projects manager connector
-2. Task project connector
-3. User task time register
-I get user id
-return 
-```
-[
-    {
-        taskId?: number,
-        taskName?: string,
-        projectName?: string,
-        projectId?: number
-        date?: number,
-        userId?: number,
-        time?: number,
-        approved?: boolean,
-        managerLogged?: boolean
-    }
-] 
-```
+2. Task project connector WIP
+3. User task time register WIP
 4. Group
 5. Get name of timetype in tasks
 6. Time as a number not string
