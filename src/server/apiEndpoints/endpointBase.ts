@@ -1,3 +1,6 @@
+import {ParsedQs} from "qs";
+import {Response} from "express";
+
 export interface User {
     authKey: string;
     id?: number;
@@ -12,7 +15,7 @@ enum Roles {
 }
 
 abstract class EndpointBase {
-    private readonly user: User;
+    protected readonly user: User;
     private getRole:Roles[]
     private postRole:Roles[]
 
@@ -31,7 +34,7 @@ abstract class EndpointBase {
     public async processRequest(requestValues: string[], primaryKey:string, keyEqual?:string[], data?:string[]):Promise<object[]> {
         try {
             if (this.ensureAuth()) {
-                return await this.getData(requestValues, this.user, primaryKey, keyEqual);
+                return await this.getData(requestValues, primaryKey, keyEqual);
             }
         } catch (e) {
             console.error(e);
@@ -39,7 +42,7 @@ abstract class EndpointBase {
         }
     }
 
-    public async baseGetData(requestValues: string[], user: User, primaryKey: string, keyEqual?: string[], data?:string[]):Promise<object[]> {
+    public async baseGetData(requestValues: string[], primaryKey: string, keyEqual?: string[], data?:string[]):Promise<object[]> {
         this.data = [];
         let dataIndex = 0;
         for (const entry of this.table) {
@@ -58,7 +61,22 @@ abstract class EndpointBase {
         return this.data;
     }
 
-    abstract getData(requestValues: string[], user: User, primaryKey: string, keyEqual?: string[], data?:string[]):Promise<object[]>;
+    abstract getData(requestValues: string[], primaryKey: string, keyEqual?: string[], data?:string[]):Promise<object[]>;
+
+    protected urlParamsConversion(params:string | string[] | ParsedQs | ParsedQs[], allowAll:boolean = true):string[] {
+        let paramsList:string[];
+        if (typeof params === "string" ) {
+            paramsList = params.split(",");
+        } else if (allowAll) {
+            paramsList = ["*"];
+        }
+        return paramsList;
+    }
+
+    protected badRequest(res: Response) {
+        res.sendStatus(400)
+        res.end();
+    }
 }
 
 export default EndpointBase;

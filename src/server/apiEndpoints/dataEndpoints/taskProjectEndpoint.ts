@@ -15,15 +15,15 @@ export class TaskProjectEndpoint extends EndpointBase {
     table = TASK_PROJECTS_CONNECTOR.data;
     data: TaskProjectReturnType[];
 
-    async getData(requestValues: string[], user: User, primaryKey: string, keyEqual: string[]): Promise<object[]> {
+    async getData(requestValues: string[], primaryKey: string, keyEqual: string[]): Promise<object[]> {
         this.data = [];
         let dataIndex = 0;
         for (const entry of this.table) {
             if (keyEqual.indexOf(entry[primaryKey].toString()) !== -1) {
                 this.data[dataIndex] = {};
                 if (requestValues.indexOf("*") !== -1) {
-                    let projectName: ProjectReturnType[] = await new ProjectEndpoint(user).processRequest(["name"], "id", [entry.projectId.toString()]);
-                    let taskName:    TaskReturnType[]    = await new TaskEndpoint(user).processRequest(["name"], "id", [entry.taskId.toString()]);
+                    let projectName: ProjectReturnType[] = await new ProjectEndpoint(this.user).processRequest(["name"], "id", [entry.projectId.toString()]);
+                    let taskName:    TaskReturnType[]    = await new TaskEndpoint(this.user).processRequest(["name"], "id", [entry.taskId.toString()]);
                     this.data[dataIndex] = {
                         taskId:      entry.taskId,
                         taskName:    taskName[0].name,
@@ -37,14 +37,14 @@ export class TaskProjectEndpoint extends EndpointBase {
                                 this.data[dataIndex].taskId = entry.taskId;
                                 break;
                             case "taskName":
-                                let taskName: TaskReturnType[] = await new TaskEndpoint(user).processRequest(["name"], "id", [entry.taskId.toString()]);
+                                let taskName: TaskReturnType[] = await new TaskEndpoint(this.user).processRequest(["name"], "id", [entry.taskId.toString()]);
                                 this.data[dataIndex].taskName  = taskName[0].name;
                                 break;
                             case "projectId":
                                 this.data[dataIndex].projectId = entry.projectId;
                                 break;
                             case "projectName":
-                                let projectName: TaskReturnType[] = await new ProjectEndpoint(user).processRequest(["name"], "id", [entry.projectId.toString()]);
+                                let projectName: TaskReturnType[] = await new ProjectEndpoint(this.user).processRequest(["name"], "id", [entry.projectId.toString()]);
                                 this.data[dataIndex].projectName  = projectName[0].name;
                                 break;
                             default:

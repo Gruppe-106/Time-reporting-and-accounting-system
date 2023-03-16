@@ -14,8 +14,8 @@ export class TaskEndpoint extends EndpointBase {
     table = TASKS.data;
     data: TaskReturnType[];
 
-    async getData(requestValues: string[], user: User, primaryKey: string, keyEqual?: string[]):Promise<object[]> {
-        return await this.baseGetData(requestValues, user, primaryKey, keyEqual);
+    async getData(requestValues: string[], primaryKey: string, keyEqual?: string[]):Promise<object[]> {
+        return await this.baseGetData(requestValues, primaryKey, keyEqual);
     }
 }
 

@@ -20,15 +20,15 @@ export class TaskTimeRegisterEndpoint extends EndpointBase {
     table = USER_TASK_TIME_REGISTER.data;
     data: TaskTimeRegisterReturnType[];
 
-    async getData(requestValues: string[], user: User, primaryKey: string, keyEqual: string[]): Promise<object[]> {
+    async getData(requestValues: string[], primaryKey: string, keyEqual: string[]): Promise<object[]> {
         this.data = [];
         let dataIndex = 0;
         for (const entry of this.table) {
             if (keyEqual.indexOf(entry[primaryKey].toString()) !== -1) {
                 this.data[dataIndex] = {};
                 if (requestValues.indexOf("*") !== -1) {
-                    let task:        TaskReturnType[]        = await new TaskEndpoint(user).processRequest(["name"], "id", [entry.taskId.toString()]);
-                    let taskProject: TaskProjectReturnType[] = await new TaskProjectEndpoint(user).processRequest(["projectId", "projectName"], "taskId", [entry.taskId.toString()]);
+                    let task:        TaskReturnType[]        = await new TaskEndpoint(this.user).processRequest(["name"], "id", [entry.taskId.toString()]);
+                    let taskProject: TaskProjectReturnType[] = await new TaskProjectEndpoint(this.user).processRequest(["projectId", "projectName"], "taskId", [entry.taskId.toString()]);
                     this.data[dataIndex] = {
                         taskId:        entry.taskId,
                         taskName:      task[0].name,
@@ -46,7 +46,7 @@ export class TaskTimeRegisterEndpoint extends EndpointBase {
                     if (requestValues.indexOf("projectName") !== -1) projectValues.push("projectName");
                     if (requestValues.indexOf("projectId") !== -1)   projectValues.push("projectId");
                     if (projectValues.length > 0) {
-                        taskProject = await new TaskProjectEndpoint(user).processRequest(projectValues, "taskId", [entry.taskId.toString()]);
+                        taskProject = await new TaskProjectEndpoint(this.user).processRequest(projectValues, "taskId", [entry.taskId.toString()]);
                     }
 
                     for (const request of requestValues) {
@@ -55,7 +55,7 @@ export class TaskTimeRegisterEndpoint extends EndpointBase {
                                 this.data[dataIndex].taskId = entry.taskId;
                                 break;
                             case "taskName":
-                                let task: TaskReturnType[] = await new TaskEndpoint(user).processRequest(["name"], "id", [entry.taskId.toString()]);
+                                let task: TaskReturnType[] = await new TaskEndpoint(this.user).processRequest(["name"], "id", [entry.taskId.toString()]);
                                 this.data[dataIndex].taskName = task[0].name;
                                 break;
                             case "projectName":

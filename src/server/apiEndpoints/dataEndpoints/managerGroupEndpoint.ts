@@ -1,5 +1,4 @@
 import EndpointBase, {User} from "../endpointBase";
-import {USERS} from "../../database/fakeData/USERS";
 import {Request, Response} from "express";
 import {GROUP} from "../../database/fakeData/GROUP";
 import {UserEndpoint, UserReturnType} from "./userEndpoint";
@@ -25,8 +24,8 @@ export class ManagerGroupEndpoint extends EndpointBase {
     table = GROUP.data;
     data: ManagerGroupReturnType[];
 
-    async getData(requestValues: string[], user: User, primaryKey: string, keyEqual?: string[]): Promise<object[]> {
-        let userEndpoint = new UserEndpoint(user);
+    async getData(requestValues: string[], primaryKey: string, keyEqual?: string[]): Promise<object[]> {
+        let userEndpoint = new UserEndpoint(this.user);
         this.data = [];
         let dataIndex = 0;
         for (const entry of this.table) {
