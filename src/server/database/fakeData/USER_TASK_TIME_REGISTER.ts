@@ -1,5 +1,5 @@
 export class USER_TASK_TIME_REGISTER {
-    public data = [
+    public static data = [
         {
             "date": 1679270400,
             "taskId": 10,

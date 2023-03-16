@@ -1,5 +1,5 @@
 export class AUTH {
-    public data = [
+    public static data = [
         {
             "email": "sam@example.com",
             "authKey": "a8b7c6d5",

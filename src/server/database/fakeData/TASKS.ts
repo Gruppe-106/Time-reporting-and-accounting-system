@@ -1,5 +1,5 @@
 export class TASKS {
-    public data = [
+    public static data = [
         {
             "id": 1,
             "name": "Task X",

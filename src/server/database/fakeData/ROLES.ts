@@ -1,5 +1,5 @@
 export class ROLES {
-    public data = [
+    public static data = [
         {
             "id": 0,
             "name": "normal"

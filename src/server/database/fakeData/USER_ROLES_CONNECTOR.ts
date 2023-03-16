@@ -1,5 +1,5 @@
 export class USER_ROLES_CONNECTOR {
-    public data = [
+    public static data = [
         {
             "role": 2,
             "user": 1

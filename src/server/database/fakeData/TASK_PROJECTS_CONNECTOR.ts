@@ -1,5 +1,5 @@
 export class TASK_PROJECTS_CONNECTOR {
-    public data = [
+    public static data = [
         {
             "taskId": 1,
             "projectId": 1
