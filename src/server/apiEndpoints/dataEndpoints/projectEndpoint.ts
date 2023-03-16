@@ -11,7 +11,7 @@ export interface ProjectReturnType {
 }
 
 export class ProjectEndpoint extends EndpointBase{
-    table = new PROJECTS().data;
+    table = PROJECTS.data;
     data: ProjectReturnType[];
 
     async getData(requestValues: string[], user: User, primaryKey: string, keyEqual?: string[]):Promise<object[]> {

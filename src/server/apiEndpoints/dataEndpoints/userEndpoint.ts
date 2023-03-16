@@ -11,7 +11,7 @@ export interface UserReturnType {
 }
 
 export class UserEndpoint extends EndpointBase {
-    table = new USERS().data;
+    table = USERS.data;
     data: UserReturnType[];
 
     async getData(requestValues: string[], user: User, primaryKey: string, keyEqual?: string[]):Promise<object[]> {

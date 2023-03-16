@@ -14,9 +14,9 @@ interface ReturnType {
 }
 
 export class UserRoleEndpoint extends EndpointConnectorBase {
-    table = new USERS().data;
-    tableSecond = new ROLES().data;
-    tableConnector = new USER_ROLES_CONNECTOR().data;
+    table = USERS.data;
+    tableSecond = ROLES.data;
+    tableConnector = USER_ROLES_CONNECTOR.data;
     data: ReturnType[];
 
     private getRoleName(entry:{role: number, user: number}, dataIndex:number) {

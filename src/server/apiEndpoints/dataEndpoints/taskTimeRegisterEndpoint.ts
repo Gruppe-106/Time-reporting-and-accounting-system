@@ -17,7 +17,7 @@ export interface TaskTimeRegisterReturnType {
 }
 
 export class TaskTimeRegisterEndpoint extends EndpointBase {
-    table = new USER_TASK_TIME_REGISTER().data;
+    table = USER_TASK_TIME_REGISTER.data;
     data: TaskTimeRegisterReturnType[];
 
     async getData(requestValues: string[], user: User, primaryKey: string, keyEqual: string[]): Promise<object[]> {

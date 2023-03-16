@@ -8,7 +8,7 @@ interface ReturnType {
 }
 
 export class TimeTypeEndpoint extends EndpointBase {
-    table = new TIMETYPE().data;
+    table = TIMETYPE.data;
     data: ReturnType[];
 
     async getData(requestValues: string[], user: User, primaryKey: string, keyEqual?: string[]):Promise<object[]> {

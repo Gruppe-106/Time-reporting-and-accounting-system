@@ -16,7 +16,7 @@ export interface TaskProjectReturnType {
 }
 
 export class TaskProjectEndpoint extends EndpointBase {
-    table = new TASK_PROJECTS_CONNECTOR().data;
+    table = TASK_PROJECTS_CONNECTOR.data;
     data: TaskProjectReturnType[];
 
     async getData(requestValues: string[], user: User, primaryKey: string, keyEqual: string[]): Promise<object[]> {

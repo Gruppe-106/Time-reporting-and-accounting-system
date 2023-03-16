@@ -19,9 +19,9 @@ interface ReturnType {
 }
 
 export class ManagerGroupEndpoint extends EndpointConnectorBase {
-    table = new USERS().data;
+    table = USERS.data;
     tableSecond = null;
-    tableConnector = new GROUP().data;
+    tableConnector = GROUP.data;
     data: ReturnType[];
 
     async getData(requestValues: string[], user: User, primaryKey: string, keyEqual?: string[]): Promise<object[]> {

@@ -11,7 +11,7 @@ export interface TaskReturnType {
 }
 
 export class TaskEndpoint extends EndpointBase {
-    table = new TASKS().data;
+    table = TASKS.data;
     data: TaskReturnType[];
 
     async getData(requestValues: string[], user: User, primaryKey: string, keyEqual?: string[]):Promise<object[]> {
