@@ -14,12 +14,12 @@ import forge from 'node-forge';
 //TODO: fixings the types as this is infact a no no but it does fix it
 interface CostumTypes {
     // * Input variables
-    firstName: string,
-    lastName: string,
-    email: string,
-    password: string,
+    firstName: string | null,
+    lastName: string | null,
+    email: string | null,
+    password: string | null,
     assignedToManager: {roleName:string, roleId:number,userId:8,firstName:string,lastName:string} | null,
-    selectedRoles: any[],
+    selectedRoles: any[] | null,
 
     // * Database varaibles
     dbRoles: any[],
@@ -103,12 +103,12 @@ class UserCreation extends Component<any, CostumTypes>{
         super(props);
         this.state = {
             // * Input variables
-            firstName: "",
-            lastName: "",
-            email: "",
-            password: "",
+            firstName:  null,
+            lastName:  null,
+            email:  null,
+            password: null,
             assignedToManager: null,
-            selectedRoles: [],
+            selectedRoles: null,
 
             // * Database varaibles
             dbRoles: [],
@@ -269,20 +269,30 @@ class UserCreation extends Component<any, CostumTypes>{
         const sha256 = forge.md.sha256.create();
 
         const userObject: {
-            firstName: string,
-            lastName: string,
-            email: string,
-            password: string,
+            firstName: string | null,
+            lastName: string | null,
+            email: string | null,
+            password: string | null,
             assignedToManager: {roleName:string, roleId:number,userId:8,firstName:string,lastName:string} | null
-            roles: any[]
+            roles: any[] | null
         } = {
             firstName: this.state.firstName,
             lastName: this.state.lastName,
             email: this.state.email,
-            password: sha256.update(this.state.password).digest().toHex(),
+            password: this.state.password ? sha256.update(this.state.password).digest().toHex(): null,
             assignedToManager: this.state.assignedToManager,
             roles: this.state.selectedRoles
         }
+
+        let missing: string[]  = []
+        let keys: string[] = Object.keys(userObject)
+
+        for(let i = 0; i < keys.length;i++){
+            if(userObject[keys[i]] === 0){
+                missing.push(keys[i])
+            }
+        }
+
 
         this.SendUser(userObject)
 
@@ -340,7 +350,7 @@ class UserCreation extends Component<any, CostumTypes>{
         roles: any[]
     }) {
 
-        console.log(userObject)
+      
         this.HandleShow("Hello world man thing")
 
     }
@@ -420,7 +430,7 @@ class UserCreation extends Component<any, CostumTypes>{
                         </Form.Group>
 
 
-                        <Button variant="primary" type="button" disabled={this.state.submitDisabled} onClick={this.HandleSubmit} >
+                        <Button variant="primary" type="button" onClick={this.HandleSubmit} >
                             {
                                 /**
                                  * todo: Fix the submit logic error TODO:
