@@ -135,6 +135,8 @@ class UserCreation extends Component<any, CostumTypes>{
         // * Component handeling
         this.HandleSubmit = this.HandleSubmit.bind(this);
         this.HandleShow = this.HandleShow.bind(this);
+        this.HandleShowMessage = this.HandleShowMessage.bind(this);
+        this.HandleShowTitle = this.HandleShowTitle.bind(this);
         this.HandleClose = this.HandleClose.bind(this);
 
         //* Test handles
@@ -249,6 +251,8 @@ class UserCreation extends Component<any, CostumTypes>{
      * Handles the form submission.
     */
     private HandleSubmit(): void {
+
+        let hasShown = false;
         const sha256 = forge.md.sha256.create();
 
         const userObject: {
@@ -274,15 +278,18 @@ class UserCreation extends Component<any, CostumTypes>{
         let missingString: string = "";
 
         for (let i = 0; i < keys.length; i++) {
-            console.log(userObject[keys[i]])
+
             if (userObject[keys[i]] === null) {
                 missing.push(keys[i])
             }
         }
 
 
+        console.log(missing)
         if (!this.state.emailValid) {
-            this.HandleShow("Please enter a valid email adress")
+            this.HandleShowTitle("Invalid e-mail adress")
+            this.HandleShowMessage("Please enter a valid e-mail adress")
+            this.HandleShow()
         } else if (missing.length > 0) {
 
             /**
@@ -303,9 +310,19 @@ class UserCreation extends Component<any, CostumTypes>{
                     split = "Assign roles"
                 }
 
+                
                 missingString += "Missing field: " + split
+                if(!hasShown){
+                    this.HandleShowTitle("Missing field")
+                    this.HandleShowMessage(missingString)
+                    this.HandleShow()
+                    hasShown = true;
+                }
+              
 
-            } else {
+            } else if(missing.length > 1) {
+
+
                 let split: string = ""
 
                 missingString += "Missing fields: "
@@ -345,13 +362,16 @@ class UserCreation extends Component<any, CostumTypes>{
                 missingString += split
             }
 
-            this.HandleShow(missingString)
+            if(!hasShown){
+                this.HandleShowTitle("Missing fields: ")
+                this.HandleShowMessage(missingString)
+                this.HandleShow()
+                hasShown = true;
+            }
+
         } else {
-            
             this.SendUser(userObject)
         }
-
-
 
 
     }
@@ -359,18 +379,41 @@ class UserCreation extends Component<any, CostumTypes>{
     /**
      * Handles modal opening
     */
-    private HandleShow(message: string): void {
+    private HandleShow(): void {
+        this.setState({ showPopup: true });
+    }
+
+    /**
+     * Handles modal message state setting
+     * @param message The message to be shown to the user
+    */
+    private HandleShowMessage(message: string): void {
         this.setState({
             popupMessage: message
         })
-        this.setState({ showPopup: true });
+    }
+
+
+    /**
+     * Handles modal message title setting
+     * @param title The message to be shown to the user
+    */
+    private HandleShowTitle(title: string): void {
+        console.log(title)
+        this.setState({
+            popupTitle: title
+        })
     }
 
     /**
      * Handles modal closing
     */
     private HandleClose() {
-        this.setState({ showPopup: false });
+        this.setState({ 
+            showPopup: false,
+            popupTitle: "",
+            popupMessage: ""
+        });
     }
 
 
@@ -408,8 +451,12 @@ class UserCreation extends Component<any, CostumTypes>{
         roles: any[] | null
     }) {
 
+        this.HandleShowTitle("Successs or Error here from the server")
+        this.HandleShowMessage("This is a where the server response goes")
+        this.HandleShow()
 
-        this.HandleShow("Hello world man thing")
+        // ? Remember to delete key before sending
+        delete userObject.key
 
     }
 
