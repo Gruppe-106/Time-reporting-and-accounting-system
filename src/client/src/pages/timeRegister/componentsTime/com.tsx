@@ -12,7 +12,13 @@ interface TimeSheetState {
   data: TimeSheetData[];
 }
 
-class TimeSheetRow extends Component<{ data: TimeSheetData }> {
+class TimeSheetRow extends Component<{ data: TimeSheetData; onDelete: () => void }> {
+  handleDeleteClick = () => {
+    const { onDelete } = this.props;
+
+    onDelete();
+  };
+  
     render() {
         const { data } = this.props;
         let arr = ['1', '2', '3', '4', '5', '6', '7'];
@@ -33,6 +39,9 @@ class TimeSheetRow extends Component<{ data: TimeSheetData }> {
                             </Form.Select>
                         </InputGroup></td>))}
                         <td>0</td> {/* Total time */}
+                        <td>
+                        <Button variant="primary" type="button" onClick={this.handleDeleteClick}>Delete</Button>
+                        </td>
             </tr>
         )
     }
@@ -52,6 +61,14 @@ class TimeSheet extends Component<Props, TimeSheetState> {
     this.addRow = this.addRow.bind(this);
   }
 
+  handleDeleteRow = (index: number) => {
+    const { data } = this.state;
+
+    this.setState({
+      data: [...data.slice(0, index), ...data.slice(index + 1)],
+    });
+  };
+
   addRow() {
     const { data } = this.state;
 
@@ -67,7 +84,7 @@ class TimeSheet extends Component<Props, TimeSheetState> {
     const { data } = this.state;
 
     return data.map((item, index) => (
-      <TimeSheetRow key={index} data={item} />
+      <TimeSheetRow key={index} data={item} onDelete={() => this.handleDeleteRow(index)} />
     ));
   }
 
