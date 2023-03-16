@@ -3,7 +3,7 @@
  */
 import React, { Component } from "react";
 import BaseNavBar from "../../components/navBar";
-import { Container } from "react-bootstrap";
+import { Container, Modal } from "react-bootstrap";
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { Typeahead, Highlighter } from 'react-bootstrap-typeahead';
@@ -13,24 +13,36 @@ import forge from 'node-forge';
 
 //TODO: fixings the types as this is infact a no no but it does fix it
 interface CostumTypes {
-    selectedRoles: any[],
+    // * Input variables
     firstName: string,
     lastName: string,
     email: string,
     password: string,
     assignedToManager: { id: number, name: string } | null,
+    selectedRoles: any[],
+
+    // * Database varaibles
     dbRoles: any[],
+
+    // * Input validation
     firstNameValid: boolean,
     lastNameValid: boolean,
     emailValid: boolean,
     passwordValid: boolean,
     rolesValid: boolean,
+
+    // * Controlling components
     submitDisabled: boolean,
+    showPopup: boolean,
 
 }
 
 class GetCreationData {
 
+    /**
+     * Get all roles from the database
+     * @returns Promise containing all possible roles
+     */
     public static GetAllRoles(): Promise<{ id: number, name: string }[]> {
         return fetch(`/api/role/get?ids=*`, {
             method: 'GET',
@@ -60,29 +72,44 @@ class UserCreation extends Component<any, CostumTypes>{
     constructor(props: any) {
         super(props);
         this.state = {
+            // * Input variables
             firstName: "",
             lastName: "",
             email: "",
             password: "",
             assignedToManager: null,
             selectedRoles: [],
+
+            // * Database varaibles
             dbRoles: [],
 
+            // * Input validation
             firstNameValid: false,
             lastNameValid: false,
             emailValid: false,
             passwordValid: false,
             rolesValid: false,
+
+            // * Input validation
+            showPopup: false,
             submitDisabled: true,
 
         }
-        this.HandleSubmit = this.HandleSubmit.bind(this);
+
+        // * Handles input
         this.HandleFirstName = this.HandleFirstName.bind(this);
         this.HandleLastName = this.HandleLastName.bind(this);
         this.HandleEmail = this.HandleEmail.bind(this);
         this.HandlePassword = this.HandlePassword.bind(this)
-        this.HandleRoles = this.HandleRoles.bind(this)
         this.HandleManager = this.HandleManager.bind(this)
+        this.HandleRoles = this.HandleRoles.bind(this)
+
+        // * Component handeling
+        this.HandleSubmit = this.HandleSubmit.bind(this);
+        this.HandleShow = this.HandleShow.bind(this);
+        this.HandleClose = this.HandleClose.bind(this);
+
+        //* Test handles
         this.test = this.test.bind(this)
     }
 
@@ -101,9 +128,16 @@ class UserCreation extends Component<any, CostumTypes>{
 
 
     /**
-   * Handles changes to the first name input field.
-   * @param event - The input change event object.
-   */
+     *
+     * ! Input handle methods
+     *
+    */
+
+
+    /**
+     * Handles changes to the first name input field.
+     * @param event - The input change event object.
+    */
     private HandleFirstName(event: any): void {
         let validFirstName = event.target.value ? true : false
         let submitValid = this.state.firstNameValid && this.state.lastNameValid && this.state.emailValid && this.state.passwordValid && this.state.rolesValid
@@ -117,7 +151,7 @@ class UserCreation extends Component<any, CostumTypes>{
     /**
      * Handles changes to the last name input field.
      * @param event - The input change event object.
-     */
+    */
     private HandleLastName(event: any): void {
         let validLastName = event.target.value ? true : false
         let submitValid = this.state.firstNameValid && this.state.lastNameValid && this.state.emailValid && this.state.passwordValid && this.state.rolesValid
@@ -126,12 +160,14 @@ class UserCreation extends Component<any, CostumTypes>{
             lastNameValid: validLastName,
             submitDisabled: !submitValid
         })
+
+
     }
 
     /**
      * Handles changes to the email input field.
      * @param event - The input change event object.
-     */
+    */
     private HandleEmail(event: any): void {
         const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(event.target.value); // check if the email is valid
         let submitValid = this.state.firstNameValid && this.state.lastNameValid && this.state.emailValid && this.state.passwordValid && this.state.rolesValid
@@ -148,7 +184,7 @@ class UserCreation extends Component<any, CostumTypes>{
     /**
      * Handles changes to the password input field.
      * @param event - The input change event object.
-     */
+    */
     private HandlePassword(event: any): void {
         let passwordValid = event.target.value ? true : false
         let submitValid = this.state.firstNameValid && this.state.lastNameValid && this.state.emailValid && this.state.passwordValid && this.state.rolesValid
@@ -161,9 +197,19 @@ class UserCreation extends Component<any, CostumTypes>{
     }
 
     /**
+     * Handles changes to the assigned to manager checkbox field.
+     * @param manager - The manager object.
+    */
+    private HandleManager(manager: any): void {
+        this.setState({
+            assignedToManager: manager[0]
+        })
+    }
+
+    /**
      * Handles changes to the roles select field.
      * @param roles - The selected roles array.
-     */
+    */
     private HandleRoles(roles: any): void {
         let rolesValid = roles.length > 0 ? true : false
 
@@ -173,20 +219,18 @@ class UserCreation extends Component<any, CostumTypes>{
         })
     }
 
+
     /**
-     * Handles changes to the assigned to manager checkbox field.
-     * @param manager - The manager object.
-     */
-    private HandleManager(manager: any): void {
-        this.setState({
-            assignedToManager: manager[0]
-        })
-    }
+     *
+     * ! Componant handle methods
+     *
+    */
+
 
     /**
      * Handles the form submission.
-     */
-    private HandleSubmit() {
+    */
+    private HandleSubmit(): void {
         const sha256 = forge.md.sha256.create();
 
         const userObject: {
@@ -209,11 +253,57 @@ class UserCreation extends Component<any, CostumTypes>{
 
     }
 
+    /**
+     * Handles modal opening
+    */
+    private HandleShow() {
+        this.setState({ showPopup: true });
+    }
+
+    /**
+     * Handles modal closing
+    */
+    private HandleClose() {
+        this.setState({ showPopup: false });
+    }
+
+
+    /**
+     *
+     * ! Test handle methods
+     *
+    */
+
 
     // Test binding for testing because haha funnyman i wanna die
-    private test() {
+    private test(): void {
         let submitValid = this.state.firstNameValid && this.state.lastNameValid && this.state.emailValid && this.state.passwordValid && this.state.rolesValid
         console.log(submitValid)
+    }
+
+
+    /**
+     *
+     * ! Handles data sending
+     *
+    */
+
+    
+    /**
+     * Handles the sending of the user object to server
+     * @param UserObject
+     */
+    private SendUser(UserObject: {
+        firstName: string,
+        lastName: string,
+        email: string,
+        password: string,
+        assignedToManager: { id: number, name: string } | null
+        roles: any[]
+    }) {
+
+
+
     }
 
 
@@ -311,28 +401,26 @@ class UserCreation extends Component<any, CostumTypes>{
                             Submit
                         </Button>
                     </Form>
+                    <Modal show={this.state.showPopup} onHide={this.HandleClose}>
+                        <Modal.Header closeButton>
+                            <Modal.Title>Popup Title</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            {/* Popup content */}
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <Button variant="secondary" onClick={this.HandleClose}>
+                                Close
+                            </Button>
+                        </Modal.Footer>
+                    </Modal>
                 </Container>
             </>
         );
     }
 
 
-    /**
-     * Handles the sending of the user object to server
-     * @param UserObject
-     */
-    private SendUser(UserObject: {
-        firstName: string,
-        lastName: string,
-        email: string,
-        password: string,
-        assignedToManager: { id: number, name: string } | null
-        roles: any[]
-    }) {
 
-        console.log(UserObject)
-
-    }
 }
 
 
