@@ -91,7 +91,7 @@ class TimeSheet extends Component<Props, TimeSheetState> {
   render() {
     let arr = ['1', '2', '3', '4', '5', '6', '7'];
     return (
-      <Container>
+      <Container fluid>
         <Table bordered hover size="sm">
             <thead>
                 <tr>
