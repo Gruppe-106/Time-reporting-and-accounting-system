@@ -40,7 +40,7 @@ class TimeSheetRow extends Component<{ data: TimeSheetData; onDelete: () => void
                         </InputGroup></td>))}
                         <td>0</td> {/* Total time */}
                         <td>
-                        <Button variant="primary" type="button" onClick={this.handleDeleteClick}>Delete</Button>
+                        <Button variant="danger" type="button" onClick={this.handleDeleteClick}>-</Button>
                         </td>
             </tr>
         )
@@ -58,7 +58,7 @@ class TimeSheet extends Component<Props, TimeSheetState> {
       ],
     };
 
-    this.addRow = this.addRow.bind(this);
+    this.handleAddRow = this.handleAddRow.bind(this);
   }
 
   handleDeleteRow = (index: number) => {
@@ -69,7 +69,7 @@ class TimeSheet extends Component<Props, TimeSheetState> {
     });
   };
 
-  addRow() {
+  handleAddRow() {
     const { data } = this.state;
 
     this.setState({
@@ -105,7 +105,7 @@ class TimeSheet extends Component<Props, TimeSheetState> {
                 {this.renderRows()}
             </tbody>
         </Table>
-        <Button variant="primary" type="button" onClick={() => this.addRow()}>Add Row</Button>
+        <Button variant="primary" type="button" onClick={() => this.handleAddRow()}>Add Row</Button>
       </Container>
     );
   }
