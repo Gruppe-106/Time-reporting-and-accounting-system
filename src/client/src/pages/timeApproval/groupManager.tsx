@@ -54,24 +54,60 @@ class GroupManager extends Component<GroupManagerProp>{
                     };
                     empData.push(emp);
                 }
-                this.setState({ empDataLoaded: true })
                 resolve(empData);
             }, 3000);
         })
     }
 
+    private CreateTable():JSX.Element {
+        return (
+            <>
+                {this.state.empDataLoaded?(
+                    <Table striped hover bordered>
+                        <thead>
+                        <tr>
+                            <th className={"col-sm-3"}>First Name</th>
+                            <th className={"col-sm-3"}>Last Name</th>
+                            <th className={"col-sm-4"}>Email</th>
+                            <th className={"col-sm-2"}></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {
+                            this.employees.map(e => (
+                                <tr>
+                                    <td>{e.firstName}</td>
+                                    <td>{e.lastName}</td>
+                                    <td>{e.email}</td>
+                                    <td><center><Button className={"col-sm-12"}>Inspect timesheet</Button></center></td>
+                                </tr>
+                            ))
+                        }
+                        </tbody>
+                    </Table>
+                ):(
+                    <h4>Loading...</h4>
+                )}
+            </>
+        )
+    }
+
     render() {
         this.GetDataAsync().then(data => {
             this.employees = data;
-        });
-        const { id } = useParams(); // ! THIS GIVES ERRORS
-        /**
-         * ! Specific error src\pages\timeApproval\groupManager.tsx
-         * ! Line 67:24:  React Hook "useParams" cannot be called in a class component.
-         * ! React Hooks must be called in a React function component or a custom React Hook function  react-hooks/rules-of-hooks
-         */
-        this.managerId = Number(id);
+            this.setState({empDataLoaded: true})
+        })
         return (
+            <>
+                <BaseNavBar />
+                <Container className={"py-3"}>
+                    <h1>Group Manager</h1>
+                    {this.CreateTable()}
+                </Container>
+            </>
+        )
+
+        /*(
             <>
                 <BaseNavBar />
                 <Container className={"py-3"}>
@@ -79,7 +115,7 @@ class GroupManager extends Component<GroupManagerProp>{
                     {
                         (this.state.empDataLoaded) ? (
                             <>
-                                <h4 className={"col-sm-3"}>{this.managerId}</h4>
+                                <this.GetTable />
                                 <Table striped hover bordered>
                                     <thead>
                                         <tr>
@@ -107,7 +143,7 @@ class GroupManager extends Component<GroupManagerProp>{
                     }
                 </Container>
             </>
-        );
+        );*/
     }
 }
 
