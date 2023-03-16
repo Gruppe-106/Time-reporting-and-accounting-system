@@ -197,10 +197,12 @@ CREATE TABLE ROLES(
 ### Params
 ```
 Required:
-    user_ids=number | number,number,... | *
+    user=number | number,number,... | *
+    or
+    role=number | number,number,... | *
     * will return all projects
 Optional:
-    val=role_id,role_name,user_id
+    val=role_id,role_name,user_id,first_name,last_name
     Can be any and/or all
 ```
 ### Structure Of Object Returned
@@ -209,6 +211,8 @@ Optional:
   [
       {
         user_id?: number,
+        first_name?: string,
+        last_name?: string,
         role_id?: number,
         role_name?: string
       }
@@ -226,6 +230,59 @@ Optional:
 CREATE TABLE USER_ROLES_CONNECTOR(
     role INT UNSIGNED 
     user INT UNSIGNED 
+    PRIMARY KEY(id, user)
+)
+```
+
+## Group manager : /group/manager/get
+### Params
+```
+Required:
+    manager=number | number,number,... | *
+    or
+    group=number | number,number,... | *
+    * will return all projects
+Optional:
+    val=manager,group,first_name,last_name,employees
+    Can be any and/or all
+```
+### Structure Of Object Returned
+
+```
+  [
+    {
+        manager?: number,
+        first_name?: string,
+        last_name?: string,
+        group?: number,
+        employees?: {
+            id?: number,
+            first_name?: string,
+            last_name?: string,
+            email?: string
+        }[];
+    }
+  ]
+```
+
+### Example
+[http://localhost:8080/api/group/manager/get?manager=7&var=manager,group,employees](http://localhost:8080/api/group/manager/get?manager=7&var=manager,group,employees)
+#### Returns:
+```json
+[
+  {"manager":7,"group":1,"employees":[
+      {"id":1,"first_name":"Sam","last_name":"Smith","email":"Smith"},
+      {"id":2,"first_name":"Joe","last_name":"Smith","email":"Smith"},
+      {"id":3,"first_name":"Jane","last_name":"Doe","email":"Doe"}
+    ]
+  }
+]
+```
+### Table
+```
+CREATE TABLE GROUP(
+    manager INT UNSIGNED 
+    group INT UNSIGNED 
     PRIMARY KEY(id, user)
 )
 ```
@@ -251,3 +308,4 @@ CREATE TABLE AUTH(
 3. User task time register
 4. Group
 5. Get name of timetype in tasks
+6. Time as a number not string

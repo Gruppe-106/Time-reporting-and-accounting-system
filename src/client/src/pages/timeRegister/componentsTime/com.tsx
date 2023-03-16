@@ -1,15 +1,19 @@
-import {Container, Table, Form, Dropdown, DropdownButton, InputGroup} from "react-bootstrap";
+import {Container, Table, Form, InputGroup, Dropdown, DropdownButton} from "react-bootstrap";
 import React, {Component} from "react";
 
-class TimeTableRegister extends Component<any> {
+type MyState = {
+    DropValue?: number; // like this
+  };
 
-    state = {valueChange: false};
-    constructor(props:any) {
+class TimeTableRegister extends Component<MyState> {
+    constructor(props:MyState) {
         super(props);
     }    
+    state: MyState = {DropValue: 0,};
 
     render() {
         let arr = ['1', '2', '3', '4', '5', '6', '7'];
+        let iniDropValue = this.state.DropValue;
         return(
             <Container>
                 <Table bordered hover size="sm">
@@ -32,16 +36,17 @@ class TimeTableRegister extends Component<any> {
                     <InputGroup.Text id={`basic-addon-${num}`}>;</InputGroup.Text>
                     <DropdownButton
                     variant="outline-secondary"
-                    title="0"
+                    title={iniDropValue}
                     drop="down-centered"
                     id={`time-input-${num}`}
                     align="end"
+                    onSelect={(selectedKey) => this.setState({iniDropValue: selectedKey})}
                     >
-                    <Dropdown.Item value={15}>15</Dropdown.Item>
-                    <Dropdown.Item value={30}>30</Dropdown.Item>
-                    <Dropdown.Item value={45}>45</Dropdown.Item>
-                    </DropdownButton> 
-                    {/* <Form.Select>
+                    <Dropdown.Item eventKey={15} value={15}>15</Dropdown.Item>
+                    <Dropdown.Item eventKey={30} value={30}>30</Dropdown.Item>
+                    <Dropdown.Item eventKey={45} value={45}>45</Dropdown.Item>
+                    </DropdownButton>
+                    {/*<Form.Select>
                         <option value="0">0</option>
                         <option value="15">15</option>
                         <option value="30">30</option>

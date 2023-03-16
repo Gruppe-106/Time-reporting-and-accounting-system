@@ -14,7 +14,7 @@ export class UserEndpoint extends EndpointBase {
     table = new USERS().data;
     data: UserReturnType[];
 
-    async getData(requestValues: string[], user: User, primaryKey: string, keyEqual?: string[]):Promise<object> {
+    async getData(requestValues: string[], user: User, primaryKey: string, keyEqual?: string[]):Promise<object[]> {
         return await this.baseGetData(requestValues, user, primaryKey, keyEqual);
     }
 }

@@ -28,13 +28,13 @@ abstract class EndpointBase {
         return this.user.authKey === "test";
     }
 
-    public async processRequest(requestValues: string[], primaryKey:string, keyEqual?:string[]):Promise<object> {
+    public async processRequest(requestValues: string[], primaryKey:string, keyEqual?:string[]):Promise<object[]> {
         if (this.ensureAuth()) {
             return await this.getData(requestValues, this.user, primaryKey, keyEqual);
         }
     }
 
-    public async baseGetData(requestValues: string[], user: User, primaryKey: string, keyEqual?: string[]):Promise<object> {
+    public async baseGetData(requestValues: string[], user: User, primaryKey: string, keyEqual?: string[]):Promise<object[]> {
         this.data = [];
         let dataIndex = 0;
         for (const entry of this.table) {
@@ -53,7 +53,7 @@ abstract class EndpointBase {
         return this.data;
     }
 
-    abstract getData(requestValues: string[], user: User, primaryKey: string, keyEqual?: string[]):Promise<object>;
+    abstract getData(requestValues: string[], user: User, primaryKey: string, keyEqual?: string[]):Promise<object[]>;
 }
 
 export default EndpointBase;

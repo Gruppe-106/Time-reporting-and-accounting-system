@@ -7,6 +7,8 @@ import {ROLES} from "../../database/fakeData/ROLES";
 
 interface ReturnType {
     user_id?: number,
+    first_name?: string,
+    last_name?: string,
     role_id?: number,
     role_name?: string
 }
@@ -28,25 +30,31 @@ export class UserRoleEndpoint extends EndpointConnectorBase {
         }
     }
 
-    async getData(requestValues: string[], user: User, primaryKey: string, keyEqual?: string[]): Promise<object> {
+    async getData(requestValues: string[], user: User, primaryKey: string, keyEqual?: string[]): Promise<object[]> {
         this.data = [];
         let dataIndex = 0;
         for (const entry of this.tableConnector) {
-            if (keyEqual.indexOf(entry[primaryKey].toString()) !== -1 || keyEqual.indexOf("*") !== -1) {
-                this.data[dataIndex] = {};
-                if (requestValues.indexOf("*") !== -1) {
-                    this.getRoleName(entry, dataIndex);
-                    this.data[dataIndex].role_id = entry.role;
-                    this.data[dataIndex].user_id = entry.user;
-                } else {
-                    console.log(requestValues)
-                    for (const request of requestValues) {
-                        if      (request === "role_id")   this.data[dataIndex].role_id = entry["role"];
-                        else if (request === "user_id")   this.data[dataIndex].user_id = entry["user"];
-                        else if (request === "role_name") this.getRoleName(entry, dataIndex);
+            if (this.table.length >= entry.user) {
+                if (keyEqual.indexOf(entry[primaryKey].toString()) !== -1 || keyEqual.indexOf("*") !== -1) {
+                    this.data[dataIndex] = {};
+                    if (requestValues.indexOf("*") !== -1) {
+                        this.getRoleName(entry, dataIndex);
+                        this.data[dataIndex].role_id = entry.role;
+                        this.data[dataIndex].user_id = entry.user;
+                        this.data[dataIndex].first_name = this.table[entry.user - 1].first_name;
+                        this.data[dataIndex].last_name = this.table[entry.user - 1].last_name;
+                    } else {
+                        console.log(requestValues)
+                        for (const request of requestValues) {
+                            if (request === "role_id") this.data[dataIndex].role_id = entry.role;
+                            else if (request === "user_id") this.data[dataIndex].user_id = entry.user;
+                            else if (request === "role_name") this.getRoleName(entry, dataIndex);
+                            else if (request === "first_name") this.data[dataIndex].first_name = this.table[entry.user - 1].first_name;
+                            else if (request === "last_name") this.data[dataIndex].last_name = this.table[entry.user - 1].last_name;
+                        }
                     }
+                    dataIndex++;
                 }
-                dataIndex++;
             }
         }
         return this.data;
@@ -54,7 +62,8 @@ export class UserRoleEndpoint extends EndpointConnectorBase {
 }
 
 export function userRoleGetRoute(req:Request, res:Response, user:User) {
-    let ids = req.query.user_ids;
+    let userIds = req.query.user;
+    let roleIds = req.query.role;
     let values = req.query.var;
 
     let requestedValues:string[];
@@ -67,9 +76,12 @@ export function userRoleGetRoute(req:Request, res:Response, user:User) {
     let primaryKey:string = "";
     let requestKeys: string[];
 
-    if (typeof ids === "string") {
-        requestKeys= ids.split(",");
+    if (typeof userIds === "string") {
+        requestKeys= userIds.split(",");
         primaryKey = "user";
+    } else if (typeof roleIds === "string") {
+        requestKeys= roleIds.split(",");
+        primaryKey = "role";
     } else {
         res.sendStatus(400)
         res.end();
