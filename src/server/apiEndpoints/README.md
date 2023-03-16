@@ -311,16 +311,17 @@ return
 ```
 [
     {
-        task_id?: number,
-        task_name?: string,
-        project_name?: string,
+        taskId?: number,
+        taskName?: string,
+        projectName?: string,
+        projectId?: number
         date?: number,
-        user_id?: number,
-        time?: int
-        approved?: bool
-        manager_logged?: bool
+        userId?: number,
+        time?: number,
+        approved?: boolean,
+        managerLogged?: boolean
     }
-]
+] 
 ```
 4. Group
 5. Get name of timetype in tasks
