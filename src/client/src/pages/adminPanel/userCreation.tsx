@@ -147,9 +147,12 @@ class UserCreation extends Component<any, CostumTypes>{
         this.test = this.test.bind(this)
     }
 
+
     async componentDidMount() {
         const dbRoles = await GetCreationData.GetAllRoles()
         const dbManagers = await GetCreationData.GetAllManagers()
+
+        console.log(dbManagers)
 
 
         this.setState({
@@ -384,7 +387,7 @@ class UserCreation extends Component<any, CostumTypes>{
                             <Form.Label>Assign Manager</Form.Label>
                             <Typeahead
                                 id="assignManager"
-                                labelKey={(option:any) => `${option.firstName} ${option.lastName}`}
+                                labelKey={(option:any) => `${option.firstName}  ${option.lastName}`}
                                 options={this.state.dbManagers}
                                 placeholder="Choose Manager..."
                                 onChange={this.HandleManager}
@@ -397,7 +400,7 @@ class UserCreation extends Component<any, CostumTypes>{
                                 renderMenuItemChildren={(option: any, props: any) => (
                                     <>
                                         <Highlighter search={props.text}>
-                                            {option.firstName + option.firstName}
+                                            {option.firstName + " " + option.lastName}
                                         </Highlighter>
                                         <div>
                                             <small>Manager user id: {option.userId}</small>
