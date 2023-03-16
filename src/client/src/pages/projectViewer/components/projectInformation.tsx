@@ -5,6 +5,7 @@ import Row from 'react-bootstrap/Row';
 import Tab from 'react-bootstrap/Tab';
 import {Table} from "react-bootstrap";
 import BaseApiHandler from "../../../network/baseApiHandler";
+import ProjectMemberTable from "./projectInformationMembers";
 /*
 TO DO HERE
 CHANGE TO CREATE A "PAGE" FROM ID
@@ -82,28 +83,7 @@ class ProjectInformation extends Component<ProjectInformationProp> {
             </Tab.Pane>
             <Tab.Pane eventKey="second">
                 <h3>Members list</h3>
-                <Table striped bordered hover>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Role</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Joe Momma (placeholder)</td>
-          <td>Project Leader</td>
-        </tr>
-       <tr>
-          <td>Big Steve</td>
-          <td>Code Monkey</td>
-        </tr>
-       <tr>
-          <td>Milo</td>
-          <td>Team Member</td>
-        </tr>
-      </tbody>
-    </Table>
+                <ProjectMemberTable/>
             </Tab.Pane>
               <Tab.Pane eventKey="third">
                 <h3>Task list</h3>
