@@ -18,7 +18,7 @@ interface CostumTypes {
     lastName: string | null,
     email: string | null,
     password: string | null,
-    assignedToManager: {roleName:string, roleId:number,userId:8,firstName:string,lastName:string} | null,
+    assignedToManager: { roleName: string, roleId: number, userId: number, firstName: string, lastName: string } | null,
     selectedRoles: any[] | null,
 
     // * Database varaibles
@@ -26,11 +26,7 @@ interface CostumTypes {
     dbManagers: any[],
 
     // * Input validation
-    firstNameValid: boolean,
-    lastNameValid: boolean,
     emailValid: boolean,
-    passwordValid: boolean,
-    rolesValid: boolean,
 
     // * Controlling components
     submitDisabled: boolean,
@@ -38,6 +34,7 @@ interface CostumTypes {
 
     // * Component variables
     popupMessage: string,
+    popupTitle: string
 
 }
 
@@ -103,9 +100,9 @@ class UserCreation extends Component<any, CostumTypes>{
         super(props);
         this.state = {
             // * Input variables
-            firstName:  null,
-            lastName:  null,
-            email:  null,
+            firstName: null,
+            lastName: null,
+            email: null,
             password: null,
             assignedToManager: null,
             selectedRoles: null,
@@ -115,11 +112,7 @@ class UserCreation extends Component<any, CostumTypes>{
             dbManagers: [],
 
             // * Input validation
-            firstNameValid: false,
-            lastNameValid: false,
             emailValid: false,
-            passwordValid: false,
-            rolesValid: false,
 
             // * Component controllers
             showPopup: false,
@@ -127,6 +120,7 @@ class UserCreation extends Component<any, CostumTypes>{
 
             // * Component variables
             popupMessage: "",
+            popupTitle: "",
 
         }
 
@@ -176,12 +170,10 @@ class UserCreation extends Component<any, CostumTypes>{
      * @param event - The input change event object.
     */
     private HandleFirstName(event: any): void {
-        let validFirstName = event.target.value ? true : false
-        let submitValid = this.state.firstNameValid && this.state.lastNameValid && this.state.emailValid && this.state.passwordValid && this.state.rolesValid
+
         this.setState({
-            firstName: event.target.value,
-            firstNameValid: validFirstName,
-            submitDisabled: !submitValid
+            firstName: event.target.value ? event.target.value : null,
+
         })
     }
 
@@ -190,14 +182,10 @@ class UserCreation extends Component<any, CostumTypes>{
      * @param event - The input change event object.
     */
     private HandleLastName(event: any): void {
-        let validLastName = event.target.value ? true : false
-        let submitValid = this.state.firstNameValid && this.state.lastNameValid && this.state.emailValid && this.state.passwordValid && this.state.rolesValid
         this.setState({
-            lastName: event.target.value,
-            lastNameValid: validLastName,
-            submitDisabled: !submitValid
-        })
+            lastName: event.target.value ? event.target.value : null,
 
+        })
 
     }
 
@@ -207,12 +195,12 @@ class UserCreation extends Component<any, CostumTypes>{
     */
     private HandleEmail(event: any): void {
         const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(event.target.value); // check if the email is valid
-        let submitValid = this.state.firstNameValid && this.state.lastNameValid && this.state.emailValid && this.state.passwordValid && this.state.rolesValid
+
 
         this.setState({
-            email: event.target.value,
+            email: event.target.value ? event.target.value : null,
             emailValid: emailValid,
-            submitDisabled: !submitValid
+
         })
     }
 
@@ -221,13 +209,10 @@ class UserCreation extends Component<any, CostumTypes>{
      * @param event - The input change event object.
     */
     private HandlePassword(event: any): void {
-        let passwordValid = event.target.value ? true : false
-        let submitValid = this.state.firstNameValid && this.state.lastNameValid && this.state.emailValid && this.state.passwordValid && this.state.rolesValid
 
         this.setState({
-            password: event.target.value,
-            passwordValid: passwordValid,
-            submitDisabled: !submitValid
+            password: event.target.value ? event.target.value : null
+
         })
     }
 
@@ -237,7 +222,7 @@ class UserCreation extends Component<any, CostumTypes>{
     */
     private HandleManager(manager: any): void {
         this.setState({
-            assignedToManager: manager[0]
+            assignedToManager: manager[0] ? manager[0] : null
         })
     }
 
@@ -246,11 +231,9 @@ class UserCreation extends Component<any, CostumTypes>{
      * @param roles - The selected roles array.
     */
     private HandleRoles(roles: any): void {
-        let rolesValid = roles.length > 0 ? true : false
 
         this.setState({
-            selectedRoles: roles,
-            rolesValid: rolesValid,
+            selectedRoles: roles.length > 0 ? roles : null,
         })
     }
 
@@ -269,32 +252,107 @@ class UserCreation extends Component<any, CostumTypes>{
         const sha256 = forge.md.sha256.create();
 
         const userObject: {
+            [key: string]: any
             firstName: string | null,
             lastName: string | null,
             email: string | null,
             password: string | null,
-            assignedToManager: {roleName:string, roleId:number,userId:8,firstName:string,lastName:string} | null
+            assignedToManager: { roleName: string, roleId: number, userId: number, firstName: string, lastName: string } | null
             roles: any[] | null
         } = {
             firstName: this.state.firstName,
             lastName: this.state.lastName,
             email: this.state.email,
-            password: this.state.password ? sha256.update(this.state.password).digest().toHex(): null,
+            password: this.state.password ? sha256.update(this.state.password).digest().toHex() : null,
             assignedToManager: this.state.assignedToManager,
             roles: this.state.selectedRoles
         }
 
-        let missing: string[]  = []
-        let keys: string[] = Object.keys(userObject)
 
-        for(let i = 0; i < keys.length;i++){
-            if(userObject[keys[i]] === 0){
+        let missing: string[] = []
+        let keys: string[] = Object.keys(userObject)
+        let missingString: string = "";
+
+        for (let i = 0; i < keys.length; i++) {
+            console.log(userObject[keys[i]])
+            if (userObject[keys[i]] === null) {
                 missing.push(keys[i])
             }
         }
 
 
-        this.SendUser(userObject)
+        if (!this.state.emailValid) {
+            this.HandleShow("Please enter a valid email adress")
+        } else if (missing.length > 0) {
+
+            /**
+             * TODO: create a function here instead
+            */
+            if (missing.length === 1) {
+                let split: string = ""
+
+                if (missing[0] === "firstName") {
+                    split = "First name"
+                } else if (missing[0] === "lastName") {
+                    split = "Last name"
+                } else if (missing[0] === "email") {
+                    split = "Email address"
+                } else if (missing[0] === "assignedToManager") {
+                    split = "Assign manager"
+                } else if (missing[0] === "roles") {
+                    split = "Assign roles"
+                }
+
+                missingString += "Missing field: " + split
+
+            } else {
+                let split: string = ""
+
+                missingString += "Missing fields: "
+
+                for (let i = 0; i < missing.length - 1; i++) {
+
+                    if (missing[i] === "firstName") {
+                        split = "First name"
+                    } else if (missing[i] === "lastName") {
+                        split = "Last name"
+                    } else if (missing[i] === "email") {
+                        split = "Email address"
+                    } else if (missing[i] === "assignedToManager") {
+                        split = "Assign manager"
+                    } else if (missing[i] === "roles") {
+                        split = "Assign roles"
+                    }
+                    if (split) {
+                        missingString += split + ", "
+                    }
+                    split = ""
+                }
+
+                missingString += " and "
+
+                if (missing[missing.length - 1] === "firstName") {
+                    split = "First name"
+                } else if (missing[missing.length - 1] === "lastName") {
+                    split = "Last name"
+                } else if (missing[missing.length - 1] === "email") {
+                    split = "Email address"
+                } else if (missing[missing.length - 1] === "assignedToManager") {
+                    split = "Assign manager"
+                } else if (missing[missing.length - 1] === "roles") {
+                    split = "Assign roles"
+                }
+                missingString += split
+            }
+
+            this.HandleShow(missingString)
+        } else {
+            
+            this.SendUser(userObject)
+        }
+
+
+
 
     }
 
@@ -325,8 +383,7 @@ class UserCreation extends Component<any, CostumTypes>{
 
     // Test binding for testing because haha funnyman i wanna die
     private test(): void {
-        let submitValid = this.state.firstNameValid && this.state.lastNameValid && this.state.emailValid && this.state.passwordValid && this.state.rolesValid
-        console.log(submitValid)
+
     }
 
 
@@ -342,15 +399,16 @@ class UserCreation extends Component<any, CostumTypes>{
      * @param uerObject
      */
     private SendUser(userObject: {
-        firstName: string,
-        lastName: string,
-        email: string,
-        password: string,
-        assignedToManager: {roleName:string, roleId:number,userId:8,firstName:string,lastName:string} | null
-        roles: any[]
+        [key: string]: any,
+        firstName: string | null,
+        lastName: string | null,
+        email: string | null
+        password: string | null,
+        assignedToManager: { roleName: string, roleId: number, userId: number, firstName: string, lastName: string } | null
+        roles: any[] | null
     }) {
 
-      
+
         this.HandleShow("Hello world man thing")
 
     }
@@ -366,12 +424,12 @@ class UserCreation extends Component<any, CostumTypes>{
                     <h1>User Creation</h1>
                     <Form >
                         <Form.Group className="mb-3" controlId="formBasicFirstName">
-                            <Form.Label>First Name</Form.Label>
+                            <Form.Label>First name</Form.Label>
                             <Form.Control type="text" placeholder="Enter first name" onChange={this.HandleFirstName} />
                         </Form.Group>
 
                         <Form.Group className="mb-3" controlId="formBasicLastName">
-                            <Form.Label>Last Name</Form.Label>
+                            <Form.Label>Last name</Form.Label>
                             <Form.Control type="text" placeholder="Enter last name" onChange={this.HandleLastName} />
                         </Form.Group>
 
@@ -390,10 +448,10 @@ class UserCreation extends Component<any, CostumTypes>{
 
 
                         <Form.Group className="mb-3" controlId="formBasicAssignManager">
-                            <Form.Label>Assign Manager</Form.Label>
+                            <Form.Label>Assign manager</Form.Label>
                             <Typeahead
                                 id="assignManager"
-                                labelKey={(option:any) => `${option.firstName}  ${option.lastName}`}
+                                labelKey={(option: any) => `${option.firstName}  ${option.lastName}`}
                                 options={this.state.dbManagers}
                                 placeholder="Choose Manager..."
                                 onChange={this.HandleManager}
@@ -417,7 +475,7 @@ class UserCreation extends Component<any, CostumTypes>{
                         </Form.Group>
 
                         <Form.Group className="mb-3" controlId="formBasicAssignRole">
-                            <Form.Label>Assign Roles</Form.Label>
+                            <Form.Label>Assign roles</Form.Label>
                             <Typeahead
                                 labelKey="name"
                                 id="assignRoles"
@@ -441,7 +499,7 @@ class UserCreation extends Component<any, CostumTypes>{
                     </Form>
                     <Modal show={this.state.showPopup} onHide={this.HandleClose}>
                         <Modal.Header closeButton>
-                            <Modal.Title>Popup Title</Modal.Title>
+                            <Modal.Title>{this.state.popupTitle}</Modal.Title>
                         </Modal.Header>
                         <Modal.Body>
                             {this.state.popupMessage}
