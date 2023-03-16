@@ -18,11 +18,12 @@ interface CostumTypes {
     lastName: string,
     email: string,
     password: string,
-    assignedToManager: { id: number, name: string } | null,
+    assignedToManager: {roleName:string, roleId:number,userId:8,firstName:string,lastName:string} | null,
     selectedRoles: any[],
 
     // * Database varaibles
     dbRoles: any[],
+    dbManagers: any[],
 
     // * Input validation
     firstNameValid: boolean,
@@ -35,6 +36,9 @@ interface CostumTypes {
     submitDisabled: boolean,
     showPopup: boolean,
 
+    // * Component variables
+    popupMessage: string,
+
 }
 
 class GetCreationData {
@@ -42,9 +46,35 @@ class GetCreationData {
     /**
      * Get all roles from the database
      * @returns Promise containing all possible roles
-     */
+    */
     public static GetAllRoles(): Promise<{ id: number, name: string }[]> {
         return fetch(`/api/role/get?ids=*`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then((response: Response) => {
+                if (response.status === 400) {
+                    throw new Error("Status 400 bad request")
+                } else if (response.status === 200) {
+                    return response.json()
+                } else {
+                    throw new Error(`Unexpected response status: ${response.status}`)
+                }
+            })
+            .catch(error => {
+                throw new Error(error.Code);
+            });
+
+    }
+
+    /**
+     * Get all roles from the database
+     * @returns Promise containing all possible roles
+    */
+    public static GetAllManagers(): Promise<{ id: number, name: string }[]> {
+        return fetch(`/api/role/user/get?role=1`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -82,6 +112,7 @@ class UserCreation extends Component<any, CostumTypes>{
 
             // * Database varaibles
             dbRoles: [],
+            dbManagers: [],
 
             // * Input validation
             firstNameValid: false,
@@ -90,9 +121,12 @@ class UserCreation extends Component<any, CostumTypes>{
             passwordValid: false,
             rolesValid: false,
 
-            // * Input validation
+            // * Component controllers
             showPopup: false,
             submitDisabled: true,
+
+            // * Component variables
+            popupMessage: "",
 
         }
 
@@ -115,9 +149,12 @@ class UserCreation extends Component<any, CostumTypes>{
 
     async componentDidMount() {
         const dbRoles = await GetCreationData.GetAllRoles()
+        const dbManagers = await GetCreationData.GetAllManagers()
+
 
         this.setState({
-            dbRoles: dbRoles
+            dbRoles: dbRoles,
+            dbManagers: dbManagers
         })
 
     }
@@ -238,7 +275,7 @@ class UserCreation extends Component<any, CostumTypes>{
             lastName: string,
             email: string,
             password: string,
-            assignedToManager: { id: number, name: string } | null
+            assignedToManager: {roleName:string, roleId:number,userId:8,firstName:string,lastName:string} | null
             roles: any[]
         } = {
             firstName: this.state.firstName,
@@ -256,7 +293,10 @@ class UserCreation extends Component<any, CostumTypes>{
     /**
      * Handles modal opening
     */
-    private HandleShow() {
+    private HandleShow(message: string): void {
+        this.setState({
+            popupMessage: message
+        })
         this.setState({ showPopup: true });
     }
 
@@ -288,7 +328,7 @@ class UserCreation extends Component<any, CostumTypes>{
      *
     */
 
-    
+
     /**
      * Handles the sending of the user object to server
      * @param UserObject
@@ -298,16 +338,13 @@ class UserCreation extends Component<any, CostumTypes>{
         lastName: string,
         email: string,
         password: string,
-        assignedToManager: { id: number, name: string } | null
+        assignedToManager: {roleName:string, roleId:number,userId:8,firstName:string,lastName:string} | null
         roles: any[]
     }) {
 
-
+        this.HandleShow("Hello world man thing")
 
     }
-
-
-
 
 
 
@@ -316,7 +353,7 @@ class UserCreation extends Component<any, CostumTypes>{
         return (
             <>
                 <BaseNavBar />
-                <Container>
+                <Container className="py-3">
                     <h1>User Creation</h1>
                     <Form >
                         <Form.Group className="mb-3" controlId="formBasicFirstName">
@@ -347,31 +384,23 @@ class UserCreation extends Component<any, CostumTypes>{
                             <Form.Label>Assign Manager</Form.Label>
                             <Typeahead
                                 id="assignManager"
-                                labelKey="name"
-                                options={[
-                                    { id: 1, name: "Andreas F-KLUB villan origin story" },
-                                    { id: 2, name: "Mads OG Mads the one Mads" },
-                                    { id: 3, name: "Mikkel Cykkelmyggen" },
-                                    { id: 5, name: "Name's Bond, Christian Bond" },
-                                    { id: 6, name: "Mads gone like the wind" },
-                                    { id: 7, name: "Simon Simon Simon" },
-                                    { id: 4, name: "Alexander 👌" },
-                                ]}
+                                labelKey={(option:any) => `${option.firstName} ${option.lastName}`}
+                                options={this.state.dbManagers}
                                 placeholder="Choose Manager..."
                                 onChange={this.HandleManager}
                                 filterBy={(option: any, props: any): boolean => {
                                     const query: string = props.text.toLowerCase().trim();
-                                    const name: string = option.name.toLowerCase();
-                                    const id: string = option.id.toString();
+                                    const name: string = option.firstName.toLowerCase() + option.lastName.toLowerCase();
+                                    const id: string = option.userId.toString();
                                     return name.includes(query) || id.includes(query);
                                 }}
                                 renderMenuItemChildren={(option: any, props: any) => (
                                     <>
                                         <Highlighter search={props.text}>
-                                            {option.name}
+                                            {option.firstName + option.firstName}
                                         </Highlighter>
                                         <div>
-                                            <small>Manager id: {option.id}</small>
+                                            <small>Manager user id: {option.userId}</small>
                                         </div>
                                     </>
                                 )}
@@ -406,7 +435,7 @@ class UserCreation extends Component<any, CostumTypes>{
                             <Modal.Title>Popup Title</Modal.Title>
                         </Modal.Header>
                         <Modal.Body>
-                            {/* Popup content */}
+                            {this.state.popupMessage}
                         </Modal.Body>
                         <Modal.Footer>
                             <Button variant="secondary" onClick={this.HandleClose}>
