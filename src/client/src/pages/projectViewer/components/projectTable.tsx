@@ -2,10 +2,6 @@ import {Table} from "react-bootstrap";
 import React, {Component} from "react";
 import BaseApiHandler from "../../../network/baseApiHandler";
 
-interface ProjectTableProp{
-    tableRows:ProjectTableRow[]
-}
-
 interface Api{
 
         id?: number,
