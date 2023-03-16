@@ -151,6 +151,7 @@ class UserCreation extends Component<any, CostumTypes>{
             email: this.state.email,
             password: this.state.password,
             assignedToManager: this.state.assignedToManager,
+            roles: this.state.selectedRoles
         }
 
     }
