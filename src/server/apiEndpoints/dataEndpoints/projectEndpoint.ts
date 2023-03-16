@@ -4,10 +4,10 @@ import {Request, Response} from "express";
 
 interface ReturnType {
     id?: number,
-    super_project?: number,
+    superProject?: number,
     name?: string,
-    start_date?: string,
-    end_date?: string
+    startDate?: string,
+    endDate?: string
 }
 
 export class ProjectEndpoint extends EndpointBase{

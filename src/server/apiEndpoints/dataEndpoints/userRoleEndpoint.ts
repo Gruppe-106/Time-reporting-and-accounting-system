@@ -6,11 +6,11 @@ import EndpointConnectorBase from "../endpointConnectorBase";
 import {ROLES} from "../../database/fakeData/ROLES";
 
 interface ReturnType {
-    user_id?: number,
-    first_name?: string,
-    last_name?: string,
-    role_id?: number,
-    role_name?: string
+    userId?: number,
+    firstName?: string,
+    lastName?: string,
+    roleId?: number,
+    roleName?: string
 }
 
 export class UserRoleEndpoint extends EndpointConnectorBase {
@@ -26,7 +26,7 @@ export class UserRoleEndpoint extends EndpointConnectorBase {
             }
         })
         if (name.length !== 0) {
-            this.data[dataIndex].role_name = name[0].name;
+            this.data[dataIndex].roleName = name[0].name;
         }
     }
 
@@ -39,18 +39,18 @@ export class UserRoleEndpoint extends EndpointConnectorBase {
                     this.data[dataIndex] = {};
                     if (requestValues.indexOf("*") !== -1) {
                         this.getRoleName(entry, dataIndex);
-                        this.data[dataIndex].role_id = entry.role;
-                        this.data[dataIndex].user_id = entry.user;
-                        this.data[dataIndex].first_name = this.table[entry.user - 1].first_name;
-                        this.data[dataIndex].last_name = this.table[entry.user - 1].last_name;
+                        this.data[dataIndex].roleId = entry.role;
+                        this.data[dataIndex].userId = entry.user;
+                        this.data[dataIndex].firstName = this.table[entry.user - 1].firstName;
+                        this.data[dataIndex].lastName = this.table[entry.user - 1].lastName;
                     } else {
                         console.log(requestValues)
                         for (const request of requestValues) {
-                            if (request === "role_id") this.data[dataIndex].role_id = entry.role;
-                            else if (request === "user_id") this.data[dataIndex].user_id = entry.user;
-                            else if (request === "role_name") this.getRoleName(entry, dataIndex);
-                            else if (request === "first_name") this.data[dataIndex].first_name = this.table[entry.user - 1].first_name;
-                            else if (request === "last_name") this.data[dataIndex].last_name = this.table[entry.user - 1].last_name;
+                            if (request === "roleId") this.data[dataIndex].roleId = entry.role;
+                            else if (request === "userId") this.data[dataIndex].userId = entry.user;
+                            else if (request === "roleName") this.getRoleName(entry, dataIndex);
+                            else if (request === "firstName") this.data[dataIndex].firstName = this.table[entry.user - 1].firstName;
+                            else if (request === "lastName") this.data[dataIndex].lastName = this.table[entry.user - 1].lastName;
                         }
                     }
                     dataIndex++;

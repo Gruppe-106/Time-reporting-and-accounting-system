@@ -7,13 +7,13 @@ import {UserEndpoint, UserReturnType} from "./userEndpoint";
 
 interface ReturnType {
     manager?: number,
-    first_name?: string,
-    last_name?: string,
+    firstName?: string,
+    lastName?: string,
     group?: number,
     employees?: {
         id?: number,
-        first_name?: string,
-        last_name?: string,
+        firstName?: string,
+        lastName?: string,
         email?: string
     }[];
 }
@@ -33,18 +33,18 @@ export class ManagerGroupEndpoint extends EndpointConnectorBase {
                 this.data[dataIndex] = {};
                 if (requestValues.indexOf("*") !== -1) {
                     this.data[dataIndex].employees   = [];
-                    let employees:UserReturnType[] = await userEndpoint.processRequest(["id", "first_name", "last_name", "group"], "id", ["*"]);
+                    let employees:UserReturnType[] = await userEndpoint.processRequest(["id", "firstName", "lastName", "group"], "id", ["*"]);
                     for (const value of employees) {
                         if (value.id === entry.manager) {
-                            this.data[dataIndex].first_name = value.first_name;
-                            this.data[dataIndex].last_name = value.last_name;
+                            this.data[dataIndex].firstName = value.firstName;
+                            this.data[dataIndex].lastName = value.lastName;
                         }
                         else if(value.group === entry.id) {
                             this.data[dataIndex].employees.push({
                                 id: value.id,
-                                first_name: value.first_name,
-                                last_name: value.last_name,
-                                email: value.last_name
+                                firstName: value.firstName,
+                                lastName: value.lastName,
+                                email: value.lastName
                             })
                         }
                     }
@@ -60,24 +60,24 @@ export class ManagerGroupEndpoint extends EndpointConnectorBase {
                             case "group":
                                 this.data[dataIndex].group = entry.id;
                                 break;
-                            case "first_name":
-                                let dataFirst:UserReturnType[]  = await userEndpoint.processRequest(["first_name"], "id", [entry.manager.toString()]);
-                                this.data[dataIndex].first_name = dataFirst.pop().first_name;
+                            case "firstName":
+                                let dataFirst:UserReturnType[]  = await userEndpoint.processRequest(["firstName"], "id", [entry.manager.toString()]);
+                                this.data[dataIndex].firstName = dataFirst.pop().firstName;
                                 break;
-                            case "last_name":
-                                let dataLast:UserReturnType[]  = await userEndpoint.processRequest(["last_name"], "id", [entry.manager.toString()]);
-                                this.data[dataIndex].first_name = dataLast.pop().first_name;
+                            case "lastName":
+                                let dataLast:UserReturnType[]  = await userEndpoint.processRequest(["lastName"], "id", [entry.manager.toString()]);
+                                this.data[dataIndex].firstName = dataLast.pop().firstName;
                                 break;
                             case "employees":
                                 this.data[dataIndex].employees   = [];
-                                let employees:UserReturnType[] = await userEndpoint.processRequest(["id", "first_name", "last_name", "group"], "id", ["*"]);
+                                let employees:UserReturnType[] = await userEndpoint.processRequest(["id", "firstName", "lastName", "group"], "id", ["*"]);
                                 for (const value of employees) {
                                     if(value.group === entry.id) {
                                         this.data[dataIndex].employees.push({
                                             id: value.id,
-                                            first_name: value.first_name,
-                                            last_name: value.last_name,
-                                            email: value.last_name
+                                            firstName: value.firstName,
+                                            lastName: value.lastName,
+                                            email: value.lastName
                                         })
                                     }
                                 }
@@ -93,7 +93,7 @@ export class ManagerGroupEndpoint extends EndpointConnectorBase {
     }
 }
 
-export function managerGroupRoute(req:Request, res:Response, user:User) {
+export function managerGroupGetRoute(req:Request, res:Response, user:User) {
     let managerIds = req.query.manager;
     let groupIds = req.query.group;
     let values = req.query.var;
