@@ -67,7 +67,6 @@ class UserCreation extends Component<any, CostumTypes>{
     private HandleFirstName(event: any): void {
         let validFirstName = event.target.value ? true : false
         let submitValid = this.state.firstNameValid && this.state.lastNameValid && this.state.emailValid && this.state.passwordValid && this.state.rolesValid
-        console.log(submitValid)
         this.setState({
             firstName: event.target.value,
             firstNameValid: validFirstName,
