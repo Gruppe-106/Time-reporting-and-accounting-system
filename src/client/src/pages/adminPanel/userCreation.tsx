@@ -12,7 +12,11 @@ import forge from 'node-forge';
 
 
 //TODO: fixings the types as this is infact a no no but it does fix it
-interface CostumTypes {
+
+/**
+ * Custom types
+ */
+interface CustomTypes {
     // * Input variables
     firstName: string | null,
     lastName: string | null,
@@ -21,7 +25,7 @@ interface CostumTypes {
     assignedToManager: { roleName: string, roleId: number, userId: number, firstName: string, lastName: string } | null,
     selectedRoles: any[] | null,
 
-    // * Database varaibles
+    // * Database variables
     dbRoles: any[],
     dbManagers: any[],
 
@@ -39,8 +43,16 @@ interface CostumTypes {
 }
 
 
+/**
+ * Class containing utility methods
+*/
 class Utility {
 
+    /**
+     * Method to validate fields
+     * @param userObject The object containing the current field information
+     * @returns Object containing information about missings fields if any
+     */
     public static CheckFields(userObject: {
         [key: string]: any
         firstName: string | null,
@@ -65,9 +77,6 @@ class Utility {
                 missing.push(keys[i])
             }
         }
-
-        console.log(missing)
-
 
         if (missing.length > 0) {
 
@@ -148,6 +157,9 @@ class Utility {
 
 }
 
+/**
+ * Class containing methods for getting data from the server+9
+*/
 class GetCreationData {
 
     /**
@@ -204,8 +216,10 @@ class GetCreationData {
 }
 
 
-
-class UserCreation extends Component<any, CostumTypes>{
+/**
+ * The user creation page it self
+*/
+class UserCreation extends Component<any, CustomTypes>{
     constructor(props: any) {
         super(props);
         this.state = {
@@ -217,7 +231,7 @@ class UserCreation extends Component<any, CostumTypes>{
             assignedToManager: null,
             selectedRoles: null,
 
-            // * Database varaibles
+            // * Database variables
             dbRoles: [],
             dbManagers: [],
 
@@ -253,7 +267,9 @@ class UserCreation extends Component<any, CostumTypes>{
         this.test = this.test.bind(this)
     }
 
-
+    /**
+     * Method is run before mounting
+    */
     async componentDidMount() {
         const dbRoles = await GetCreationData.GetAllRoles()
         const dbManagers = await GetCreationData.GetAllManagers()
@@ -433,7 +449,6 @@ class UserCreation extends Component<any, CostumTypes>{
             popupMessage: message
         })
     }
-
 
     /**
      * Handles modal message title setting
