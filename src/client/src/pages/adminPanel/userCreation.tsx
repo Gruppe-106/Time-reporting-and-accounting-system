@@ -39,11 +39,113 @@ interface CostumTypes {
 }
 
 
-class Utility{
+class Utility {
 
-    public static CreateMissingMessage(missing: string[]){
+    public static CheckFields(userObject: {
+        [key: string]: any
+        firstName: string | null,
+        lastName: string | null,
+        email: string | null,
+        password: string | null,
+        assignedToManager: { roleName: string, roleId: number, userId: number, firstName: string, lastName: string } | null
+        roles: any[] | null
+    }): {
+        valid: boolean,
+        missingFields: number,
+        errorString: string
+    } {
+        let missing: string[] = []
+        let keys: string[] = Object.keys(userObject)
+        let missingString: string = "";
+        let valid: boolean = true
 
+        for (let i = 0; i < keys.length; i++) {
+
+            if (userObject[keys[i]] === null) {
+                missing.push(keys[i])
+            }
+        }
+
+        console.log(missing)
+
+
+        if (missing.length > 0) {
+
+            valid = false;
+            let split: string = ""
+
+            if (missing.length === 1) {
+
+                if (missing[0] === "firstName") {
+                    split = "First name"
+                } else if (missing[0] === "lastName") {
+                    split = "Last name"
+                } else if (missing[0] === "email") {
+                    split = "Email address"
+                } else if (missing[0] === "password") {
+                    split = "Password"
+                } else if (missing[0] === "assignedToManager") {
+                    split = "Assign manager"
+                } else if (missing[0] === "roles") {
+                    split = "Assign roles"
+                }
+
+
+                missingString += "Missing field: " + split
+
+            } else if (missing.length > 1) {
+
+
+                missingString += "Missing fields: "
+
+                for (let i = 0; i < missing.length - 1; i++) {
+
+                    if (missing[i] === "firstName") {
+                        split = "First name"
+                    } else if (missing[i] === "lastName") {
+                        split = "Last name"
+                    } else if (missing[i] === "email") {
+                        split = "Email address"
+                    } else if (missing[i] === "password") {
+                        split = "Password"
+                    } else if (missing[i] === "assignedToManager") {
+                        split = "Assign manager"
+                    } else if (missing[i] === "roles") {
+                        split = "Assign roles"
+                    }
+                    if (split) {
+                        missingString += split + ", "
+                    }
+                    split = ""
+                }
+
+                missingString += " and "
+
+                if (missing[missing.length - 1] === "firstName") {
+                    split = "First name"
+                } else if (missing[missing.length - 1] === "lastName") {
+                    split = "Last name"
+                } else if (missing[missing.length - 1] === "email") {
+                    split = "Email address"
+                } else if (missing[missing.length - 1] === "password") {
+                    split = "Password"
+                } else if (missing[missing.length - 1] === "assignedToManager") {
+                    split = "Assign manager"
+                } else if (missing[missing.length - 1] === "roles") {
+                    split = "Assign roles"
+                }
+                missingString += split
+            }
+
+        }
+
+        return {
+            valid: valid,
+            missingFields: missing.length,
+            errorString: missingString
+        }
     }
+
 }
 
 class GetCreationData {
@@ -280,108 +382,39 @@ class UserCreation extends Component<any, CostumTypes>{
             roles: this.state.selectedRoles
         }
 
-
-        let missing: string[] = []
-        let keys: string[] = Object.keys(userObject)
-        let missingString: string = "";
-
-        for (let i = 0; i < keys.length; i++) {
-
-            if (userObject[keys[i]] === null) {
-                missing.push(keys[i])
-            }
-        }
-
-
-        console.log(missing)
         if (!this.state.emailValid) {
             this.HandleShowTitle("Invalid e-mail adress")
             this.HandleShowMessage("Please enter a valid e-mail adress")
             this.HandleShow()
-        } else if (missing.length > 0) {
-
-            /**
-             * TODO: create a function here instead
-            */
-            if (missing.length === 1) {
-                let split: string = ""
-
-                if (missing[0] === "firstName") {
-                    split = "First name"
-                } else if (missing[0] === "lastName") {
-                    split = "Last name"
-                } else if (missing[0] === "email") {
-                    split = "Email address"
-                } else if (missing[0] === "assignedToManager") {
-                    split = "Assign manager"
-                } else if (missing[0] === "roles") {
-                    split = "Assign roles"
-                }
-
-                
-                missingString += "Missing field: " + split
-                if(!hasShown){
-                    this.HandleShowTitle("Missing field")
-                    this.HandleShowMessage(missingString)
-                    this.HandleShow()
-                    hasShown = true;
-                }
-              
-
-            } else if(missing.length > 1) {
-
-
-                let split: string = ""
-
-                missingString += "Missing fields: "
-
-                for (let i = 0; i < missing.length - 1; i++) {
-
-                    if (missing[i] === "firstName") {
-                        split = "First name"
-                    } else if (missing[i] === "lastName") {
-                        split = "Last name"
-                    } else if (missing[i] === "email") {
-                        split = "Email address"
-                    } else if (missing[i] === "assignedToManager") {
-                        split = "Assign manager"
-                    } else if (missing[i] === "roles") {
-                        split = "Assign roles"
-                    }
-                    if (split) {
-                        missingString += split + ", "
-                    }
-                    split = ""
-                }
-
-                missingString += " and "
-
-                if (missing[missing.length - 1] === "firstName") {
-                    split = "First name"
-                } else if (missing[missing.length - 1] === "lastName") {
-                    split = "Last name"
-                } else if (missing[missing.length - 1] === "email") {
-                    split = "Email address"
-                } else if (missing[missing.length - 1] === "assignedToManager") {
-                    split = "Assign manager"
-                } else if (missing[missing.length - 1] === "roles") {
-                    split = "Assign roles"
-                }
-                missingString += split
-            }
-
-            if(!hasShown){
-                this.HandleShowTitle("Missing fields: ")
-                this.HandleShowMessage(missingString)
-                this.HandleShow()
-                hasShown = true;
-            }
-
         } else {
-            this.SendUser(userObject)
+            const validCheck: {
+                valid: boolean;
+                missingFields: number;
+                errorString: string;
+            } = Utility.CheckFields(userObject)
+
+            if (!validCheck.valid) {
+
+                if (validCheck.missingFields === 1) {
+                    if (!hasShown) {
+                        this.HandleShowTitle("Missing field")
+                        this.HandleShowMessage(validCheck.errorString)
+                        this.HandleShow()
+                        hasShown = true;
+                    }
+                } else {
+                    if (!hasShown) {
+                        this.HandleShowTitle("Missing fields")
+                        this.HandleShowMessage(validCheck.errorString)
+                        this.HandleShow()
+                        hasShown = true;
+                    }
+                }
+            } else {
+                this.SendUser(userObject)
+            }
+
         }
-
-
     }
 
     /**
@@ -417,7 +450,7 @@ class UserCreation extends Component<any, CostumTypes>{
      * Handles modal closing
     */
     private HandleClose() {
-        this.setState({ 
+        this.setState({
             showPopup: false,
             popupTitle: "",
             popupMessage: ""
