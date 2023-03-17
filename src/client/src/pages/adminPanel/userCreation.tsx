@@ -38,6 +38,14 @@ interface CostumTypes {
 
 }
 
+
+class Utility{
+
+    public static CreateMissingMessage(missing: string[]){
+
+    }
+}
+
 class GetCreationData {
 
     /**
@@ -565,6 +573,7 @@ class UserCreation extends Component<any, CostumTypes>{
 
 
 }
+
 
 
 
