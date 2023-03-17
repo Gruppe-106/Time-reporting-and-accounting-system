@@ -25,7 +25,7 @@ export class ApiRouter extends BaseRouter {
     private getRoutes() {
         this.router.get("/", (req: Request, res: Response): void => {
             res.setHeader('Content-Type', 'application/json');
-            res.status(200).json(JSON.stringify({message: "Api GET gotten"}));
+            res.status(200).json({message: "Api GET gotten"});
         });
 
         this.router.get("/project/get",      (req: Request, res: Response) => new ProjectEndpoint(this.user).getRoute(req, res));
@@ -43,10 +43,10 @@ export class ApiRouter extends BaseRouter {
         this.router.use(express.json());
         this.router.post("/", (req: Request, res: Response): void => {
             res.setHeader('Content-Type', 'application/json');
-            res.status(200).json(JSON.stringify({message: "Api POST gotten"}));
+            res.status(200).json({message: "Api POST gotten"});
         })
 
-        this.router.post("/user/creation/post", (req: Request, res:Response) => new UserCreationEndpoint(this.user).postRoute(req, res))
+        this.router.post("/user/creation/post", (req: Request, res:Response) => new UserCreationEndpoint().postRoute(req, res))
     }
 
     public routes(): Router {
