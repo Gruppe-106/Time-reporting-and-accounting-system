@@ -90,14 +90,18 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
    * @param index 
    * @param value 
    */
-  handleTimeChange = (index: number, value: string) => {
+  handleControlTimeChange = (index: number, value: string) => {
     const { times } = this.state;
     const newValue = parseInt(value) < 0 ? "0" : value; // prevent negative values
     times[index] = newValue;
     const total = times.reduce((acc, cur) => acc + parseInt(cur), 0);
     this.setState({ times, total });
   };
-  handleSelectChange = (value: string) => {
+  /**
+   * 
+   * @param value 
+   */
+  handleSelectTimeChange = (value: string) => {
     const { minTotal } = this.state;
     const newValue = parseInt(value);
     const newTotal = minTotal + newValue;
@@ -121,10 +125,10 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
                               type="number" 
                               placeholder="0" 
                               value={times[index]}
-                              onChange={(e) => this.handleTimeChange(index, e.target.value)}
+                              onChange={(e) => this.handleControlTimeChange(index, e.target.value)}
                               />
                             <InputGroup.Text id={`basic-addon-${num}`}>;</InputGroup.Text>
-                            <Form.Select onChange={(e) => this.handleSelectChange(e.target.value)}>
+                            <Form.Select onChange={(e) => this.handleSelectTimeChange(e.target.value)}>
                                 <option value="0">0</option>
                                 <option value="15">15</option>
                                 <option value="30">30</option>
