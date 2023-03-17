@@ -58,8 +58,24 @@ interface TimeSheetData {
 interface TimeSheetState {
   data: TimeSheetData[];
 }
+interface TimeSheetRowProps {
+  data: TimeSheetData; 
+  onDelete: () => void
+}
+
+interface TimeSheetRowState {
+  times: string[];
+  total: number;
+  minTotal: number;
+}
+
 // Creating a tablerow for the table body, takes in 2 props, data and onDelete
-class TimeSheetRow extends Component<{ data: TimeSheetData; onDelete: () => void }> {
+class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
+  state: TimeSheetRowState = {
+    times: ["0", "0", "0", "0", "0", "0", "0"],
+    total: 0,
+    minTotal: 0,
+  };
   /**
    * @description When this method is called, it extracts the onDelete prop from this.props and invokes it.
    */
@@ -69,29 +85,53 @@ class TimeSheetRow extends Component<{ data: TimeSheetData; onDelete: () => void
     //  onDelete function passed in as a prop, delets corresponding time sheet row
     if(result) onDelete();
   };
-  
+  /**
+   * 
+   * @param index 
+   * @param value 
+   */
+  handleTimeChange = (index: number, value: string) => {
+    const { times } = this.state;
+    const newValue = parseInt(value) < 0 ? "0" : value; // prevent negative values
+    times[index] = newValue;
+    const total = times.reduce((acc, cur) => acc + parseInt(cur), 0);
+    this.setState({ times, total });
+  };
+  handleSelectChange = (value: string) => {
+    const { minTotal } = this.state;
+    const newValue = parseInt(value);
+    const newTotal = minTotal + newValue;
+    this.setState({ minTotal: newTotal });
+  };
+
     render() {
         // Defining data as this.prop, it reprensents the data (prop) passed to TimeSheetRow
         const { data } = this.props;
+        // 
+        const { times, total, minTotal } = this.state;
         // arr to create a input field for all 7 dates
         let arr = ['1', '2', '3', '4', '5', '6', '7'];
         return (
             <tr>
                 <td>{data.projectName}</td>
                         <td>{data.taskName}</td>
-                        {arr.map(
-                        (num) => (
-                        <td><InputGroup size="sm">
-                            <Form.Control type="number" placeholder="0" />
+                        {arr.map((num, index) => (<td key={index}>
+                          <InputGroup size="sm">
+                            <Form.Control 
+                              type="number" 
+                              placeholder="0" 
+                              value={times[index]}
+                              onChange={(e) => this.handleTimeChange(index, e.target.value)}
+                              />
                             <InputGroup.Text id={`basic-addon-${num}`}>;</InputGroup.Text>
-                            <Form.Select>
+                            <Form.Select onChange={(e) => this.handleSelectChange(e.target.value)}>
                                 <option value="0">0</option>
                                 <option value="15">15</option>
                                 <option value="30">30</option>
                                 <option value="45">45</option>
                             </Form.Select>
                         </InputGroup></td>))}
-                        <td>0</td> {/* Total time */}
+                        <td>{total},{minTotal}</td> {/* Total time */}
                         <td>
                         <Button variant="danger" type="button" onClick={this.handleDeleteClick}>-</Button>
                         </td>
