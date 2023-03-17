@@ -2,7 +2,6 @@
     Show all users that a group leader resides over
  */
 
-
 import React, { Component } from "react";
 import ReactDOM from "react-dom/client";
 import BaseNavBar from "../../components/navBar";
