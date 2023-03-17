@@ -64,12 +64,14 @@ class BaseApiHandler {
         headers["Content-type"] = contentType;
         headers["Auth-Key"]     = this.authKey;
         headers["Accept"]       = "application/json";
-
+        let body = message === null ? null : JSON.stringify(message)
+        console.log(message);
         //Make request to node server
         return await fetch(url, {
             method: method,
             headers: headers,
-            body: message === null ? null : JSON.stringify(message)
+            cache: 'default',
+            body: body,
         })
             //Create task/promise for converting response to json
             .then((response) => { return response.json(); })
