@@ -60,11 +60,14 @@ interface TimeSheetState {
 }
 // Creating a tablerow for the table body, takes in 2 props, data and onDelete
 class TimeSheetRow extends Component<{ data: TimeSheetData; onDelete: () => void }> {
-  // When this method is called, it extracts the onDelete prop from this.props and invokes it.
+  /**
+   * @description When this method is called, it extracts the onDelete prop from this.props and invokes it.
+   */
   handleDeleteClick = () => {
     const { onDelete } = this.props;
-    // onDelete function passed in as a prop, delets corresponding time sheet row
-    onDelete();
+    const result = window.confirm('Are you sure you want to delete this row?');
+    //  onDelete function passed in as a prop, delets corresponding time sheet row
+    if(result) onDelete();
   };
   
     render() {
