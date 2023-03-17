@@ -1,37 +1,12 @@
-import EndpointBase, {User} from "../endpointBase";
-import {Request, Response} from "express";
+import EndpointBase from "../endpointBase";
 import {ROLES} from "../../database/fakeData/ROLES";
 
-interface ReturnType {
+export interface RoleReturnType {
     id?: number,
     name?: string,
 }
 
 export class RoleEndpoint extends EndpointBase {
-    table = new ROLES().data;
-    data: ReturnType[];
-
-    async getData(requestValues: string[], user: User, primaryKey: string, keyEqual?: string[]):Promise<object[]> {
-        return await this.baseGetData(requestValues, user, primaryKey, keyEqual);
-    }
-}
-
-export function roleGetRoute(req: Request, res: Response, user: User) {
-    let ids = req.query.ids;
-
-    let requestKeys: string[];
-
-    if (typeof ids === "string") {
-        requestKeys = ids.split(",");
-    } else {
-        res.sendStatus(400)
-        res.end();
-        return;
-    }
-
-    let roleEndpoint = new RoleEndpoint(user);
-    roleEndpoint.processRequest(["*"], "id", requestKeys).then((data) => {
-        res.setHeader('Content-Type', 'application/json');
-        res.status(200).json(data);
-    })
+    table = ROLES.data;
+    data: RoleReturnType[];
 }

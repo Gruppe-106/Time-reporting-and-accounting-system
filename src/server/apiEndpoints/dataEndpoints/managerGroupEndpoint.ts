@@ -1,11 +1,10 @@
-import {User} from "../endpointBase";
-import {USERS} from "../../database/fakeData/USERS";
+import EndpointBase from "../endpointBase";
 import {Request, Response} from "express";
-import EndpointConnectorBase from "../endpointConnectorBase";
 import {GROUP} from "../../database/fakeData/GROUP";
 import {UserEndpoint, UserReturnType} from "./userEndpoint";
+import {TaskProjectEndpoint, TaskProjectReturnType} from "./taskProjectEndpoint";
 
-interface ReturnType {
+interface ManagerGroupReturnType {
     manager?: number,
     firstName?: string,
     lastName?: string,
@@ -18,111 +17,96 @@ interface ReturnType {
     }[];
 }
 
-export class ManagerGroupEndpoint extends EndpointConnectorBase {
-    table = new USERS().data;
-    tableSecond = null;
-    tableConnector = new GROUP().data;
-    data: ReturnType[];
+interface EntryType {
+    manager: number,
+    id: number
+}
 
-    async getData(requestValues: string[], user: User, primaryKey: string, keyEqual?: string[]): Promise<object[]> {
-        let userEndpoint = new UserEndpoint(user);
+export class ManagerGroupEndpoint extends EndpointBase {
+    table = GROUP.data;
+    data: ManagerGroupReturnType[];
+
+    private async getAllDataForKey(dataIndex:number, entry:EntryType) {
+        this.data[dataIndex].employees = [];
+        let users:UserReturnType[] = await new UserEndpoint(this.user).processRequest(["id", "firstName", "lastName", "group"], "group", [entry.id.toString()]);
+        users.forEach((value) => {
+            this.data[dataIndex].employees.push({
+                id: value.id,
+                firstName: value.firstName,
+                lastName: value.lastName,
+                email: value.lastName
+            })
+        })
+
+        let manager:UserReturnType[]   = await new UserEndpoint(this.user).processRequest(["firstName", "lastName"], "id", [entry.manager.toString()]);
+        this.data[dataIndex].firstName = manager[0].firstName;
+        this.data[dataIndex].lastName  = manager[0].lastName;
+        this.data[dataIndex].manager   = entry.manager;
+        this.data[dataIndex].group     = entry.id;
+    }
+
+    private async getSpecificDataForKey(requestValues: string[], dataIndex:number, entry:EntryType) {
+        let managerData: UserReturnType[];
+        let managerValues: string[] = [];
+        if (requestValues.indexOf("firstName") !== -1)  managerValues.push("firstName");
+        if (requestValues.indexOf("lastName") !== -1)   managerValues.push("lastName");
+        if (managerValues.length > 0) {
+            managerData = await new UserEndpoint(this.user).processRequest(managerValues, "id", [entry.manager.toString()]);
+        }
+        for (const request of requestValues) {
+            switch (request) {
+                case "manager":
+                    this.data[dataIndex].manager = entry.manager;
+                    break;
+                case "group":
+                    this.data[dataIndex].group = entry.id;
+                    break;
+                case "firstName":
+                    this.data[dataIndex].firstName = managerData[0].firstName;
+                    break;
+                case "lastName":
+                    this.data[dataIndex].firstName = managerData[0].firstName;
+                    break;
+                case "employees":
+                    this.data[dataIndex].employees = await new UserEndpoint(this.user).processRequest(["id", "firstName", "lastName", "group"], "group", [entry.id.toString()]);
+                    break;
+                default: break;
+            }
+        }
+    }
+
+    async getData(requestValues: string[], primaryKey: string, keyEqual?: string[]): Promise<object[]> {
         this.data = [];
         let dataIndex = 0;
-        for (const entry of this.tableConnector) {
+        for (const entry of this.table) {
             if (keyEqual.indexOf(entry[primaryKey].toString()) !== -1 || keyEqual.indexOf("*") !== -1) {
                 this.data[dataIndex] = {};
                 if (requestValues.indexOf("*") !== -1) {
-                    this.data[dataIndex].employees   = [];
-                    let employees:UserReturnType[] = await userEndpoint.processRequest(["id", "firstName", "lastName", "group"], "id", ["*"]);
-                    for (const value of employees) {
-                        if (value.id === entry.manager) {
-                            this.data[dataIndex].firstName = value.firstName;
-                            this.data[dataIndex].lastName = value.lastName;
-                        }
-                        else if(value.group === entry.id) {
-                            this.data[dataIndex].employees.push({
-                                id: value.id,
-                                firstName: value.firstName,
-                                lastName: value.lastName,
-                                email: value.lastName
-                            })
-                        }
-                    }
-                    this.data[dataIndex].manager = entry.manager;
-                    this.data[dataIndex].group = entry.id;
+                    await this.getAllDataForKey(dataIndex, entry);
                 } else {
-                    console.log(requestValues)
-                    for (const request of requestValues) {
-                        switch (request) {
-                            case "manager":
-                                this.data[dataIndex].manager = entry.manager;
-                                break;
-                            case "group":
-                                this.data[dataIndex].group = entry.id;
-                                break;
-                            case "firstName":
-                                let dataFirst:UserReturnType[]  = await userEndpoint.processRequest(["firstName"], "id", [entry.manager.toString()]);
-                                this.data[dataIndex].firstName = dataFirst.pop().firstName;
-                                break;
-                            case "lastName":
-                                let dataLast:UserReturnType[]  = await userEndpoint.processRequest(["lastName"], "id", [entry.manager.toString()]);
-                                this.data[dataIndex].firstName = dataLast.pop().firstName;
-                                break;
-                            case "employees":
-                                this.data[dataIndex].employees   = [];
-                                let employees:UserReturnType[] = await userEndpoint.processRequest(["id", "firstName", "lastName", "group"], "id", ["*"]);
-                                for (const value of employees) {
-                                    if(value.group === entry.id) {
-                                        this.data[dataIndex].employees.push({
-                                            id: value.id,
-                                            firstName: value.firstName,
-                                            lastName: value.lastName,
-                                            email: value.lastName
-                                        })
-                                    }
-                                }
-                                break;
-                            default: break;
-                        }
-                    }
+                    await this.getSpecificDataForKey(requestValues, dataIndex, entry);
                 }
                 dataIndex++;
             }
         }
         return this.data;
     }
-}
 
-export function managerGroupGetRoute(req:Request, res:Response, user:User) {
-    let managerIds = req.query.manager;
-    let groupIds = req.query.group;
-    let values = req.query.var;
+    getRoute(req: Request, res: Response) {
+        let primaryKey:string = "manager";
+        let requestKeys: string[] = this.urlParamsConversion(req.query.manager, false);
 
-    let requestedValues:string[];
-    if (typeof values === "string" ) {
-        requestedValues = values.split(",");
-    } else {
-        requestedValues = ["*"];
+        if (requestKeys === undefined) {
+            requestKeys = this.urlParamsConversion(req.query.group, false, true, res);
+            if (requestKeys === undefined) { return; }
+            primaryKey  = "id";
+        }
+
+        let requestedValues:string[] = this.urlParamsConversion(req.query.var);
+
+        this.processRequest(requestedValues, primaryKey, requestKeys).then((data) => {
+            res.setHeader('Content-Type', 'application/json');
+            res.status(200).json(data);
+        })
     }
-
-    let primaryKey:string = "";
-    let requestKeys: string[];
-
-    if (typeof managerIds === "string") {
-        requestKeys= managerIds.split(",");
-        primaryKey = "manager";
-    } else if (typeof groupIds === "string") {
-        requestKeys= groupIds.split(",");
-        primaryKey = "id";
-    } else {
-        res.sendStatus(400)
-        res.end();
-        return;
-    }
-
-    let managerGroupEndpoint = new ManagerGroupEndpoint(user);
-    managerGroupEndpoint.processRequest(requestedValues, primaryKey, requestKeys).then((data) => {
-        res.setHeader('Content-Type', 'application/json');
-        res.status(200).json(data);
-    })
 }
