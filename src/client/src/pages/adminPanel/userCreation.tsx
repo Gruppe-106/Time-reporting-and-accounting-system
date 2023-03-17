@@ -6,7 +6,7 @@ import BaseNavBar from "../../components/navBar";
 import { Container, Modal } from "react-bootstrap";
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-import { Typeahead, Highlighter } from 'react-bootstrap-typeahead';
+import { Typeahead, Highlighter} from 'react-bootstrap-typeahead';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 import forge from 'node-forge';
 
@@ -23,7 +23,7 @@ interface CustomTypes {
     email: string | null,
     password: string | null,
     assignedToManager: { roleName: string, roleId: number, userId: number, firstName: string, lastName: string } | null,
-    selectedRoles: any[] | null,
+    selectedRoles: {id:number,name:string}[] | null,
 
     // * Database variables
     dbRoles: any[],
@@ -60,7 +60,7 @@ class Utility {
         email: string | null,
         password: string | null,
         assignedToManager: { roleName: string, roleId: number, userId: number, firstName: string, lastName: string } | null
-        roles: any[] | null
+        roles: {id:number,name:string}[] | null
     }): {
         valid: boolean,
         missingFields: number,
@@ -297,8 +297,7 @@ class UserCreation extends Component<any, CustomTypes>{
      * Handles changes to the first name input field.
      * @param event - The input change event object.
     */
-    private HandleFirstName(event: any): void {
-
+    private HandleFirstName(event:  React.ChangeEvent<HTMLInputElement>): void {
         this.setState({
             firstName: event.target.value ? event.target.value : null,
 
@@ -309,7 +308,7 @@ class UserCreation extends Component<any, CustomTypes>{
      * Handles changes to the last name input field.
      * @param event - The input change event object.
     */
-    private HandleLastName(event: any): void {
+    private HandleLastName(event: React.ChangeEvent<HTMLInputElement>): void {
         this.setState({
             lastName: event.target.value ? event.target.value : null,
 
@@ -321,7 +320,7 @@ class UserCreation extends Component<any, CustomTypes>{
      * Handles changes to the email input field.
      * @param event - The input change event object.
     */
-    private HandleEmail(event: any): void {
+    private HandleEmail(event: React.ChangeEvent<HTMLInputElement>): void {
         const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(event.target.value); // check if the email is valid
 
 
@@ -336,7 +335,7 @@ class UserCreation extends Component<any, CustomTypes>{
      * Handles changes to the password input field.
      * @param event - The input change event object.
     */
-    private HandlePassword(event: any): void {
+    private HandlePassword(event: React.ChangeEvent<HTMLInputElement>): void {
 
         this.setState({
             password: event.target.value ? event.target.value : null
@@ -388,7 +387,7 @@ class UserCreation extends Component<any, CustomTypes>{
             email: string | null,
             password: string | null,
             assignedToManager: { roleName: string, roleId: number, userId: number, firstName: string, lastName: string } | null
-            roles: any[] | null
+            roles: {id:number,name:string}[] | null
         } = {
             firstName: this.state.firstName,
             lastName: this.state.lastName,
@@ -504,7 +503,7 @@ class UserCreation extends Component<any, CustomTypes>{
         email: string | null
         password: string | null,
         assignedToManager: { roleName: string, roleId: number, userId: number, firstName: string, lastName: string } | null
-        roles: any[] | null
+        roles: {id:number,name:string}[] | null
     }) {
 
         this.HandleShowTitle("Successs or Error here from the server")
