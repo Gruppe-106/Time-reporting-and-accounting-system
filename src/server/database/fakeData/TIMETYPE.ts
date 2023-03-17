@@ -1,5 +1,5 @@
 export class TIMETYPE {
-    public data = [
+    public static data = [
         {
             "id": 0,
             "name": "billable"
