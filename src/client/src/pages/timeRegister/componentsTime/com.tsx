@@ -86,25 +86,28 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
     if(result) onDelete();
   };
   /**
-   * 
-   * @param index 
-   * @param value 
+   * @description This method is used to handle changes to a set of Form.controls, 
+   * making sure the values entered are valid (not under 0) and updating the component's state with the new values.
+   * @param index : The index is used to identify which Form.control has been changed
+   * @param value : The value is the new value of that Form.control.
    */
   handleControlTimeChange = (index: number, value: string) => {
     const { times } = this.state;
     const newValue = parseInt(value) < 0 ? "0" : value; // prevent negative values
     times[index] = newValue;
-    const total = times.reduce((acc, cur) => acc + parseInt(cur), 0);
+    const total = times.reduce((acc, cur) => acc + parseInt(cur), 0); // This line of code is used to calculate the total sum of all the values in the times array, which is then used to update the component's state with the new total time.
     this.setState({ times, total });
   };
   /**
+   * @description This method is used to handle changes to a form.select,
+   *  and updates the component's state with the new minut total time for a set of time controls.
    * 
-   * @param value 
+   * Updates the minTotal, but i think it should use this.state, but it doesnt, so not sure?
+   * @param value The value is the new value of that Form.select.
    */
   handleSelectTimeChange = (value: string) => {
-    const { minTotal } = this.state;
     const newValue = parseInt(value);
-    const newTotal = minTotal + newValue;
+    const newTotal = newValue;
     this.setState({ minTotal: newTotal });
   };
 
