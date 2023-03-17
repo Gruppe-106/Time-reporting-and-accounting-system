@@ -1,66 +1,151 @@
-import {Container, Table, Form, InputGroup, Dropdown, DropdownButton} from "react-bootstrap";
-import React, {Component} from "react";
+import React, { Component } from 'react';
+import {Container, Table, Form, InputGroup, Button} from "react-bootstrap";
 
-type MyState = {
-    DropValue?: number; // like this
+interface TableHeaderProps {}
+
+interface TableHeaderState {
+  dates: string[];
+}
+
+class TableHeader extends React.Component<TableHeaderProps, TableHeaderState> {
+  constructor(props: TableHeaderProps) {
+    super(props);
+
+    // Get the current date
+    const today = new Date();
+
+    // Get the start date of the current week (Sunday)
+    const sunday = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay() + 1);
+
+    // Create an array of date strings for each day of the week
+    const dates = [];
+    for (let i = 0; i < 7; i++) {
+      const currentDate = new Date(sunday.getFullYear(), sunday.getMonth(), sunday.getDate() + i);
+      dates.push(currentDate.toLocaleDateString());
+    }
+
+    // Set the initial state
+    this.state = {
+      dates: dates,
+    };
+  }
+
+  render() {
+    return (
+          <thead>
+            <tr>
+              <th>Project Name</th>
+              <th>Task Name</th>
+              {this.state.dates.map((date, index) => (
+                <th key={index}>{date}</th>
+              ))}
+              <th>Total Time</th>
+            </tr>
+          </thead> 
+    );
+  }
+}
+
+interface TimeSheetData {
+    projectName:string
+    taskName:string
+}
+
+interface Props {}
+
+interface TimeSheetState {
+  data: TimeSheetData[];
+}
+
+class TimeSheetRow extends Component<{ data: TimeSheetData; onDelete: () => void }> {
+  handleDeleteClick = () => {
+    const { onDelete } = this.props;
+
+    onDelete();
   };
-
-class TimeTableRegister extends Component<MyState> {
-    constructor(props:MyState) {
-        super(props);
-    }    
-    state: MyState = {DropValue: 0,};
-
+  
     render() {
+        const { data } = this.props;
         let arr = ['1', '2', '3', '4', '5', '6', '7'];
-        let iniDropValue = this.state.DropValue;
-        return(
-            <Container>
-                <Table bordered hover size="sm">
-                <thead>
-                <tr>
-                    <th>Project Name</th>
-                    <th>Task Name</th>
-                    {arr.map((num) => (<th>{num} Date</th>))}
-                    <th>Total Time</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                <td>ExampleProject</td>
-                <td>ExampleTask</td>
-                {arr.map(
-                (num) => (
-                <td><InputGroup size="sm">
-                    <Form.Control type="number" placeholder="0" />
-                    <InputGroup.Text id={`basic-addon-${num}`}>;</InputGroup.Text>
-                    <DropdownButton
-                    variant="outline-secondary"
-                    title={iniDropValue}
-                    drop="down-centered"
-                    id={`time-input-${num}`}
-                    align="end"
-                    onSelect={(selectedKey) => this.setState({iniDropValue: selectedKey})}
-                    >
-                    <Dropdown.Item eventKey={15} value={15}>15</Dropdown.Item>
-                    <Dropdown.Item eventKey={30} value={30}>30</Dropdown.Item>
-                    <Dropdown.Item eventKey={45} value={45}>45</Dropdown.Item>
-                    </DropdownButton>
-                    {/*<Form.Select>
-                        <option value="0">0</option>
-                        <option value="15">15</option>
-                        <option value="30">30</option>
-                        <option value="45">45</option>
-                    </Form.Select> */}
-                </InputGroup></td>))}
-                <td>0</td> {/* Total time */}
-                </tr>
-                <tr><th colSpan={2}>Total Time:</th></tr>
-                </tbody>
-                </Table>
-            </Container>
+        return (
+            <tr>
+                <td>{data.projectName}</td>
+                        <td>{data.taskName}</td>
+                        {arr.map(
+                        (num) => (
+                        <td><InputGroup size="sm">
+                            <Form.Control type="number" placeholder="0" />
+                            <InputGroup.Text id={`basic-addon-${num}`}>;</InputGroup.Text>
+                            <Form.Select>
+                                <option value="0">0</option>
+                                <option value="15">15</option>
+                                <option value="30">30</option>
+                                <option value="45">45</option>
+                            </Form.Select>
+                        </InputGroup></td>))}
+                        <td>0</td> {/* Total time */}
+                        <td>
+                        <Button variant="danger" type="button" onClick={this.handleDeleteClick}>-</Button>
+                        </td>
+            </tr>
         )
     }
 }
 
-export default TimeTableRegister
+class TimeSheet extends Component<Props, TimeSheetState> {
+  constructor(props: Props) {
+    super(props);
+
+    this.state = {
+      data: [
+        {projectName: "test", taskName: "test"},
+        {projectName: "test2", taskName: "test2"},
+      ],
+    };
+
+    this.handleAddRow = this.handleAddRow.bind(this);
+  }
+
+  handleDeleteRow = (index: number) => {
+    const { data } = this.state;
+
+    this.setState({
+      data: [...data.slice(0, index), ...data.slice(index + 1)],
+    });
+  };
+
+  handleAddRow() {
+    const { data } = this.state;
+
+    this.setState({
+      data: [
+        ...data,
+        { projectName: "New project", taskName: "New task" },
+      ],
+    });
+  }
+
+  renderRows() {
+    const { data } = this.state;
+
+    return data.map((item, index) => (
+      <TimeSheetRow key={index} data={item} onDelete={() => this.handleDeleteRow(index)} />
+    ));
+  }
+
+  render() {
+    return (
+      <Container fluid>
+        <Table bordered size="sm">
+            <TableHeader />
+            <tbody>
+                {this.renderRows()}
+            </tbody>
+        </Table>
+        <Button variant="primary" type="button" onClick={() => this.handleAddRow()}>Add Row</Button>
+      </Container>
+    );
+  }
+}
+
+export default TimeSheet

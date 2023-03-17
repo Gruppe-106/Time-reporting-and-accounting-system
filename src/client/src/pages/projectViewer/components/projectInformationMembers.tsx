@@ -1,33 +1,40 @@
 import {Table} from "react-bootstrap";
 import React, {Component} from "react";
 import BaseApiHandler from "../../../network/baseApiHandler";
-
+/*
+NEED TO ADD SO IT SHOWS BY GROUP AND NOT JUST EVERYONE.
+NUMBER FOR THE GROUP SHOULD CORRESPOND TO THE ID OF THE PROJECT AND PROJECT PAGE
+ */
 interface Api{
 
         id?: number,
-        superProject?: number,
-        name?: string,
-        startDate?: string,
-        endDate?: string
+        email?: string,
+        firstName?: string,
+        lastName?: string,
+        group?: number
 
 }
 
-export interface ProjectTableRow{
+export interface ProjectTableMemberRow{
     id:number
-    superProject?:number
-    name?:string
-    startDate?:any
-    endDate?:any
+    email?:string
+    firstName?:string
+    lastName?:string
+    group?:number
 }
 
-class ProjectTable extends Component<any> {
+const queryString = window.location.search;
+const params = new URLSearchParams(queryString);
+const id = parseInt(params.get("id") as string);
+
+class ProjectMemberTable extends Component<any> {
     state = {
         tableRows: [ {
             id: -1,
-            superProject: "",
-            name: "",
-            startDate: "",
-            endDate: ""
+            email: "",
+            firstName: "",
+            lastName: "",
+            group: -1
         } ]
     }
 
@@ -36,7 +43,7 @@ class ProjectTable extends Component<any> {
         let apiHandler = new BaseApiHandler("test");
         //Run the get or post function depending on need only neccesarry argument is the path aka what comes after the hostname
         //Callbacks can be used to tell what to do with the data once it's been retrieved
-        apiHandler.get(`/api/project/get?ids=*`, (value) => {
+        apiHandler.get(`/api/user/get?ids=*`, (value) => {
             console.log(value)
             //Then convert the string to the expected object(eg. )
             let json:Api[] = JSON.parse(JSON.stringify(value))
@@ -49,11 +56,11 @@ class ProjectTable extends Component<any> {
     private tableRender():JSX.Element[] {
         return this.state.tableRows.map(row => (
             <tr key={row.id}>
-              <td> <a href={`/project/viewer?id=${row.id}`}>{row.id}</a> </td>
-              <td>{row.superProject ?? ''}</td>
-              <td>{row.name ?? ''}</td>
-              <td>{row.startDate ? new Date(row.startDate).toLocaleDateString() : ''}</td>
-              <td>{row.endDate ? new Date(row.endDate).toLocaleDateString() : ''}</td>
+              <td>{row.id ?? ''}</td>
+              <td>{row.email ?? ''}</td>
+              <td>{row.firstName ?? ''}</td>
+              <td>{row.lastName ?? ''}</td>
+              <td>{row.group ?? ''}</td>
             </tr>
         ))
     }
@@ -63,11 +70,11 @@ class ProjectTable extends Component<any> {
             <Table bordered hover>
                 <thead>
                 <tr>
-                    <th>Project ID</th>
-                    <th>Parent Project</th>
-                    <th>Project Name</th>
-                    <th>Start Date</th>
-                    <th>End Date</th>
+                    <th>ID</th>
+                    <th>Email</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Group</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -78,4 +85,4 @@ class ProjectTable extends Component<any> {
     }
 }
 
-export default ProjectTable;
+export default ProjectMemberTable;

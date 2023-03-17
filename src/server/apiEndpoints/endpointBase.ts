@@ -1,3 +1,6 @@
+import {ParsedQs} from "qs";
+import {Request, Response} from "express";
+
 export interface User {
     authKey: string;
     id?: number;
@@ -12,7 +15,7 @@ enum Roles {
 }
 
 abstract class EndpointBase {
-    private readonly user: User;
+    protected readonly user: User;
     private getRole:Roles[]
     private postRole:Roles[]
 
@@ -28,13 +31,18 @@ abstract class EndpointBase {
         return this.user.authKey === "test";
     }
 
-    public async processRequest(requestValues: string[], primaryKey:string, keyEqual?:string[]):Promise<object[]> {
-        if (this.ensureAuth()) {
-            return await this.getData(requestValues, this.user, primaryKey, keyEqual);
+    public async processRequest(requestValues: string[], primaryKey:string, keyEqual?:string[], data?:string[]):Promise<object[]> {
+        try {
+            if (this.ensureAuth()) {
+                return await this.getData(requestValues, primaryKey, keyEqual);
+            }
+        } catch (e) {
+            console.error(e);
+            return [{error: "Failed to get data"}];
         }
     }
 
-    public async baseGetData(requestValues: string[], user: User, primaryKey: string, keyEqual?: string[]):Promise<object[]> {
+    public async getData(requestValues: string[], primaryKey: string, keyEqual?: string[], data?:string[]):Promise<object[]> {
         this.data = [];
         let dataIndex = 0;
         for (const entry of this.table) {
@@ -53,7 +61,34 @@ abstract class EndpointBase {
         return this.data;
     }
 
-    abstract getData(requestValues: string[], user: User, primaryKey: string, keyEqual?: string[]):Promise<object[]>;
+    protected urlParamsConversion(params:string | string[] | ParsedQs | ParsedQs[], allowAll:boolean = true, throwOnMissing:boolean = false, res?:Response):string[] {
+        let paramsList:string[];
+        if (typeof params === "string" ) {
+            paramsList = params.split(",");
+        } else if (allowAll) {
+            paramsList = ["*"];
+        } else if (throwOnMissing) {
+            this.badRequest(res);
+        }
+        return paramsList;
+    }
+
+    protected badRequest(res: Response) {
+        res.sendStatus(400)
+        res.end();
+    }
+
+    public getRoute(req:Request, res:Response, primaryKey:string = "id", requestKeysName:string = "ids") {
+        let requestKeys: string[] = this.urlParamsConversion(req.query[requestKeysName], false, true, res);
+        if (requestKeys === undefined) { return; }
+
+        let requestedValues:string[] = this.urlParamsConversion(req.query.var);
+
+        this.processRequest(requestedValues, primaryKey, requestKeys).then((data) => {
+            res.setHeader('Content-Type', 'application/json');
+            res.status(200).json(data);
+        })
+    };
 }
 
 export default EndpointBase;

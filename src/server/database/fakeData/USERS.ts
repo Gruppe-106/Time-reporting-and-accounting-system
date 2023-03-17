@@ -1,5 +1,5 @@
 export class USERS {
-    public data = [
+    public static data = [
         {
             "id": 1,
             "email": "sam@example.com",

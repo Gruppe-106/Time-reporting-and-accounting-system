@@ -1,5 +1,5 @@
 export class GROUP {
-    public data = [
+    public static data = [
         {
             "manager": 7,
             "id": 1
