@@ -8,7 +8,6 @@ import React, {Component} from "react";
 import BaseNavBar from "../../components/navBar";
 import {Container} from "react-bootstrap";
 import TimeSheet from "./componentsTime/com";
-import MyComponent from "./componentsTime/get_data";
 
 class UserTimeRegister extends Component<any>{
 /*    constructor(props:any) {
@@ -23,7 +22,6 @@ class UserTimeRegister extends Component<any>{
                     <h1>User Time Register</h1>
                 </Container>
                 <TimeSheet/>
-                <MyComponent/>
             </>
         );
     }
