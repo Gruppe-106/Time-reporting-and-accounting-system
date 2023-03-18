@@ -72,8 +72,8 @@ CREATE TABLE USERS_TASKS_TIME_REGISTER (
 
 CREATE TABLE AUTH (
     email CHAR(50) NOT NULL UNIQUE,
-    authKey CHAR(50) NOT NULL UNIQUE,
-    authKeyEndDate DATETIME NOT NULL,
+    authKey CHAR(50) UNIQUE,
+    authKeyEndDate DATETIME,
     userId INT UNSIGNED NOT NULL UNIQUE,
     password CHAR(32) NOT NULL,
     PRIMARY KEY (email , authKey , userId),

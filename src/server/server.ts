@@ -21,6 +21,6 @@ export class Server {
 
     public stop(): void {
         this.server.close();
-        console.log("Node Server is closed");
+        console.log("Node Server is now closed");
     }
 }
