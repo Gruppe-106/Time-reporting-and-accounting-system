@@ -1,5 +1,5 @@
 import * as mysql from "mysql";
-import {Connection, FieldInfo, MysqlError, Query} from "mysql";
+import {Connection, FieldInfo, MysqlError} from "mysql";
 
 interface Where {
     column: string,
@@ -74,12 +74,37 @@ class MysqlHandler {
     }
 
     /**
+     * Creates a string of all insert values
+     * @param values string[][] | string[]: a list of all values to insert
+     * @return String: string of all insert values
+     * @private
+     */
+    private createValuesString(values: string[][] | string[]): string {
+        let valuesString: string;
+        if (Array.isArray(values[0])) {
+            let valueList: string[] = [];
+            for (const value of values) {
+                valueList.push(`(${value})`);
+            }
+            valuesString = `${valueList}`;
+        } else {
+            valuesString = `(${values})`;
+        }
+
+        /* Each value in the list has to have '' around them e.g. 1 has to be '1'
+           This ensures all variable in the string has the quotes (There is definitely a better solution to this)*/
+        return valuesString.replace("(", "('")
+                           .replace(")", "')")
+                           .replace(/(?<!'),'|(?<!'),(?!')|',(?!')/g, "','");
+    }
+
+    /**
      * Sends a query to the database if one is present
      * @param sqlQuery String: query to send to server
      * @param callback Callback: callback function to process data
      * @private
      */
-    private sendQuery(sqlQuery: string, callback?: (error: MysqlError | null, results: any, fields: FieldInfo[]) => void): void {
+    public sendQuery(sqlQuery: string, callback?: (error: MysqlError | null, results: any, fields: FieldInfo[]) => void): void {
         if (this.hasOrCreateConnection()) {
             MysqlHandler.connection.query({ sql: sqlQuery, timeout: 30000 }, callback);
         }
@@ -95,6 +120,18 @@ class MysqlHandler {
     public select(table: string, columns?: string[], where?:Where, callback?: (error: MysqlError | null, results: any, fields: FieldInfo[]) => void): void {
         let queryString = `SELECT ${columns !== undefined ? columns : "*"} FROM ${table} ${this.createWhereString(where)}`;
         this.sendQuery(queryString, callback);
+    }
+
+    /**
+     * Sends an insert query to server
+     * @param table String: table to get data from
+     * @param columns String[]: column(s) to insert into
+     * @param values string[][] | string[]: values to insert into columns
+     * @param callback Callback: callback function to process data
+     */
+    public insert(table: string, columns: string[], values: string[][] | string[], callback?: (error: MysqlError | null, results: any, fields: FieldInfo[]) => void): void {
+        let queryString = `INSERT INTO ${table} (${columns}) VALUES ${this.createValuesString(values)}`;
+        this.sendQuery(queryString, callback)
     }
 }
 
