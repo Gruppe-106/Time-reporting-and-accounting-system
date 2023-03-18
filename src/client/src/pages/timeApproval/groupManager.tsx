@@ -64,13 +64,13 @@ class GroupManager extends Component<GroupManagerProp>{
         this.GetDataAsync().then(data => {
             this.employees = data;
         });
-        const { id } = useParams(); // ! THIS GIVES ERRORS
+        //const { id } = useParams(); // ! THIS GIVES ERRORS
         /**
          * ! Specific error src\pages\timeApproval\groupManager.tsx
          * ! Line 67:24:  React Hook "useParams" cannot be called in a class component.
          * ! React Hooks must be called in a React function component or a custom React Hook function  react-hooks/rules-of-hooks
          */
-        this.managerId = Number(id);
+        //this.managerId = Number(id);
         return (
             <>
                 <BaseNavBar />
