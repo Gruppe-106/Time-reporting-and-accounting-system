@@ -58,7 +58,7 @@ class MysqlHandler {
     public destroyConnection(): void {
         if (this.hasConnection()) {
             MysqlHandler.connection.destroy();
-            return console.log("[MySQL] connection to database destroyed");
+            return console.log("[MySQL] Connection to database destroyed");
         }
         console.log("[MySQL] Can't stop connection to DB as there is none")
     }
@@ -93,9 +93,9 @@ class MysqlHandler {
 
         /* Each value in the list has to have '' around them e.g. 1 has to be '1'
            This ensures all variable in the string has the quotes (There is definitely a better solution to this)*/
-        return valuesString.replace("(", "('")
-                           .replace(")", "')")
-                           .replace(/(?<!'),'|(?<!'),(?!')|',(?!')/g, "','");
+        return valuesString.replace(/\((?!['])/g, "('")
+                           .replace(/(?<!['])\)/g, "')")
+                           .replace(/(?<![\)']),'|(?<![\)']),(?![\('])|',(?![\('])/g, "','");
     }
 
     /**

@@ -2,6 +2,7 @@ import {Server} from "./server/server";
 import express from "express";
 import MysqlHandler from "./server/database/mysqlHandler";
 import readline from 'readline'
+import AddFakeDataToDB from "./server/database/fakeData/addFakeDataToDB";
 const app = express();
 
 // --- Config ---
@@ -18,20 +19,7 @@ const server = new Server(app);
 server.start(port);
 
 //Create Mysql connection
-const mysql: MysqlHandler = new MysqlHandler(mySQLConnectionConfig);
-
-/*
-mysql.insert("users", ["email", "firstName", "lastName", "groupId"], ["sam@example.com", "Sam", "Smith", "1"], (error, results, fields) => {
-    console.log(error);
-    console.log(results);
-    console.log(fields);
-    mysql.select("users", undefined, {column: "id", equals: ["1"]}, (error, results, fields) => {
-        console.log(error);
-        console.log(results);
-        console.log(fields);
-    })
-})
-*/
+export const mysql: MysqlHandler = new MysqlHandler(mySQLConnectionConfig);
 
 //Console input
 const inquirer = readline.createInterface({
@@ -41,14 +29,13 @@ const inquirer = readline.createInterface({
 
 inquirer.question("", input => {
     if (input === "stop") {
-        server.stop();
-        mysql.destroyConnection();
         inquirer.close();
-        return;
     }
 });
 
 inquirer.on("close", function() {
-    console.log("[Server] Server closed");
+    server.stop();
+    mysql.destroyConnection();
+    console.log("[Process] Everything shutdown, ending process");
     process.exit(0);
 });

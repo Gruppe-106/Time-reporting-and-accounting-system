@@ -41,7 +41,9 @@ CREATE TABLE TASKS (
     startDate DATETIME NOT NULL,
     endDate DATETIME NOT NULL,
     timeType INT UNSIGNED NOT NULL,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    FOREIGN KEY (timeType)
+        REFERENCES TIMETYPES (id)
 );
 
 CREATE TABLE TIMETYPES (
@@ -75,7 +77,7 @@ CREATE TABLE AUTH (
     authKey CHAR(50) UNIQUE,
     authKeyEndDate DATETIME,
     userId INT UNSIGNED NOT NULL UNIQUE,
-    password CHAR(32) NOT NULL,
+    password CHAR(64) NOT NULL,
     PRIMARY KEY (email , authKey , userId),
     FOREIGN KEY (email)
         REFERENCES USERS (email),

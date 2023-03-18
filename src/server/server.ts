@@ -23,6 +23,6 @@ export class Server {
 
     public stop(): void {
         Server.server.close();
-        console.log("[Server]  Server is now closed");
+        console.log("[Server] Websocket closed");
     }
 }
