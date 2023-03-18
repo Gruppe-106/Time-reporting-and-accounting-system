@@ -1,9 +1,11 @@
 import {Express} from "express";
 import {MainRouter} from "./mainRouter";
+import * as Http from "http";
 
 export class Server {
     private app: Express;
     private router: MainRouter
+    private server: Http.Server;
 
     constructor(app: Express) {
         this.app = app;
@@ -12,11 +14,11 @@ export class Server {
     }
 
     public start(port: number): void {
-        this.app.listen(port, () => console.log(`[HTTP] Server listening on port ${port}, http://localhost:${port}`));
+        this.server = this.app.listen(port, () => console.log(`[Server] Server listening on port ${port}, http://localhost:${port}`));
     }
 
     public stop(): void {
         this.server.close();
-        console.log("Node Server is closed");
+        console.log("[Server] Node Server is closed");
     }
 }
