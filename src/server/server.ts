@@ -7,22 +7,22 @@ export class Server {
     private router: MainRouter
     //Need SSL cert for https server
     //private server: https.Server;
-    private server: http.Server;
+    private static server: http.Server;
 
     constructor(app: Express) {
         this.app = app;
         this.router = new MainRouter();
         app.use('/', this.router.routes());
 
-        this.server = http.createServer(app);
+        Server.server = http.createServer(app);
     }
 
     public start(port: number): void {
-        this.server.listen(port, () => console.log(`[HTTP] Server listening on port ${port}, http://localhost:${port}`));
+        Server.server.listen(port, () => console.log(`[Server] Server listening on port ${port}, http://localhost:${port}`));
     }
 
     public stop(): void {
-        this.server.close();
-        console.log("Node Server is now closed");
+        Server.server.close();
+        console.log("[Server]  Server is now closed");
     }
 }
