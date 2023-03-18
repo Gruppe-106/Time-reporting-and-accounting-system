@@ -1,18 +1,20 @@
 import {Express} from "express";
 import {MainRouter} from "./mainRouter";
-import * as https from "https";
+import * as http from "http";
 
 export class Server {
     private app: Express;
     private router: MainRouter
-    private server: https.Server;
+    //Need SSL cert for https server
+    //private server: https.Server;
+    private server: http.Server;
 
     constructor(app: Express) {
         this.app = app;
         this.router = new MainRouter();
         app.use('/', this.router.routes());
 
-        this.server = https.createServer(app);
+        this.server = http.createServer(app);
     }
 
     public start(port: number): void {
