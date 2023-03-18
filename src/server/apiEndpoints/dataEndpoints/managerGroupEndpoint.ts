@@ -2,7 +2,6 @@ import EndpointBase from "../endpointBase";
 import {Request, Response} from "express";
 import {GROUP} from "../../database/fakeData/GROUP";
 import {UserEndpoint, UserReturnType} from "./userEndpoint";
-import {TaskProjectEndpoint, TaskProjectReturnType} from "./taskProjectEndpoint";
 
 interface ManagerGroupReturnType {
     manager?: number,
@@ -28,13 +27,13 @@ export class ManagerGroupEndpoint extends EndpointBase {
 
     private async getAllDataForKey(dataIndex:number, entry:EntryType) {
         this.data[dataIndex].employees = [];
-        let users:UserReturnType[] = await new UserEndpoint(this.user).processRequest(["id", "firstName", "lastName", "group"], "group", [entry.id.toString()]);
+        let users:UserReturnType[] = await new UserEndpoint(this.user).processRequest(["id", "firstName", "lastName", "email"], "group", [entry.id.toString()]);
         users.forEach((value) => {
             this.data[dataIndex].employees.push({
                 id: value.id,
                 firstName: value.firstName,
                 lastName: value.lastName,
-                email: value.lastName
+                email: value.email
             })
         })
 
