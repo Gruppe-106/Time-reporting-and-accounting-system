@@ -12,9 +12,8 @@ import {USER_TASK_CONNECTOR} from "./USER_TASK_CONNECTOR";
 import {PROJECTS_MANAGER_CONNECTOR} from "./PROJECTS_MANAGER_CONNECTOR";
 import {Server} from "../../server";
 
-const mysql = Server.mysql;
-
 class AddFakeDataToDB {
+    private mysql = Server.mysql;
     private dateFormatter(date:number) {
         return new Date(date).toISOString().slice(0, 19).replace('T', ' ');
     }
@@ -42,9 +41,7 @@ class AddFakeDataToDB {
             values.push([user.email, user.firstName, user.lastName, user.group.toString()]);
         }
 
-        mysql.insert("users", ["email", "firstName", "lastName", "groupId"], values, (error, results, fields) => {
-            console.log("users", error, results, fields);
-        })
+        this.mysql.insert("users", ["email", "firstName", "lastName", "groupId"], values);
     }
 
     public addAUTHS() {
@@ -55,9 +52,7 @@ class AddFakeDataToDB {
             values.push([auth.email, auth.authKey, this.dateFormatter(auth.authKeyEndDate), auth.userId.toString(), auth.password]);
         }
 
-        mysql.insert("auth", ["email", "authKey", "authKeyEndDate", "userId", "password"], values, (error, results, fields) => {
-            console.log("auth", error, results, fields);
-        })
+        this.mysql.insert("auth", ["email", "authKey", "authKeyEndDate", "userId", "password"], values)
     }
 
     public addGROUP() {
@@ -68,9 +63,7 @@ class AddFakeDataToDB {
             values.push([group.manager.toString(), group.id.toString()]);
         }
 
-        mysql.insert("groups_connector", ["managerId", "groupId"], values, (error, results, fields) => {
-            console.log("groups_connector", error, results, fields);
-        })
+        this.mysql.insert("groups_connector", ["managerId", "groupId"], values)
     }
 
     public addPROJECT() {
@@ -81,9 +74,7 @@ class AddFakeDataToDB {
             values.push([project.id.toString(), project.superProject.toString(), project.name, this.dateFormatter(project.startDate), this.dateFormatter(project.endDate)]);
         }
 
-        mysql.insert("projects", ["id", "superProjectId", "name", "startDate", "endDate"], values, (error, results, fields) => {
-            console.log("projects", error, results, fields);
-        })
+        this.mysql.insert("projects", ["id", "superProjectId", "name", "startDate", "endDate"], values)
     }
 
     public addROLES() {
@@ -94,9 +85,7 @@ class AddFakeDataToDB {
             values.push([role.id.toString(), role.name]);
         }
 
-        mysql.insert("roles", ["id", "name"], values, (error, results, fields) => {
-            console.log("roles", error, results, fields);
-        })
+        this.mysql.insert("roles", ["id", "name"], values)
     }
 
     public addTIMETYPES() {
@@ -107,9 +96,7 @@ class AddFakeDataToDB {
             values.push([timetype.id.toString(), timetype.name]);
         }
 
-        mysql.insert("timetypes", ["id", "name"], values, (error, results, fields) => {
-            console.log("timetypes", error, results, fields);
-        })
+        this.mysql.insert("timetypes", ["id", "name"], values)
     }
 
     public addTASKS() {
@@ -120,9 +107,7 @@ class AddFakeDataToDB {
             values.push([task.id.toString(), task.name, this.dateFormatter(task.startDate), this.dateFormatter(task.endDate), task.timeType.toString()]);
         }
 
-        mysql.insert("tasks", ["id", "name", "startDate", "endDate", "timeType"], values, (error, results, fields) => {
-            console.log("tasks", error, results, fields);
-        })
+        this.mysql.insert("tasks", ["id", "name", "startDate", "endDate", "timeType"], values)
     }
 
     public addTASKPROJECT() {
@@ -133,9 +118,7 @@ class AddFakeDataToDB {
             values.push([con.taskId.toString(), con.projectId.toString()]);
         }
 
-        mysql.insert("tasks_projects_connector", ["taskId", "projectId"], values, (error, results, fields) => {
-            console.log("tasks_projects_connector", error, results, fields);
-        })
+        this.mysql.insert("tasks_projects_connector", ["taskId", "projectId"], values)
     }
 
     public addUSERROLE() {
@@ -146,9 +129,7 @@ class AddFakeDataToDB {
             values.push([con.role.toString(), con.user.toString()]);
         }
 
-        mysql.insert("users_roles_connector", ["roleId", "userId"], values, (error, results, fields) => {
-            console.log("users_roles_connector", error, results, fields);
-        })
+        this.mysql.insert("users_roles_connector", ["roleId", "userId"], values)
     }
 
     public addUSERTASKTIMEREGISTER() {
@@ -159,9 +140,7 @@ class AddFakeDataToDB {
             values.push([this.dateFormatter(con.date), con.taskId.toString(), con.userId.toString(), con.time.toString(), con.approved ? "1" : "0", con.managerLogged ? "1" : "0"]);
         }
 
-        mysql.insert("users_tasks_time_register", ["date", "taskId", "userId", "time", "approved", "managerLogged"], values, (error, results, fields) => {
-            console.log("users_tasks_time_register", error, results, fields);
-        })
+        this.mysql.insert("users_tasks_time_register", ["date", "taskId", "userId", "time", "approved", "managerLogged"], values)
     }
 
     public addUSERSTASKS() {
@@ -172,9 +151,7 @@ class AddFakeDataToDB {
             values.push([con.userId.toString(), con.taskId.toString()]);
         }
 
-        mysql.insert("users_tasks_connector", ["userId", "taskId"], values, (error, results, fields) => {
-            console.log("users_tasks_connector", error, results, fields);
-        })
+        this.mysql.insert("users_tasks_connector", ["userId", "taskId"], values)
     }
 
     public addPROJECTSMANAGER() {
@@ -185,9 +162,7 @@ class AddFakeDataToDB {
             values.push([con.userId.toString(), con.projectId.toString()]);
         }
 
-        mysql.insert("projects_manager_connector", ["userId", "projectId"], values, (error, results, fields) => {
-            console.log("projects_manager_connector", error, results, fields);
-        })
+        this.mysql.insert("projects_manager_connector", ["userId", "projectId"], values)
     }
 }
 
