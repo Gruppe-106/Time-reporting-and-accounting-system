@@ -1,6 +1,9 @@
 import EndpointBase from "../endpointBase";
 import {MySQLResponse} from "../../database/mysqlHandler";
 
+/**
+ * Endpoint for .../api/project/get
+ */
 class ProjectEndpoint extends  EndpointBase {
     allowedColumns: string[] = [
         "id",
@@ -18,7 +21,7 @@ class ProjectEndpoint extends  EndpointBase {
 
         for (const result of response.results) {
             if (result.startDate) result.startDate = this.mySQL.dateToNumber(result.startDate);
-            if (result.endDate) result.endDate = this.mySQL.dateToNumber(result.endDate);
+            if (result.endDate)   result.endDate = this.mySQL.dateToNumber(result.endDate);
         }
 
         return response.results;

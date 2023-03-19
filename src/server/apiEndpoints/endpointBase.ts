@@ -56,6 +56,14 @@ abstract class EndpointBase {
         }
     }
 
+    /**
+     * Gets data from DB and convert to client format
+     * @param requestValues String[]: the values to request from the DB also known as columns
+     * @param primaryKey String: The primary key to look for
+     * @param keyEqual String[]?: Specific primary keys to look for if undefined get all aka *
+     * @param data String[]?: Additional data needed for sending query
+     * @return Promise object[] : containing the information to send to client
+     */
     abstract getData(requestValues: string[], primaryKey: string, keyEqual?: string[], data?:string[]):Promise<object[]>;
 
     protected urlParamsConversion(params:string | string[] | ParsedQs | ParsedQs[], allowAll:boolean = true, throwOnMissing:boolean = false, res?:Response):string[] {
