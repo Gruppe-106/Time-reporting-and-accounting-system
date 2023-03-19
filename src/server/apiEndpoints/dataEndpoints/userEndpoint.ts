@@ -1,4 +1,4 @@
-import EndpointBase, {User} from "../endpointBase";
+import _endpointBase from "../_endpointBase";
 import {USERS} from "../../database/fakeData/USERS";
 import {Request, Response} from "express";
 
@@ -10,7 +10,7 @@ export interface UserReturnType {
     group?: number
 }
 
-export class UserEndpoint extends EndpointBase {
+export class UserEndpointOld extends _endpointBase {
     table = USERS.data;
     data: UserReturnType[];
 

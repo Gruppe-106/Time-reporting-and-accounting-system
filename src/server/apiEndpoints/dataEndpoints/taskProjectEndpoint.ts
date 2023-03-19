@@ -1,8 +1,8 @@
-import EndpointBase, {User} from "../endpointBase";
+import _endpointBase, {User} from "../_endpointBase";
 import {Request, Response} from "express";
 import {TASK_PROJECTS_CONNECTOR} from "../../database/fakeData/TASK_PROJECTS_CONNECTOR";
-import {ProjectEndpoint, ProjectReturnType} from "./projectEndpoint";
-import {TaskEndpoint, TaskReturnType} from "./taskEndpoint";
+import {ProjectEndpointOld, ProjectReturnType} from "./projectEndpoint";
+import {TaskEndpointOld, TaskReturnType} from "./taskEndpoint";
 
 export interface TaskProjectReturnType {
     taskId?:      number,
@@ -16,13 +16,13 @@ interface EntryType {
     projectId: number
 }
 
-export class TaskProjectEndpoint extends EndpointBase {
+export class TaskProjectEndpointOld extends _endpointBase {
     table = TASK_PROJECTS_CONNECTOR.data;
     data: TaskProjectReturnType[];
 
     private async getAllDataForKey(dataIndex:number, entry:EntryType) {
-        let projectName: ProjectReturnType[] = await new ProjectEndpoint(this.user).processRequest(["name"], "id", [entry.projectId.toString()]);
-        let taskName:    TaskReturnType[]    = await new TaskEndpoint(this.user).processRequest(["name"], "id", [entry.taskId.toString()]);
+        let projectName: ProjectReturnType[] = await new ProjectEndpointOld(this.user).processRequest(["name"], "id", [entry.projectId.toString()]);
+        let taskName:    TaskReturnType[]    = await new TaskEndpointOld(this.user).processRequest(["name"], "id", [entry.taskId.toString()]);
         this.data[dataIndex] = {
             taskId:      entry.taskId,
             taskName:    taskName[0].name,
@@ -38,14 +38,14 @@ export class TaskProjectEndpoint extends EndpointBase {
                     this.data[dataIndex].taskId = entry.taskId;
                     break;
                 case "taskName":
-                    let taskName: TaskReturnType[] = await new TaskEndpoint(this.user).processRequest(["name"], "id", [entry.taskId.toString()]);
+                    let taskName: TaskReturnType[] = await new TaskEndpointOld(this.user).processRequest(["name"], "id", [entry.taskId.toString()]);
                     this.data[dataIndex].taskName  = taskName[0].name;
                     break;
                 case "projectId":
                     this.data[dataIndex].projectId = entry.projectId;
                     break;
                 case "projectName":
-                    let projectName: TaskReturnType[] = await new ProjectEndpoint(this.user).processRequest(["name"], "id", [entry.projectId.toString()]);
+                    let projectName: TaskReturnType[] = await new ProjectEndpointOld(this.user).processRequest(["name"], "id", [entry.projectId.toString()]);
                     this.data[dataIndex].projectName  = projectName[0].name;
                     break;
                 default:

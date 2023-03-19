@@ -1,7 +1,7 @@
-import EndpointBase from "../endpointBase";
+import _endpointBase from "../_endpointBase";
 import {Request, Response} from "express";
 import {GROUP} from "../../database/fakeData/GROUP";
-import {UserEndpoint, UserReturnType} from "./userEndpoint";
+import {UserEndpointOld, UserReturnType} from "./userEndpoint";
 
 interface ManagerGroupReturnType {
     manager?: number,
@@ -21,13 +21,13 @@ interface EntryType {
     id: number
 }
 
-export class ManagerGroupEndpoint extends EndpointBase {
+export class ManagerGroupEndpointOld extends _endpointBase {
     table = GROUP.data;
     data: ManagerGroupReturnType[];
 
     private async getAllDataForKey(dataIndex:number, entry:EntryType) {
         this.data[dataIndex].employees = [];
-        let users:UserReturnType[] = await new UserEndpoint(this.user).processRequest(["id", "firstName", "lastName", "email"], "group", [entry.id.toString()]);
+        let users:UserReturnType[] = await new UserEndpointOld(this.user).processRequest(["id", "firstName", "lastName", "email"], "group", [entry.id.toString()]);
         users.forEach((value) => {
             this.data[dataIndex].employees.push({
                 id: value.id,
@@ -37,7 +37,7 @@ export class ManagerGroupEndpoint extends EndpointBase {
             })
         })
 
-        let manager:UserReturnType[]   = await new UserEndpoint(this.user).processRequest(["firstName", "lastName"], "id", [entry.manager.toString()]);
+        let manager:UserReturnType[]   = await new UserEndpointOld(this.user).processRequest(["firstName", "lastName"], "id", [entry.manager.toString()]);
         this.data[dataIndex].firstName = manager[0].firstName;
         this.data[dataIndex].lastName  = manager[0].lastName;
         this.data[dataIndex].manager   = entry.manager;
@@ -50,7 +50,7 @@ export class ManagerGroupEndpoint extends EndpointBase {
         if (requestValues.indexOf("firstName") !== -1)  managerValues.push("firstName");
         if (requestValues.indexOf("lastName") !== -1)   managerValues.push("lastName");
         if (managerValues.length > 0) {
-            managerData = await new UserEndpoint(this.user).processRequest(managerValues, "id", [entry.manager.toString()]);
+            managerData = await new UserEndpointOld(this.user).processRequest(managerValues, "id", [entry.manager.toString()]);
         }
         for (const request of requestValues) {
             switch (request) {
@@ -67,7 +67,7 @@ export class ManagerGroupEndpoint extends EndpointBase {
                     this.data[dataIndex].firstName = managerData[0].firstName;
                     break;
                 case "employees":
-                    this.data[dataIndex].employees = await new UserEndpoint(this.user).processRequest(["id", "firstName", "lastName", "group"], "group", [entry.id.toString()]);
+                    this.data[dataIndex].employees = await new UserEndpointOld(this.user).processRequest(["id", "firstName", "lastName", "group"], "group", [entry.id.toString()]);
                     break;
                 default: break;
             }

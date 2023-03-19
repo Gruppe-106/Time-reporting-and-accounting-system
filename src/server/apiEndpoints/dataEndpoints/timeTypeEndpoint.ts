@@ -1,4 +1,4 @@
-import EndpointBase, {User} from "../endpointBase";
+import _endpointBase from "../_endpointBase";
 import {TIMETYPE} from "../../database/fakeData/TIMETYPE";
 
 interface TimeTypeReturnType {
@@ -6,7 +6,7 @@ interface TimeTypeReturnType {
     name?: string,
 }
 
-export class TimeTypeEndpoint extends EndpointBase {
+export class TimeTypeEndpointOld extends _endpointBase {
     table = TIMETYPE.data;
     data: TimeTypeReturnType[];
 }

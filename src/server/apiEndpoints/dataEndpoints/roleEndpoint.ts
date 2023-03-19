@@ -1,4 +1,4 @@
-import EndpointBase from "../endpointBase";
+import _endpointBase from "../_endpointBase";
 import {ROLES} from "../../database/fakeData/ROLES";
 
 export interface RoleReturnType {
@@ -6,7 +6,7 @@ export interface RoleReturnType {
     name?: string,
 }
 
-export class RoleEndpoint extends EndpointBase {
+export class RoleEndpointOld extends _endpointBase {
     table = ROLES.data;
     data: RoleReturnType[];
 }

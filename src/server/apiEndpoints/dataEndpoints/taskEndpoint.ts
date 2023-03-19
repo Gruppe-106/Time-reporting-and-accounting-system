@@ -1,4 +1,4 @@
-import EndpointBase from "../endpointBase";
+import _endpointBase from "../_endpointBase";
 import {TASKS} from "../../database/fakeData/TASKS";
 
 export interface TaskReturnType {
@@ -9,7 +9,7 @@ export interface TaskReturnType {
     timeType?: number
 }
 
-export class TaskEndpoint extends EndpointBase {
+export class TaskEndpointOld extends _endpointBase {
     table = TASKS.data;
     data: TaskReturnType[];
 }

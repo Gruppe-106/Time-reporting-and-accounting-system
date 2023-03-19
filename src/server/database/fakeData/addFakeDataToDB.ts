@@ -1,5 +1,4 @@
 import {USERS} from "./USERS";
-import {mysql} from "../../../app";
 import {AUTH} from "./AUTH";
 import {GROUP} from "./GROUP";
 import {PROJECTS} from "./PROJECTS";
@@ -11,6 +10,9 @@ import {USER_ROLES_CONNECTOR} from "./USER_ROLES_CONNECTOR";
 import {USER_TASK_TIME_REGISTER} from "./USER_TASK_TIME_REGISTER";
 import {USER_TASK_CONNECTOR} from "./USER_TASK_CONNECTOR";
 import {PROJECTS_MANAGER_CONNECTOR} from "./PROJECTS_MANAGER_CONNECTOR";
+import {Server} from "../../server";
+
+const mysql = Server.mysql;
 
 class AddFakeDataToDB {
     private dateFormatter(date:number) {

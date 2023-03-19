@@ -8,9 +8,10 @@ import {UserRoleEndpoint} from "../apiEndpoints/dataEndpoints/userRoleEndpoint";
 import {ManagerGroupEndpoint} from "../apiEndpoints/dataEndpoints/managerGroupEndpoint";
 import {TaskProjectEndpoint} from "../apiEndpoints/dataEndpoints/taskProjectEndpoint";
 import {TaskTimeRegisterEndpoint} from "../apiEndpoints/dataEndpoints/taskTimeRegisterEndpoint";
-import {ProjectEndpoint} from "../apiEndpoints/dataEndpoints/projectEndpoint";
+import {ProjectEndpointOld} from "../apiEndpoints/dataEndpoints/projectEndpoint";
 import {TaskEndpoint} from "../apiEndpoints/dataEndpoints/taskEndpoint";
 import UserCreationEndpoint from "../apiEndpoints/dataPostEndpoints/userCreationEndpoint";
+import ProjectEndpoint from "../apiEndpoints/dataGetEndpoints/projectEndpoint";
 
 /* Implement this shit and ensure CORS
     res.setHeader("Access-Control-Allow-Origin" , "*");
@@ -28,7 +29,7 @@ export class ApiRouter extends BaseRouter {
             res.status(200).json({message: "Api GET gotten"});
         });
 
-        this.router.get("/project/get",      (req: Request, res: Response) => new ProjectEndpoint(this.user).getRoute(req, res));
+        this.router.get("/project/get",      (req: Request, res: Response) => new ProjectEndpointOld(this.user).getRoute(req, res));
         this.router.get("/user/get",         (req: Request, res: Response) => new UserEndpoint(this.user).getRoute(req, res));
         this.router.get("/task/get",         (req: Request, res: Response) => new TaskEndpoint(this.user).getRoute(req, res));
         this.router.get("/task/project/get", (req: Request, res: Response) => new TaskProjectEndpoint(this.user).getRoute(req, res));
@@ -37,6 +38,9 @@ export class ApiRouter extends BaseRouter {
         this.router.get("/role/user/get",    (req: Request, res: Response) => new UserRoleEndpoint(this.user).getRoute(req, res));
         this.router.get("/group/manager/get",(req: Request, res: Response) => new ManagerGroupEndpoint(this.user).getRoute(req, res));
         this.router.get("/time/register/get",(req: Request, res: Response) => new TaskTimeRegisterEndpoint(this.user).getRoute(req, res));
+
+        //V.2
+        this.router.get("/v2/project/get",(req: Request, res: Response) => new ProjectEndpoint(this.user).getRoute(req, res));
     }
 
     private postRoutes() {

@@ -1,8 +1,8 @@
-import EndpointBase from "../endpointBase";
+import _endpointBase from "../_endpointBase";
 import {Request, Response} from "express";
 import {USER_ROLES_CONNECTOR} from "../../database/fakeData/USER_ROLES_CONNECTOR";
-import {UserEndpoint, UserReturnType} from "./userEndpoint";
-import {RoleEndpoint, RoleReturnType} from "./roleEndpoint";
+import {UserEndpointOld, UserReturnType} from "./userEndpoint";
+import {RoleEndpointOld, RoleReturnType} from "./roleEndpoint";
 
 export interface UserRoleReturnType {
     userId?: number,
@@ -17,17 +17,17 @@ interface EntryType {
     user: number
 }
 
-export class UserRoleEndpoint extends EndpointBase {
+export class UserRoleEndpointOld extends _endpointBase {
     table = USER_ROLES_CONNECTOR.data;
     data: UserRoleReturnType[] = [];
 
     private async getAllDataForKey(dataIndex:number, entry:EntryType) {
         this.data[dataIndex].userId    = entry.user;
-        let task: UserReturnType[]     = await new UserEndpoint(this.user).processRequest(["firstName", "lastName"], "id", [(entry.user).toString()]);
+        let task: UserReturnType[]     = await new UserEndpointOld(this.user).processRequest(["firstName", "lastName"], "id", [(entry.user).toString()]);
         this.data[dataIndex].firstName = task[0].firstName;
         this.data[dataIndex].lastName  = task[0].lastName;
         this.data[dataIndex].roleId    = entry.role;
-        let role: RoleReturnType[]     = await new RoleEndpoint(this.user).processRequest(["name"], "id", [entry.role.toString()]);
+        let role: RoleReturnType[]     = await new RoleEndpointOld(this.user).processRequest(["name"], "id", [entry.role.toString()]);
         this.data[dataIndex].roleName  = role[0].name;
     }
 
@@ -38,7 +38,7 @@ export class UserRoleEndpoint extends EndpointBase {
         if (requestValues.indexOf("firstName") !== -1) userValues.push("firstName");
         if (requestValues.indexOf("lastName") !== -1)   userValues.push("lastName");
         if (userValues.length > 0) {
-            userData = await new UserEndpoint(this.user).processRequest(userValues, "id", [(entry.user).toString()]);
+            userData = await new UserEndpointOld(this.user).processRequest(userValues, "id", [(entry.user).toString()]);
         }
 
         //Go through all requested values and them to the returning data
@@ -48,7 +48,7 @@ export class UserRoleEndpoint extends EndpointBase {
             else if (request === "lastName")  this.data[dataIndex].lastName  = userData[0].lastName;
             else if (request === "roleId")    this.data[dataIndex].roleId = entry.role;
             else if (request === "roleName")  {
-                let role: RoleReturnType[]     = await new RoleEndpoint(this.user).processRequest(["name"], "id", [entry.role.toString()]);
+                let role: RoleReturnType[]     = await new RoleEndpointOld(this.user).processRequest(["name"], "id", [entry.role.toString()]);
                 this.data[dataIndex].roleName  = role[0].name;
             }
         }
