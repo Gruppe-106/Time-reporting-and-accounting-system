@@ -1,9 +1,15 @@
 import * as mysql from "mysql";
 import {Connection, FieldInfo, MysqlError} from "mysql";
 
-interface Where {
+export interface Where {
     column: string,
     equals: string[]
+}
+
+export interface MySQLResponse {
+    error: MysqlError | null,
+    results: any,
+    fields: FieldInfo[]
 }
 
 class MysqlHandler {
@@ -104,10 +110,24 @@ class MysqlHandler {
      * @param callback Callback: callback function to process data
      * @private
      */
-    public sendQuery(sqlQuery: string, callback?: (error: MysqlError | null, results: any, fields: FieldInfo[]) => void): void {
+    public async sendQuery(sqlQuery: string): Promise<MySQLResponse>{
         if (this.hasOrCreateConnection()) {
-            MysqlHandler.connection.query({ sql: sqlQuery, timeout: 30000 }, callback);
+            let promise:Promise<MySQLResponse> = new Promise<MySQLResponse>((resolve) =>  {
+                MysqlHandler.connection.query({ sql: sqlQuery, timeout: 30000 }, (error: MysqlError | null, results: any, fields: FieldInfo[]) => {
+                    if (error !== null) {
+                        console.log("[MySQL] Error retrieving data: ", error);
+                    }
+                    resolve({
+                        error: error,
+                        results: results,
+                        fields: fields
+                    });
+                });
+            })
+            console.log("[MySQL] Retrieving data from DB, query: ", sqlQuery);
+            return promise;
         }
+        return {error: undefined, results: undefined, fields: undefined};
     }
 
     /**
@@ -115,11 +135,10 @@ class MysqlHandler {
      * @param table String: table to get data from
      * @param columns String[]?: column(s) to retrieve
      * @param where Where?: condition for the selection of data
-     * @param callback Callback: callback function to process data
      */
-    public select(table: string, columns?: string[], where?:Where, callback?: (error: MysqlError | null, results: any, fields: FieldInfo[]) => void): void {
+    public select(table: string, columns?: string[], where?:Where): Promise<MySQLResponse> {
         let queryString = `SELECT ${columns !== undefined ? columns : "*"} FROM ${table} ${this.createWhereString(where)}`;
-        this.sendQuery(queryString, callback);
+        return this.sendQuery(queryString);
     }
 
     /**
@@ -127,11 +146,18 @@ class MysqlHandler {
      * @param table String: table to get data from
      * @param columns String[]: column(s) to insert into
      * @param values string[][] | string[]: values to insert into columns
-     * @param callback Callback: callback function to process data
      */
-    public insert(table: string, columns: string[], values: string[][] | string[], callback?: (error: MysqlError | null, results: any, fields: FieldInfo[]) => void): void {
+    public insert(table: string, columns: string[], values: string[][] | string[]): Promise<MySQLResponse> {
         let queryString = `INSERT INTO ${table} (${columns}) VALUES ${this.createValuesString(values)}`;
-        this.sendQuery(queryString, callback)
+        return this.sendQuery(queryString);
+    }
+
+    public dateFormatter(date:number): string {
+        return new Date(date).toISOString().slice(0, 19).replace('T', ' ');
+    }
+
+    public dateToNumber(date:Date): number {
+        return date.getTime();
     }
 }
 
