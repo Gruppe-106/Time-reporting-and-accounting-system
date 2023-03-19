@@ -1,5 +1,7 @@
 import {ParsedQs} from "qs";
 import {Request, Response} from "express";
+import {Server} from "../server";
+import {Where} from "../database/mysqlHandler";
 
 export interface User {
     authKey: string;
@@ -16,11 +18,8 @@ enum Roles {
 
 abstract class EndpointBase {
     protected readonly user: User;
-    private getRole:Roles[]
-    private postRole:Roles[]
-
-    abstract table:object[];
-    abstract data:object[];
+    protected readonly mySQL = Server.mysql;
+    abstract allowedColumns: string[];
 
     constructor(user: User) {
         this.user = user;
@@ -31,35 +30,33 @@ abstract class EndpointBase {
         return this.user.authKey === "test";
     }
 
-    public async processRequest(requestValues: string[], primaryKey:string, keyEqual?:string[], data?:string[]):Promise<object[]> {
+    public async processRequest(requestValues: string[], primaryKey:string, keyEqual?:string[], data?:string[]):Promise<{status:number, data: object[]}> {
         try {
             if (this.ensureAuth()) {
-                return await this.getData(requestValues, primaryKey, keyEqual);
+                return {status: 200, data: await this.getData(requestValues, primaryKey, keyEqual)};
             }
+            return {status: 401, data: [{error: "Not authorized"}]};
         } catch (e) {
             console.error(e);
-            return [{error: "Failed to get data"}];
+            return {status: 404, data: [{error: "Failed to get data"}]};
         }
     }
 
-    public async getData(requestValues: string[], primaryKey: string, keyEqual?: string[], data?:string[]):Promise<object[]> {
-        this.data = [];
-        let dataIndex = 0;
-        for (const entry of this.table) {
-            if (keyEqual.indexOf(entry[primaryKey].toString()) !== -1 || keyEqual.indexOf("*") !== -1) {
-                this.data[dataIndex] = {}
-                if (requestValues.indexOf("*") !== -1) {
-                    this.data[dataIndex] = entry;
-                } else {
-                    for (const request of requestValues) {
-                        if (entry[request]) this.data[dataIndex][request] = entry[request];
-                    }
-                }
-                dataIndex++;
-            }
+    protected createWhere(primaryKey: string, keyEqual: string[]): Where | undefined {
+        if (keyEqual.indexOf("*") === -1) {
+            return  {column: primaryKey, equals: keyEqual};
         }
-        return this.data;
     }
+
+    protected createColumns(requestValues: string[]): string[] {
+        if (requestValues.indexOf("*") === -1) {
+            return  requestValues.filter((value) => {
+                if (this.allowedColumns.indexOf(value) !== -1) return value;
+            })
+        }
+    }
+
+    abstract getData(requestValues: string[], primaryKey: string, keyEqual?: string[], data?:string[]):Promise<object[]>;
 
     protected urlParamsConversion(params:string | string[] | ParsedQs | ParsedQs[], allowAll:boolean = true, throwOnMissing:boolean = false, res?:Response):string[] {
         let paramsList:string[];
@@ -74,7 +71,7 @@ abstract class EndpointBase {
     }
 
     protected badRequest(res: Response) {
-        res.sendStatus(400)
+        res.sendStatus(400);
         res.end();
     }
 
@@ -86,7 +83,7 @@ abstract class EndpointBase {
 
         this.processRequest(requestedValues, primaryKey, requestKeys).then((data) => {
             res.setHeader('Content-Type', 'application/json');
-            res.status(200).json(data);
+            res.status(data.status).json(data.data);
         })
     };
 }
