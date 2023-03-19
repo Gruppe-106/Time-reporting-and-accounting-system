@@ -60,7 +60,7 @@ class MysqlHandler {
             MysqlHandler.connection.destroy();
             return console.log("[MySQL] Connection to database destroyed");
         }
-        console.log("[MySQL] Can't stop connection to DB as there is none")
+        console.log("[MySQL] No connection to destroy")
     }
 
     /**
