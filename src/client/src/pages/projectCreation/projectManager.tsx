@@ -4,7 +4,7 @@
 import React, {Component} from "react";
 import BaseNavBar from "../../components/navBar";
 import {Button, Container} from "react-bootstrap";
-import ProjectTable, {ProjectTableRow} from "../projectViewer/components/projectTable";
+import {ProjectTableRow} from "../projectViewer/components/projectTable";
 import ProjectManageInformation from "../projectViewer/components/projectManageInformation";
 
 interface  ProjectMenuState{
