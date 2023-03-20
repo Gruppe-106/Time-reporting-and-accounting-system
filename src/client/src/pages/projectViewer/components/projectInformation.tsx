@@ -61,7 +61,6 @@ class ProjectInformation extends Component<ProjectInformationProp> {
     private informationRender():JSX.Element {
             return (
                 <Tab.Container id="left-tabs-example" defaultActiveKey="first">
-                    {this.state.pageInformation.name !== "" ? (<h2>{this.state.pageInformation.name}</h2>) : ""}
 
       <Row>
         <Col sm={2}>
@@ -80,7 +79,23 @@ class ProjectInformation extends Component<ProjectInformationProp> {
         <Col sm={9}>
           <Tab.Content>
             <Tab.Pane eventKey="first">
-                <h3>Project Description</h3>
+                {this.state.pageInformation.name !== "" ? (<h1>{this.state.pageInformation.name}</h1>) : ""}
+                <h3>Description</h3>
+                 <Table>
+                     <thead>
+                     <tr>
+                         <th>Start Date: {new Date(this.state.pageInformation.startDate).toLocaleDateString()}</th>
+                         <th>End Date: {new Date(this.state.pageInformation.endDate).toLocaleDateString()}</th>
+                     </tr>
+                     <tr>
+                         <th>Project Number: {this.state.pageInformation.id}</th>
+                         <th>Parent Project: {this.state.pageInformation.superProject}</th>
+                     </tr>
+                     <tr>
+                         <th>Project Manager: no one</th>
+                     </tr>
+                     </thead>
+                 </Table>
             </Tab.Pane>
             <Tab.Pane eventKey="second">
                 <h3>Members list</h3>
