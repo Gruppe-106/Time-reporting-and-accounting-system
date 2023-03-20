@@ -18,7 +18,7 @@ class UserTimeRegister extends Component<any>{
         return (
             <>
                 <BaseNavBar/>
-                <Container>
+                <Container fluid="sm">
                     <h1>User Time Register</h1>
                 </Container>
                 <TimeSheet/>
