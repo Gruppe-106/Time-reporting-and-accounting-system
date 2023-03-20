@@ -54,11 +54,11 @@ export default class UserCreationEndpoint {
     public postRoute(req:Request, res:Response):void {
         let data:UserCreationData | string[] = this.dataConverter(req.body)
         if (data.constructor === Array) {
-            res.status(400).json({ success: false, missing: data });
+            res.status(404).json({status: 404, success: false, missing: data });
             res.end();
             return;
         }
-        res.status(200).json({success: true});
+        res.status(200).json({status: 200, success: true});
         res.end();
     }
 }
