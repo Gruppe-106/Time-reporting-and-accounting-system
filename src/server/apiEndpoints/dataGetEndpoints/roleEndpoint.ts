@@ -12,8 +12,10 @@ class RoleEndpoint extends  EndpointBase {
     ];
 
     async getData(requestValues: string[], primaryKey: string, keyEqual?: string[], data?: string[]): Promise<object[]> {
+        //Get all roles that fulfill the given request
         let response:MySQLResponse = await this.mySQL.select("roles", this.createColumns(requestValues), this.createWhere(primaryKey, keyEqual));
-        if (response.error !== null) return [{error: "Failed to retrieve data"}];
+        //Check if there was an error and throw if so
+        if (response.error !== null) throw new Error("[MySQL] Failed to retrieve data");
 
         return response.results;
     }
