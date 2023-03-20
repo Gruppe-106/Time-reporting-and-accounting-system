@@ -3,56 +3,283 @@
  */
 import React, { Component } from "react";
 import BaseNavBar from "../../components/navBar";
-import { Container } from "react-bootstrap";
+import { Container, Modal } from "react-bootstrap";
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-import { Typeahead, Highlighter } from 'react-bootstrap-typeahead';
+import { Typeahead, Highlighter} from 'react-bootstrap-typeahead';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
+import forge from 'node-forge';
 
-//TODO: fixings the types as this is infact a no no
-interface CostumTypes {
-    selectedRoles: any[],
-    firstName: string,
-    lastName: string,
-    email: string,
-    password: string,
-    assignedToManager: { id: number, name: string }
-    firstNameValid: boolean,
-    lastNameValid: boolean,
+
+//TODO: fixings the types as this is infact a no no but it does fix it
+
+/**
+ * Custom types
+ */
+interface CustomTypes {
+    // * Input variables
+    firstName: string | null,
+    lastName: string | null,
+    email: string | null,
+    password: string | null,
+    assignedToManager: { roleName: string, roleId: number, userId: number, firstName: string, lastName: string } | null,
+    selectedRoles: {id:number,name:string}[] | null,
+
+    // * Database variables
+    dbRoles: any[],
+    dbManagers: any[],
+
+    // * Input validation
     emailValid: boolean,
-    passwordValid: boolean,
-    rolesValid: boolean,
-    submitDisabled: boolean,
 
+    // * Controlling components
+    submitDisabled: boolean,
+    showPopup: boolean,
+
+    // * Component variables
+    popupMessage: string,
+    popupTitle: string
 
 }
 
-class UserCreation extends Component<any, CostumTypes>{
+
+/**
+ * Class containing utility methods
+*/
+class Utility {
+
+    /**
+     * Method to validate fields
+     * @param userObject The object containing the current field information
+     * @returns Object containing information about missings fields if any
+     */
+    public static CheckFields(userObject: {
+        [key: string]: any
+        firstName: string | null,
+        lastName: string | null,
+        email: string | null,
+        password: string | null,
+        assignedToManager: { roleName: string, roleId: number, userId: number, firstName: string, lastName: string } | null
+        roles: {id:number,name:string}[] | null
+    }): {
+        valid: boolean,
+        missingFields: number,
+        errorString: string
+    } {
+        let missing: string[] = []
+        let keys: string[] = Object.keys(userObject)
+        let missingString: string = "";
+        let valid: boolean = true
+
+        for (let i = 0; i < keys.length; i++) {
+
+            if (userObject[keys[i]] === null) {
+                missing.push(keys[i])
+            }
+        }
+
+        if (missing.length > 0) {
+
+            valid = false;
+            let split: string = ""
+
+            if (missing.length === 1) {
+
+                if (missing[0] === "firstName") {
+                    split = "First name"
+                } else if (missing[0] === "lastName") {
+                    split = "Last name"
+                } else if (missing[0] === "email") {
+                    split = "Email address"
+                } else if (missing[0] === "password") {
+                    split = "Password"
+                } else if (missing[0] === "assignedToManager") {
+                    split = "Assign manager"
+                } else if (missing[0] === "roles") {
+                    split = "Assign roles"
+                }
+
+
+                missingString += "Missing field: " + split
+
+            } else if (missing.length > 1) {
+
+
+                missingString += "Missing fields: "
+
+                for (let i = 0; i < missing.length - 1; i++) {
+
+                    if (missing[i] === "firstName") {
+                        split = "First name"
+                    } else if (missing[i] === "lastName") {
+                        split = "Last name"
+                    } else if (missing[i] === "email") {
+                        split = "Email address"
+                    } else if (missing[i] === "password") {
+                        split = "Password"
+                    } else if (missing[i] === "assignedToManager") {
+                        split = "Assign manager"
+                    } else if (missing[i] === "roles") {
+                        split = "Assign roles"
+                    }
+                    if (split) {
+                        missingString += split + ", "
+                    }
+                    split = ""
+                }
+
+                missingString += " and "
+
+                if (missing[missing.length - 1] === "firstName") {
+                    split = "First name"
+                } else if (missing[missing.length - 1] === "lastName") {
+                    split = "Last name"
+                } else if (missing[missing.length - 1] === "email") {
+                    split = "Email address"
+                } else if (missing[missing.length - 1] === "password") {
+                    split = "Password"
+                } else if (missing[missing.length - 1] === "assignedToManager") {
+                    split = "Assign manager"
+                } else if (missing[missing.length - 1] === "roles") {
+                    split = "Assign roles"
+                }
+                missingString += split
+            }
+
+        }
+
+        return {
+            valid: valid,
+            missingFields: missing.length,
+            errorString: missingString
+        }
+    }
+
+}
+
+/**
+ * Class containing methods for getting data from the server+9
+*/
+class APICalls {
+
+    /**
+     * Get all roles from the database
+     * @returns Promise containing all possible roles
+    */
+    public static GetAllRoles(): Promise<{ id: number, name: string }[]> {
+        return fetch(`/api/role/get?ids=*`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then((response: Response) => {
+                if (response.status === 400) {
+                    throw new Error("Status 400 bad request")
+                } else if (response.status === 200) {
+                    return response.json()
+                } else {
+                    throw new Error(`Unexpected response status: ${response.status}`)
+                }
+            })
+            .catch(error => {
+                throw new Error(error.Code);
+            });
+
+    }
+
+    /**
+     * Get all roles from the database
+     * @returns Promise containing all possible roles
+    */
+    public static GetAllManagers(): Promise<{ id: number, name: string }[]> {
+        return fetch(`/api/role/user/get?role=1`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then((response: Response) => {
+                if (response.status === 400) {
+                    throw new Error("Status 400 bad request")
+                } else if (response.status === 200) {
+                    return response.json()
+                } else {
+                    throw new Error(`Unexpected response status: ${response.status}`)
+                }
+            })
+            .catch(error => {
+                throw new Error(error.Code);
+            });
+
+    }
+
+}
+
+
+/**
+ * The user creation page it self
+*/
+class UserCreation extends Component<any, CustomTypes>{
     constructor(props: any) {
         super(props);
         this.state = {
-            firstName: "",
-            lastName: "",
-            email: "",
-            password: "",
-            assignedToManager: { "id": Infinity, "name": "" },
-            selectedRoles: [],
-            firstNameValid: false,
-            lastNameValid: false,
+            // * Input variables
+            firstName: null,
+            lastName: null,
+            email: null,
+            password: null,
+            assignedToManager: null,
+            selectedRoles: null,
+
+            // * Database variables
+            dbRoles: [],
+            dbManagers: [],
+
+            // * Input validation
             emailValid: false,
-            passwordValid: false,
-            rolesValid: false,
+
+            // * Component controllers
+            showPopup: false,
             submitDisabled: true,
 
+            // * Component variables
+            popupMessage: "",
+            popupTitle: "",
+
         }
-        this.HandleSubmit = this.HandleSubmit.bind(this);
+
+        // * Handles input
         this.HandleFirstName = this.HandleFirstName.bind(this);
         this.HandleLastName = this.HandleLastName.bind(this);
         this.HandleEmail = this.HandleEmail.bind(this);
         this.HandlePassword = this.HandlePassword.bind(this)
-        this.HandleRoles = this.HandleRoles.bind(this)
         this.HandleManager = this.HandleManager.bind(this)
+        this.HandleRoles = this.HandleRoles.bind(this)
+
+        // * Component handeling
+        this.HandleSubmit = this.HandleSubmit.bind(this);
+        this.HandleShow = this.HandleShow.bind(this);
+        this.HandleShowMessage = this.HandleShowMessage.bind(this);
+        this.HandleShowTitle = this.HandleShowTitle.bind(this);
+        this.HandleClose = this.HandleClose.bind(this);
+
+        //* Test handles
         this.test = this.test.bind(this)
+    }
+
+    /**
+     * Method is run before mounting
+    */
+    async componentDidMount() {
+        const dbRoles = await APICalls.GetAllRoles()
+        const dbManagers = await APICalls.GetAllManagers()
+
+        this.setState({
+            dbRoles: dbRoles,
+            dbManagers: dbManagers
+        })
+
     }
 
 
@@ -61,127 +288,249 @@ class UserCreation extends Component<any, CostumTypes>{
 
 
     /**
-   * Handles changes to the first name input field.
-   * @param event - The input change event object.
-   */
-    private HandleFirstName(event: any): void {
-        let validFirstName = event.target.value ? true : false
-        let submitValid = this.state.firstNameValid && this.state.lastNameValid && this.state.emailValid && this.state.passwordValid && this.state.rolesValid
+     *
+     * ! Input handle methods
+     *
+    */
+
+
+    /**
+     * Handles changes to the first name input field.
+     * @param event - The input change event object.
+    */
+    private HandleFirstName(event:  React.ChangeEvent<HTMLInputElement>): void {
         this.setState({
-            firstName: event.target.value,
-            firstNameValid: validFirstName,
-            submitDisabled: !submitValid
+            firstName: event.target.value ? event.target.value : null,
+
         })
     }
 
     /**
      * Handles changes to the last name input field.
      * @param event - The input change event object.
-     */
-    private HandleLastName(event: any): void {
-        let validLastName = event.target.value ? true : false
-        let submitValid = this.state.firstNameValid && this.state.lastNameValid && this.state.emailValid && this.state.passwordValid && this.state.rolesValid
+    */
+    private HandleLastName(event: React.ChangeEvent<HTMLInputElement>): void {
         this.setState({
-            lastName: event.target.value,
-            lastNameValid: validLastName,
-            submitDisabled: !submitValid
+            lastName: event.target.value ? event.target.value : null,
+
         })
+
     }
 
     /**
      * Handles changes to the email input field.
      * @param event - The input change event object.
-     */
-    private HandleEmail(event: any): void {
+    */
+    private HandleEmail(event: React.ChangeEvent<HTMLInputElement>): void {
         const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(event.target.value); // check if the email is valid
-        let submitValid = this.state.firstNameValid && this.state.lastNameValid && this.state.emailValid && this.state.passwordValid && this.state.rolesValid
+
 
         this.setState({
-            email: event.target.value,
+            email: event.target.value ? event.target.value : null,
             emailValid: emailValid,
-            submitDisabled: !submitValid
+
         })
     }
 
     /**
      * Handles changes to the password input field.
      * @param event - The input change event object.
-     */
-    private HandlePassword(event: any): void {
-        let passwordValid = event.target.value ? true : false
-        let submitValid = this.state.firstNameValid && this.state.lastNameValid && this.state.emailValid && this.state.passwordValid && this.state.rolesValid
+    */
+    private HandlePassword(event: React.ChangeEvent<HTMLInputElement>): void {
 
         this.setState({
-            password: event.target.value,
-            passwordValid: passwordValid,
-            submitDisabled: !submitValid
-        })
-    }
+            password: event.target.value ? event.target.value : null
 
-    /**
-     * Handles changes to the roles select field.
-     * @param roles - The selected roles array.
-     */
-    private HandleRoles(roles: any): void {
-        let rolesValid = roles.length > 0 ? true : false
-
-        this.setState({
-            selectedRoles: roles,
-            rolesValid: rolesValid,
         })
     }
 
     /**
      * Handles changes to the assigned to manager checkbox field.
      * @param manager - The manager object.
-     */
+    */
     private HandleManager(manager: any): void {
         this.setState({
-            assignedToManager: manager[0]
+            assignedToManager: manager[0] ? manager[0] : null
         })
     }
 
     /**
+     * Handles changes to the roles select field.
+     * @param roles - The selected roles array.
+    */
+    private HandleRoles(roles: any): void {
+
+        this.setState({
+            selectedRoles: roles.length > 0 ? roles : null,
+        })
+    }
+
+
+    /**
+     *
+     * ! Componant handle methods
+     *
+    */
+
+
+    /**
      * Handles the form submission.
-     */
-    private HandleSubmit() {
-        const userObject = {
+    */
+    private HandleSubmit(): void {
+
+        let hasShown = false;
+        const sha256 = forge.md.sha256.create();
+
+        const userObject: {
+            [key: string]: any
+            firstName: string | null,
+            lastName: string | null,
+            email: string | null,
+            password: string | null,
+            assignedToManager: { roleName: string, roleId: number, userId: number, firstName: string, lastName: string } | null
+            roles: {id:number,name:string}[] | null
+        } = {
             firstName: this.state.firstName,
             lastName: this.state.lastName,
             email: this.state.email,
-            password: this.state.password,
+            password: this.state.password ? sha256.update(this.state.password).digest().toHex() : null,
             assignedToManager: this.state.assignedToManager,
+            roles: this.state.selectedRoles
         }
 
+        if (!this.state.emailValid) {
+            this.HandleShowTitle("Invalid e-mail adress")
+            this.HandleShowMessage("Please enter a valid e-mail adress")
+            this.HandleShow()
+        } else {
+            const validCheck: {
+                valid: boolean;
+                missingFields: number;
+                errorString: string;
+            } = Utility.CheckFields(userObject)
+
+            if (!validCheck.valid) {
+
+                if (validCheck.missingFields === 1) {
+                    if (!hasShown) {
+                        this.HandleShowTitle("Missing field")
+                        this.HandleShowMessage(validCheck.errorString)
+                        this.HandleShow()
+                        hasShown = true;
+                    }
+                } else {
+                    if (!hasShown) {
+                        this.HandleShowTitle("Missing fields")
+                        this.HandleShowMessage(validCheck.errorString)
+                        this.HandleShow()
+                        hasShown = true;
+                    }
+                }
+            } else {
+                this.SendUser(userObject)
+            }
+
+        }
     }
+
+    /**
+     * Handles modal opening
+    */
+    private HandleShow(): void {
+        this.setState({ showPopup: true });
+    }
+
+    /**
+     * Handles modal message state setting
+     * @param message The message to be shown to the user
+    */
+    private HandleShowMessage(message: string): void {
+        this.setState({
+            popupMessage: message
+        })
+    }
+
+    /**
+     * Handles modal message title setting
+     * @param title The message to be shown to the user
+    */
+    private HandleShowTitle(title: string): void {
+        console.log(title)
+        this.setState({
+            popupTitle: title
+        })
+    }
+
+    /**
+     * Handles modal closing
+    */
+    private HandleClose() {
+        this.setState({
+            showPopup: false,
+            popupTitle: "",
+            popupMessage: ""
+        });
+    }
+
+
+    /**
+     *
+     * ! Test handle methods
+     *
+    */
 
 
     // Test binding for testing because haha funnyman i wanna die
-    private test() {
-        let submitValid = this.state.firstNameValid && this.state.lastNameValid && this.state.emailValid && this.state.passwordValid && this.state.rolesValid
-        console.log(submitValid)
+    private test(): void {
+
     }
 
 
+    /**
+     *
+     * ! Handles data sending
+     *
+    */
 
 
+    /**
+     * Handles the sending of the user object to server
+     * @param uerObject
+     */
+    private SendUser(userObject: {
+        [key: string]: any,
+        firstName: string | null,
+        lastName: string | null,
+        email: string | null
+        password: string | null,
+        assignedToManager: { roleName: string, roleId: number, userId: number, firstName: string, lastName: string } | null
+        roles: {id:number,name:string}[] | null
+    }) {
 
+        this.HandleShowTitle("Successs or Error here from the server")
+        this.HandleShowMessage("This is a where the server response goes")
+        this.HandleShow()
+
+        // ? Remember to delete key before sending
+        delete userObject.key
+
+    }
 
     render() {
 
         return (
             <>
                 <BaseNavBar />
-                <Container>
+                <Container className="py-3">
                     <h1>User Creation</h1>
                     <Form >
                         <Form.Group className="mb-3" controlId="formBasicFirstName">
-                            <Form.Label>First Name</Form.Label>
+                            <Form.Label>First name</Form.Label>
                             <Form.Control type="text" placeholder="Enter first name" onChange={this.HandleFirstName} />
                         </Form.Group>
 
                         <Form.Group className="mb-3" controlId="formBasicLastName">
-                            <Form.Label>Last Name</Form.Label>
+                            <Form.Label>Last name</Form.Label>
                             <Form.Control type="text" placeholder="Enter last name" onChange={this.HandleLastName} />
                         </Form.Group>
 
@@ -200,31 +549,26 @@ class UserCreation extends Component<any, CostumTypes>{
 
 
                         <Form.Group className="mb-3" controlId="formBasicAssignManager">
-                            <Form.Label>Assign Manager</Form.Label>
+                            <Form.Label>Assign manager</Form.Label>
                             <Typeahead
                                 id="assignManager"
-                                labelKey="name"
-                                options={[
-                                    { id: 1, name: "Andreas Monster addict" },
-                                    { id: 2, name: "Mads the OG Mads" },
-                                    { id: 3, name: "Mikkel the mikkelman" },
-                                    { id: 4, name: "Alexander 👌" }
-                                ]}
+                                labelKey={(option: any) => `${option.firstName}  ${option.lastName}`}
+                                options={this.state.dbManagers}
                                 placeholder="Choose Manager..."
                                 onChange={this.HandleManager}
                                 filterBy={(option: any, props: any): boolean => {
                                     const query: string = props.text.toLowerCase().trim();
-                                    const name: string = option.name.toLowerCase();
-                                    const id: string = option.id.toString();
+                                    const name: string = option.firstName.toLowerCase() + option.lastName.toLowerCase();
+                                    const id: string = option.userId.toString();
                                     return name.includes(query) || id.includes(query);
                                 }}
                                 renderMenuItemChildren={(option: any, props: any) => (
                                     <>
                                         <Highlighter search={props.text}>
-                                            {option.name}
+                                            {option.firstName + " " + option.lastName}
                                         </Highlighter>
                                         <div>
-                                            <small>Manager id: {option.id}</small>
+                                            <small>Manager user id: {option.userId}</small>
                                         </div>
                                     </>
                                 )}
@@ -232,25 +576,20 @@ class UserCreation extends Component<any, CostumTypes>{
                         </Form.Group>
 
                         <Form.Group className="mb-3" controlId="formBasicAssignRole">
-                            <Form.Label>Assign Roles</Form.Label>
+                            <Form.Label>Assign roles</Form.Label>
                             <Typeahead
+                                labelKey="name"
                                 id="assignRoles"
                                 multiple
-                                options={[
-                                    { id: 1, label: "Admin" },
-                                    { id: 2, label: "Code monkey" },
-                                    { id: 3, label: "Group manager" },
-                                    { id: 4, label: "Slave" }
-                                ]}
+                                options={this.state.dbRoles}
                                 placeholder="Choose roles..."
                                 onChange={this.HandleRoles}
-
 
                             />
                         </Form.Group>
 
 
-                        <Button variant="primary" type="button" disabled={this.state.submitDisabled} onClick={this.HandleSubmit} >
+                        <Button variant="primary" type="button" onClick={this.HandleSubmit} >
                             {
                                 /**
                                  * todo: Fix the submit logic error TODO:
@@ -259,11 +598,28 @@ class UserCreation extends Component<any, CostumTypes>{
                             Submit
                         </Button>
                     </Form>
+                    <Modal show={this.state.showPopup} onHide={this.HandleClose}>
+                        <Modal.Header closeButton>
+                            <Modal.Title>{this.state.popupTitle}</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            {this.state.popupMessage}
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <Button variant="secondary" onClick={this.HandleClose}>
+                                Close
+                            </Button>
+                        </Modal.Footer>
+                    </Modal>
                 </Container>
             </>
         );
     }
+
+
+
 }
+
 
 
 
