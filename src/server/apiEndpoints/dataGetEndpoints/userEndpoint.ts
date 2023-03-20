@@ -27,7 +27,7 @@ class UserEndpoint extends  EndpointBase {
         let requestKeys: string[] = this.urlParamsConversion(req.query.ids, false);
         if (requestKeys === undefined) {
             requestKeys = this.urlParamsConversion(req.query.emails, false, true, res);
-            if (requestKeys === undefined) { return; }
+            if (requestKeys === undefined) { return this.badRequest(res); }
             primaryKey = "email";
         }
 
