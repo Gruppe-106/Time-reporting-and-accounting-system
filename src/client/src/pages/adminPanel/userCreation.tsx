@@ -1,14 +1,20 @@
 /*
     Form for creating new users
- */
+*/
+
+//React imports
 import React, { Component } from "react";
-import BaseNavBar from "../../components/navBar";
 import { Container, Modal } from "react-bootstrap";
+import BaseNavBar from "../../components/navBar";
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { Typeahead, Highlighter } from 'react-bootstrap-typeahead';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
+
+//Forge import
 import forge from 'node-forge';
+
+//Custom import
 import BaseApiHandler from "../../network/baseApiHandler";
 
 
@@ -167,7 +173,9 @@ class APICalls {
      * Get all roles from the database
      * @returns Promise containing all possible roles
     */
-    public static getAllRoles(): Promise<{ id: number, name: string }[]> {
+    public static getAllRoles(): Promise<{ status: number, data: { id: number, name: string }[] }> {
+        // const apiHandler:BaseApiHandler = new BaseApiHandler()
+
         return fetch(`/api/role/get?ids=*`, {
             method: 'GET',
             headers: {
@@ -194,6 +202,8 @@ class APICalls {
      * @returns Promise containing all possible roles
     */
     public static getAllManagers(): Promise<{ id: number, name: string }[]> {
+        // const apiHandler:BaseApiHandler = new BaseApiHandler()
+
         return fetch(`/api/role/user/get?role=1`, {
             method: 'GET',
             headers: {
@@ -242,7 +252,7 @@ class UserCreation extends Component<any, CustomTypes>{
 
             // * Component controllers
             showPopup: false,
-            submitDisabled: true,
+            submitDisabled: false,
 
             // * Component variables
             popupMessage: "",
@@ -266,6 +276,7 @@ class UserCreation extends Component<any, CustomTypes>{
         this.handleClose = this.handleClose.bind(this);
         this.sendUser = this.sendUser.bind(this)
 
+
         //* Test handles
         this.test = this.test.bind(this)
     }
@@ -274,8 +285,10 @@ class UserCreation extends Component<any, CustomTypes>{
      * Method is run before mounting
     */
     async componentDidMount() {
-        const dbRoles = await APICalls.getAllRoles()
+
+        const dbRoles = (await APICalls.getAllRoles()).data
         const dbManagers = await APICalls.getAllManagers()
+
 
         this.setState({
             dbRoles: dbRoles,
@@ -457,7 +470,6 @@ class UserCreation extends Component<any, CustomTypes>{
      * @param title The message to be shown to the user
     */
     private handleShowTitle(title: string): void {
-        console.log(title)
         this.setState({
             popupTitle: title
         })
@@ -473,7 +485,6 @@ class UserCreation extends Component<any, CustomTypes>{
             popupMessage: ""
         });
     }
-
 
     /**
      *
@@ -508,20 +519,20 @@ class UserCreation extends Component<any, CustomTypes>{
         assignedToManager: { roleName: string, roleId: number, userId: number, firstName: string, lastName: string } | null
         roles: { id: number, name: string }[] | null
     }) {
-        const api:BaseApiHandler = new BaseApiHandler()
+        const apiHandler: BaseApiHandler = new BaseApiHandler("test")
 
         let roles: number[] = []
         userObject.roles?.forEach((ele: { id: number, name: string }) => roles.push(ele.id))
 
-        let dataToSend:{
-            firstName   : string | null,
-            lastName    : string | null,
-            email       : string | null,
-            password    : string | null,
-            manager     : number | null | undefined,
-            roles       : number[] | null
+        let dataToSend: {
+            firstName: string | null,
+            lastName: string | null,
+            email: string | null,
+            password: string | null,
+            manager: number | null | undefined,
+            roles: number[] | null
         }
-         = {
+            = {
             firstName: userObject.firstName,
             lastName: userObject.lastName,
             email: userObject.email,
@@ -530,43 +541,40 @@ class UserCreation extends Component<any, CustomTypes>{
             roles: roles
         }
 
-
-        // api.post("/api/user/creation/post",())
-
-
-        fetch(`/api/user/creation/post`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(dataToSend)
+        this.setState({
+            submitDisabled: true
         })
-            .then((response: Response) => {
 
-               response.json()
-                // if (response.json() === 400) {
-                //     this.handleShowTitle("Error")
-                //     this.handleShowMessage("Status 400 bad request")
-                //     this.handleShow()
-                //     throw new Error("Status 400 bad request")
-                // } else if (response.status === 200) {
-                //     this.handleShowTitle("Success")
-                //     this.handleShowMessage("User created")
-                //     this.handleShow()
-                //     return response.json()
-                // } else {
-                //     this.handleShowTitle("Success")
-                //     this.handleShowMessage("User created")
-                //     this.handleShow()
-                //     throw new Error(`Unexpected response status: ${response.status}`)
-                // }
-            })
-            .catch((error:Error) => {
-                this.handleShowTitle("Error")
-                this.handleShowMessage(error.message)
+        apiHandler.post("/api/user/creation/post", { body: dataToSend }, (value: any) => {
+
+            if (value.status === 200) {
+                this.handleShowTitle("Success")
+                this.handleShowMessage("User created")
                 this.handleShow()
-                throw new Error(error.message);
-            });
+            } else if (value.status === 400) {
+                this.handleShowTitle("Error")
+                this.handleShowMessage("Status 400 bad request")
+                this.handleShow()
+                throw new Error("Status 400 bad request")
+            } else if (value.status === 404) {
+                this.handleShowTitle("Error")
+                this.handleShowMessage(`Status 404 missing fields: ${value.missing}`)
+                this.handleShow()
+                throw new Error("Status 404 missing fields")
+            } else {
+                this.handleShowTitle("Error")
+                this.handleShowMessage(`Status ${value.status}`)
+                this.handleShow()
+                throw new Error(value.status)
+
+            }
+
+            this.setState({
+                submitDisabled: false
+            })
+        })
+
+
 
 
     }
@@ -586,12 +594,12 @@ class UserCreation extends Component<any, CustomTypes>{
 
                         <Form.Group className="mb-3" controlId="formBasicLastName">
                             <Form.Label>Last name</Form.Label>
-                            <Form.Control type="text" placeholder="Enter last name" onChange={this.handleLastName} />
+                            <Form.Control  type="text" placeholder="Enter last name" onChange={this.handleLastName} />
                         </Form.Group>
 
                         <Form.Group className="mb-3" controlId="formBasicEmail">
                             <Form.Label>Email address</Form.Label>
-                            <Form.Control type="email" placeholder="Enter email" onChange={this.handleEmail} isInvalid={!this.state.emailValid} />
+                            <Form.Control  type="email" placeholder="Enter email" onChange={this.handleEmail} isInvalid={!this.state.emailValid} />
                             <Form.Control.Feedback type="invalid">
                                 Please enter a valid email address.
                             </Form.Control.Feedback>
@@ -599,7 +607,7 @@ class UserCreation extends Component<any, CustomTypes>{
 
                         <Form.Group className="mb-3" controlId="formBasicPassword">
                             <Form.Label>Password</Form.Label>
-                            <Form.Control type="password" placeholder="Password" onChange={this.handlePassword} />
+                            <Form.Control  type="password" placeholder="Password" onChange={this.handlePassword} />
                         </Form.Group>
 
 
@@ -644,7 +652,7 @@ class UserCreation extends Component<any, CustomTypes>{
                         </Form.Group>
 
 
-                        <Button variant="primary" type="button" onClick={this.handleSubmit} >
+                        <Button variant="primary" type="button" onClick={this.handleSubmit} disabled={this.state.submitDisabled} >
                             {
                                 /**
                                  * todo: Fix the submit logic error TODO:
