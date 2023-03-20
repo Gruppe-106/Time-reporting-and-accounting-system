@@ -12,6 +12,12 @@ import {ProjectEndpointOld} from "../apiEndpoints/dataEndpoints/projectEndpoint"
 import {TaskEndpointOld} from "../apiEndpoints/dataEndpoints/taskEndpoint";
 import UserCreationEndpoint from "../apiEndpoints/dataPostEndpoints/userCreationEndpoint";
 import ProjectEndpoint from "../apiEndpoints/dataGetEndpoints/projectEndpoint";
+import RoleEndpoint from "../apiEndpoints/dataGetEndpoints/roleEndpoint";
+import TaskEndpoint from "../apiEndpoints/dataGetEndpoints/taskEndpoint";
+import TimeTypeEndpoint from "../apiEndpoints/dataGetEndpoints/timeTypeEndpoint";
+import UserEndpoint from "../apiEndpoints/dataGetEndpoints/userEndpoint";
+import TaskProjectEndpoint from "../apiEndpoints/dataGetEndpoints/taskProjectEndpoint";
+import ManagerGroupEndpoint from "../apiEndpoints/dataGetEndpoints/managerGroupEndpoint";
 
 /* Implement this shit and ensure CORS
     res.setHeader("Access-Control-Allow-Origin" , "*");
@@ -40,7 +46,14 @@ export class ApiRouter extends BaseRouter {
         this.router.get("/time/register/get",(req: Request, res: Response) => new TaskTimeRegisterEndpointOld(this.user).getRoute(req, res));
 
         //V.2
-        this.router.get("/v2/project/get",(req: Request, res: Response) => new ProjectEndpoint(this.user).getRoute(req, res));
+        this.router.get("/v2/project/get",      (req: Request, res: Response) => new ProjectEndpoint(this.user).getRoute(req, res));
+        this.router.get("/v2/user/get",         (req: Request, res: Response) => new UserEndpoint(this.user).getRoute(req, res));
+        this.router.get("/v2/task/get",         (req: Request, res: Response) => new TaskEndpoint(this.user).getRoute(req, res));
+        this.router.get("/v2/task/project/get", (req: Request, res: Response) => new TaskProjectEndpoint(this.user).getRoute(req, res));
+        this.router.get("/v2/timetype/get",     (req: Request, res: Response) => new TimeTypeEndpoint(this.user).getRoute(req, res));
+        this.router.get("/v2/role/get",         (req: Request, res: Response) => new RoleEndpoint(this.user).getRoute(req, res));
+
+        this.router.get("/v2/group/manager/get",(req: Request, res: Response) => new ManagerGroupEndpoint(this.user).getRoute(req, res));
     }
 
     private postRoutes() {

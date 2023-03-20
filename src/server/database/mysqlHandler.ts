@@ -75,7 +75,7 @@ class MysqlHandler {
      * @return String: of the condition or an empty string if where is empty
      * @private
      */
-    private createWhereString(where?:Where): string {
+    public createWhereString(where?:Where): string {
         return where !== undefined ? "WHERE " + where.column + " in (" + where.equals.toString() + ")" : "";
     }
 

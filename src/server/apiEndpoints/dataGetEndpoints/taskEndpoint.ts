@@ -2,21 +2,20 @@ import EndpointBase from "../endpointBase";
 import {MySQLResponse} from "../../database/mysqlHandler";
 
 /**
- * Endpoint for .../api/project/get
+ * Endpoint for .../api/task/get
  */
-class ProjectEndpoint extends  EndpointBase {
+class TaskEndpoint extends  EndpointBase {
     allowedColumns: string[] = [
         "id",
-        "superProjectId",
         "name",
         "startDate",
         "endDate",
+        "timeType",
         "*"
     ];
 
     async getData(requestValues: string[], primaryKey: string, keyEqual?: string[], data?: string[]): Promise<object[]> {
-        let response:MySQLResponse = await this.mySQL.select("projects", this.createColumns(requestValues), this.createWhere(primaryKey, keyEqual));
-
+        let response:MySQLResponse = await this.mySQL.select("tasks", this.createColumns(requestValues), this.createWhere(primaryKey, keyEqual));
         if (response.error !== null) return [{error: "Failed to retrieve data"}];
 
         for (const result of response.results) {
@@ -28,4 +27,4 @@ class ProjectEndpoint extends  EndpointBase {
     }
 }
 
-export default ProjectEndpoint;
+export default TaskEndpoint;

@@ -86,7 +86,7 @@ abstract class _endpointBase {
 
         this.processRequest(requestedValues, primaryKey, requestKeys).then((data) => {
             res.setHeader('Content-Type', 'application/json');
-            res.status(200).json(data);
+            res.status(200).json({status: 200, data: data});
         })
     };
 }
