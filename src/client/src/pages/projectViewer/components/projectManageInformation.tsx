@@ -16,13 +16,14 @@ IMPORT MEMBERS AND ROLES
 */
 
 interface Api{
-
-        id?: number,
-        superProject?: number,
-        name?: string,
-        startDate?: string,
-        endDate?: string
-
+        status:number,
+        data: {
+            id?: number,
+            superProject?: number,
+            name?: string,
+            startDate?: string,
+            endDate?: string
+        }[]
 }
 
 interface ProjectInformationProp {
@@ -53,10 +54,10 @@ class ProjectManageInformation extends Component<ProjectInformationProp> {
         apiHandler.get(`/api/project/get?ids=${this.state.pageInformation.id}`, {},(value) => {
             console.log(value)
             //Then convert the string to the expected object(eg. )
-            let json:Api[] = JSON.parse(JSON.stringify(value))
+            let json:Api = JSON.parse(JSON.stringify(value))
             //Then update states or variables or whatever you want with the information
-            this.setState({pageInformation: json[0]})
-            console.log(json)
+            this.setState({pageInformation: json.data[0]})
+            console.log(json.data)
         })
     }
     private HandleManager(manager: any): void {
