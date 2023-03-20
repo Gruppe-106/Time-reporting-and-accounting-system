@@ -70,7 +70,6 @@ class BaseNavBar extends Component<any>{
                             <Nav className="me-auto">
                                 { this.dropDownRender("Project", [
                                     {href:"/project/create", title:"Create Project"},
-                                    {href:"/project/manage", title:"Manage Project"},
                                     {href:"/project/menu"  , title:"Project Menu"},
                                 ])}
                                 { this.linkRender("/user-register", "Register time") }

@@ -1,68 +1,46 @@
 /*
-    Editing of projects by its respective project leader
+    Show a list of projects a user is related to
  */
-
 import React, {Component} from "react";
 import BaseNavBar from "../../components/navBar";
-import {Container, Table} from "react-bootstrap";
-import ProjectModel, {ProjectData} from "../../Models/projectModel";
+import {Button, Container} from "react-bootstrap";
+import ProjectTable, {ProjectTableRow} from "../projectViewer/components/projectTable";
+import ProjectManageInformation from "../projectViewer/components/projectManageInformation";
 
-class ProjectManager extends Component<any>{
+interface  ProjectMenuState{
+    projects: ProjectTableRow[];
+}
 
-    pData:ProjectData[] = [];
-    state = {pLoaded: false};
+const queryString = window.location.search;
+const params = new URLSearchParams(queryString);
+const id = parseInt(params.get("id") as string);
+
+class ProjectMenu extends Component<any, ProjectMenuState>{
+
     constructor(props:any) {
         super(props);
-    }
 
-    async GetProjectData():Promise<void> {
-        let pModel:ProjectModel = new ProjectModel();
-        pModel.GetAllModels().then(data => {
-            this.pData = data
-            this.setState({pLoaded: true});
-        });
+        this.state ={
+            projects: []
+        };
     }
 
     render() {
-        if (!this.state.pLoaded)
-        {
-            this.GetProjectData();
-        }
         return (
             <>
-                <BaseNavBar/>
-                <Container className={"py-5"}>
+               <BaseNavBar/>
+                <Container>
                     <h1>Project Manager</h1>
-                    {
-                        this.state.pLoaded? (
-                            <Table striped bordered hover variant="dark">
-                                <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Parent project</th>
-                                    <th>Name</th>
-                                    <th>Start date</th>
-                                    <th>End date</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {this.pData.map(p => (
-                                    <tr>
-                                        <td>{p.id}</td>
-                                        <td>{p.superProject}</td>
-                                        <td>{p.name}</td>
-                                        <td>{p.startDate}</td>
-                                        <td>{p.endDate}</td>
-                                    </tr>
-                                ))}
-                                </tbody>
-                            </Table>
-                        ):(<h4>Loading...</h4>)
-                    }
+                    <Button href="/project/menu" variant="outline-secondary">Back</Button>{''}
                 </Container>
+
+                <Container>
+                    <ProjectManageInformation id={id}/>
+                </Container>
+
             </>
         );
     }
 }
 
-export default ProjectManager;
+export default ProjectMenu;
