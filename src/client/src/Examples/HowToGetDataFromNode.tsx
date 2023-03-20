@@ -20,7 +20,7 @@ class Example extends Component<any> {
         let apiHandler = new BaseApiHandler("test");
         //Run the get or post function depending on need only neccesarry argument is the path aka what comes after the hostname
         //Callbacks can be used to tell what to do with the data once it's been retrieved
-        apiHandler.get("/api", (value) => {
+        apiHandler.get("/api",{}, (value) => {
             //First check if the value gotten is a string
             if (typeof value === "string") {
                 //Then convert the string to the expected object(eg. )

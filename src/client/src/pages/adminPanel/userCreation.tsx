@@ -6,9 +6,10 @@ import BaseNavBar from "../../components/navBar";
 import { Container, Modal } from "react-bootstrap";
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-import { Typeahead, Highlighter} from 'react-bootstrap-typeahead';
+import { Typeahead, Highlighter } from 'react-bootstrap-typeahead';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 import forge from 'node-forge';
+import BaseApiHandler from "../../network/baseApiHandler";
 
 
 //TODO: fixings the types as this is infact a no no but it does fix it
@@ -23,7 +24,7 @@ interface CustomTypes {
     email: string | null,
     password: string | null,
     assignedToManager: { roleName: string, roleId: number, userId: number, firstName: string, lastName: string } | null,
-    selectedRoles: {id:number,name:string}[] | null,
+    selectedRoles: { id: number, name: string }[] | null,
 
     // * Database variables
     dbRoles: any[],
@@ -60,7 +61,7 @@ class Utility {
         email: string | null,
         password: string | null,
         assignedToManager: { roleName: string, roleId: number, userId: number, firstName: string, lastName: string } | null
-        roles: {id:number,name:string}[] | null
+        roles: { id: number, name: string }[] | null
     }): {
         valid: boolean,
         missingFields: number,
@@ -166,7 +167,7 @@ class APICalls {
      * Get all roles from the database
      * @returns Promise containing all possible roles
     */
-    public static GetAllRoles(): Promise<{ id: number, name: string }[]> {
+    public static getAllRoles(): Promise<{ id: number, name: string }[]> {
         return fetch(`/api/role/get?ids=*`, {
             method: 'GET',
             headers: {
@@ -192,7 +193,7 @@ class APICalls {
      * Get all roles from the database
      * @returns Promise containing all possible roles
     */
-    public static GetAllManagers(): Promise<{ id: number, name: string }[]> {
+    public static getAllManagers(): Promise<{ id: number, name: string }[]> {
         return fetch(`/api/role/user/get?role=1`, {
             method: 'GET',
             headers: {
@@ -250,19 +251,20 @@ class UserCreation extends Component<any, CustomTypes>{
         }
 
         // * Handles input
-        this.HandleFirstName = this.HandleFirstName.bind(this);
-        this.HandleLastName = this.HandleLastName.bind(this);
-        this.HandleEmail = this.HandleEmail.bind(this);
-        this.HandlePassword = this.HandlePassword.bind(this)
-        this.HandleManager = this.HandleManager.bind(this)
-        this.HandleRoles = this.HandleRoles.bind(this)
+        this.handleFirstName = this.handleFirstName.bind(this);
+        this.handleLastName = this.handleLastName.bind(this);
+        this.handleEmail = this.handleEmail.bind(this);
+        this.handlePassword = this.handlePassword.bind(this)
+        this.handleManager = this.handleManager.bind(this)
+        this.handleRoles = this.handleRoles.bind(this)
 
         // * Component handeling
-        this.HandleSubmit = this.HandleSubmit.bind(this);
-        this.HandleShow = this.HandleShow.bind(this);
-        this.HandleShowMessage = this.HandleShowMessage.bind(this);
-        this.HandleShowTitle = this.HandleShowTitle.bind(this);
-        this.HandleClose = this.HandleClose.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleShow = this.handleShow.bind(this);
+        this.handleShowMessage = this.handleShowMessage.bind(this);
+        this.handleShowTitle = this.handleShowTitle.bind(this);
+        this.handleClose = this.handleClose.bind(this);
+        this.sendUser = this.sendUser.bind(this)
 
         //* Test handles
         this.test = this.test.bind(this)
@@ -272,8 +274,8 @@ class UserCreation extends Component<any, CustomTypes>{
      * Method is run before mounting
     */
     async componentDidMount() {
-        const dbRoles = await APICalls.GetAllRoles()
-        const dbManagers = await APICalls.GetAllManagers()
+        const dbRoles = await APICalls.getAllRoles()
+        const dbManagers = await APICalls.getAllManagers()
 
         this.setState({
             dbRoles: dbRoles,
@@ -298,7 +300,7 @@ class UserCreation extends Component<any, CustomTypes>{
      * Handles changes to the first name input field.
      * @param event - The input change event object.
     */
-    private HandleFirstName(event:  React.ChangeEvent<HTMLInputElement>): void {
+    private handleFirstName(event: React.ChangeEvent<HTMLInputElement>): void {
         this.setState({
             firstName: event.target.value ? event.target.value : null,
 
@@ -309,7 +311,7 @@ class UserCreation extends Component<any, CustomTypes>{
      * Handles changes to the last name input field.
      * @param event - The input change event object.
     */
-    private HandleLastName(event: React.ChangeEvent<HTMLInputElement>): void {
+    private handleLastName(event: React.ChangeEvent<HTMLInputElement>): void {
         this.setState({
             lastName: event.target.value ? event.target.value : null,
 
@@ -321,7 +323,7 @@ class UserCreation extends Component<any, CustomTypes>{
      * Handles changes to the email input field.
      * @param event - The input change event object.
     */
-    private HandleEmail(event: React.ChangeEvent<HTMLInputElement>): void {
+    private handleEmail(event: React.ChangeEvent<HTMLInputElement>): void {
         const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(event.target.value); // check if the email is valid
 
 
@@ -336,7 +338,7 @@ class UserCreation extends Component<any, CustomTypes>{
      * Handles changes to the password input field.
      * @param event - The input change event object.
     */
-    private HandlePassword(event: React.ChangeEvent<HTMLInputElement>): void {
+    private handlePassword(event: React.ChangeEvent<HTMLInputElement>): void {
 
         this.setState({
             password: event.target.value ? event.target.value : null
@@ -348,7 +350,7 @@ class UserCreation extends Component<any, CustomTypes>{
      * Handles changes to the assigned to manager checkbox field.
      * @param manager - The manager object.
     */
-    private HandleManager(manager: any): void {
+    private handleManager(manager: any): void {
         this.setState({
             assignedToManager: manager[0] ? manager[0] : null
         })
@@ -358,7 +360,7 @@ class UserCreation extends Component<any, CustomTypes>{
      * Handles changes to the roles select field.
      * @param roles - The selected roles array.
     */
-    private HandleRoles(roles: any): void {
+    private handleRoles(roles: any): void {
 
         this.setState({
             selectedRoles: roles.length > 0 ? roles : null,
@@ -376,7 +378,7 @@ class UserCreation extends Component<any, CustomTypes>{
     /**
      * Handles the form submission.
     */
-    private HandleSubmit(): void {
+    private handleSubmit(): void {
 
         let hasShown = false;
         const sha256 = forge.md.sha256.create();
@@ -388,7 +390,7 @@ class UserCreation extends Component<any, CustomTypes>{
             email: string | null,
             password: string | null,
             assignedToManager: { roleName: string, roleId: number, userId: number, firstName: string, lastName: string } | null
-            roles: {id:number,name:string}[] | null
+            roles: { id: number, name: string }[] | null
         } = {
             firstName: this.state.firstName,
             lastName: this.state.lastName,
@@ -399,9 +401,9 @@ class UserCreation extends Component<any, CustomTypes>{
         }
 
         if (!this.state.emailValid) {
-            this.HandleShowTitle("Invalid e-mail adress")
-            this.HandleShowMessage("Please enter a valid e-mail adress")
-            this.HandleShow()
+            this.handleShowTitle("Invalid e-mail adress")
+            this.handleShowMessage("Please enter a valid e-mail adress")
+            this.handleShow()
         } else {
             const validCheck: {
                 valid: boolean;
@@ -413,21 +415,21 @@ class UserCreation extends Component<any, CustomTypes>{
 
                 if (validCheck.missingFields === 1) {
                     if (!hasShown) {
-                        this.HandleShowTitle("Missing field")
-                        this.HandleShowMessage(validCheck.errorString)
-                        this.HandleShow()
+                        this.handleShowTitle("Missing field")
+                        this.handleShowMessage(validCheck.errorString)
+                        this.handleShow()
                         hasShown = true;
                     }
                 } else {
                     if (!hasShown) {
-                        this.HandleShowTitle("Missing fields")
-                        this.HandleShowMessage(validCheck.errorString)
-                        this.HandleShow()
+                        this.handleShowTitle("Missing fields")
+                        this.handleShowMessage(validCheck.errorString)
+                        this.handleShow()
                         hasShown = true;
                     }
                 }
             } else {
-                this.SendUser(userObject)
+                this.sendUser(userObject)
             }
 
         }
@@ -436,7 +438,7 @@ class UserCreation extends Component<any, CustomTypes>{
     /**
      * Handles modal opening
     */
-    private HandleShow(): void {
+    private handleShow(): void {
         this.setState({ showPopup: true });
     }
 
@@ -444,7 +446,7 @@ class UserCreation extends Component<any, CustomTypes>{
      * Handles modal message state setting
      * @param message The message to be shown to the user
     */
-    private HandleShowMessage(message: string): void {
+    private handleShowMessage(message: string): void {
         this.setState({
             popupMessage: message
         })
@@ -454,7 +456,7 @@ class UserCreation extends Component<any, CustomTypes>{
      * Handles modal message title setting
      * @param title The message to be shown to the user
     */
-    private HandleShowTitle(title: string): void {
+    private handleShowTitle(title: string): void {
         console.log(title)
         this.setState({
             popupTitle: title
@@ -464,7 +466,7 @@ class UserCreation extends Component<any, CustomTypes>{
     /**
      * Handles modal closing
     */
-    private HandleClose() {
+    private handleClose() {
         this.setState({
             showPopup: false,
             popupTitle: "",
@@ -497,22 +499,75 @@ class UserCreation extends Component<any, CustomTypes>{
      * Handles the sending of the user object to server
      * @param uerObject
      */
-    private SendUser(userObject: {
+    private sendUser(userObject: {
         [key: string]: any,
         firstName: string | null,
         lastName: string | null,
         email: string | null
         password: string | null,
         assignedToManager: { roleName: string, roleId: number, userId: number, firstName: string, lastName: string } | null
-        roles: {id:number,name:string}[] | null
+        roles: { id: number, name: string }[] | null
     }) {
+        const api:BaseApiHandler = new BaseApiHandler()
 
-        this.HandleShowTitle("Successs or Error here from the server")
-        this.HandleShowMessage("This is a where the server response goes")
-        this.HandleShow()
+        let roles: number[] = []
+        userObject.roles?.forEach((ele: { id: number, name: string }) => roles.push(ele.id))
 
-        // ? Remember to delete key before sending
-        delete userObject.key
+        let dataToSend:{
+            firstName   : string | null,
+            lastName    : string | null,
+            email       : string | null,
+            password    : string | null,
+            manager     : number | null | undefined,
+            roles       : number[] | null
+        }
+         = {
+            firstName: userObject.firstName,
+            lastName: userObject.lastName,
+            email: userObject.email,
+            password: userObject.password,
+            manager: userObject.assignedToManager?.userId,
+            roles: roles
+        }
+
+
+        // api.post("/api/user/creation/post",())
+
+
+        fetch(`/api/user/creation/post`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(dataToSend)
+        })
+            .then((response: Response) => {
+
+               response.json()
+                // if (response.json() === 400) {
+                //     this.handleShowTitle("Error")
+                //     this.handleShowMessage("Status 400 bad request")
+                //     this.handleShow()
+                //     throw new Error("Status 400 bad request")
+                // } else if (response.status === 200) {
+                //     this.handleShowTitle("Success")
+                //     this.handleShowMessage("User created")
+                //     this.handleShow()
+                //     return response.json()
+                // } else {
+                //     this.handleShowTitle("Success")
+                //     this.handleShowMessage("User created")
+                //     this.handleShow()
+                //     throw new Error(`Unexpected response status: ${response.status}`)
+                // }
+            })
+            .catch((error:Error) => {
+                this.handleShowTitle("Error")
+                this.handleShowMessage(error.message)
+                this.handleShow()
+                throw new Error(error.message);
+            });
+
 
     }
 
@@ -526,17 +581,17 @@ class UserCreation extends Component<any, CustomTypes>{
                     <Form >
                         <Form.Group className="mb-3" controlId="formBasicFirstName">
                             <Form.Label>First name</Form.Label>
-                            <Form.Control type="text" placeholder="Enter first name" onChange={this.HandleFirstName} />
+                            <Form.Control type="text" placeholder="Enter first name" onChange={this.handleFirstName} />
                         </Form.Group>
 
                         <Form.Group className="mb-3" controlId="formBasicLastName">
                             <Form.Label>Last name</Form.Label>
-                            <Form.Control type="text" placeholder="Enter last name" onChange={this.HandleLastName} />
+                            <Form.Control type="text" placeholder="Enter last name" onChange={this.handleLastName} />
                         </Form.Group>
 
                         <Form.Group className="mb-3" controlId="formBasicEmail">
                             <Form.Label>Email address</Form.Label>
-                            <Form.Control type="email" placeholder="Enter email" onChange={this.HandleEmail} isInvalid={!this.state.emailValid} />
+                            <Form.Control type="email" placeholder="Enter email" onChange={this.handleEmail} isInvalid={!this.state.emailValid} />
                             <Form.Control.Feedback type="invalid">
                                 Please enter a valid email address.
                             </Form.Control.Feedback>
@@ -544,7 +599,7 @@ class UserCreation extends Component<any, CustomTypes>{
 
                         <Form.Group className="mb-3" controlId="formBasicPassword">
                             <Form.Label>Password</Form.Label>
-                            <Form.Control type="password" placeholder="Password" onChange={this.HandlePassword} />
+                            <Form.Control type="password" placeholder="Password" onChange={this.handlePassword} />
                         </Form.Group>
 
 
@@ -555,7 +610,7 @@ class UserCreation extends Component<any, CustomTypes>{
                                 labelKey={(option: any) => `${option.firstName}  ${option.lastName}`}
                                 options={this.state.dbManagers}
                                 placeholder="Choose Manager..."
-                                onChange={this.HandleManager}
+                                onChange={this.handleManager}
                                 filterBy={(option: any, props: any): boolean => {
                                     const query: string = props.text.toLowerCase().trim();
                                     const name: string = option.firstName.toLowerCase() + option.lastName.toLowerCase();
@@ -583,13 +638,13 @@ class UserCreation extends Component<any, CustomTypes>{
                                 multiple
                                 options={this.state.dbRoles}
                                 placeholder="Choose roles..."
-                                onChange={this.HandleRoles}
+                                onChange={this.handleRoles}
 
                             />
                         </Form.Group>
 
 
-                        <Button variant="primary" type="button" onClick={this.HandleSubmit} >
+                        <Button variant="primary" type="button" onClick={this.handleSubmit} >
                             {
                                 /**
                                  * todo: Fix the submit logic error TODO:
@@ -598,7 +653,7 @@ class UserCreation extends Component<any, CustomTypes>{
                             Submit
                         </Button>
                     </Form>
-                    <Modal show={this.state.showPopup} onHide={this.HandleClose}>
+                    <Modal show={this.state.showPopup} onHide={this.handleClose}>
                         <Modal.Header closeButton>
                             <Modal.Title>{this.state.popupTitle}</Modal.Title>
                         </Modal.Header>
@@ -606,7 +661,7 @@ class UserCreation extends Component<any, CustomTypes>{
                             {this.state.popupMessage}
                         </Modal.Body>
                         <Modal.Footer>
-                            <Button variant="secondary" onClick={this.HandleClose}>
+                            <Button variant="secondary" onClick={this.handleClose}>
                                 Close
                             </Button>
                         </Modal.Footer>

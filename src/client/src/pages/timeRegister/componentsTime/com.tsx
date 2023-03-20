@@ -162,6 +162,7 @@ class TimeSheet extends Component<EmptyProps, TimeSheetState> {
     let apiHandler = new BaseApiHandler("fuldstændigligemeget");
     apiHandler.get(
       `api/time/register/get?user=1&var=taskName,taskId,projectName`,
+      {},
       (value) => {
         let json: TimeSheetData[] = JSON.parse(JSON.stringify(value));
         this.setState({data: json});
