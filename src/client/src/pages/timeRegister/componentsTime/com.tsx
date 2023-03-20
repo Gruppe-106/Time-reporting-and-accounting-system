@@ -2,6 +2,16 @@ import React, { Component } from 'react';
 import {Container, Table, Form, InputGroup, Button, Modal} from "react-bootstrap";
 import BaseApiHandler from "../../../network/baseApiHandler";
 
+/*
+
+    * TODO:
+      * Fix add row (with popup modal)
+      * Show TimeSheet for different users
+      * Load "time" form data to timeSheet
+      * Submit button (Post data)
+
+*/
+
 // Empty prop to indicate that the component will not recive a prop.
 interface EmptyProps {}
 
@@ -69,6 +79,7 @@ interface TimeSheetRowProps {
 interface TimeSheetRowState {
   times: string[];
   total: number;
+  minTimes: string[];
   minTotal: number;
   showDeleteRowModal: boolean;
 }
@@ -80,6 +91,7 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
   state: TimeSheetRowState = {
     times: ["0", "0", "0", "0", "0", "0", "0"],
     total: 0,
+    minTimes: ["0", "0", "0", "0", "0", "0", "0"],
     minTotal: 0,
     showDeleteRowModal: false,
   };
@@ -118,29 +130,46 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
     const { times } = this.state;
     const newValue = parseInt(value) < 0 ? "0" : value; // prevent negative values
     times[index] = newValue;
-    const total = times.reduce((acc, cur) => acc + parseInt(cur), 0); // This line of code is used to calculate the total sum of all the values in the times array, which is then used to update the component's state with the new total time.
+    const total = 60 * times.reduce((acc, cur) => acc + parseInt(cur), 0); // This line of code is used to calculate the total sum of all the values in the times array, which is then used to update the component's state with the new total time.
     this.setState({ times, total });
   };
-
+// < 0 ? "0" : value
   /**
-   * @description This method is used to handle changes to a form.select,
-   *  and updates the component's state with the new minut total time for a set of time controls.
+   * This method is used to handle changes to a form.select,
+   * and updates the component's state with the new minut total time for a set of time controls.
    * 
    * Updates the minTotal, but doent work proberly. TODO: fix
    * @param value The value is the new value of that Form.select.
    */
-  private handleSelectTimeChange = (value: string) => {
-    const newValue = parseInt(value);
-    const newTotal = newValue;
-    this.setState({ minTotal: newTotal });
-
+  private handleSelectTimeChange = (index: number, value: string) => {
+    const { minTimes } = this.state;
+    const newValue = value;
+    minTimes[index] = newValue;
+    const minTotal = minTimes.reduce((acc, cur) => acc + parseInt(cur), 0);
+    this.setState({ minTotal: minTotal });
   };
+
+  /**
+      * Calculates total hours and minutes.
+   */
+  private displayTimeTotal = ():JSX.Element => {
+    const { total } = this.state;
+    const { minTotal } = this.state;
+    const totalMinutes = total + minTotal;
+
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+
+    return (
+      <p>{hours}:{minutes}</p>
+    )
+  }
 
     render() {
         // Defining data as this.prop, it reprensents the data (prop) passed to TimeSheetRow
         const { data } = this.props;
         // Loades the initial state
-        const { times, total, minTotal, showDeleteRowModal } = this.state;
+        const { times, showDeleteRowModal } = this.state;
         // arr to create a input field for all 7 dates
         let arr = ['1', '2', '3', '4', '5', '6', '7'];
         return (
@@ -156,14 +185,14 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
                               onChange={(e) => this.handleControlTimeChange(index, e.target.value)}
                               />
                             <InputGroup.Text id={`basic-addon-${num}`}>:</InputGroup.Text>
-                            <Form.Select onChange={(e) => this.handleSelectTimeChange(e.target.value)}>
+                            <Form.Select onChange={(e) => this.handleSelectTimeChange(index, e.target.value)}>
                                 <option value="0">0</option>
                                 <option value="15">15</option>
                                 <option value="30">30</option>
                                 <option value="45">45</option>
                             </Form.Select>
                         </InputGroup></td>))}
-                        <td>{total},{minTotal}</td> {/* Total time */}
+                        <td>{this.displayTimeTotal()}</td> {/* Total time */}
                         <td>
                         <Button variant="danger" type="button" onClick={this.handleShowModal}>-</Button>
                         </td>
