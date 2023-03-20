@@ -6,9 +6,10 @@ import BaseNavBar from "../../components/navBar";
 import { Container, Modal } from "react-bootstrap";
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-import { Typeahead, Highlighter} from 'react-bootstrap-typeahead';
+import { Typeahead, Highlighter } from 'react-bootstrap-typeahead';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 import forge from 'node-forge';
+import BaseApiHandler from "../../network/baseApiHandler";
 
 
 //TODO: fixings the types as this is infact a no no but it does fix it
@@ -23,7 +24,7 @@ interface CustomTypes {
     email: string | null,
     password: string | null,
     assignedToManager: { roleName: string, roleId: number, userId: number, firstName: string, lastName: string } | null,
-    selectedRoles: {id:number,name:string}[] | null,
+    selectedRoles: { id: number, name: string }[] | null,
 
     // * Database variables
     dbRoles: any[],
@@ -60,7 +61,7 @@ class Utility {
         email: string | null,
         password: string | null,
         assignedToManager: { roleName: string, roleId: number, userId: number, firstName: string, lastName: string } | null
-        roles: {id:number,name:string}[] | null
+        roles: { id: number, name: string }[] | null
     }): {
         valid: boolean,
         missingFields: number,
@@ -299,7 +300,7 @@ class UserCreation extends Component<any, CustomTypes>{
      * Handles changes to the first name input field.
      * @param event - The input change event object.
     */
-    private handleFirstName(event:  React.ChangeEvent<HTMLInputElement>): void {
+    private handleFirstName(event: React.ChangeEvent<HTMLInputElement>): void {
         this.setState({
             firstName: event.target.value ? event.target.value : null,
 
@@ -389,7 +390,7 @@ class UserCreation extends Component<any, CustomTypes>{
             email: string | null,
             password: string | null,
             assignedToManager: { roleName: string, roleId: number, userId: number, firstName: string, lastName: string } | null
-            roles: {id:number,name:string}[] | null
+            roles: { id: number, name: string }[] | null
         } = {
             firstName: this.state.firstName,
             lastName: this.state.lastName,
@@ -505,15 +506,68 @@ class UserCreation extends Component<any, CustomTypes>{
         email: string | null
         password: string | null,
         assignedToManager: { roleName: string, roleId: number, userId: number, firstName: string, lastName: string } | null
-        roles: {id:number,name:string}[] | null
+        roles: { id: number, name: string }[] | null
     }) {
+        const api:BaseApiHandler = new BaseApiHandler()
 
-        this.handleShowTitle("Successs or Error here from the server")
-        this.handleShowMessage("This is a where the server response goes")
-        this.handleShow()
+        let roles: number[] = []
+        userObject.roles?.forEach((ele: { id: number, name: string }) => roles.push(ele.id))
 
-        // ? Remember to delete key before sending
-        delete userObject.key
+        let dataToSend:{
+            firstName   : string | null,
+            lastName    : string | null,
+            email       : string | null,
+            password    : string | null,
+            manager     : number | null | undefined,
+            roles       : number[] | null
+        }
+         = {
+            firstName: userObject.firstName,
+            lastName: userObject.lastName,
+            email: userObject.email,
+            password: userObject.password,
+            manager: userObject.assignedToManager?.userId,
+            roles: roles
+        }
+
+
+        // api.post("/api/user/creation/post",())
+
+
+        fetch(`/api/user/creation/post`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(dataToSend)
+        })
+            .then((response: Response) => {
+
+               response.json()
+                // if (response.json() === 400) {
+                //     this.handleShowTitle("Error")
+                //     this.handleShowMessage("Status 400 bad request")
+                //     this.handleShow()
+                //     throw new Error("Status 400 bad request")
+                // } else if (response.status === 200) {
+                //     this.handleShowTitle("Success")
+                //     this.handleShowMessage("User created")
+                //     this.handleShow()
+                //     return response.json()
+                // } else {
+                //     this.handleShowTitle("Success")
+                //     this.handleShowMessage("User created")
+                //     this.handleShow()
+                //     throw new Error(`Unexpected response status: ${response.status}`)
+                // }
+            })
+            .catch((error:Error) => {
+                this.handleShowTitle("Error")
+                this.handleShowMessage(error.message)
+                this.handleShow()
+                throw new Error(error.message);
+            });
+
 
     }
 

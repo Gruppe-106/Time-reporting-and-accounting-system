@@ -15,7 +15,7 @@ class FrontPage extends Component<any> {
 
     componentDidMount() {
         let apiHandler = new BaseApiHandler("test");
-        apiHandler.get("/api", (value) => {
+        apiHandler.get("/api", {},(value) => {
             if (typeof value === "string") {
                 let json:{message: string} = JSON.parse(value)
                 this.setState({test: json.message});
