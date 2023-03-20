@@ -160,7 +160,7 @@ class Utility {
 /**
  * Class containing methods for getting data from the server+9
 */
-class GetCreationData {
+class APICalls {
 
     /**
      * Get all roles from the database
@@ -213,6 +213,7 @@ class GetCreationData {
             });
 
     }
+
 }
 
 
@@ -271,8 +272,8 @@ class UserCreation extends Component<any, CustomTypes>{
      * Method is run before mounting
     */
     async componentDidMount() {
-        const dbRoles = await GetCreationData.GetAllRoles()
-        const dbManagers = await GetCreationData.GetAllManagers()
+        const dbRoles = await APICalls.GetAllRoles()
+        const dbManagers = await APICalls.GetAllManagers()
 
         this.setState({
             dbRoles: dbRoles,
@@ -514,8 +515,6 @@ class UserCreation extends Component<any, CustomTypes>{
         delete userObject.key
 
     }
-
-
 
     render() {
 
