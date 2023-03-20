@@ -1,4 +1,4 @@
-import {Table} from "react-bootstrap";
+import {Button, Table} from "react-bootstrap";
 import React, {Component} from "react";
 import BaseApiHandler from "../../../network/baseApiHandler";
 
@@ -54,6 +54,7 @@ class ProjectTable extends Component<any> {
               <td>{row.name ?? ''}</td>
               <td>{row.startDate ? new Date(row.startDate).toLocaleDateString() : ''}</td>
               <td>{row.endDate ? new Date(row.endDate).toLocaleDateString() : ''}</td>
+                <Button href={`/project/manage?id=${row.id}`} variant="outline-primary">Edit</Button>{''}
             </tr>
         ))
     }
