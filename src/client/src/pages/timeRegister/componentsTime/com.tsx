@@ -6,7 +6,7 @@ import BaseApiHandler from "../../../network/baseApiHandler";
 
     * TODO:
       * Fix add row (with popup modal)
-      * Show TimeSheet for different users
+      * Show TimeSheet for different users (Working)
       * Load "time" form data to timeSheet
       * Submit button (Post data)
 
@@ -283,7 +283,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
    * It is used to generate an array of TimeSheetRow components based on the data array in the component's state.
    * @returns class component. <TimeSheetRow>
    */
-  renderRows() {
+  private renderRows() {
     const { data } = this.state;
 
     return data.map((item, index) => (
@@ -315,16 +315,41 @@ class UserTimeSheet extends Component<EmptyProps, UserState> {
     super(props);
 
     this.state = {
-      userId: 10,
+      userId: 0,
     };
   }
 
-  render() {
-    const { userId } = this.state;
+  private handleSelectChange(value:string) {
+    const newId = parseInt(value);
+    this.setState({ userId: newId });
+  }
 
+  private renderTimeSheet() {
+    const { userId } = this.state;
+    const selectedUser = userId;
+
+    if (selectedUser > 0) {
+      return <TimeSheetPage key={selectedUser} userId={selectedUser} />;
+    }
+  }  
+
+  render() {
     return (
       <Container fluid="sm">
-        <TimeSheetPage userId={userId} />
+        <Form.Select onChange={(e) => this.handleSelectChange(e.target.value)}>
+          <option>Select user</option>
+          <option value={1}>One</option>
+          <option value={2}>Two</option>
+          <option value={3}>Three</option>
+          <option value={4}>Four</option>
+          <option value={5}>Five</option>
+          <option value={6}>Six</option>
+          <option value={7}>Seven</option>
+          <option value={8}>Eight</option>
+          <option value={9}>Nine</option>
+          <option value={10}>Ten</option>
+        </Form.Select>
+        {this.renderTimeSheet()}
       </Container>
     );
   }
