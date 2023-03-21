@@ -218,11 +218,15 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
     }
 }
 
+interface TimeSheetProp {
+  userId: number;
+}
+
 /*
     * Creating the full Timesheet page
 */
-class TimeSheetPage extends Component<EmptyProps, TimeSheetState> {
-  constructor(props: EmptyProps) {
+class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
+  constructor(props: TimeSheetProp) {
     super(props);
 
     this.state = {
@@ -251,9 +255,10 @@ class TimeSheetPage extends Component<EmptyProps, TimeSheetState> {
   
   // apiHandler to get data from "database", the data is passed to the data array
   public componentDidMount() {
+    const { userId } = this.props;
     let apiHandler = new BaseApiHandler("fuldstændigligemeget");
     apiHandler.get(
-      `api/time/register/get?user=1&var=taskName,taskId,projectName`,{},
+      `api/time/register/get?user=${userId}&var=taskName,taskId,projectName`,{},
       (value) => {
         let json: TimeSheetData[] = JSON.parse(JSON.stringify(value));
         this.setState({data: json});
@@ -301,4 +306,28 @@ class TimeSheetPage extends Component<EmptyProps, TimeSheetState> {
   }
 }
 
-export default TimeSheetPage
+interface UserState {
+  userId: number;
+}
+
+class UserTimeSheet extends Component<EmptyProps, UserState> {
+  constructor(props: EmptyProps) {
+    super(props);
+
+    this.state = {
+      userId: 10,
+    };
+  }
+
+  render() {
+    const { userId } = this.state;
+
+    return (
+      <Container fluid="sm">
+        <TimeSheetPage userId={userId} />
+      </Container>
+    );
+  }
+}
+
+export default UserTimeSheet;
