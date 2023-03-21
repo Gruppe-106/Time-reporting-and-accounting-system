@@ -3,9 +3,10 @@
  */
 import React, {Component} from "react";
 import BaseNavBar from "../../components/navBar";
-import {Button, Container} from "react-bootstrap";
+import {Button, Col, Container} from "react-bootstrap";
 import {ProjectTableRow} from "../projectViewer/components/projectTable";
-import ProjectCreate from "../projectViewer/components/projectCreate";
+import ProjectCreate from "./components/projectCreate";
+import Row from "react-bootstrap/Row";
 
 interface  ProjectMenuState{
     projects: ProjectTableRow[];
@@ -25,6 +26,12 @@ class ProjectMenu extends Component<any, ProjectMenuState>{
         };
     }
 
+    submitData(){
+        //Use this function to submit/create the project and post it to the database.
+        //Return an error if not all fields have been filled in
+
+    }
+
     render() {
         return (
             <>
@@ -35,7 +42,14 @@ class ProjectMenu extends Component<any, ProjectMenuState>{
                 </Container>
 
                 <Container>
+                    <Row>
+                        <Col sm={11}>
                     <ProjectCreate id={id}/>
+                            </Col>
+                        <Col>
+                    <Button variant="success" type="button" onClick={() => this.submitData()}>Create Project</Button>
+                            </Col>
+                    </Row>
                 </Container>
 
             </>

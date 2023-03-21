@@ -5,13 +5,8 @@ import Row from 'react-bootstrap/Row';
 import Tab from 'react-bootstrap/Tab';
 import {Button, Form} from "react-bootstrap";
 import BaseApiHandler from "../../../network/baseApiHandler";
+import ProjectTaskTable from "../../projectViewer/components/projectInformationTasks";
 import {Highlighter, Typeahead} from "react-bootstrap-typeahead";
-import TimeSheet from "../../timeRegister/componentsTime/com";
-
-/*
-uses TimeSheet at this point. This needs to be changed
-It is only there for placeholder.
- */
 
 interface Api{
         status:number,
@@ -24,7 +19,7 @@ interface Api{
         }[]
 }
 
-interface ProjectCreateProp {
+interface ProjectInformationProp {
     id:number
     superProject?:number
     name?:string
@@ -33,12 +28,12 @@ interface ProjectCreateProp {
     assignedToManager?: { managerId: number, managerName: string }
 }
 
-class ProjectCreate extends Component<ProjectCreateProp> {
+class ProjectManageInformation extends Component<ProjectInformationProp> {
     state = {
         pageInformation: {id: -1, superProject: -1, name: "", startDate: "", endDate: "", assignedToManager: {"managerId": Infinity, "managerName": "" }}
     }
 
-    constructor(props:ProjectCreateProp) {
+    constructor(props:ProjectInformationProp) {
         super(props);
         this.state.pageInformation.id = props.id;
         this.HandleManager = this.HandleManager.bind(this)
@@ -83,24 +78,18 @@ class ProjectCreate extends Component<ProjectCreateProp> {
         <Col sm={9}>
           <Tab.Content>
             <Tab.Pane eventKey="first">
-                <h1>Create a project</h1>
+                {this.state.pageInformation.name !== "" ? (<h1>{this.state.pageInformation.name}</h1>) : ""}
                 <Form>
                     <Row>
                         <Col>
-                        <Form.Group className="mb-3" controlId="formBasicProjectName">
-                <Form.Label>Project Name</Form.Label>
-                <Form.Control type="text" placeholder="Project Name" />
-                        </Form.Group>
-                        </Col>
-                        <Col>
             <Form.Group className="mb-3" controlId="formBasicProjectId">
-                <Form.Label>Project ID</Form.Label>
+                <Form.Label>Current Project ID: {this.state.pageInformation.id}</Form.Label>
                 <Form.Control type="number" placeholder="New Project ID (number)" />
             </Form.Group>
                         </Col>
                         <Col>
             <Form.Group className="mb-3" controlId="formBasicSuperProjectId">
-                <Form.Label>Parent Project ID</Form.Label>
+                <Form.Label>Current Parent Project ID: {this.state.pageInformation.superProject}</Form.Label>
                 <Form.Control type="number" placeholder="New Parent Project ID (number)" />
             </Form.Group>
                         </Col>
@@ -108,20 +97,20 @@ class ProjectCreate extends Component<ProjectCreateProp> {
                     <Row>
                         <Col>
             <Form.Group className="mb-3" controlId="formBasicStartDate">
-                <Form.Label>Start Date</Form.Label>
+                <Form.Label>Current Start Date: {new Date(this.state.pageInformation.startDate).toLocaleDateString()}</Form.Label>
                 <Form.Control type="date" placeholder="1/20/1970" />
             </Form.Group>
                         </Col>
                         <Col>
              <Form.Group className="mb-3" controlId="formBasicEndDate">
-                <Form.Label>End Date</Form.Label>
+                <Form.Label>Current End Date: {new Date(this.state.pageInformation.endDate).toLocaleDateString()}</Form.Label>
                 <Form.Control type="date" placeholder="1/20/1970" />
             </Form.Group>
                         </Col>
                     </Row>
 
             <Form.Group className="mb-3" controlId="formBasicChangeManager">
-                            <Form.Label>Assign Manager</Form.Label>
+                            <Form.Label>Assign New Manager</Form.Label>
                             <Typeahead
                                 id="changeManager"
                                 labelKey="name"
@@ -131,7 +120,7 @@ class ProjectCreate extends Component<ProjectCreateProp> {
                                     { id: 3, name: "Mikkel the mikkelman" },
                                     { id: 4, name: "Alexander 👌" }
                                 ]}
-                                placeholder="Choose Manager..."
+                                placeholder="Choose New Manager..."
                                 onChange={this.HandleManager}
                                 filterBy={(option: any, props: any): boolean => {
                                     const query: string = props.text.toLowerCase().trim();
@@ -151,12 +140,12 @@ class ProjectCreate extends Component<ProjectCreateProp> {
                                 )}
                             />
                         </Form.Group>
-                    <Button variant="primary" type="button">Create</Button>
+                    <Button variant="primary" type="button">Submit</Button>
                 </Form>
             </Tab.Pane>
               <Tab.Pane eventKey="second">
                 <h3>Task list</h3>
-                  <TimeSheet/>
+                  <ProjectTaskTable/>
             </Tab.Pane>
           </Tab.Content>
         </Col>
@@ -174,4 +163,4 @@ class ProjectCreate extends Component<ProjectCreateProp> {
     }
 }
 
-export default ProjectCreate;
+export default ProjectManageInformation;
