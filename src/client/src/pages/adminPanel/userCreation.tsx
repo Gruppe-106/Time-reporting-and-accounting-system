@@ -21,7 +21,6 @@ import BaseApiHandler from "../../network/baseApiHandler";
 import Utility from './utility/userCreation/userCreation'
 import APICalls from "./utility/userCreation/apiCalls";
 
-//TODO: fixings the types as this is infact a no no but it does fix it
 
 /**
  * Custom types
@@ -117,9 +116,15 @@ class UserCreation extends Component<any, CustomTypes>{
     async componentDidMount() {
 
         this.handleLoader("Getting roles")
-        const dbRoles = (await APICalls.getAllRoles()).data
+        const dbRoles: {
+            id: number;
+            name: string;
+        }[] = (await APICalls.getAllRoles()).data
         this.handleLoader("Getting managers", true)
-        const dbManagers = await APICalls.getAllManagers()
+        const dbManagers: {
+            id: number;
+            name: string;
+        }[] = await APICalls.getAllManagers()
         this.handleLoader("All done")
 
         this.setState({
@@ -170,7 +175,7 @@ class UserCreation extends Component<any, CustomTypes>{
      * @param event - The input change event object.
     */
     private handleEmail(event: React.ChangeEvent<HTMLInputElement>): void {
-        const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(event.target.value); // check if the email is valid
+        const emailValid:boolean = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(event.target.value); // check if the email is valid
 
 
         this.setState({
@@ -226,8 +231,8 @@ class UserCreation extends Component<any, CustomTypes>{
     */
     private handleSubmit(): void {
 
-        let hasShown = false;
-        const sha256 = forge.md.sha256.create();
+        let hasShown: boolean = false;
+        const sha256: any = forge.md.sha256.create();
 
         const userObject: {
             [key: string]: any
@@ -444,11 +449,11 @@ class UserCreation extends Component<any, CustomTypes>{
                 spinner
                 text={this.state.loadingText}
                 styles={{
-                    wrapper:{
+                    wrapper: {
                         height: '100%',
                         width: '100%'
                     }
-                }} 
+                }}
             >
                 <>
 
