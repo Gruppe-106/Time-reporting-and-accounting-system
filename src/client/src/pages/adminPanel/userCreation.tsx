@@ -621,6 +621,12 @@ class UserCreation extends Component<any, CustomTypes>{
                 active={this.state.loading}
                 spinner
                 text={this.state.loadingText}
+                styles={{
+                    wrapper:{
+                        height: '100%',
+                        width: '100%'
+                    }
+                }} 
             >
                 <>
 
