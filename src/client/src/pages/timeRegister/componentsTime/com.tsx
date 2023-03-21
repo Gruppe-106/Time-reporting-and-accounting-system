@@ -7,7 +7,7 @@ import BaseApiHandler from "../../../network/baseApiHandler";
     * TODO:
       * Fix add row (with popup modal)
       * Show TimeSheet for different users (Working)
-      * Load "time" form data to timeSheet
+      * Load "time" form data to timeSheet (hard)
       * Submit button (Post data)
 
 */
@@ -63,16 +63,14 @@ class TableHeader extends React.Component<EmptyProps, TableHeaderState> {
   }
 }
 
-interface TimeSheetData {
+interface TimeSheetRowData {
     projectName:string
     taskName:string
+    sheetTime:string;
 }
 
-interface TimeSheetState {
-  data: TimeSheetData[];
-}
 interface TimeSheetRowProps {
-  data: TimeSheetData; 
+  data: TimeSheetRowData; 
   onDelete: () => void
 }
 
@@ -156,7 +154,6 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
     const { total } = this.state;
     const { minTotal } = this.state;
     const totalMinutes = total + minTotal;
-
     const hours = Math.floor(totalMinutes / 60);
     const minutes = totalMinutes % 60;
 
@@ -222,6 +219,11 @@ interface TimeSheetProp {
   userId: number;
 }
 
+interface TimeSheetState {
+  data: TimeSheetRowData[];
+  showAddRowModal: boolean;
+}
+
 /*
     * Creating the full Timesheet page
 */
@@ -231,10 +233,25 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
 
     this.state = {
       data: [],
+      showAddRowModal: false,
     };
 
     this.handleAddRow = this.handleAddRow.bind(this);
   }
+
+  /*
+      * Closes the modal 
+   */
+  private handleCloseAddModal = () => {
+    this.setState({ showAddRowModal: false });
+  };
+
+  /*
+      * Opens the modal
+   */
+  private handleShowAddModal = () => {
+    this.setState({ showAddRowModal: true });
+  };
 
   /**
    * @description First, the current state's data array is destructured from this.state. This array is then sliced to remove the element at the specified index using the spread operator (...) to create a new array. This new array is then used to update the component's state using the setState method.
@@ -258,9 +275,9 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     const { userId } = this.props;
     let apiHandler = new BaseApiHandler("fuldstændigligemeget");
     apiHandler.get(
-      `api/time/register/get?user=${userId}&var=taskName,taskId,projectName`,{},
+      `api/time/register/get?user=${userId}&var=taskName,taskId,projectName,time`,{},
       (value) => {
-        let json: TimeSheetData[] = JSON.parse(JSON.stringify(value));
+        let json: TimeSheetRowData[] = JSON.parse(JSON.stringify(value));
         this.setState({data: json});
       }
     );
@@ -275,9 +292,10 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     this.setState({
       data: [
         ...data,
-        { projectName: "New project", taskName: "New task" },
+        { projectName: "New project", taskName: "New task", sheetTime: "0"},
       ],
     });
+    this.handleCloseAddModal();
   }
   /**
    * It is used to generate an array of TimeSheetRow components based on the data array in the component's state.
@@ -292,6 +310,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
   }
 
   render() {
+    const { showAddRowModal } = this.state;
     return (
       <Container fluid="sm">
         <Table bordered size="sm">
@@ -300,7 +319,19 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
                 {this.renderRows()}
             </tbody>
         </Table>
-        <Button variant="primary" type="button" onClick={() => this.handleAddRow()}>Add Row</Button>
+        <Button variant="primary" type="button" onClick={() => this.handleShowAddModal()}>Add Row</Button>
+        <Modal show={showAddRowModal} onHide={this.handleCloseAddModal}>
+        <Modal.Header closeButton>
+         <Modal.Title>Add Row?</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+         <p>Which task do you want to add?</p>
+         </Modal.Body>
+         <Modal.Footer>
+          <Button variant="secondary" onClick={this.handleCloseAddModal}>Cancel</Button>
+          <Button variant="primary" onClick={this.handleAddRow}>Add</Button>
+         </Modal.Footer>
+        </Modal>
       </Container>
     );
   }
