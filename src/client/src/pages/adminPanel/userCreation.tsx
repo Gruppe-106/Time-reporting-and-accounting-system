@@ -1,18 +1,26 @@
 /*
     Form for creating new users
- */
-import React, { Component } from "react";
+*/
+
+//React imports
 import BaseNavBar from "../../components/navBar";
-import { Container, Modal } from "react-bootstrap";
 import Button from 'react-bootstrap/Button';
+import { Container, Modal } from "react-bootstrap";
 import Form from 'react-bootstrap/Form';
-import { Typeahead, Highlighter } from 'react-bootstrap-typeahead';
+import LoadingOverlay from 'react-loading-overlay-ts';
+import React, { Component } from "react";
+import { Highlighter, Typeahead } from 'react-bootstrap-typeahead';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
+import Spinner from 'react-bootstrap/Spinner';
+
+//Forge import
 import forge from 'node-forge';
+
+//Custom import
 import BaseApiHandler from "../../network/baseApiHandler";
+import Utility from './utility/userCreation/userCreation'
+import APICalls from "./utility/userCreation/apiCalls";
 
-
-//TODO: fixings the types as this is infact a no no but it does fix it
 
 /**
  * Custom types
@@ -36,184 +44,12 @@ interface CustomTypes {
     // * Controlling components
     submitDisabled: boolean,
     showPopup: boolean,
+    loading: boolean,
 
     // * Component variables
     popupMessage: string,
-    popupTitle: string
-
-}
-
-
-/**
- * Class containing utility methods
-*/
-class Utility {
-
-    /**
-     * Method to validate fields
-     * @param userObject The object containing the current field information
-     * @returns Object containing information about missings fields if any
-     */
-    public static CheckFields(userObject: {
-        [key: string]: any
-        firstName: string | null,
-        lastName: string | null,
-        email: string | null,
-        password: string | null,
-        assignedToManager: { roleName: string, roleId: number, userId: number, firstName: string, lastName: string } | null
-        roles: { id: number, name: string }[] | null
-    }): {
-        valid: boolean,
-        missingFields: number,
-        errorString: string
-    } {
-        let missing: string[] = []
-        let keys: string[] = Object.keys(userObject)
-        let missingString: string = "";
-        let valid: boolean = true
-
-        for (let i = 0; i < keys.length; i++) {
-
-            if (userObject[keys[i]] === null) {
-                missing.push(keys[i])
-            }
-        }
-
-        if (missing.length > 0) {
-
-            valid = false;
-            let split: string = ""
-
-            if (missing.length === 1) {
-
-                if (missing[0] === "firstName") {
-                    split = "First name"
-                } else if (missing[0] === "lastName") {
-                    split = "Last name"
-                } else if (missing[0] === "email") {
-                    split = "Email address"
-                } else if (missing[0] === "password") {
-                    split = "Password"
-                } else if (missing[0] === "assignedToManager") {
-                    split = "Assign manager"
-                } else if (missing[0] === "roles") {
-                    split = "Assign roles"
-                }
-
-
-                missingString += "Missing field: " + split
-
-            } else if (missing.length > 1) {
-
-
-                missingString += "Missing fields: "
-
-                for (let i = 0; i < missing.length - 1; i++) {
-
-                    if (missing[i] === "firstName") {
-                        split = "First name"
-                    } else if (missing[i] === "lastName") {
-                        split = "Last name"
-                    } else if (missing[i] === "email") {
-                        split = "Email address"
-                    } else if (missing[i] === "password") {
-                        split = "Password"
-                    } else if (missing[i] === "assignedToManager") {
-                        split = "Assign manager"
-                    } else if (missing[i] === "roles") {
-                        split = "Assign roles"
-                    }
-                    if (split) {
-                        missingString += split + ", "
-                    }
-                    split = ""
-                }
-
-                missingString += " and "
-
-                if (missing[missing.length - 1] === "firstName") {
-                    split = "First name"
-                } else if (missing[missing.length - 1] === "lastName") {
-                    split = "Last name"
-                } else if (missing[missing.length - 1] === "email") {
-                    split = "Email address"
-                } else if (missing[missing.length - 1] === "password") {
-                    split = "Password"
-                } else if (missing[missing.length - 1] === "assignedToManager") {
-                    split = "Assign manager"
-                } else if (missing[missing.length - 1] === "roles") {
-                    split = "Assign roles"
-                }
-                missingString += split
-            }
-
-        }
-
-        return {
-            valid: valid,
-            missingFields: missing.length,
-            errorString: missingString
-        }
-    }
-
-}
-
-/**
- * Class containing methods for getting data from the server+9
-*/
-class APICalls {
-
-    /**
-     * Get all roles from the database
-     * @returns Promise containing all possible roles
-    */
-    public static getAllRoles(): Promise<{ id: number, name: string }[]> {
-        return fetch(`/api/role/get?ids=*`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-            .then((response: Response) => {
-                if (response.status === 400) {
-                    throw new Error("Status 400 bad request")
-                } else if (response.status === 200) {
-                    return response.json()
-                } else {
-                    throw new Error(`Unexpected response status: ${response.status}`)
-                }
-            })
-            .catch(error => {
-                throw new Error(error.Code);
-            });
-
-    }
-
-    /**
-     * Get all roles from the database
-     * @returns Promise containing all possible roles
-    */
-    public static getAllManagers(): Promise<{ id: number, name: string }[]> {
-        return fetch(`/api/role/user/get?role=1`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-            .then((response: Response) => {
-                if (response.status === 400) {
-                    throw new Error("Status 400 bad request")
-                } else if (response.status === 200) {
-                    return response.json()
-                } else {
-                    throw new Error(`Unexpected response status: ${response.status}`)
-                }
-            })
-            .catch(error => {
-                throw new Error(error.Code);
-            });
-
-    }
+    popupTitle: string,
+    loadingText: string
 
 }
 
@@ -242,11 +78,13 @@ class UserCreation extends Component<any, CustomTypes>{
 
             // * Component controllers
             showPopup: false,
-            submitDisabled: true,
+            submitDisabled: false,
+            loading: false,
 
             // * Component variables
             popupMessage: "",
             popupTitle: "",
+            loadingText: "",
 
         }
 
@@ -264,6 +102,7 @@ class UserCreation extends Component<any, CustomTypes>{
         this.handleShowMessage = this.handleShowMessage.bind(this);
         this.handleShowTitle = this.handleShowTitle.bind(this);
         this.handleClose = this.handleClose.bind(this);
+        this.handleLoader = this.handleLoader.bind(this)
         this.sendUser = this.sendUser.bind(this)
 
         //* Test handles
@@ -274,17 +113,26 @@ class UserCreation extends Component<any, CustomTypes>{
      * Method is run before mounting
     */
     async componentDidMount() {
-        const dbRoles = await APICalls.getAllRoles()
-        const dbManagers = await APICalls.getAllManagers()
+
+        this.handleLoader("Getting roles")
+        const dbRoles: {
+            id: number;
+            name: string;
+        }[] = (await APICalls.getAllRoles()).data
+        this.handleLoader("Getting managers", true)
+        const dbManagers: {
+            id: number;
+            name: string;
+        }[] = await APICalls.getAllManagers()
+        this.handleLoader("All done")
 
         this.setState({
             dbRoles: dbRoles,
-            dbManagers: dbManagers
+            dbManagers: dbManagers,
+            loading: false
         })
 
     }
-
-
 
     //TODO: find the types or else i commit the no monster day
 
@@ -324,7 +172,7 @@ class UserCreation extends Component<any, CustomTypes>{
      * @param event - The input change event object.
     */
     private handleEmail(event: React.ChangeEvent<HTMLInputElement>): void {
-        const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(event.target.value); // check if the email is valid
+        const emailValid: boolean = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(event.target.value); // check if the email is valid
 
 
         this.setState({
@@ -380,8 +228,8 @@ class UserCreation extends Component<any, CustomTypes>{
     */
     private handleSubmit(): void {
 
-        let hasShown = false;
-        const sha256 = forge.md.sha256.create();
+        let hasShown: boolean = false;
+        const sha256: any = forge.md.sha256.create();
 
         const userObject: {
             [key: string]: any
@@ -457,7 +305,6 @@ class UserCreation extends Component<any, CustomTypes>{
      * @param title The message to be shown to the user
     */
     private handleShowTitle(title: string): void {
-        console.log(title)
         this.setState({
             popupTitle: title
         })
@@ -466,7 +313,7 @@ class UserCreation extends Component<any, CustomTypes>{
     /**
      * Handles modal closing
     */
-    private handleClose() {
+    private handleClose(): void {
         this.setState({
             showPopup: false,
             popupTitle: "",
@@ -474,6 +321,26 @@ class UserCreation extends Component<any, CustomTypes>{
         });
     }
 
+    /**
+     * Handles loading
+     * @param message Loading message
+     * @param change Change message only
+    */
+    private handleLoader(message?: string, change: boolean = false): void {
+        if (change) {
+            this.setState({
+                loadingText: message || ""
+            })
+        } else if (!this.state.loading) {
+            this.setState(
+                {
+                    loading: true,
+                    loadingText: message || ""
+                })
+        } else {
+            this.setState({ loading: false })
+        }
+    }
 
     /**
      *
@@ -508,20 +375,20 @@ class UserCreation extends Component<any, CustomTypes>{
         assignedToManager: { roleName: string, roleId: number, userId: number, firstName: string, lastName: string } | null
         roles: { id: number, name: string }[] | null
     }) {
-        const api:BaseApiHandler = new BaseApiHandler()
+        const apiHandler: BaseApiHandler = new BaseApiHandler("test")
 
         let roles: number[] = []
         userObject.roles?.forEach((ele: { id: number, name: string }) => roles.push(ele.id))
 
-        let dataToSend:{
-            firstName   : string | null,
-            lastName    : string | null,
-            email       : string | null,
-            password    : string | null,
-            manager     : number | null | undefined,
-            roles       : number[] | null
+        let dataToSend: {
+            firstName: string | null,
+            lastName: string | null,
+            email: string | null,
+            password: string | null,
+            manager: number | null | undefined,
+            roles: number[] | null
         }
-         = {
+            = {
             firstName: userObject.firstName,
             lastName: userObject.lastName,
             email: userObject.email,
@@ -530,43 +397,43 @@ class UserCreation extends Component<any, CustomTypes>{
             roles: roles
         }
 
-
-        // api.post("/api/user/creation/post",())
-
-
-        fetch(`/api/user/creation/post`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(dataToSend)
+        this.handleLoader("Creating user")
+        this.setState({
+            submitDisabled: true
         })
-            .then((response: Response) => {
 
-               response.json()
-                // if (response.json() === 400) {
-                //     this.handleShowTitle("Error")
-                //     this.handleShowMessage("Status 400 bad request")
-                //     this.handleShow()
-                //     throw new Error("Status 400 bad request")
-                // } else if (response.status === 200) {
-                //     this.handleShowTitle("Success")
-                //     this.handleShowMessage("User created")
-                //     this.handleShow()
-                //     return response.json()
-                // } else {
-                //     this.handleShowTitle("Success")
-                //     this.handleShowMessage("User created")
-                //     this.handleShow()
-                //     throw new Error(`Unexpected response status: ${response.status}`)
-                // }
-            })
-            .catch((error:Error) => {
+
+        apiHandler.post("/api/user/creation/post", { body: dataToSend }, (value: any) => {
+
+            if (value.status === 200) {
+                this.handleShowTitle("Success")
+                this.handleShowMessage("User created")
+            } else if (value.status === 400) {
                 this.handleShowTitle("Error")
-                this.handleShowMessage(error.message)
-                this.handleShow()
-                throw new Error(error.message);
-            });
+                this.handleShowMessage("Status 400 bad request")
+                throw new Error("Status 400 bad request")
+            } else if (value.status === 404) {
+                this.handleShowTitle("Error")
+                this.handleShowMessage(`Status 404 missing fields: ${value.missing}`)
+                throw new Error("Status 404 missing fields")
+            } else {
+                this.handleShowTitle("Error")
+                this.handleShowMessage(`Status ${value.status}`)
+                throw new Error(value.status)
+
+
+            }
+
+
+        })
+
+        this.setState({
+            submitDisabled: false,
+            loading: false
+        })
+
+        this.handleShow()
+
 
 
     }
@@ -574,100 +441,122 @@ class UserCreation extends Component<any, CustomTypes>{
     render() {
 
         return (
-            <>
-                <BaseNavBar />
-                <Container className="py-3">
-                    <h1>User Creation</h1>
-                    <Form >
-                        <Form.Group className="mb-3" controlId="formBasicFirstName">
-                            <Form.Label>First name</Form.Label>
-                            <Form.Control type="text" placeholder="Enter first name" onChange={this.handleFirstName} />
-                        </Form.Group>
-
-                        <Form.Group className="mb-3" controlId="formBasicLastName">
-                            <Form.Label>Last name</Form.Label>
-                            <Form.Control type="text" placeholder="Enter last name" onChange={this.handleLastName} />
-                        </Form.Group>
-
-                        <Form.Group className="mb-3" controlId="formBasicEmail">
-                            <Form.Label>Email address</Form.Label>
-                            <Form.Control type="email" placeholder="Enter email" onChange={this.handleEmail} isInvalid={!this.state.emailValid} />
-                            <Form.Control.Feedback type="invalid">
-                                Please enter a valid email address.
-                            </Form.Control.Feedback>
-                        </Form.Group>
-
-                        <Form.Group className="mb-3" controlId="formBasicPassword">
-                            <Form.Label>Password</Form.Label>
-                            <Form.Control type="password" placeholder="Password" onChange={this.handlePassword} />
-                        </Form.Group>
+            <LoadingOverlay
+                active={this.state.loading}
+                spinner
+                text={this.state.loadingText}
+                styles={{
+                    wrapper: {
+                        height: '100%',
+                        width: '100%'
+                    }
+                }}
+            >
+                <>
 
 
-                        <Form.Group className="mb-3" controlId="formBasicAssignManager">
-                            <Form.Label>Assign manager</Form.Label>
-                            <Typeahead
-                                id="assignManager"
-                                labelKey={(option: any) => `${option.firstName}  ${option.lastName}`}
-                                options={this.state.dbManagers}
-                                placeholder="Choose Manager..."
-                                onChange={this.handleManager}
-                                filterBy={(option: any, props: any): boolean => {
-                                    const query: string = props.text.toLowerCase().trim();
-                                    const name: string = option.firstName.toLowerCase() + option.lastName.toLowerCase();
-                                    const id: string = option.userId.toString();
-                                    return name.includes(query) || id.includes(query);
-                                }}
-                                renderMenuItemChildren={(option: any, props: any) => (
-                                    <>
-                                        <Highlighter search={props.text}>
-                                            {option.firstName + " " + option.lastName}
-                                        </Highlighter>
-                                        <div>
-                                            <small>Manager user id: {option.userId}</small>
-                                        </div>
-                                    </>
+
+                    <BaseNavBar />
+                    <Container className="py-3">
+                        <h1>User Creation</h1>
+                        <Form >
+                            <Form.Group className="mb-3" controlId="formBasicFirstName">
+                                <Form.Label>First name</Form.Label>
+                                <Form.Control type="text" placeholder="Enter first name" onChange={this.handleFirstName} />
+                            </Form.Group>
+
+                            <Form.Group className="mb-3" controlId="formBasicLastName">
+                                <Form.Label>Last name</Form.Label>
+                                <Form.Control type="text" placeholder="Enter last name" onChange={this.handleLastName} />
+                            </Form.Group>
+
+                            <Form.Group className="mb-3" controlId="formBasicEmail">
+                                <Form.Label>Email address</Form.Label>
+                                <Form.Control type="email" placeholder="Enter email" onChange={this.handleEmail} isInvalid={!this.state.emailValid} />
+                                <Form.Control.Feedback type="invalid">
+                                    Please enter a valid email address.
+                                </Form.Control.Feedback>
+                            </Form.Group>
+
+                            <Form.Group className="mb-3" controlId="formBasicPassword">
+                                <Form.Label>Password</Form.Label>
+                                <Form.Control type="password" placeholder="Password" onChange={this.handlePassword} />
+                            </Form.Group>
+
+
+                            <Form.Group className="mb-3" controlId="formBasicAssignManager">
+                                <Form.Label>Assign manager</Form.Label>
+                                <Typeahead
+                                    id="assignManager"
+                                    labelKey={(option: any) => `${option.firstName}  ${option.lastName}`}
+                                    options={this.state.dbManagers}
+                                    placeholder="Choose Manager..."
+                                    onChange={this.handleManager}
+                                    filterBy={(option: any, props: any): boolean => {
+                                        const query: string = props.text.toLowerCase().trim();
+                                        const name: string = option.firstName.toLowerCase() + option.lastName.toLowerCase();
+                                        const id: string = option.userId.toString();
+                                        return name.includes(query) || id.includes(query);
+                                    }}
+                                    renderMenuItemChildren={(option: any, props: any) => (
+                                        <>
+                                            <Highlighter search={props.text}>
+                                                {option.firstName + " " + option.lastName}
+                                            </Highlighter>
+                                            <div>
+                                                <small>Manager user id: {option.userId}</small>
+                                            </div>
+                                        </>
+                                    )}
+                                />
+                            </Form.Group>
+
+                            <Form.Group className="mb-3" controlId="formBasicAssignRole">
+                                <Form.Label>Assign roles</Form.Label>
+                                <Typeahead
+                                    labelKey="name"
+                                    id="assignRoles"
+                                    multiple
+                                    options={this.state.dbRoles}
+                                    placeholder="Choose roles..."
+                                    onChange={this.handleRoles}
+
+                                />
+                            </Form.Group>
+
+
+                            <Button variant="primary" type="button" onClick={this.handleSubmit} disabled={this.state.submitDisabled} >
+                                {this.state.submitDisabled ? (
+                                    <Spinner
+                                        as="span"
+                                        animation="border"
+                                        size="sm"
+                                        role="status"
+                                        aria-hidden="true"
+                                    />
+                                ) : (
+                                    'Submit'
                                 )}
-                            />
-                        </Form.Group>
-
-                        <Form.Group className="mb-3" controlId="formBasicAssignRole">
-                            <Form.Label>Assign roles</Form.Label>
-                            <Typeahead
-                                labelKey="name"
-                                id="assignRoles"
-                                multiple
-                                options={this.state.dbRoles}
-                                placeholder="Choose roles..."
-                                onChange={this.handleRoles}
-
-                            />
-                        </Form.Group>
-
-
-                        <Button variant="primary" type="button" onClick={this.handleSubmit} >
-                            {
-                                /**
-                                 * todo: Fix the submit logic error TODO:
-                                 */
-                            }
-                            Submit
-                        </Button>
-                    </Form>
-                    <Modal show={this.state.showPopup} onHide={this.handleClose}>
-                        <Modal.Header closeButton>
-                            <Modal.Title>{this.state.popupTitle}</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>
-                            {this.state.popupMessage}
-                        </Modal.Body>
-                        <Modal.Footer>
-                            <Button variant="secondary" onClick={this.handleClose}>
-                                Close
                             </Button>
-                        </Modal.Footer>
-                    </Modal>
-                </Container>
-            </>
+                        </Form>
+                        <Modal show={this.state.showPopup} onHide={this.handleClose}>
+                            <Modal.Header closeButton>
+                                <Modal.Title>{this.state.popupTitle}</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>
+                                {this.state.popupMessage}
+                            </Modal.Body>
+                            <Modal.Footer>
+                                <Button variant="secondary" onClick={this.handleClose}>
+                                    Close
+                                </Button>
+                            </Modal.Footer>
+                        </Modal>
+                    </Container>
+
+
+                </>
+            </LoadingOverlay>
         );
     }
 
