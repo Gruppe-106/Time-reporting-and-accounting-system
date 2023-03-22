@@ -80,7 +80,9 @@ CREATE TABLE AUTH (
     password CHAR(64) NOT NULL,
     PRIMARY KEY (email , authKey , userId),
     FOREIGN KEY (email)
-        REFERENCES USERS (email),
+        REFERENCES USERS (email)  
+            ON DELETE CASCADE
+            ON UPDATE CASCADE,
     FOREIGN KEY (userId)
         REFERENCES USERS (id)
 );
@@ -88,21 +90,22 @@ CREATE TABLE AUTH (
 CREATE TABLE USERS_ROLES_CONNECTOR (
     roleId INT UNSIGNED NOT NULL,
     userId INT UNSIGNED NOT NULL,
-    PRIMARY KEY (roleId , userId),
     FOREIGN KEY (roleId)
         REFERENCES ROLES (id),
     FOREIGN KEY (userId)
         REFERENCES USERS (id)
 );
+ALTER TABLE users_roles_connector ADD UNIQUE urc_row_unique(roleId, userId);
 
 CREATE TABLE GROUPS_CONNECTOR (
     managerId INT UNSIGNED NOT NULL,
     groupId INT UNSIGNED NOT NULL,
-    PRIMARY KEY (managerId , groupId),
     FOREIGN KEY (managerId)
         REFERENCES USERS (id),
 	FOREIGN KEY (groupId)
-        REFERENCES USERS (groupId)
+        REFERENCES USERS (groupId)   
+            ON DELETE CASCADE
+            ON UPDATE CASCADE
 );
 
 
@@ -135,5 +138,4 @@ CREATE TABLE USERS_TASKS_CONNECTOR (
     FOREIGN KEY (taskId)
         REFERENCES TASKS (id)
 );
-
 ```

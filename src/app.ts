@@ -1,5 +1,6 @@
 import {Server} from "./server/server";
 import express from "express";
+import AddFakeDataToDB from "./server/database/fakeData/addFakeDataToDB";
 
 // --- Config ---
 const app = express();
@@ -13,3 +14,4 @@ const mySQLConnectionConfig = {
 
 // Startup Server
 export const server: Server = new Server(app, mySQLConnectionConfig, port);
+new AddFakeDataToDB().addUSERROLE();

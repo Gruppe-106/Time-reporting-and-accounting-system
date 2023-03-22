@@ -15,13 +15,13 @@ interface UserCreationData {
 class UserCreationEndpoint extends PostEndpointBase {
     allowedColumns: string[];
 
-    async submitData(req: Request, res: Response): Promise<string> {
+    async submitData(req: Request, res: Response): Promise<string[]> {
         //Get data from the user creation form
         let user: UserCreationData = req.body;
 
         // Input validate email address
         const emailValid:boolean = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(user.email);
-        if (emailValid) return Promise.resolve("Email not valid");
+        if (emailValid) return Promise.resolve(["Email not valid"]);
 
         // Get the group id the manager presides over
         let groupResponse: MySQLResponse = await this.mySQL.select("groups_connector", ["groupId"], {column: "managerId", equals: [user.manager.toString()]})
@@ -51,7 +51,7 @@ class UserCreationEndpoint extends PostEndpointBase {
             [user.email, authKey.key, this.mySQL.dateFormatter(authKey.valid), userId.toString(), user.password]);
         if (authResponse.error !== null) throw new Error("[MySQL] Failed insert data");
 
-        return Promise.resolve("success");
+        return Promise.resolve(["success"]);
     }
 }
 

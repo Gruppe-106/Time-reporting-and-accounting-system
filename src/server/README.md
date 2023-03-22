@@ -1,6 +1,6 @@
 # Todo
 ## Post
-1. UserCreation 
+1. UserCreation _/
 2. UserEdit 
 3. ProjectCreation 
 4. ProjectEdit 
@@ -11,5 +11,5 @@
 9. GroupEdit
 
 ## Other
-Add auth system and cookies
-Get name of timetype in tasks
+1. Add auth system and cookies
+2. Get name of timetype in tasks

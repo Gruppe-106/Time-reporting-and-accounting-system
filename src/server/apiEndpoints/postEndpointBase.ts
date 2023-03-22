@@ -27,14 +27,14 @@ abstract class GetEndpointBase {
         return this.user.authKey === "test";
     }
 
-    abstract submitData(req:Request, res:Response): Promise<string>;
+    abstract submitData(req:Request, res:Response): Promise<string[]>;
 
     public async processRequest(req:Request, res:Response):Promise<{status:number, data: object}> {
         try {
             if (this.ensureAuth()) {
-                let message: string = await this.submitData(req, res);
-                if (message !== "success") {
-                    return {status: 404, data: {success: "false", reason: message}};
+                let message: string[] = await this.submitData(req, res);
+                if (message[0] !== "success") {
+                    return {status: 404, data: {success: "false", reasons: message}};
                 }
                 return {status: 200, data: {success: "true"}};
             }

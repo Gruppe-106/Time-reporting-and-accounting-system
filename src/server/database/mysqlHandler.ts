@@ -6,6 +6,11 @@ export interface Where {
     equals: string[]
 }
 
+export interface UpdateSet {
+    column: string,
+    value: string
+}
+
 export interface MySQLResponse {
     error: MysqlError | null,
     results: any,
@@ -80,6 +85,21 @@ class MysqlHandler {
     }
 
     /**
+     * Creates a string with the sql query condition based on a list of wheres
+     * @param where Where[]: A list of conditions which includes column to check and what to check against
+     * @return String: of the condition or an empty string if where is empty
+     * @private
+     */
+    public createWhereListString(where: Where[]): string {
+        let whereString: string = "WHERE ";
+        for (let i = 0; i < where.length; i++) {
+            if (i !== 0) whereString += " AND "
+            whereString += where[i].column + "=" + where[i].equals[0].toString();
+        }
+        return whereString;
+    }
+
+    /**
      * Creates a string of all insert values
      * @param values string[][] | string[]: a list of all values to insert
      * @return String: string of all insert values
@@ -104,10 +124,17 @@ class MysqlHandler {
                            .replace(/(?<![\)']),'|(?<![\)']),(?![\('])|',(?![\('])/g, "','");
     }
 
+    private createUpdateSetString(updateSet: UpdateSet[]): string[] {
+        let setString: string[] = [];
+        for (const set of updateSet) {
+            setString.push(`${set.column}="${set.value}"`);
+        }
+        return setString;
+    }
+
     /**
      * Sends a query to the database if one is present
      * @param sqlQuery String: query to send to server
-     * @param callback Callback: callback function to process data
      * @private
      */
     public async sendQuery(sqlQuery: string): Promise<MySQLResponse>{
@@ -148,14 +175,38 @@ class MysqlHandler {
      * @param values string[][] | string[]: values to insert into columns
      */
     public insert(table: string, columns: string[], values: string[][] | string[]): Promise<MySQLResponse> {
-        let queryString = `INSERT INTO ${table} (${columns}) VALUES ${this.createValuesString(values)}`;
+        let queryString = `INSERT IGNORE INTO ${table} (${columns}) VALUES ${this.createValuesString(values)}`;
         return this.sendQuery(queryString);
     }
 
+    /**
+     * Sends an update query to DB
+     * @param table String: table to update data in
+     * @param updateSet UpdateSet[]?: columns and the value to alter in the table
+     * @param where Where?: condition for which rows to edit in table
+     */
+    public update(table: string, updateSet: UpdateSet[], where:Where): Promise<MySQLResponse> {
+        let queryString = `UPDATE ${table} SET ${this.createUpdateSetString(updateSet)} ${this.createWhereString(where)}`;
+        return this.sendQuery(queryString);
+    }
+
+    public remove(table: string, where: Where[]) {
+        let queryString = `DELETE FROM ${table} ${this.createWhereListString(where)}`;
+        return this.sendQuery(queryString);
+    }
+
+    /**
+     * Converts numeric date to a string date MySQL understands (datetime, date)
+     * @param date Number: date in numeric form
+     */
     public dateFormatter(date:number): string {
         return new Date(date).toISOString().slice(0, 19).replace('T', ' ');
     }
 
+    /**
+     * Converts date to a date in numeric form
+     * @param date Date: a date...
+     */
     public dateToNumber(date:Date): number {
         return date.getTime();
     }
