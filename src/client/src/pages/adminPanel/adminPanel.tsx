@@ -52,9 +52,7 @@ interface CustomTypes {
     // * Component variables
     loadingText: string
 
-    //* Seach varriables
-    searchQuery: string;
-    searchResults: any[];
+
 
 }
 
@@ -71,18 +69,27 @@ class AdminPanel extends Component<any, CustomTypes> {
             // * Component variables
             loadingText: "",
 
-            //* Seach varriables
-            searchQuery: "",
-            searchResults: [],
 
         };
         this.handleLoader = this.handleLoader.bind(this);
-        this.handleSearch = this.handleSearch.bind(this);
+
     }
 
-    componentDidMount() {
-        // Initialize filteredUsers with all the users
-        this.setState({ searchResults: this.state.dbUsers });
+    async componentDidMount() {
+        this.handleLoader("Getting users")
+        const dbUsers: {
+            id: number;
+            email: string;
+            firstName: string;
+            lastName: string;
+            group: number;
+        }[] = await APICalls.getAllUsers()
+        this.handleLoader("All done")
+        this.setState(
+            {
+                dbUsers: dbUsers,
+                loading: false
+            });
     }
 
     /**
@@ -103,40 +110,6 @@ class AdminPanel extends Component<any, CustomTypes> {
         } else {
             this.setState({ loading: false });
         }
-    }
-
-
-    private handleSearch(event: any) {
-
-        const searchQuery = event.target.value.toLowerCase();
-        const searchResults: {
-            id: number;
-            email: string;
-            firstName: string;
-            lastName: string;
-            group: number;
-        }[] = searchQuery
-                ? this.state.dbUsers.filter(
-                    (user: {
-                        id: number;
-                        email: string;
-                        firstName: string;
-                        lastName: string;
-                        group: number;
-                    }) =>
-                        user.id.toString().toLowerCase().includes(searchQuery) ||
-                        user.email.toLowerCase().includes(searchQuery) ||
-                        user.firstName.toLowerCase().includes(searchQuery) ||
-                        user.lastName.toLowerCase().includes(searchQuery) ||
-                        user.group.toString().includes(searchQuery)
-                )
-                : this.state.dbUsers;
-
-        this.setState(
-            {
-                searchQuery,
-                searchResults
-            });
     }
 
 
@@ -164,8 +137,7 @@ class AdminPanel extends Component<any, CustomTypes> {
                                 <Form.Control
                                     type="text"
                                     placeholder="Enter search query"
-                                    value={this.state.searchQuery}
-                                    onChange={this.handleSearch}
+
                                 />
                             </Form.Group>
                         </Form>
@@ -180,7 +152,7 @@ class AdminPanel extends Component<any, CustomTypes> {
                                 </tr>
                             </thead>
                             <tbody>
-                                {this.state.searchResults.map(user => (
+                                {this.state.dbUsers.map((user) => (
                                     <tr key={user.id}>
                                         <td>{user.id}</td>
                                         <td>{user.email}</td>
