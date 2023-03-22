@@ -15,13 +15,14 @@ IMPORT MEMBERS AND ROLES
 */
 
 interface Api{
-
-        id?: number,
-        superProject?: number,
-        name?: string,
-        startDate?: string,
-        endDate?: string
-
+        status:number,
+        data: {
+            id?: number,
+            superProject?: number,
+            name?: string,
+            startDate?: string,
+            endDate?: string
+        }[]
 }
 
 interface ProjectInformationProp {
@@ -47,13 +48,13 @@ class ProjectInformation extends Component<ProjectInformationProp> {
         let apiHandler = new BaseApiHandler("test");
         //Run the get or post function depending on need only neccesarry argument is the path aka what comes after the hostname
         //Callbacks can be used to tell what to do with the data once it's been retrieved
-        apiHandler.get(`/api/project/get?ids=${this.state.pageInformation.id}`, (value) => {
+        apiHandler.get(`/api/project/get?ids=${this.state.pageInformation.id}`, {},(value) => {
             console.log(value)
             //Then convert the string to the expected object(eg. )
-            let json:Api[] = JSON.parse(JSON.stringify(value))
+            let json:Api = JSON.parse(JSON.stringify(value))
             //Then update states or variables or whatever you want with the information
-            this.setState({pageInformation: json[0]})
-            console.log(json)
+            this.setState({pageInformation: json.data[0]})
+            console.log(json.data)
         })
     }
 
@@ -61,7 +62,6 @@ class ProjectInformation extends Component<ProjectInformationProp> {
     private informationRender():JSX.Element {
             return (
                 <Tab.Container id="left-tabs-example" defaultActiveKey="first">
-                    {this.state.pageInformation.name !== "" ? (<h2>{this.state.pageInformation.name}</h2>) : ""}
 
       <Row>
         <Col sm={2}>
@@ -80,7 +80,23 @@ class ProjectInformation extends Component<ProjectInformationProp> {
         <Col sm={9}>
           <Tab.Content>
             <Tab.Pane eventKey="first">
-                <h3>Project Description</h3>
+                {this.state.pageInformation.name !== "" ? (<h1>{this.state.pageInformation.name}</h1>) : ""}
+                <h3>Description</h3>
+                 <Table>
+                     <thead>
+                     <tr>
+                         <th>Start Date: {new Date(this.state.pageInformation.startDate).toLocaleDateString()}</th>
+                         <th>End Date: {new Date(this.state.pageInformation.endDate).toLocaleDateString()}</th>
+                     </tr>
+                     <tr>
+                         <th>Project Number: {this.state.pageInformation.id}</th>
+                         <th>Parent Project: {this.state.pageInformation.superProject}</th>
+                     </tr>
+                     <tr>
+                         <th>Project Manager: no one</th>
+                     </tr>
+                     </thead>
+                 </Table>
             </Tab.Pane>
             <Tab.Pane eventKey="second">
                 <h3>Members list</h3>

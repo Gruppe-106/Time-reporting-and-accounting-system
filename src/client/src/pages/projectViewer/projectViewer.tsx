@@ -1,8 +1,5 @@
 /*
     Show single project
-
-    TO DO:
-    DEPENDING ON ID FROM OPTIONAL PARAMETER, SHOW DIFFERENT PAGE
  */
 import React, {Component} from "react";
 import BaseNavBar from "../../components/navBar";
