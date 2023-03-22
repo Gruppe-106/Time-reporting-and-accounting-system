@@ -1,10 +1,10 @@
-import EndpointBase from "../endpointBase";
+import GetEndpointBase from "../getEndpointBase";
 import {MySQLResponse} from "../../database/mysqlHandler";
 
 /**
  * Endpoint for .../api/project/get
  */
-class ProjectEndpoint extends  EndpointBase {
+class ProjectEndpoint extends  GetEndpointBase {
     allowedColumns: string[] = [
         "id",
         "superProjectId",

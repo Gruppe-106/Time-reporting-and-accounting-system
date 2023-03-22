@@ -1,11 +1,11 @@
-import EndpointBase from "../endpointBase";
+import GetEndpointBase from "../getEndpointBase";
 import {MySQLResponse} from "../../database/mysqlHandler";
 import {Request, Response} from "express";
 
 /**
  * Endpoint for .../api/task/project/get
  */
-class TaskProjectEndpoint extends  EndpointBase {
+class TaskProjectEndpoint extends  GetEndpointBase {
     allowedColumns: string[] = [
         "taskId",
         "taskName",

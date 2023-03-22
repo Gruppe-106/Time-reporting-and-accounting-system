@@ -1,10 +1,10 @@
-import EndpointBase from "../endpointBase";
+import GetEndpointBase from "../getEndpointBase";
 import {MySQLResponse} from "../../database/mysqlHandler";
 
 /**
  * Endpoint for .../api/task/get
  */
-class TaskEndpoint extends  EndpointBase {
+class TaskEndpoint extends  GetEndpointBase {
     allowedColumns: string[] = [
         "id",
         "name",

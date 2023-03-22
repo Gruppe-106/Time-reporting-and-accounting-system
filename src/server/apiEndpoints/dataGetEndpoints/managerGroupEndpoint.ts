@@ -1,4 +1,4 @@
-import EndpointBase from "../endpointBase";
+import GetEndpointBase from "../getEndpointBase";
 import {MySQLResponse} from "../../database/mysqlHandler";
 import {Request, Response} from "express";
 
@@ -26,7 +26,7 @@ export interface UserReturnType {
 /**
  * Endpoint for .../api/group/manager/get
  */
-class ManagerGroupEndpoint extends EndpointBase {
+class ManagerGroupEndpoint extends GetEndpointBase {
     //Not used, but required by base class
     allowedColumns: string[];
 

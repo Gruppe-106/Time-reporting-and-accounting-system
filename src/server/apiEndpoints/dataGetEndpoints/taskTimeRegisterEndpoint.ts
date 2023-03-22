@@ -1,10 +1,10 @@
-import EndpointBase from "../endpointBase";
+import GetEndpointBase from "../getEndpointBase";
 import {MySQLResponse} from "../../database/mysqlHandler";
 
 /**
  * Endpoint for .../api/time/register/get
  */
-class TaskTimeRegisterEndpoint extends  EndpointBase {
+class TaskTimeRegisterEndpoint extends  GetEndpointBase {
     allowedColumns: string[] = [
         "taskId",
         "taskName",

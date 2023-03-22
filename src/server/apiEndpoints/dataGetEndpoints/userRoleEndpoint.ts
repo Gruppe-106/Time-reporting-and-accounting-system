@@ -1,11 +1,11 @@
-import EndpointBase from "../endpointBase";
+import GetEndpointBase from "../getEndpointBase";
 import {MySQLResponse} from "../../database/mysqlHandler";
 import {Request, Response} from "express";
 
 /**
  * Endpoint for .../api/role/user/get
  */
-class UserRoleEndpoint extends  EndpointBase {
+class UserRoleEndpoint extends  GetEndpointBase {
     allowedColumns: string[] = [
         "userId",
         "firstName",

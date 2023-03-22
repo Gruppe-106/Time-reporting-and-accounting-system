@@ -16,7 +16,7 @@ enum Roles {
     ADMIN
 }
 
-abstract class EndpointBase {
+abstract class GetEndpointBase {
     protected readonly user: User;
     protected readonly mySQL = Server.mysql;
     abstract allowedColumns: string[];
@@ -96,4 +96,4 @@ abstract class EndpointBase {
     };
 }
 
-export default EndpointBase;
+export default GetEndpointBase;

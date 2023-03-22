@@ -124,9 +124,8 @@ class UserCreation extends Component<any, CustomTypes>{
         const dbManagers: {
             id: number;
             name: string;
-        }[] = await APICalls.getAllManagers()
+        }[] = (await APICalls.getAllManagers()).data
         this.handleLoader("All done")
-
         this.setState({
             dbRoles: dbRoles,
             dbManagers: dbManagers,
