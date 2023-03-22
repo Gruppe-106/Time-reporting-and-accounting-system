@@ -6,13 +6,14 @@ NEED TO ADD SO IT SHOWS BY GROUP AND NOT JUST EVERYONE.
 NUMBER FOR THE GROUP SHOULD CORRESPOND TO THE ID OF THE PROJECT AND PROJECT PAGE
  */
 interface Api{
-
+        status:number,
+        data:{
         id?: number,
         name?: string,
         startDate?: number,
         endDate?: number,
         timeType?: number
-
+        }[]
 }
 
 export interface ProjectTableTaskRow{
@@ -46,10 +47,10 @@ class ProjectTaskTable extends Component<any> {
         apiHandler.get(`/api/task/get?ids=*`,{}, (value) => {
             console.log(value)
             //Then convert the string to the expected object(eg. )
-            let json:Api[] = JSON.parse(JSON.stringify(value))
+            let json:Api = JSON.parse(JSON.stringify(value))
             //Then update states or variables or whatever you want with the information
-            this.setState({tableRows: json})
-            console.log(json)
+            this.setState({tableRows: json.data})
+            console.log(json.data)
         })
     }
 

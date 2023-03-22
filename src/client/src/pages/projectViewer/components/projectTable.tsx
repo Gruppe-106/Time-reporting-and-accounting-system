@@ -3,13 +3,14 @@ import React, {Component} from "react";
 import BaseApiHandler from "../../../network/baseApiHandler";
 
 interface Api{
-
-        id?: number,
-        superProject?: number,
-        name?: string,
-        startDate?: string,
-        endDate?: string
-
+        status:number,
+        data: {
+            id?: number,
+            superProject?: number,
+            name?: string,
+            startDate?: string,
+            endDate?: string
+        }[]
 }
 
 export interface ProjectTableRow{
@@ -39,10 +40,10 @@ class ProjectTable extends Component<any> {
         apiHandler.get(`/api/project/get?ids=*`, {}, (value) => {
             console.log(value)
             //Then convert the string to the expected object(eg. )
-            let json:Api[] = JSON.parse(JSON.stringify(value))
+            let json:Api = JSON.parse(JSON.stringify(value))
             //Then update states or variables or whatever you want with the information
-            this.setState({tableRows: json})
-            console.log(json)
+            this.setState({tableRows: json.data})
+            console.log(json.data)
         })
     }
 

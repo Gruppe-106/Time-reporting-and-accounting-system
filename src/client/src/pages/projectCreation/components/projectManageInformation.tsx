@@ -3,26 +3,20 @@ import Col from 'react-bootstrap/Col';
 import Nav from 'react-bootstrap/Nav';
 import Row from 'react-bootstrap/Row';
 import Tab from 'react-bootstrap/Tab';
-import {Button, Form, Table} from "react-bootstrap";
+import {Button, Form} from "react-bootstrap";
 import BaseApiHandler from "../../../network/baseApiHandler";
-import ProjectMemberTable from "./projectInformationMembers";
-import ProjectTaskTable from "./projectInformationTasks";
+import ProjectTaskTable from "../../projectViewer/components/projectInformationTasks";
 import {Highlighter, Typeahead} from "react-bootstrap-typeahead";
-/*
-TO DO HERE
-CHANGE TO CREATE A "PAGE" FROM ID
-THEN SHOW INFORMATION ABOUT PROJECT
-IMPORT MEMBERS AND ROLES
-*/
 
 interface Api{
-
-        id?: number,
-        superProject?: number,
-        name?: string,
-        startDate?: string,
-        endDate?: string
-
+        status:number,
+        data: {
+            id?: number,
+            superProject?: number,
+            name?: string,
+            startDate?: string,
+            endDate?: string
+        }[]
 }
 
 interface ProjectInformationProp {
@@ -53,10 +47,10 @@ class ProjectManageInformation extends Component<ProjectInformationProp> {
         apiHandler.get(`/api/project/get?ids=${this.state.pageInformation.id}`, {},(value) => {
             console.log(value)
             //Then convert the string to the expected object(eg. )
-            let json:Api[] = JSON.parse(JSON.stringify(value))
+            let json:Api = JSON.parse(JSON.stringify(value))
             //Then update states or variables or whatever you want with the information
-            this.setState({pageInformation: json[0]})
-            console.log(json)
+            this.setState({pageInformation: json.data[0]})
+            console.log(json.data)
         })
     }
     private HandleManager(manager: any): void {
@@ -85,7 +79,6 @@ class ProjectManageInformation extends Component<ProjectInformationProp> {
           <Tab.Content>
             <Tab.Pane eventKey="first">
                 {this.state.pageInformation.name !== "" ? (<h1>{this.state.pageInformation.name}</h1>) : ""}
-                <h3>Description</h3>
                 <Form>
                     <Row>
                         <Col>
