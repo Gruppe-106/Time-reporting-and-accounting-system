@@ -36,13 +36,13 @@ class TaskTimeRegisterEndpoint extends  EndpointBase {
             join += " CROSS JOIN tasks t ON t.id=ttr.taskId";
         }
         if (requestValues.indexOf("projectName") !== -1 || requestValues.indexOf("projectId") || allColumns) {
-            join += " CROSS JOIN (SELECT projectId FROM tasks_projects_connector tp ON ttr.taskId=tp.taskId CROSS JOIN projects project ON tp.projectId=project.id) p";
+            join += " CROSS JOIN tasks_projects_connector tp ON ttr.taskId=tp.taskId CROSS JOIN projects p ON tp.projectId=p.id";
             if (requestValues.indexOf("projectId")   || allColumns) select.push("p.id as projectId");
             if (requestValues.indexOf("projectName") || allColumns) select.push("p.name as projectName");
         }
 
         //Query the data for all group that satisfies conditions
-        let query: string = `SELECT ${select} FROM (SELECT * FROM users_roles_connector ${this.mySQL.createWhereString(this.createWhere(primaryKey, keyEqual))}) ur ${join}`;
+        let query: string = `SELECT ${select} FROM (SELECT * FROM users_tasks_time_register ${this.mySQL.createWhereString(this.createWhere(primaryKey, keyEqual))}) ttr ${join}`;
         let response:MySQLResponse = await this.mySQL.sendQuery(query);
         //Check if there was an error and throw if so
         if (response.error !== null) throw new Error("[MySQL] Failed to retrieve data");
