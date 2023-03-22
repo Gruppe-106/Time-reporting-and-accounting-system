@@ -5,10 +5,12 @@ import BaseApiHandler from "../../../network/baseApiHandler";
 /*
 
     * TODO:
-      * Fix add row (with popup modal)
+      * Fix add row (with popup modal) (have pop up, but fix loading of data so only data(rows) with time is loaded)
+      * Only render table row if there is time for said table, otherwise be able to create a row for that task.
       * Show TimeSheet for different users (Working)
-      * Load "time" form data to timeSheet (hard)
+      * Load "time" and "date" form data to timeSheet (done, but have to fix data , and how and where data is loaded)
       * Submit button (Post data)
+      * Clean up code
 
 */
 
@@ -20,8 +22,10 @@ interface TableHeaderState {
 }
 
 /*
+
     * Creating the table header
-*/
+
+*/ 
 class TableHeader extends React.Component<EmptyProps, TableHeaderState> {
   constructor(props: EmptyProps) {
     super(props);
@@ -63,17 +67,21 @@ class TableHeader extends React.Component<EmptyProps, TableHeaderState> {
   }
 }
 
+// Loaded data from database, used in TimeSheetRow and TimeSheetPage
 interface TimeSheetRowData {
-    projectName:string
-    taskName:string
-    sheetTime:string;
+    projectName:string;
+    taskName:string;
+    time:number;
+    date:number;
 }
 
+// The props given to TimeSheetRow
 interface TimeSheetRowProps {
   data: TimeSheetRowData; 
   onDelete: () => void
 }
 
+// State of variables in TimeSheetRow
 interface TimeSheetRowState {
   times: string[];
   total: number;
@@ -83,11 +91,14 @@ interface TimeSheetRowState {
 }
 
 /*
+
     * Creating a tablerow for the table body, takes in 2 props, data and onDelete
+
 */
 class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
+  // Inilisie all states
   state: TimeSheetRowState = {
-    times: ["0", "0", "0", "0", "0", "0", "0"],
+    times: [this.props.data.time.toString(), "0", "0", "0", "0", "0", "0"],
     total: 0,
     minTimes: ["0", "0", "0", "0", "0", "0", "0"],
     minTotal: 0,
@@ -118,7 +129,7 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
   };
 
   /**
-   * @description This method is used to handle changes to a set of Form.controls, 
+   * This method is used to handle changes to a set of Form.controls, 
    * making sure the values entered are valid (not under 0) and updating the component's state with the new values.
    * @param index : The index is used to identify which Form.control has been changed
    * @param value : The value is the new value of that Form.control.
@@ -131,13 +142,12 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
     const total = 60 * times.reduce((acc, cur) => acc + parseInt(cur), 0); // This line of code is used to calculate the total sum of all the values in the times array, which is then used to update the component's state with the new total time.
     this.setState({ times, total });
   };
-// < 0 ? "0" : value
+
   /**
    * This method is used to handle changes to a form.select,
-   * and updates the component's state with the new minut total time for a set of time controls.
    * 
-   * Updates the minTotal, but doent work proberly. TODO: fix
-   * @param value The value is the new value of that Form.select.
+   * @param index : The index is used to identify which Form.select has been changed
+   * @param value : The value is the new value of that Form.select.
    */
   private handleSelectTimeChange = (index: number, value: string) => {
     const { minTimes } = this.state;
@@ -147,7 +157,7 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
     this.setState({ minTotal: minTotal });
   };
 
-  /**
+  /*
       * Calculates total hours and minutes.
    */
   private displayTimeTotal = ():JSX.Element => {
@@ -215,27 +225,33 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
     }
 }
 
+// Props used in TimeSheetPage
 interface TimeSheetProp {
   userId: number;
 }
 
+// Variable states in TimeSheetPage
 interface TimeSheetState {
   data: TimeSheetRowData[];
   showAddRowModal: boolean;
 }
 
 /*
+
     * Creating the full Timesheet page
+
 */
 class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
   constructor(props: TimeSheetProp) {
     super(props);
 
+    // Initialise states
     this.state = {
       data: [],
       showAddRowModal: false,
     };
 
+    // Bind (TODO: Add description)
     this.handleAddRow = this.handleAddRow.bind(this);
   }
 
@@ -254,7 +270,9 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
   };
 
   /**
-   * @description First, the current state's data array is destructured from this.state. This array is then sliced to remove the element at the specified index using the spread operator (...) to create a new array. This new array is then used to update the component's state using the setState method.
+   * Handles delete row click, setting the current values to nothing and there by delting the rows.
+   * 
+   * First, the current state's data array is destructured from this.state. This array is then sliced to remove the element at the specified index using the spread operator (...) to create a new array. This new array is then used to update the component's state using the setState method.
       The setState method is a built-in React method that updates the component's state and triggers a re-render of the component. It takes an object as an argument that represents the new state of the component. In this case, the data property in the state object is updated with the new array that was created by removing the element at the specified index.
       The spread operator is used to create a new array from the original data array in the state object because React requires that state be updated immutably. That is, the original state should not be modified directly, but instead a new copy of the state should be created with the necessary changes.
       
@@ -275,7 +293,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     const { userId } = this.props;
     let apiHandler = new BaseApiHandler("fuldstændigligemeget");
     apiHandler.get(
-      `api/time/register/get?user=${userId}&var=taskName,taskId,projectName,time`,{},
+      `api/time/register/get?user=${userId}&var=taskName,projectName,time,date`,{},
       (value) => {
         let json: TimeSheetRowData[] = JSON.parse(JSON.stringify(value));
         this.setState({data: json});
@@ -284,7 +302,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
   }
 
   /**
-   * @description First, the current state's data array is destructured from this.state. This array is then copied using the spread operator (...) and a new object representing the new row is added to the end of the array. The new row object contains default values for projectName and taskName.
+   * First, the current state's data array is destructured from this.state. This array is then copied using the spread operator (...) and a new object representing the new row is added to the end of the array. The new row object contains default values for projectName and taskName.
    */
   private handleAddRow() {
     const { data } = this.state;
@@ -292,7 +310,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     this.setState({
       data: [
         ...data,
-        { projectName: "New project", taskName: "New task", sheetTime: "0"},
+        { projectName: "New project", taskName: "New task", time: 0, date:1679443200},
       ],
     });
     this.handleCloseAddModal();
@@ -304,13 +322,17 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
   private renderRows() {
     const { data } = this.state;
 
-    return data.map((item, index) => (
-      <TimeSheetRow key={index} data={item} onDelete={() => this.handleDeleteRow(index)} />
-    ));
+    return data.map((item, index) => {
+      if (item.time !== 1) {
+        return <TimeSheetRow key={index} data={item} onDelete={() => this.handleDeleteRow(index)} />;
+      } else {
+        return null; // if sheettime is 0, don't render the row
+      }
+    });
   }
 
   render() {
-    const { showAddRowModal } = this.state;
+    const { showAddRowModal} = this.state;
     return (
       <Container fluid="sm">
         <Table bordered size="sm">
@@ -326,6 +348,9 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
         </Modal.Header>
         <Modal.Body>
          <p>Which task do you want to add?</p>
+         <Form.Select>
+            <option></option>
+         </Form.Select>
          </Modal.Body>
          <Modal.Footer>
           <Button variant="secondary" onClick={this.handleCloseAddModal}>Cancel</Button>
@@ -337,6 +362,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
   }
 }
 
+// State of UserTimeSheet
 interface UserState {
   userId: number;
 }
