@@ -6,14 +6,14 @@ NEED TO ADD SO IT SHOWS BY GROUP AND NOT JUST EVERYONE.
 NUMBER FOR THE GROUP SHOULD CORRESPOND TO THE ID OF THE PROJECT AND PROJECT PAGE
  */
 interface Api{
-        status:number,
-        data:{
+    status:number,
+    data:{
         id?: number,
         name?: string,
         startDate?: number,
         endDate?: number,
         timeType?: number
-        }[]
+    }[]
 }
 
 export interface ProjectTableTaskRow{
@@ -78,53 +78,53 @@ class ProjectManageTask extends Component<any> {
         const { isFocused } = this.state
         return this.state.tableRows.map(row => (
             <tr key={row.id}>
-              <td><InputGroup size="sm">
-                            <Form.Control
-                              type="number"
-                              placeholder={row.id.toString()}
-                              id="id"
-                              />
-                        </InputGroup></td>
                 <td><InputGroup size="sm">
-                            <Form.Control
-                              type="text"
-                              placeholder={row.name}
-                              id="name"
-                              />
-                        </InputGroup></td>
-                <td><InputGroup size="sm"> {isFocused ?(
-                            <Form.Control
-                              type="date"
-                              placeholder=""
-                              id="startDate"
-                              onBlur={this.handleBlur}
-                              />):(<Form.Control
-                              type="text"
-                              placeholder={new Date(row.startDate).toLocaleDateString()}
-                              id="startDate"
-                              onFocus={this.handleFocus}
-                              />)}
-                        </InputGroup></td>
-                <td><InputGroup size="sm"> {isFocused ?(
-                            <Form.Control
-                              type="date"
-                              placeholder=""
-                              id="endDate"
-                              onBlur={this.handleBlur}
-                              />):(<Form.Control
-                              type="text"
-                              placeholder={new Date(row.endDate).toLocaleDateString()}
-                              id="endDate"
-                              onFocus={this.handleFocus}
-                              />)}
-                        </InputGroup></td>
+                    <Form.Control
+                        type="number"
+                        placeholder={row.id.toString()}
+                        id="id"
+                    />
+                </InputGroup></td>
                 <td><InputGroup size="sm">
-                            <Form.Control
-                              type="text"
-                              placeholder={row.timeType.toString()}
-                              id="task"
-                              />
-                        </InputGroup></td>
+                    <Form.Control
+                        type="text"
+                        placeholder={row.name}
+                        id="name"
+                    />
+                </InputGroup></td>
+                <td><InputGroup size="sm"> {isFocused ?(
+                    <Form.Control
+                        type="date"
+                        placeholder=""
+                        id="startDate"
+                        onBlur={this.handleBlur}
+                    />):(<Form.Control
+                    type="text"
+                    placeholder={new Date(row.startDate).toLocaleDateString()}
+                    id="startDate"
+                    onFocus={this.handleFocus}
+                />)}
+                </InputGroup></td>
+                <td><InputGroup size="sm"> {isFocused ?(
+                    <Form.Control
+                        type="date"
+                        placeholder=""
+                        id="endDate"
+                        onBlur={this.handleBlur}
+                    />):(<Form.Control
+                    type="text"
+                    placeholder={new Date(row.endDate).toLocaleDateString()}
+                    id="endDate"
+                    onFocus={this.handleFocus}
+                />)}
+                </InputGroup></td>
+                <td><InputGroup size="sm">
+                    <Form.Control
+                        type="text"
+                        placeholder={row.timeType.toString()}
+                        id="task"
+                    />
+                </InputGroup></td>
             </tr>
         ))
     }

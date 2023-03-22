@@ -6,14 +6,14 @@ NEED TO ADD SO IT SHOWS BY GROUP AND NOT JUST EVERYONE.
 NUMBER FOR THE GROUP SHOULD CORRESPOND TO THE ID OF THE PROJECT AND PROJECT PAGE
  */
 interface Api{
-        status:number,
-        data:{
+    status:number,
+    data:{
         id?: number,
         name?: string,
         startDate?: number,
         endDate?: number,
         timeType?: number
-        }[]
+    }[]
 }
 
 export interface ProjectTableTaskRow{
@@ -60,11 +60,11 @@ class ProjectTaskTable extends Component<any> {
     private tableRender():JSX.Element[] {
         return this.state.tableRows.map(row => (
             <tr key={row.id}>
-              <td>{row.id ?? ''}</td>
-              <td>{row.name ?? ''}</td>
-              <td>{row.startDate ? new Date(row.startDate).toLocaleDateString() : ''}</td>
-              <td>{row.endDate ? new Date(row.endDate).toLocaleDateString() : ''}</td>
-              <td>{row.timeType ?? ''}</td>
+                <td>{row.id ?? ''}</td>
+                <td>{row.name ?? ''}</td>
+                <td>{row.startDate ? new Date(row.startDate).toLocaleDateString() : ''}</td>
+                <td>{row.endDate ? new Date(row.endDate).toLocaleDateString() : ''}</td>
+                <td>{row.timeType ?? ''}</td>
             </tr>
         ))
     }
