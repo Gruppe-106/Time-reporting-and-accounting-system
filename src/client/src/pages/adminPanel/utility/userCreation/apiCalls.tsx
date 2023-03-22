@@ -77,7 +77,7 @@ export default class APICalls {
      * Get all roles from the database
      * @returns Promise containing all possible roles
     */
-    public static getAllManagers(): Promise<{ id: number, name: string }[]> {
+    public static getAllManagers(): Promise<{ status: number, data: { id: number, name: string }[] }> {
         // const apiHandler:BaseApiHandler = new BaseApiHandler()
 
         return fetch(`/api/role/user/get?role=1`, {
