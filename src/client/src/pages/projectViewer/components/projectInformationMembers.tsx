@@ -7,11 +7,11 @@ NUMBER FOR THE GROUP SHOULD CORRESPOND TO THE ID OF THE PROJECT AND PROJECT PAGE
  */
 interface Api{
 
-        id?: number,
-        email?: string,
-        firstName?: string,
-        lastName?: string,
-        group?: number
+    id?: number,
+    email?: string,
+    firstName?: string,
+    lastName?: string,
+    group?: number
 
 }
 
@@ -22,10 +22,12 @@ export interface ProjectTableMemberRow{
     lastName?:string
     group?:number
 }
-
+/*
 const queryString = window.location.search;
 const params = new URLSearchParams(queryString);
 const id = parseInt(params.get("id") as string);
+TO BE USED IN THE FUTURE
+ */
 
 class ProjectMemberTable extends Component<any> {
     state = {
@@ -57,11 +59,11 @@ class ProjectMemberTable extends Component<any> {
     private tableRender():JSX.Element[] {
         return this.state.tableRows.map(row => (
             <tr key={row.id}>
-              <td>{row.id ?? ''}</td>
-              <td>{row.email ?? ''}</td>
-              <td>{row.firstName ?? ''}</td>
-              <td>{row.lastName ?? ''}</td>
-              <td>{row.group ?? ''}</td>
+                <td>{row.id ?? ''}</td>
+                <td>{row.email ?? ''}</td>
+                <td>{row.firstName ?? ''}</td>
+                <td>{row.lastName ?? ''}</td>
+                <td>{row.group ?? ''}</td>
             </tr>
         ))
     }

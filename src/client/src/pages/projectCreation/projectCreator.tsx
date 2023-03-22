@@ -35,7 +35,7 @@ class ProjectMenu extends Component<any, ProjectMenuState>{
     render() {
         return (
             <>
-               <BaseNavBar/>
+                <BaseNavBar/>
                 <Container>
                     <h1>Project Creator</h1>
                     <Button href="/project/menu" variant="outline-secondary">Back</Button>{''}
@@ -44,11 +44,11 @@ class ProjectMenu extends Component<any, ProjectMenuState>{
                 <Container>
                     <Row>
                         <Col sm={11}>
-                    <ProjectCreate id={id}/>
-                            </Col>
+                            <ProjectCreate id={id}/>
+                        </Col>
                         <Col>
-                    <Button variant="success" type="button" onClick={() => this.submitData()}>Create Project</Button>
-                            </Col>
+                            <Button variant="success" type="button" onClick={() => this.submitData()}>Create Project</Button>
+                        </Col>
                     </Row>
                 </Container>
 
