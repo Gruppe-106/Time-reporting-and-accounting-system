@@ -14,6 +14,9 @@ class TableHeader extends React.Component<EmptyProps> {
             <tr>
               <th>Task Name</th>
               <th>Project Member</th>
+              <th>Start Date</th>
+              <th>End Date</th>
+              <th>Time Type</th>
               <th>&#128465;</th> {/* Trashcan, HTML Entity: */}
             </tr>
           </thead>
@@ -52,8 +55,6 @@ class TaskCreateRow extends Component<TaskCreateRowProps, TaskCreateRowState> {
   };
 
     render() {
-        // Defining data as this.prop, it represents the data (prop) passed to TimeSheetRow
-        const { data } = this.props;
         return (
             <tr>
                        <td><InputGroup size="sm">
@@ -75,6 +76,27 @@ class TaskCreateRow extends Component<TaskCreateRowProps, TaskCreateRowState> {
                                 <option>Deez Nuts</option>
                                 <option>Din Mor</option>
                             </Form.Select>
+                        </InputGroup></td>
+                         <td><InputGroup size="sm">
+                            <Form.Control
+                              type="date"
+                              placeholder="Task 1"
+                              id="startDate"
+                              />
+                        </InputGroup></td>
+                        <td><InputGroup size="sm">
+                            <Form.Control
+                              type="date"
+                              placeholder="Task 1"
+                              id="endDate"
+                              />
+                        </InputGroup></td>
+                        <td><InputGroup size="sm">
+                            <Form.Control
+                              type="number"
+                              placeholder="1"
+                              id="timeType"
+                              />
                         </InputGroup></td>
                         <td>
                         <Button variant="danger" type="button" onClick={this.handleDeleteClick}>-</Button>

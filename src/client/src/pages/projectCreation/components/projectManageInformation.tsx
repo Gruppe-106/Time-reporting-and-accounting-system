@@ -5,8 +5,8 @@ import Row from 'react-bootstrap/Row';
 import Tab from 'react-bootstrap/Tab';
 import {Button, Form} from "react-bootstrap";
 import BaseApiHandler from "../../../network/baseApiHandler";
-import ProjectTaskTable from "../../projectViewer/components/projectInformationTasks";
 import {Highlighter, Typeahead} from "react-bootstrap-typeahead";
+import ProjectManageTask from "./projectManageTasks";
 
 interface Api{
         status:number,
@@ -145,7 +145,7 @@ class ProjectManageInformation extends Component<ProjectInformationProp> {
             </Tab.Pane>
               <Tab.Pane eventKey="second">
                 <h3>Task list</h3>
-                  <ProjectTaskTable/>
+                  <ProjectManageTask/>
             </Tab.Pane>
           </Tab.Content>
         </Col>
