@@ -44,6 +44,12 @@ class TaskTimeRegisterEndpoint extends  EndpointBase {
         //Query the data for all group that satisfies conditions
         let query: string = `SELECT ${select} FROM (SELECT * FROM users_tasks_time_register ${this.mySQL.createWhereString(this.createWhere(primaryKey, keyEqual))}) ttr ${join}`;
         let response:MySQLResponse = await this.mySQL.sendQuery(query);
+
+        // Convert date to a timestamp
+        for (const result of response.results) {
+            if (result.date) result.date = this.mySQL.dateToNumber(result.date);
+        }
+
         //Check if there was an error and throw if so
         if (response.error !== null) throw new Error("[MySQL] Failed to retrieve data");
 
