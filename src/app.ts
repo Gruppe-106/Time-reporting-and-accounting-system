@@ -14,4 +14,3 @@ const mySQLConnectionConfig = {
 
 // Startup Server
 export const server: Server = new Server(app, mySQLConnectionConfig, port);
-new AddFakeDataToDB().addUSERROLE();
