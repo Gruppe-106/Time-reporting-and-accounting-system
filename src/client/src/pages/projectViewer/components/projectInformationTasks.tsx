@@ -23,10 +23,13 @@ export interface ProjectTableTaskRow{
     endDate?:number
     timeType?:number
 }
-
+/*
 const queryString = window.location.search;
 const params = new URLSearchParams(queryString);
 const id = parseInt(params.get("id") as string);
+
+THIS IS TO BE USED IN THE FUTURE
+ */
 
 class ProjectTaskTable extends Component<any> {
     state = {
