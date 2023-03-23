@@ -58,7 +58,7 @@ Config files are located, these should load automatically:
 
 # Code style
 ## Function/Method case
-**P**ascal**Case** & methods should always have private or publice
+camel**Case** & methods should always have private or publice
 ## Class Case
 **F**irst letter uppercase
 ## Variable/params/Member case

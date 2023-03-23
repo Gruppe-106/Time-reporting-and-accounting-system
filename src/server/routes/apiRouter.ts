@@ -1,5 +1,5 @@
 import {Router} from "express-serve-static-core";
-import {Request, Response} from "express";
+import express, {Request, Response} from "express";
 import {BaseRouter} from "../baseRouter";
 import {UserEndpoint} from "../apiEndpoints/dataEndpoints/userEndpoint";
 import {TimeTypeEndpoint} from "../apiEndpoints/dataEndpoints/timeTypeEndpoint";
@@ -10,6 +10,7 @@ import {TaskProjectEndpoint} from "../apiEndpoints/dataEndpoints/taskProjectEndp
 import {TaskTimeRegisterEndpoint} from "../apiEndpoints/dataEndpoints/taskTimeRegisterEndpoint";
 import {ProjectEndpoint} from "../apiEndpoints/dataEndpoints/projectEndpoint";
 import {TaskEndpoint} from "../apiEndpoints/dataEndpoints/taskEndpoint";
+import UserCreationEndpoint from "../apiEndpoints/dataPostEndpoints/userCreationEndpoint";
 
 /* Implement this shit and ensure CORS
     res.setHeader("Access-Control-Allow-Origin" , "*");
@@ -24,7 +25,7 @@ export class ApiRouter extends BaseRouter {
     private getRoutes() {
         this.router.get("/", (req: Request, res: Response): void => {
             res.setHeader('Content-Type', 'application/json');
-            res.status(200).json(JSON.stringify({message: "Api gotten"}));
+            res.status(200).json({message: "Api GET gotten"});
         });
 
         this.router.get("/project/get",      (req: Request, res: Response) => new ProjectEndpoint(this.user).getRoute(req, res));
@@ -39,9 +40,13 @@ export class ApiRouter extends BaseRouter {
     }
 
     private postRoutes() {
+        this.router.use(express.json());
         this.router.post("/", (req: Request, res: Response): void => {
-            res.send("Api post");
+            res.setHeader('Content-Type', 'application/json');
+            res.status(200).json({message: "Api POST gotten"});
         })
+
+        this.router.post("/user/creation/post", (req: Request, res:Response) => new UserCreationEndpoint().postRoute(req, res))
     }
 
     public routes(): Router {

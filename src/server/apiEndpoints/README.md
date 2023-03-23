@@ -402,3 +402,4 @@ CREATE TABLE AUTH(
 1. Projects manager connector
 2. Get name of timetype in tasks
 3. Time as a number not string
+4. User Task connector
