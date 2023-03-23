@@ -15,14 +15,14 @@ IMPORT MEMBERS AND ROLES
 */
 
 interface Api{
-        status:number,
-        data: {
-            id?: number,
-            superProject?: number,
-            name?: string,
-            startDate?: string,
-            endDate?: string
-        }[]
+    status:number,
+    data: {
+        id?: number,
+        superProject?: number,
+        name?: string,
+        startDate?: string,
+        endDate?: string
+    }[]
 }
 
 interface ProjectInformationProp {
@@ -43,7 +43,7 @@ class ProjectInformation extends Component<ProjectInformationProp> {
         this.state.pageInformation.id = props.id;
     }
 
-     componentDidMount() {
+    componentDidMount() {
         //First make an instance of the api handler, give it the auth key of the user once implemented
         let apiHandler = new BaseApiHandler("test");
         //Run the get or post function depending on need only neccesarry argument is the path aka what comes after the hostname
@@ -60,64 +60,64 @@ class ProjectInformation extends Component<ProjectInformationProp> {
 
 
     private informationRender():JSX.Element {
-            return (
-                <Tab.Container id="left-tabs-example" defaultActiveKey="first">
+        return (
+            <Tab.Container id="left-tabs-example" defaultActiveKey="first">
 
-      <Row>
-        <Col sm={2}>
-          <Nav variant="pills" className="flex-column">
-            <Nav.Item>
-              <Nav.Link eventKey="first">Project Information</Nav.Link>
-            </Nav.Item>
-            <Nav.Item>
-              <Nav.Link eventKey="second">Members</Nav.Link>
-            </Nav.Item>
-              <Nav.Item>
-              <Nav.Link eventKey="third">Tasks</Nav.Link>
-            </Nav.Item>
-          </Nav>
-        </Col>
-        <Col sm={9}>
-          <Tab.Content>
-            <Tab.Pane eventKey="first">
-                {this.state.pageInformation.name !== "" ? (<h1>{this.state.pageInformation.name}</h1>) : ""}
-                <h3>Description</h3>
-                 <Table>
-                     <thead>
-                     <tr>
-                         <th>Start Date: {new Date(this.state.pageInformation.startDate).toLocaleDateString()}</th>
-                         <th>End Date: {new Date(this.state.pageInformation.endDate).toLocaleDateString()}</th>
-                     </tr>
-                     <tr>
-                         <th>Project Number: {this.state.pageInformation.id}</th>
-                         <th>Parent Project: {this.state.pageInformation.superProject}</th>
-                     </tr>
-                     <tr>
-                         <th>Project Manager: no one</th>
-                     </tr>
-                     </thead>
-                 </Table>
-            </Tab.Pane>
-            <Tab.Pane eventKey="second">
-                <h3>Members list</h3>
-                <ProjectMemberTable/>
-            </Tab.Pane>
-              <Tab.Pane eventKey="third">
-                <h3>Task list</h3>
-                  <ProjectTaskTable/>
-            </Tab.Pane>
-          </Tab.Content>
-        </Col>
-      </Row>
-                </Tab.Container>
-            )
+                <Row>
+                    <Col sm={2}>
+                        <Nav variant="pills" className="flex-column">
+                            <Nav.Item>
+                                <Nav.Link eventKey="first">Project Information</Nav.Link>
+                            </Nav.Item>
+                            <Nav.Item>
+                                <Nav.Link eventKey="second">Members</Nav.Link>
+                            </Nav.Item>
+                            <Nav.Item>
+                                <Nav.Link eventKey="third">Tasks</Nav.Link>
+                            </Nav.Item>
+                        </Nav>
+                    </Col>
+                    <Col sm={9}>
+                        <Tab.Content>
+                            <Tab.Pane eventKey="first">
+                                {this.state.pageInformation.name !== "" ? (<h1>{this.state.pageInformation.name}</h1>) : ""}
+                                <h3>Description</h3>
+                                <Table>
+                                    <thead>
+                                    <tr>
+                                        <th>Start Date: {new Date(this.state.pageInformation.startDate).toLocaleDateString()}</th>
+                                        <th>End Date: {new Date(this.state.pageInformation.endDate).toLocaleDateString()}</th>
+                                    </tr>
+                                    <tr>
+                                        <th>Project Number: {this.state.pageInformation.id}</th>
+                                        <th>Parent Project: {this.state.pageInformation.superProject}</th>
+                                    </tr>
+                                    <tr>
+                                        <th>Project Manager: no one</th>
+                                    </tr>
+                                    </thead>
+                                </Table>
+                            </Tab.Pane>
+                            <Tab.Pane eventKey="second">
+                                <h3>Members list</h3>
+                                <ProjectMemberTable/>
+                            </Tab.Pane>
+                            <Tab.Pane eventKey="third">
+                                <h3>Task list</h3>
+                                <ProjectTaskTable/>
+                            </Tab.Pane>
+                        </Tab.Content>
+                    </Col>
+                </Row>
+            </Tab.Container>
+        )
     }
 
     render() {
         return(
-                <div>
-                    {this.informationRender()}
-                </div>
+            <div>
+                {this.informationRender()}
+            </div>
         )
     }
 }
