@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import {Container, Table, Form, InputGroup, Button, Modal} from "react-bootstrap";
+import { Highlighter, Typeahead } from 'react-bootstrap-typeahead';
 import BaseApiHandler from "../../../network/baseApiHandler";
 
 /*
@@ -14,11 +15,52 @@ import BaseApiHandler from "../../../network/baseApiHandler";
 
 */
 
+
+/*
+
+       * Utility
+
+*/
+class Utility {
+  public static getCurrentWeekDates(dates:string[]){
+    // Get the current date
+  const today = new Date();
+
+  // Get the start date of the current week (Monday)
+  const monday = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay() + 1);
+  
+  dates.push(Utility.makeDateFromNum(1679356800000));
+
+  // Create an array of date strings for each day of the week
+  for (let i = 1; i < 7; i++) {
+    const currentDate = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + i);
+    dates.push(currentDate.toLocaleDateString());
+  }
+  return dates;
+  }
+
+  public static makeDateFromNum(date:number){
+    const newDate = new Date(date);
+
+    const secNewDate = new Date(newDate.getFullYear(), newDate.getMonth(), newDate.getDay());
+    
+    return secNewDate.toLocaleDateString();
+  }
+
+  public static makeDateFromString(date:string){
+    const newDate = new Date(Number(date));
+
+    const secNewDate = new Date(newDate.getFullYear(), newDate.getMonth(), newDate.getDay());
+    
+    return secNewDate.toLocaleDateString();
+  }
+}
+
 // Empty prop to indicate that the component will not recive a prop.
 interface EmptyProps {}
 
 interface TableHeaderState {
-  dates: string[];
+  headerDates: string[];
 }
 
 /*
@@ -30,22 +72,11 @@ class TableHeader extends React.Component<EmptyProps, TableHeaderState> {
   constructor(props: EmptyProps) {
     super(props);
 
-    // Get the current date
-    const today = new Date();
-
-    // Get the start date of the current week (Monday)
-    const monday = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay() + 1);
-
-    // Create an array of date strings for each day of the week
-    const dates = [];
-    for (let i = 0; i < 7; i++) {
-      const currentDate = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + i);
-      dates.push(currentDate.toLocaleDateString());
-    }
+    const dates: string[] = [];
 
     // Set the initial state
     this.state = {
-      dates: dates,
+      headerDates: Utility.getCurrentWeekDates(dates),
     };
   }
 
@@ -56,7 +87,7 @@ class TableHeader extends React.Component<EmptyProps, TableHeaderState> {
               <th>Project Name</th>
               <th>Task Name</th>
               {/* Gets the dates, and maps each date with an index to a table header, creating 7 <th>, all dates in a week */}
-              {this.state.dates.map((date, index) => (
+              {this.state.headerDates.map((date, index) => (
                 <th key={index}>{date}</th>
               ))}
               <th>Total Time</th>
@@ -233,6 +264,7 @@ interface TimeSheetProp {
 // Variable states in TimeSheetPage
 interface TimeSheetState {
   data: TimeSheetRowData[];
+  selectedProject: TimeSheetRowData | null;
   showAddRowModal: boolean;
 }
 
@@ -248,6 +280,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     // Initialise states
     this.state = {
       data: [],
+      selectedProject: null,
       showAddRowModal: false,
     };
 
@@ -293,7 +326,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     const { userId } = this.props;
     let apiHandler = new BaseApiHandler("fuldstændigligemeget");
     apiHandler.get(
-      `api/time/register/get?user=${userId}&var=taskName,projectName,time,date`,{},
+      `api/time/register/get?user=${userId}&var=taskName,taskId,projectName,time,date`,{},
       (value) => {
         let json: TimeSheetRowData[] = JSON.parse(JSON.stringify(value));
         this.setState({data: json});
@@ -305,16 +338,28 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
    * First, the current state's data array is destructured from this.state. This array is then copied using the spread operator (...) and a new object representing the new row is added to the end of the array. The new row object contains default values for projectName and taskName.
    */
   private handleAddRow() {
-    const { data } = this.state;
-
+    const { data, selectedProject } = this.state;
+  
+    if (!selectedProject) {
+      // No project is selected, do not add a new row
+      return;
+    }
+  
+    const newProjectName = selectedProject.projectName;
+    const newTaskName = selectedProject.taskName;
+  
     this.setState({
       data: [
         ...data,
-        { projectName: "New project", taskName: "New task", time: 0, date:1679443200},
+        { projectName: newProjectName, taskName: newTaskName, time: 0, date: 1679356800000 },
       ],
+      selectedProject: null, // clear the selectedProject state after adding a new row
     });
+  
     this.handleCloseAddModal();
   }
+  
+
   /**
    * It is used to generate an array of TimeSheetRow components based on the data array in the component's state.
    * @returns class component. <TimeSheetRow>
@@ -322,11 +367,17 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
   private renderRows() {
     const { data } = this.state;
 
+    const dates:string[] = [];
+    Utility.getCurrentWeekDates(dates);
+    
     return data.map((item, index) => {
-      if (item.time !== 1) {
+      if (Utility.makeDateFromNum(item.date) === dates[0]) {
         return <TimeSheetRow key={index} data={item} onDelete={() => this.handleDeleteRow(index)} />;
       } else {
-        return null; // if sheettime is 0, don't render the row
+        console.log(dates[0]);
+        console.log((item.date).toString());
+        console.log("Dates dosent match")
+        return null; // if the date dosent match, don't render the row
       }
     });
   }
@@ -348,9 +399,32 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
         </Modal.Header>
         <Modal.Body>
          <p>Which task do you want to add?</p>
-         <Form.Select>
-            <option></option>
-         </Form.Select>
+         <Form.Group className="mb-3" controlId="formBasicAssignManager">
+        <Form.Label>Find project</Form.Label>
+          <Typeahead
+            id="findProject"
+            labelKey={(option: any) => `${option.projectName}  ${option.taskName}`}
+            options={this.state.data}
+            placeholder="Pick a project"
+            filterBy={(option: any, props: any): boolean => {
+              const query: string = props.text.toLowerCase().trim();
+              const name: string = option.projectName.toLowerCase() + option.taskName.toLowerCase();
+              return name.includes(query);
+            }}
+              renderMenuItemChildren={(option: any, props: any) => (
+              <>
+                <Highlighter search={props.text}>
+                  {option.projectName + ", " + option.taskName}
+                </Highlighter>
+              </>
+            )}
+            onChange={(selected: any) => {
+              // Set selectedProject state to the first selected option (if any)
+              this.setState({ selectedProject: selected[0] || null });
+            }}
+            selected={this.state.selectedProject ? [this.state.selectedProject] : []}
+          />
+        </Form.Group>
          </Modal.Body>
          <Modal.Footer>
           <Button variant="secondary" onClick={this.handleCloseAddModal}>Cancel</Button>
