@@ -1,12 +1,10 @@
 import React, { Component } from 'react';
 import {Container, Table, Form, InputGroup, Button} from "react-bootstrap";
+import BaseApiHandler from "../../../network/baseApiHandler";
 // Empty prop to indicate that the component will not receive a prop.
 interface EmptyProps {}
 
-class TableHeader extends React.Component<EmptyProps> {
-    constructor(props: EmptyProps) {
-        super(props);
-    }
+class TableHeader extends React.Component<any> {
 
     render() {
         return (
@@ -29,6 +27,16 @@ interface TaskCreateData {
     member:string
 }
 
+interface Api{
+
+    id?: number,
+    email?: string,
+    firstName?: string,
+    lastName?: string,
+    group?: number
+
+}
+
 interface TaskCreateState {
     data: TaskCreateData[];
 }
@@ -44,7 +52,7 @@ interface TaskCreateRowState {
 }
 
 // Creating a tablerow for the table body, takes in 2 props, data and onDelete
-class TaskCreateRow extends Component<TaskCreateRowProps, TaskCreateRowState> {
+class TaskCreateRow extends Component<TaskCreateRowProps> {
     /**
      * @description When this method is called, it extracts the onDelete prop from this.props and invokes it.
      */
@@ -53,6 +61,31 @@ class TaskCreateRow extends Component<TaskCreateRowProps, TaskCreateRowState> {
         //  onDelete function passed in as a prop, deletes corresponding time sheet row
         onDelete();
     };
+
+     state = {
+        tableRows: [ {
+            id: -1,
+            email: "",
+            firstName: "",
+            lastName: "",
+            group: -1
+        } ]
+    }
+
+    componentDidMount() {
+        //First make an instance of the api handler, give it the auth key of the user once implemented
+        let apiHandler = new BaseApiHandler("test");
+        //Run the get or post function depending on need only neccesarry argument is the path aka what comes after the hostname
+        //Callbacks can be used to tell what to do with the data once it's been retrieved
+        apiHandler.get(`/api/user/get?ids=*`,{}, (value) => {
+            console.log(value)
+            //Then convert the string to the expected object(eg. )
+            let json:Api[] = JSON.parse(JSON.stringify(value))
+            //Then update states or variables or whatever you want with the information
+            this.setState({tableRows: json})
+            console.log(json)
+        })
+    }
 
     render() {
         return (
@@ -71,10 +104,10 @@ class TaskCreateRow extends Component<TaskCreateRowProps, TaskCreateRowState> {
                             placeholder="John Doe"
                             id="member"
                         />
-                        <option>John Doe</option>
-                        <option>Sam Smith</option>
-                        <option>Deez Nuts</option>
-                        <option>Din Mor</option>
+                        {this.state.tableRows.map(row => (
+                        <option>{row.firstName} {row.lastName}</option>
+                        ))}
+
                     </Form.Select>
                 </InputGroup></td>
                 <td><InputGroup size="sm">
