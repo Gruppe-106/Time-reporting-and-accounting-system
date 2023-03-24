@@ -1,8 +1,8 @@
 # Todo
 ## Post
 1. UserCreation _/
-2. UserEdit 
-3. ProjectCreation 
+2. UserEdit _/
+3. ProjectCreation _/
 4. ProjectEdit 
 5. TaskCreation 
 6. TaskEdit 

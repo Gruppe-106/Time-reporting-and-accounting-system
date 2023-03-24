@@ -12,6 +12,7 @@ import ManagerGroupEndpoint from "../apiEndpoints/dataGetEndpoints/managerGroupE
 import UserRoleEndpoint from "../apiEndpoints/dataGetEndpoints/userRoleEndpoint";
 import TaskTimeRegisterEndpoint from "../apiEndpoints/dataGetEndpoints/taskTimeRegisterEndpoint";
 import UserEditEndpoint from "../apiEndpoints/dataPostEndpoints/userEditEndpoint";
+import ProjectCreationEndpoint from "../apiEndpoints/dataPostEndpoints/projectCreationEndpoint";
 
 /* Implement this shit and ensure CORS
     res.setHeader("Access-Control-Allow-Origin" , "*");
@@ -47,8 +48,9 @@ export class ApiRouter extends BaseRouter {
             res.status(200).json({message: "Api POST gotten"});
         })
 
-        this.router.post("/user/creation/post", (req: Request, res:Response) => new UserCreationEndpoint(this.user).postRoute(req, res))
-        this.router.post("/user/edit/post",     (req: Request, res:Response) => new UserEditEndpoint(this.user).postRoute(req, res))
+        this.router.post("/user/creation/post",   (req: Request, res:Response) => new UserCreationEndpoint(this.user).postRoute(req, res))
+        this.router.post("/user/edit/post",       (req: Request, res:Response) => new UserEditEndpoint(this.user).postRoute(req, res))
+        this.router.post("/project/creation/post",(req: Request, res:Response) => new ProjectCreationEndpoint(this.user).postRoute(req, res))
     }
 
     public routes(): Router {
