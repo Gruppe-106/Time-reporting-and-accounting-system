@@ -1,34 +1,10 @@
 import {ParsedQs} from "qs";
 import {Request, Response} from "express";
-import {Server} from "../server";
 import {Where} from "../database/mysqlHandler";
+import EndpointBase from "./endpointBase";
 
-export interface User {
-    authKey: string;
-    id?: number;
-    role?: Roles;
-}
-
-enum Roles {
-    NORMAL,
-    MANAGER,
-    PROJECT_MANAGER,
-    ADMIN
-}
-
-abstract class GetEndpointBase {
-    protected readonly user: User;
-    protected readonly mySQL = Server.mysql;
+abstract class GetEndpointBase extends EndpointBase{
     abstract allowedColumns: string[];
-
-    constructor(user: User) {
-        this.user = user;
-    }
-
-    //Needs to actually be implemented
-    private ensureAuth():boolean {
-        return this.user.authKey === "test";
-    }
 
     /**
      * Gets data from DB and convert to client format
@@ -40,9 +16,9 @@ abstract class GetEndpointBase {
      */
     abstract getData(requestValues: string[], primaryKey: string, keyEqual?: string[], data?:string[]):Promise<object[]>;
 
-    public async processRequest(requestValues: string[], primaryKey:string, keyEqual?:string[], data?:string[]):Promise<{status:number, data: object[]}> {
+    public async processRequest(req: Request, requestValues: string[], primaryKey:string, keyEqual?:string[], data?:string[]):Promise<{status:number, data: object[]}> {
         try {
-            if (this.ensureAuth()) {
+            if (await this.ensureAuth(req)) {
                 return {status: 200, data: await this.getData(requestValues, primaryKey, keyEqual)};
             }
             return {status: 401, data: [{error: "Not authorized"}]};
@@ -78,18 +54,13 @@ abstract class GetEndpointBase {
         return paramsList;
     }
 
-    protected badRequest(res: Response) {
-        res.sendStatus(400);
-        res.end();
-    }
-
     public getRoute(req:Request, res:Response, primaryKey:string = "id", requestKeysName:string = "ids") {
         let requestKeys: string[] = this.urlParamsConversion(req.query[requestKeysName], false, true, res);
         if (requestKeys === undefined) { return this.badRequest(res); }
 
         let requestedValues:string[] = this.urlParamsConversion(req.query.var);
 
-        this.processRequest(requestedValues, primaryKey, requestKeys).then((data) => {
+        this.processRequest(req, requestedValues, primaryKey, requestKeys).then((data) => {
             res.setHeader('Content-Type', 'application/json');
             res.status(data.status).json(data);
         })

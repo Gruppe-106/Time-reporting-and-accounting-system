@@ -14,6 +14,7 @@ interface UserEditData {
 }
 
 class UserEditEndpoint extends PostEndpointBase {
+    requiredRole: number = 4;
     async submitData(req: Request, res: Response): Promise<string[]> {
         let message: string[] = [];
         //Get data from the user creation form

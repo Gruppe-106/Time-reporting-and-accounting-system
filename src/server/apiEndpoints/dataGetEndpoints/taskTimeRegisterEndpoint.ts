@@ -5,6 +5,8 @@ import {MySQLResponse} from "../../database/mysqlHandler";
  * Endpoint for .../api/time/register/get
  */
 class TaskTimeRegisterEndpoint extends  GetEndpointBase {
+    requiredRole: number = 1;
+
     allowedColumns: string[] = [
         "taskId",
         "taskName",

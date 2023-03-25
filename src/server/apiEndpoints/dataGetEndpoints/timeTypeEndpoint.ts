@@ -5,6 +5,8 @@ import {MySQLResponse} from "../../database/mysqlHandler";
  * Endpoint for .../api/role/get
  */
 class TimeTypeEndpoint extends  GetEndpointBase {
+    requiredRole: number = 1;
+
     allowedColumns: string[] = [
         "id",
         "name",

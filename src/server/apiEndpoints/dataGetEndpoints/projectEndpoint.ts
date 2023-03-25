@@ -5,6 +5,8 @@ import {MySQLResponse} from "../../database/mysqlHandler";
  * Endpoint for .../api/project/get
  */
 class ProjectEndpoint extends  GetEndpointBase {
+    requiredRole: number = 1;
+
     allowedColumns: string[] = [
         "id",
         "superProjectId",

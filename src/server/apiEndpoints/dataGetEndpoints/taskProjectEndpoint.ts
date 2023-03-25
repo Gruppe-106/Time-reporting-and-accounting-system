@@ -6,6 +6,8 @@ import {Request, Response} from "express";
  * Endpoint for .../api/task/project/get
  */
 class TaskProjectEndpoint extends  GetEndpointBase {
+    requiredRole: number = 1;
+
     allowedColumns: string[] = [
         "taskId",
         "taskName",
@@ -62,7 +64,7 @@ class TaskProjectEndpoint extends  GetEndpointBase {
         //Get vars if any otherwise it will get all
         let requestedValues:string[] = this.urlParamsConversion(req.query.var);
 
-        this.processRequest(requestedValues, primaryKey, requestKeys).then((data) => {
+        this.processRequest(req, requestedValues, primaryKey, requestKeys).then((data) => {
             res.setHeader('Content-Type', 'application/json');
             res.status(data.status).json(data);
         })

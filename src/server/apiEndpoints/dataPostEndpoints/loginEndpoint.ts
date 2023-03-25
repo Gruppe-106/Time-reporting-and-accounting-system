@@ -9,6 +9,12 @@ interface LoginData {
 }
 
 class LoginEndpoint extends PostEndpointBase{
+    requiredRole: number;
+    
+    async processRequest(req: Request, res: Response): Promise<{ status: number; data: object }> {
+        return {status: 200, data: await this.submitData(req, res)};
+    }
+
     async submitData(req: Request, res: Response): Promise<string[]> {
         let data: LoginData = req.body;
 

@@ -27,6 +27,8 @@ export interface UserReturnType {
  * Endpoint for .../api/group/manager/get
  */
 class ManagerGroupEndpoint extends GetEndpointBase {
+    requiredRole: number = 1;
+
     //Not used, but required by base class
     allowedColumns: string[];
 
@@ -117,7 +119,7 @@ class ManagerGroupEndpoint extends GetEndpointBase {
         //Get vars if any otherwise it will get all
         let requestedValues:string[] = this.urlParamsConversion(req.query.var);
 
-        this.processRequest(requestedValues, primaryKey, requestKeys).then((data) => {
+        this.processRequest(req, requestedValues, primaryKey, requestKeys).then((data) => {
             res.setHeader('Content-Type', 'application/json');
             res.status(data.status).json(data);
         })

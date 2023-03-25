@@ -34,15 +34,15 @@ export class ApiRouter extends BaseRouter {
 
         this.router.get("/auth",             (req: Request, res: Response) => new AuthEndpoint().getRoute(req, res));
 
-        this.router.get("/project/get",      (req: Request, res: Response) => new ProjectEndpoint(this.user).getRoute(req, res));
-        this.router.get("/user/get",         (req: Request, res: Response) => new UserEndpoint(this.user).getRoute(req, res));
-        this.router.get("/task/get",         (req: Request, res: Response) => new TaskEndpoint(this.user).getRoute(req, res));
-        this.router.get("/task/project/get", (req: Request, res: Response) => new TaskProjectEndpoint(this.user).getRoute(req, res));
-        this.router.get("/timetype/get",     (req: Request, res: Response) => new TimeTypeEndpoint(this.user).getRoute(req, res));
-        this.router.get("/role/get",         (req: Request, res: Response) => new RoleEndpoint(this.user).getRoute(req, res));
-        this.router.get("/role/user/get",    (req: Request, res: Response) => new UserRoleEndpoint(this.user).getRoute(req, res));
-        this.router.get("/group/manager/get",(req: Request, res: Response) => new ManagerGroupEndpoint(this.user).getRoute(req, res));
-        this.router.get("/time/register/get",(req: Request, res: Response) => new TaskTimeRegisterEndpoint(this.user).getRoute(req, res, "userId", "user"));
+        this.router.get("/project/get",      (req: Request, res: Response) => new ProjectEndpoint().getRoute(req, res));
+        this.router.get("/user/get",         (req: Request, res: Response) => new UserEndpoint().getRoute(req, res));
+        this.router.get("/task/get",         (req: Request, res: Response) => new TaskEndpoint().getRoute(req, res));
+        this.router.get("/task/project/get", (req: Request, res: Response) => new TaskProjectEndpoint().getRoute(req, res));
+        this.router.get("/timetype/get",     (req: Request, res: Response) => new TimeTypeEndpoint().getRoute(req, res));
+        this.router.get("/role/get",         (req: Request, res: Response) => new RoleEndpoint().getRoute(req, res));
+        this.router.get("/role/user/get",    (req: Request, res: Response) => new UserRoleEndpoint().getRoute(req, res));
+        this.router.get("/group/manager/get",(req: Request, res: Response) => new ManagerGroupEndpoint().getRoute(req, res));
+        this.router.get("/time/register/get",(req: Request, res: Response) => new TaskTimeRegisterEndpoint().getRoute(req, res, "userId", "user"));
     }
 
     private postRoutes() {
@@ -52,11 +52,11 @@ export class ApiRouter extends BaseRouter {
             res.status(200).json({message: "Api POST gotten"});
         })
 
-        this.router.post("/login",                (req: Request, res:Response) => new LoginEndpoint(this.user).postRoute(req, res));
+        this.router.post("/login",                (req: Request, res:Response) => new LoginEndpoint().postRoute(req, res));
 
-        this.router.post("/user/creation/post",   (req: Request, res:Response) => new UserCreationEndpoint(this.user).postRoute(req, res));
-        this.router.post("/user/edit/post",       (req: Request, res:Response) => new UserEditEndpoint(this.user).postRoute(req, res));
-        this.router.post("/project/creation/post",(req: Request, res:Response) => new ProjectCreationEndpoint(this.user).postRoute(req, res));
+        this.router.post("/user/creation/post",   (req: Request, res:Response) => new UserCreationEndpoint().postRoute(req, res));
+        this.router.post("/user/edit/post",       (req: Request, res:Response) => new UserEditEndpoint().postRoute(req, res));
+        this.router.post("/project/creation/post",(req: Request, res:Response) => new ProjectCreationEndpoint().postRoute(req, res));
     }
 
     public routes(): Router {

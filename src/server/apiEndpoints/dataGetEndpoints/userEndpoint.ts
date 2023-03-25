@@ -6,6 +6,8 @@ import {Request, Response} from "express";
  * Endpoint for .../api/role/get
  */
 class UserEndpoint extends  GetEndpointBase {
+    requiredRole: number = 1;
+
     allowedColumns: string[] = [
         "id",
         "email",
@@ -33,7 +35,7 @@ class UserEndpoint extends  GetEndpointBase {
 
         let requestedValues:string[] = this.urlParamsConversion(req.query.var);
 
-        this.processRequest(requestedValues, primaryKey, requestKeys).then((data) => {
+        this.processRequest(req, requestedValues, primaryKey, requestKeys).then((data) => {
             res.setHeader('Content-Type', 'application/json');
             res.status(data.status).json(data.data);
         })

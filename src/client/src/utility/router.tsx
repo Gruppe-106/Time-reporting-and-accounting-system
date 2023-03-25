@@ -1,4 +1,4 @@
-import {BrowserRouter, Route, Routes} from "react-router-dom";
+import {BrowserRouter, Navigate, Route, Routes} from "react-router-dom";
 import React, {Component} from "react";
 import Cookies from "js-cookie";
 
@@ -23,9 +23,21 @@ interface AuthApi {
     status: number,
     data: {
         success: boolean,
-        userId?: number
+        userId?: number,
+        userRoles?: {
+            roleId: number
+        }[]
     }
 }
+
+const userInfo = {
+    userId: -1,
+    isAdmin: false,
+    isProjectLeader: false,
+    isManager: false
+}
+
+export {userInfo};
 
 class Router extends Component<any> {
     state = {
@@ -41,7 +53,16 @@ class Router extends Component<any> {
             let apiHandler:BaseApiHandler = new BaseApiHandler("test");
             apiHandler.get("/api/auth", {}, (value) => {
                 let response: AuthApi = JSON.parse(JSON.stringify(value));
-                if (response.data.success && response.data.userId) {
+                if (response.data.success && response.data.userId && response.data.userRoles) {
+                    userInfo.userId   = response.data.userId;
+
+                    for (const userRole of response.data.userRoles) {
+                        if (userRole.roleId === 4)                          userInfo.isAdmin         = true;
+                        if (userRole.roleId === 3 || userRole.roleId === 4) userInfo.isProjectLeader = true;
+                        if (userRole.roleId === 2 || userRole.roleId === 4) userInfo.isManager       = true;
+                        if (userInfo.isAdmin) break;
+                    }
+
                     this.setState({ authenticated: true });
                 } else {
                     Cookies.remove("auth");
@@ -59,16 +80,17 @@ class Router extends Component<any> {
                         <BrowserRouter>
                             <Routes>
                                 <Route path={"/"} Component={FrontPage}/>
-                                <Route path={"/admin"} Component={AdminPanel} />
-                                <Route path={"/admin/create-user"} Component={UserCreation}/>
-                                <Route path={"/data-export"} Component={DataExport}/>
-                                <Route path={"/project/create"} Component={ProjectCreator}/>
-                                <Route path={"/project/manage"} Component={ProjectManager}/>
+                                { userInfo.isAdmin ? <Route path={"/admin"} Component={AdminPanel}/> : ""}
+                                { userInfo.isAdmin ? <Route path={"/admin/create-user"} Component={UserCreation}/> : ""}
+                                { userInfo.isProjectLeader ?  <Route path={"/data-export"} Component={DataExport}/> : ""}
+                                { userInfo.isProjectLeader ?  <Route path={"/project/create"} Component={ProjectCreator}/> : ""}
+                                { userInfo.isProjectLeader ? <Route path={"/project/manage"} Component={ProjectManager}/> : ""}
                                 <Route path={"/project/menu"} Component={ProjectMenu}/>
                                 <Route path={"/project/viewer"} Component={ProjectViewer}/>
-                                <Route path={"/group/manager"} Component={GroupManager}/>
-                                <Route path={"/group/time-approval"} Component={UserTimeApproval}/>
+                                { userInfo.isManager ?  <Route path={"/group/manager"} Component={GroupManager}/> : ""}
+                                { userInfo.isManager ?  <Route path={"/group/time-approval"} Component={UserTimeApproval}/> : ""}
                                 <Route path={"/user-register"} Component={UserTimeRegister}/>
+                                <Route path="*" element={<Navigate to="/" replace />} />
                             </Routes>
                         </BrowserRouter>
                     ) : (

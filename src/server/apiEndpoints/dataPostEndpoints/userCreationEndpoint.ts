@@ -13,6 +13,8 @@ interface UserCreationData {
 }
 
 class UserCreationEndpoint extends PostEndpointBase {
+    requiredRole: number = 4;
+
     allowedColumns: string[];
 
     async submitData(req: Request, res: Response): Promise<string[]> {

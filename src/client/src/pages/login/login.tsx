@@ -12,15 +12,13 @@ import Cookies from "js-cookie";
 
 interface AuthApi {
     status: number,
-    data: {
-        message: string[],
-        status: boolean
-    }
+    data: string[]
 }
 
 class Login extends Component<any>{
     state = {
         submitting: false,
+        failed: false,
         email: "",
         password: ""
     }
@@ -30,8 +28,10 @@ class Login extends Component<any>{
         apiHandler.post("/api/login", {body: {email: this.state.email, password: forge.md.sha256.create().update(this.state.password).digest().toHex()}}, (value) => {
             let response: AuthApi = JSON.parse(JSON.stringify(value));
             if (response.status === 200) {
-                Cookies.set("auth", response.data.message[1], {expires: Number(response.data.message[2])});
+                Cookies.set("auth", response.data[1], {expires: Number(response.data[2])});
                 window.location.reload();
+            } else {
+                this.setState({failed: true, submitting: false})
             }
         })
     }
@@ -39,7 +39,7 @@ class Login extends Component<any>{
     private LoginFormRender(): JSX.Element {
         const handleSubmit = (event: FormEvent) => {
             event.preventDefault();
-            this.setState({submitting: true});
+            this.setState({submitting: true, failed: false});
             this.login();
         }
         return (
@@ -49,12 +49,19 @@ class Login extends Component<any>{
                         <h1 style={{textAlign: "center"}}>Login</h1>
                     </Col>
                 </Row>
+                {this.state.failed ? (
+                    <Row className="justify-content-md-center">
+                        <Col md="auto">
+                            <h5 className={"text-danger"} style={{textAlign: "center"}}>Email or password incorrect</h5>
+                        </Col>
+                    </Row>
+                ) : ""}
                 <Container>
                     <Row className="justify-content-md-center py-3">
                         <Col style={{maxWidth: "500px"}}>
                             <Form.Group className="mb-3" controlId="formBasicEmail">
                                 <FloatingLabel controlId="floatingInputEmail" label="Email address" className="mb-3">
-                                    <Form.Control type="email" placeholder="name@example.com" required onChange={(e) => { this.setState({email: e.target.value})} }/>
+                                    <Form.Control type="email" placeholder="name@example.com" required onChange={(e) => { this.setState({email: e.target.value})} } isInvalid={this.state.failed}/>
                                 </FloatingLabel>
                             </Form.Group>
                         </Col>
@@ -63,7 +70,7 @@ class Login extends Component<any>{
                         <Col style={{maxWidth: "500px"}}>
                             <Form.Group className="mb-3" controlId="formBasicPassword">
                                 <FloatingLabel controlId="floatingInputPassword" label="Password" className="mb-3">
-                                    <Form.Control type="password" placeholder="Password" required onChange={(e) => { this.setState({password: e.target.value})} }/>
+                                    <Form.Control type="password" placeholder="Password" required onChange={(e) => { this.setState({password: e.target.value})} } isInvalid={this.state.failed}/>
                                 </FloatingLabel>
                             </Form.Group>
                         </Col>

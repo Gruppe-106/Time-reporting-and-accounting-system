@@ -5,6 +5,8 @@ import {MySQLResponse} from "../../database/mysqlHandler";
  * Endpoint for .../api/task/get
  */
 class TaskEndpoint extends  GetEndpointBase {
+    requiredRole: number = 1;
+
     allowedColumns: string[] = [
         "id",
         "name",

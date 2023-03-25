@@ -18,6 +18,8 @@ interface ProjectCreationData {
 }
 
 class ProjectCreationEndpoint extends PostEndpointBase {
+    requiredRole: number = 3;
+
     async submitData(req: Request, res: Response): Promise<string[]> {
         //Get data from the user creation form
         let project: ProjectCreationData = req.body;
