@@ -11,5 +11,5 @@
 9. GroupEdit
 
 ## Other
-1. Add auth system and cookies
+1. Add auth system and cookies _/
 2. Get name of timetype in tasks
