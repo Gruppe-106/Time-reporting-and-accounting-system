@@ -1,5 +1,7 @@
-import {Button, Container, Nav, Navbar, NavDropdown, Offcanvas} from "react-bootstrap";
+import {Button, Container, Nav, Navbar, NavDropdown, Offcanvas, Modal, Row} from "react-bootstrap";
 import React, {Component} from "react";
+import Col from "react-bootstrap/Col";
+import Cookies from "js-cookie";
 
 interface DropDownItem {
     href: string;
@@ -8,6 +10,10 @@ interface DropDownItem {
 
 class BaseNavBar extends Component<any>{
     currentPage: string;
+
+    state = {
+        logOutConfirmationShow: false
+    }
 
     constructor(props:any) {
         super(props);
@@ -51,6 +57,11 @@ class BaseNavBar extends Component<any>{
         )
     }
 
+    private logOut() {
+        Cookies.remove("auth");
+        window.location.reload();
+    }
+
     render() {
         return (
             <Navbar expand="lg" bg={"dark"} variant="dark" sticky="top">
@@ -82,11 +93,36 @@ class BaseNavBar extends Component<any>{
                                 { this.linkRender("/admin/create-user", "Create User") }
                             </Nav>
                             <Nav>
-                                <Button variant={"primary"} href={"/login"}>Login</Button>
+                                <Button variant={"danger"} onClick={() => {this.setState({logOutConfirmationShow: true})}}>Log Out</Button>
                             </Nav>
                         </Offcanvas.Body>
                     </Navbar.Offcanvas>
                 </Container>
+                <Modal
+                    show={this.state.logOutConfirmationShow}
+                    size="sm"
+                    onHide={() => {this.setState({logOutConfirmationShow: false})}}
+                    backdrop="static"
+                    keyboard={true}
+                >
+                    <Modal.Header closeButton>
+                        <Modal.Title>Are you sure?</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <Container>
+                            <Row>
+                                <Col md="auto">
+                                    <Button size="lg" variant="secondary" onClick={() => {this.setState({logOutConfirmationShow: false})}}>
+                                        No
+                                    </Button>
+                                </Col>
+                                <Col md="auto">
+                                    <Button size="lg" variant="primary" onClick={this.logOut}>Yes</Button>
+                                </Col>
+                            </Row>
+                        </Container>
+                    </Modal.Body>
+                </Modal>
             </Navbar>
         );
     }

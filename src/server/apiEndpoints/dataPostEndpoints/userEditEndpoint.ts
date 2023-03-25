@@ -52,7 +52,7 @@ class UserEditEndpoint extends PostEndpointBase {
             if (userResponse.error !== null) message.push("User couldn't be updated");
         }
 
-        // Add edited columns in the auth table
+        // Add edited columns in the utility table
         if (user.password) authUpdateSet.push({column: "password", value: user.password});
         if (authUpdateSet.length !== 0) {
             // Send update request to DB

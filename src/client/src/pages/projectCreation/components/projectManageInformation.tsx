@@ -40,7 +40,7 @@ class ProjectManageInformation extends Component<ProjectInformationProp> {
     }
 
      componentDidMount() {
-        //First make an instance of the api handler, give it the auth key of the user once implemented
+        //First make an instance of the api handler, give it the utility key of the user once implemented
         let apiHandler = new BaseApiHandler("test");
         //Run the get or post function depending on need only neccesarry argument is the path aka what comes after the hostname
         //Callbacks can be used to tell what to do with the data once it's been retrieved

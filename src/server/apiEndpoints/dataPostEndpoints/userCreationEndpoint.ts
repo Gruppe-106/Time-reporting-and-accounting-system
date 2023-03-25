@@ -1,7 +1,7 @@
 import PostEndpointBase from "../postEndpointBase";
 import {Request, Response} from "express";
 import {MySQLResponse} from "../../database/mysqlHandler";
-import {AuthKey, authKeyCreate} from "../../auth/authKeyCreator";
+import {AuthKey, authKeyCreate} from "../../utility/authKeyCreator";
 
 interface UserCreationData {
     firstName   : string,

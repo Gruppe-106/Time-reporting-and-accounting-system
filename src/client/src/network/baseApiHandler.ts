@@ -29,8 +29,7 @@ class BaseApiHandler {
      * Sent GET request to url
      * @param urlPath String: path of the url meaning not hostname
      * @param callback Callback?: an anonymous function to run after data is received, the value will be the json object
-     * @param baseUrl String?: the hostname of the url
-     * @param headers Record<string, string>?: Headers for request in key-value pairs
+     * @param settings GetSettings: settings for get request
      */
     public get(urlPath: string, settings: GetSettings, callback?: (value: Object) => void): boolean {
         //Check if required authKey is present
@@ -47,10 +46,8 @@ class BaseApiHandler {
     /**
      * Sent POST request to url
      * @param urlPath String: path of the url meaning not hostname
+     * @param settings PostSettings: settings for post request
      * @param callback Callback?: an anonymous function to run after data is received, the value will be the json object or void
-     * @param baseUrl String?: the hostname of the url
-     * @param message String | Object?: message or data to send (Auto converts to JSON format)
-     * @param headers Record<string, string>?: Headers for request in key-value pairs
      */
     public post(urlPath: string, settings: PostSettings, callback?: (value: Object) => void,): boolean {
         //Check if required authKey is present
@@ -69,10 +66,7 @@ class BaseApiHandler {
     /**
      * Sent request to url
      * @param urlPath String: path of the url meaning not hostname
-     * @param baseUrl String: the hostname of the url
-     * @param method String: method of request eg. POST, GET...
-     * @param message String | Object: message or data to send (Auto converts to JSON format)
-     * @param headers Record<string, string>: Headers for request in key-value pairs
+     * @param settings RequesterSettings: settings for request
      * @private
      */
     // baseUrl:string = this.baseUrl, method:string = "GET", message:null | object | string = "", headers:Record<string, string> = {}
@@ -88,6 +82,7 @@ class BaseApiHandler {
 
         //Make request to node server
         return await fetch(url, {
+            credentials: "include",
             method: settings.method,
             headers: settings.headers,
             body: body

@@ -13,6 +13,8 @@ import UserRoleEndpoint from "../apiEndpoints/dataGetEndpoints/userRoleEndpoint"
 import TaskTimeRegisterEndpoint from "../apiEndpoints/dataGetEndpoints/taskTimeRegisterEndpoint";
 import UserEditEndpoint from "../apiEndpoints/dataPostEndpoints/userEditEndpoint";
 import ProjectCreationEndpoint from "../apiEndpoints/dataPostEndpoints/projectCreationEndpoint";
+import LoginEndpoint from "../apiEndpoints/dataPostEndpoints/loginEndpoint";
+import AuthEndpoint from "../apiEndpoints/dataGetEndpoints/authEndpoint";
 
 /* Implement this shit and ensure CORS
     res.setHeader("Access-Control-Allow-Origin" , "*");
@@ -29,6 +31,8 @@ export class ApiRouter extends BaseRouter {
             res.setHeader('Content-Type', 'application/json');
             res.status(200).json({message: "Api GET gotten"});
         });
+
+        this.router.get("/auth",             (req: Request, res: Response) => new AuthEndpoint().getRoute(req, res));
 
         this.router.get("/project/get",      (req: Request, res: Response) => new ProjectEndpoint(this.user).getRoute(req, res));
         this.router.get("/user/get",         (req: Request, res: Response) => new UserEndpoint(this.user).getRoute(req, res));
@@ -48,9 +52,11 @@ export class ApiRouter extends BaseRouter {
             res.status(200).json({message: "Api POST gotten"});
         })
 
-        this.router.post("/user/creation/post",   (req: Request, res:Response) => new UserCreationEndpoint(this.user).postRoute(req, res))
-        this.router.post("/user/edit/post",       (req: Request, res:Response) => new UserEditEndpoint(this.user).postRoute(req, res))
-        this.router.post("/project/creation/post",(req: Request, res:Response) => new ProjectCreationEndpoint(this.user).postRoute(req, res))
+        this.router.post("/login",                (req: Request, res:Response) => new LoginEndpoint(this.user).postRoute(req, res));
+
+        this.router.post("/user/creation/post",   (req: Request, res:Response) => new UserCreationEndpoint(this.user).postRoute(req, res));
+        this.router.post("/user/edit/post",       (req: Request, res:Response) => new UserEditEndpoint(this.user).postRoute(req, res));
+        this.router.post("/project/creation/post",(req: Request, res:Response) => new ProjectCreationEndpoint(this.user).postRoute(req, res));
     }
 
     public routes(): Router {

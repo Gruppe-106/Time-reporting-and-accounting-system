@@ -36,7 +36,7 @@ abstract class GetEndpointBase {
                 if (message[0] !== "success") {
                     return {status: 404, data: {success: "false", reasons: message}};
                 }
-                return {status: 200, data: {success: "true"}};
+                return {status: 200, data: {success: "true", message: message}};
             }
             return {status: 401, data: {error: "Not authorized"}};
         } catch (e) {
