@@ -114,6 +114,7 @@ interface TimeSheetRowProps {
 
 // State of variables in TimeSheetRow
 interface TimeSheetRowState {
+  dataTotal: number;
   times: string[];
   total: number;
   minTimes: string[];
@@ -129,7 +130,8 @@ interface TimeSheetRowState {
 class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
   // Inilisie all states
   state: TimeSheetRowState = {
-    times: [this.props.data.time.toString(), "0", "0", "0", "0", "0", "0"],
+    dataTotal: this.props.data.time,
+    times: ["0", "0", "0", "0", "0", "0", "0"],
     total: 0,
     minTimes: ["0", "0", "0", "0", "0", "0", "0"],
     minTotal: 0,
@@ -192,9 +194,13 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
       * Calculates total hours and minutes.
    */
   private displayTimeTotal = ():JSX.Element => {
+    const { dataTotal } = this.state;
     const { total } = this.state;
     const { minTotal } = this.state;
-    const totalMinutes = total + minTotal;
+
+    let newDataTotal = dataTotal * 60;  
+
+    const totalMinutes = total + minTotal + newDataTotal;
     const hours = Math.floor(totalMinutes / 60);
     const minutes = totalMinutes % 60;
 
@@ -265,6 +271,7 @@ interface TimeSheetProp {
 interface TimeSheetState {
   data: TimeSheetRowData[];
   selectedProject: TimeSheetRowData | null;
+  loadedProjects: TimeSheetRowData | null;
   showAddRowModal: boolean;
 }
 
@@ -280,6 +287,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     // Initialise states
     this.state = {
       data: [],
+      loadedProjects: null,
       selectedProject: null,
       showAddRowModal: false,
     };
@@ -383,7 +391,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
   }
 
   render() {
-    const { showAddRowModal} = this.state;
+    const { showAddRowModal } = this.state;
     return (
       <Container fluid="sm">
         <Table bordered size="sm">
