@@ -3,14 +3,14 @@ import React, {Component} from "react";
 import BaseApiHandler from "../../../network/baseApiHandler";
 
 interface Api{
-        status:number,
-        data: {
-            id?: number,
-            superProject?: number,
-            name?: string,
-            startDate?: string,
-            endDate?: string
-        }[]
+    status:number,
+    data: {
+        id?: number,
+        superProject?: number,
+        name?: string,
+        startDate?: string,
+        endDate?: string
+    }[]
 }
 
 export interface ProjectTableRow{
@@ -50,11 +50,11 @@ class ProjectTable extends Component<any> {
     private tableRender():JSX.Element[] {
         return this.state.tableRows.map(row => (
             <tr key={row.id}>
-              <td> <a href={`/project/viewer?id=${row.id}`}>{row.id}</a> </td>
-              <td>{row.superProject ?? ''}</td>
-              <td>{row.name ?? ''}</td>
-              <td>{row.startDate ? new Date(row.startDate).toLocaleDateString() : ''}</td>
-              <td>{row.endDate ? new Date(row.endDate).toLocaleDateString() : ''}</td>
+                <td> <a href={`/project/viewer?id=${row.id}`}>{row.id}</a> </td>
+                <td>{row.superProject ?? ''}</td>
+                <td>{row.name ?? ''}</td>
+                <td>{row.startDate ? new Date(row.startDate).toLocaleDateString() : ''}</td>
+                <td>{row.endDate ? new Date(row.endDate).toLocaleDateString() : ''}</td>
                 <Button href={`/project/manage?id=${row.id}`} variant="outline-primary">Edit</Button>{''}
             </tr>
         ))

@@ -27,7 +27,7 @@ class ProjectMenu extends Component<any, ProjectMenuState>{
                 <Container>
                     <h1>Project Menu</h1>
                     {
-                    <ProjectTable/>
+                        <ProjectTable/>
                     }
                 </Container>
 
