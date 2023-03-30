@@ -14,14 +14,6 @@ interface Api{
     group?: number
 
 }
-
-export interface ProjectTableMemberRow{
-    id:number
-    email?:string
-    firstName?:string
-    lastName?:string
-    group?:number
-}
 /*
 const queryString = window.location.search;
 const params = new URLSearchParams(queryString);
