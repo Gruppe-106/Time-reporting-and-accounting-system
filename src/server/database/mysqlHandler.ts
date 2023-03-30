@@ -21,9 +21,9 @@ class MysqlHandler {
     private static connectionConfig: object = undefined;
     private static connection: Connection   = undefined;
 
-    constructor(connectionConfig?:object) {
+    constructor(connectionConfig?:object, mysqlOnConnectCallback?: () => void) {
         if (connectionConfig !== undefined) { MysqlHandler.connectionConfig = connectionConfig; }
-        this.hasOrCreateConnection();
+        this.hasOrCreateConnection(mysqlOnConnectCallback);
     }
 
     /**
@@ -37,7 +37,7 @@ class MysqlHandler {
      * @return Boolean: Returns whether a MySQL connection is present or not
      * @private
      */
-    private createConnection(): boolean {
+    private createConnection(mysqlOnConnectCallback?: () => void): boolean {
         if (MysqlHandler.connectionConfig !== undefined) {
             MysqlHandler.connection = mysql.createConnection(MysqlHandler.connectionConfig);
 
@@ -47,6 +47,7 @@ class MysqlHandler {
                     return false;
                 }
                 console.log(`[MySQL] Connected to database with id: ${MysqlHandler.connection.threadId}`);
+                mysqlOnConnectCallback();
                 return true;
             });
         }
@@ -56,9 +57,9 @@ class MysqlHandler {
     /** Checks if connection is present, if not try to create one
      * @return Boolean: Returns true if connection is present otherwise false
      */
-    public hasOrCreateConnection(): boolean {
+    public hasOrCreateConnection(mysqlOnConnectCallback?: () => void): boolean {
         if (!this.hasConnection()) {
-            return this.createConnection();
+            return this.createConnection(mysqlOnConnectCallback);
         }
         return true;
     }

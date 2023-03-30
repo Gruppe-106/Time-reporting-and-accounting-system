@@ -28,15 +28,15 @@ class TaskProjectEndpoint extends  GetEndpointBase {
         // The 2 columns below has to be retrieved from a different table, so add a join statement to query
         if (requestValues.indexOf("taskName")  !== -1 || allColumns) {
             select.push("t.name as taskName");
-            join += " CROSS JOIN tasks t ON tp.taskId=t.id";
+            join += " CROSS JOIN TASKS t ON tp.taskId=t.id";
         }
         if (requestValues.indexOf("projectName") !== -1 || allColumns) {
             select.push("p.name as projectName");
-            join += " CROSS JOIN projects p ON tp.projectId=p.id";
+            join += " CROSS JOIN PROJECTS p ON tp.projectId=p.id";
         }
 
         //Query the data for all group that satisfies conditions
-        let query: string = `SELECT ${select} FROM (SELECT * FROM tasks_projects_connector ${this.mySQL.createWhereString(this.createWhere(primaryKey, keyEqual))}) tp ${join}`;
+        let query: string = `SELECT ${select} FROM (SELECT * FROM TASKS_PROJECTS_CONNECTOR ${this.mySQL.createWhereString(this.createWhere(primaryKey, keyEqual))}) tp ${join}`;
         let response:MySQLResponse = await this.mySQL.sendQuery(query);
         //Check if there was an error and throw if so
         if (response.error !== null) throw new Error("[MySQL] Failed to retrieve data");

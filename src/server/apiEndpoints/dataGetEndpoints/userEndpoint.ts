@@ -18,7 +18,7 @@ class UserEndpoint extends  GetEndpointBase {
     ];
 
     async getData(requestValues: string[], primaryKey: string, keyEqual?: string[], data?: string[]): Promise<object[]> {
-        let response:MySQLResponse = await this.mySQL.select("users", this.createColumns(requestValues), this.createWhere(primaryKey, keyEqual));
+        let response:MySQLResponse = await this.mySQL.select("USERS", this.createColumns(requestValues), this.createWhere(primaryKey, keyEqual));
         if (response.error !== null) throw new Error("[MySQL] Failed to retrieve data");
 
         return response.results;

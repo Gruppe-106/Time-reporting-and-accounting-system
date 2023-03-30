@@ -95,7 +95,7 @@ CREATE TABLE USERS_ROLES_CONNECTOR (
     FOREIGN KEY (userId)
         REFERENCES USERS (id)
 );
-ALTER TABLE users_roles_connector ADD UNIQUE urc_row_unique(roleId, userId);
+ALTER TABLE USERS_ROLES_CONNECTOR ADD UNIQUE urc_row_unique(roleId, userId);
 
 CREATE TABLE GROUPS_CONNECTOR (
     managerId INT UNSIGNED NOT NULL,
@@ -127,7 +127,7 @@ CREATE TABLE PROJECTS_MANAGER_CONNECTOR (
     FOREIGN KEY (projectId)
         REFERENCES PROJECTS (id)
 );
-ALTER TABLE projects_manager_connector ADD UNIQUE pmc_row_unique(userId, projectId);
+ALTER TABLE PROJECTS_MANAGER_CONNECTOR ADD UNIQUE pmc_row_unique(userId, projectId);
 
 CREATE TABLE USERS_TASKS_CONNECTOR (
     userId INT UNSIGNED NOT NULL,

@@ -118,7 +118,7 @@ class AddFakeDataToDB {
             values.push([con.taskId.toString(), con.projectId.toString()]);
         }
 
-        this.mysql.insert("TASK_PROJECTS_CONNECTOR", ["taskId", "projectId"], values)
+        this.mysql.insert("TASKS_PROJECTS_CONNECTOR", ["taskId", "projectId"], values)
     }
 
     public addUSERROLE() {
@@ -129,7 +129,7 @@ class AddFakeDataToDB {
             values.push([con.role.toString(), con.user.toString()]);
         }
 
-        this.mysql.insert("USER_ROLES_CONNECTOR", ["roleId", "userId"], values)
+        this.mysql.insert("USERS_ROLES_CONNECTOR", ["roleId", "userId"], values)
     }
 
     public addUSERTASKTIMEREGISTER() {

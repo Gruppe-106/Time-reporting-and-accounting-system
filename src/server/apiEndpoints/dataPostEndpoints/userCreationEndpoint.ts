@@ -26,11 +26,11 @@ class UserCreationEndpoint extends PostEndpointBase {
         if (emailValid) return Promise.resolve(["Email not valid"]);
 
         // Get the group id the manager presides over
-        let groupResponse: MySQLResponse = await this.mySQL.select("groups_connector", ["groupId"], {column: "managerId", equals: [user.manager.toString()]})
+        let groupResponse: MySQLResponse = await this.mySQL.select("GROUPS_CONNECTOR", ["groupId"], {column: "managerId", equals: [user.manager.toString()]})
         if (groupResponse.error !== null) throw new Error("[MySQL] Failed to retrieve data");
         let groupId = groupResponse.results[0].groupId;
 
-        let userResponse: MySQLResponse = await this.mySQL.insert("users",
+        let userResponse: MySQLResponse = await this.mySQL.insert("USERS",
             ["email", "firstName", "lastName", "groupId"],
             [user.email, user.firstName, user.lastName, groupId.toString()])
         if (userResponse.error !== null) throw new Error("[MySQL] Failed insert data");
@@ -43,12 +43,12 @@ class UserCreationEndpoint extends PostEndpointBase {
         }
 
         // Append all roles the user has to the user role connector table
-        let userRoleResponse: MySQLResponse = await this.mySQL.insert("users_roles_connector", ["userId", "roleId"], userRoles);
+        let userRoleResponse: MySQLResponse = await this.mySQL.insert("USERS_ROLES_CONNECTOR", ["userId", "roleId"], userRoles);
         if (userRoleResponse.error !== null) throw new Error("[MySQL] Failed insert data");
 
         // Add user to the authentication table
         let authKey: AuthKey = authKeyCreate(userId);
-        let authResponse: MySQLResponse = await this.mySQL.insert("auth",
+        let authResponse: MySQLResponse = await this.mySQL.insert("AUTH",
             ["email", "authKey", "authKeyEndDate", "userId", "password"],
             [user.email, authKey.key, this.mySQL.dateFormatter(authKey.valid), userId.toString(), user.password]);
         if (authResponse.error !== null) throw new Error("[MySQL] Failed insert data");

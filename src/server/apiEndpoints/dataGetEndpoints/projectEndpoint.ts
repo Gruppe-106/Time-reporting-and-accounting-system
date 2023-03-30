@@ -18,7 +18,7 @@ class ProjectEndpoint extends  GetEndpointBase {
 
     async getData(requestValues: string[], primaryKey: string, keyEqual?: string[], data?: string[]): Promise<object[]> {
         //Get all projects that fulfill the given request
-        let response:MySQLResponse = await this.mySQL.select("projects", this.createColumns(requestValues), this.createWhere(primaryKey, keyEqual));
+        let response:MySQLResponse = await this.mySQL.select("PROJECTS", this.createColumns(requestValues), this.createWhere(primaryKey, keyEqual));
 
         //Check if there was an error and throw if so
         if (response.error !== null) throw new Error("[MySQL] Failed to retrieve data");

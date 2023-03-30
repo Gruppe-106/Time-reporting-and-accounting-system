@@ -28,7 +28,7 @@ class UserEditEndpoint extends PostEndpointBase {
         if (user.lastName)  userUpdateSet.push({column: "lastName", value: user.lastName});
         if (user.manager) {
             // Get the group id of the manager
-            let groupResponse: MySQLResponse = await this.mySQL.select("groups_connector", ["groupId"], {column: "managerId", equals: [user.manager.toString()]})
+            let groupResponse: MySQLResponse = await this.mySQL.select("GROUPS_CONNECTOR", ["groupId"], {column: "managerId", equals: [user.manager.toString()]})
             if (groupResponse.error !== null) message.push("Manager data couldn't be retrieved");
             let groupId = groupResponse.results[0].groupId;
             // Check if the group id is different from the altered
@@ -48,7 +48,7 @@ class UserEditEndpoint extends PostEndpointBase {
         }
         if (userUpdateSet.length !== 0) {
             // Send update request to DB
-            let userResponse: MySQLResponse = await this.mySQL.update("users", userUpdateSet, {column: "id", equals: [user.userId.toString()]});
+            let userResponse: MySQLResponse = await this.mySQL.update("USERS", userUpdateSet, {column: "id", equals: [user.userId.toString()]});
             // Check if it failed to update
             if (userResponse.error !== null) message.push("User couldn't be updated");
         }
@@ -57,7 +57,7 @@ class UserEditEndpoint extends PostEndpointBase {
         if (user.password) authUpdateSet.push({column: "password", value: user.password});
         if (authUpdateSet.length !== 0) {
             // Send update request to DB
-            let authResponse: MySQLResponse = await this.mySQL.update("auth", authUpdateSet, {column: "userId", equals: [user.userId.toString()]});
+            let authResponse: MySQLResponse = await this.mySQL.update("AUTH", authUpdateSet, {column: "userId", equals: [user.userId.toString()]});
             // Check if it failed to update
             if (authResponse.error !== null) message.push("Auth couldn't be updated");
         }
@@ -68,7 +68,7 @@ class UserEditEndpoint extends PostEndpointBase {
             for (const userRole of user.rolesAdd) {
                 userRoles.push([user.userId.toString(), userRole.toString()])
             }
-            let userRoleResponse: MySQLResponse = await this.mySQL.insert("users_roles_connector", ["userId", "roleId"], userRoles);
+            let userRoleResponse: MySQLResponse = await this.mySQL.insert("USERS_ROLES_CONNECTOR", ["userId", "roleId"], userRoles);
             if (userRoleResponse.error !== null)  message.push("User roles couldn't be added");
         }
 
@@ -82,7 +82,7 @@ class UserEditEndpoint extends PostEndpointBase {
                 ]);
             }
             for (const where of userRoleWhere) {
-                let userRoleRemoveResponse: MySQLResponse = await this.mySQL.remove("users_roles_connector", where);
+                let userRoleRemoveResponse: MySQLResponse = await this.mySQL.remove("USERS_ROLES_CONNECTOR", where);
                 if (userRoleRemoveResponse.error !== null)  message.push(`User roles couldn't be remove set u: ${where[0].equals}, r: ${where[1].equals}`);
             }
         }

@@ -12,13 +12,13 @@ export class Server {
     public static server: http.Server;
     public static mysql: MysqlHandler;
 
-    constructor(app: Express, mySQLConnectionConfig: object, port: number) {
+    constructor(app: Express, mySQLConnectionConfig: object, port: number, mysqlOnConnectCallback?: () => void) {
         this.app = app;
         this.router = new MainRouter();
         app.use('/', this.router.routes());
 
         Server.server = http.createServer(app);
-        Server.mysql = new MysqlHandler(mySQLConnectionConfig);
+        Server.mysql = new MysqlHandler(mySQLConnectionConfig, mysqlOnConnectCallback);
         this.start(port);
 
         this.commandLineInterface(this);

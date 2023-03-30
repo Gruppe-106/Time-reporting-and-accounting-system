@@ -45,15 +45,15 @@ class ManagerGroupEndpoint extends GetEndpointBase {
         // The 2 columns below has to be retrieved from a different table, so add a join statement to query
         if (requestValues.indexOf("firstName") !== -1 || allColumns) {
             select.push("u.firstName");
-            join = "CROSS JOIN users u ON u.id=g.managerId";
+            join = "CROSS JOIN USERS u ON u.id=g.managerId";
         }
         if (requestValues.indexOf("lastName")  !== -1 || allColumns) {
             select.push("u.lastName");
-            join = "CROSS JOIN users u ON u.id=g.managerId";
+            join = "CROSS JOIN USERS u ON u.id=g.managerId";
         }
 
         //Query the data for all group that satisfies conditions
-        let query: string = `SELECT ${select} FROM ((SELECT * FROM groups_connector ${where}) g ${join}) ORDER BY groupId`;
+        let query: string = `SELECT ${select} FROM ((SELECT * FROM GROUPS_CONNECTOR ${where}) g ${join}) ORDER BY groupId`;
         let response:MySQLResponse = await this.mySQL.sendQuery(query);
         //Check if there was an error and throw if so
         if (response.error !== null) throw new Error("[MySQL] Failed to retrieve data");
@@ -81,7 +81,7 @@ class ManagerGroupEndpoint extends GetEndpointBase {
             }
 
             //Send query to get all employees with a group id found above
-            let employeeQuery: string = `SELECT id,firstName,lastName,email,groupId from users WHERE groupId IN (${groupId}) ORDER BY groupId`;
+            let employeeQuery: string = `SELECT id,firstName,lastName,email,groupId from USERS WHERE groupId IN (${groupId}) ORDER BY groupId`;
             let employeeResponse:MySQLResponse = await this.mySQL.sendQuery(employeeQuery);
             if (employeeResponse.error !== null) throw new Error("[MySQL] Failed to retrieve data");
 
