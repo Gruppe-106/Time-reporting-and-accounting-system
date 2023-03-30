@@ -105,7 +105,6 @@ class UserCreation extends Component<any, CustomTypes>{
         this.handleLoader = this.handleLoader.bind(this)
         this.sendUser = this.sendUser.bind(this)
 
-
         //* Test handles
         this.test = this.test.bind(this)
     }
@@ -133,8 +132,6 @@ class UserCreation extends Component<any, CustomTypes>{
         })
 
     }
-
-
 
     //TODO: find the types or else i commit the no monster day
 
@@ -174,7 +171,7 @@ class UserCreation extends Component<any, CustomTypes>{
      * @param event - The input change event object.
     */
     private handleEmail(event: React.ChangeEvent<HTMLInputElement>): void {
-        const emailValid:boolean = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(event.target.value); // check if the email is valid
+        const emailValid: boolean = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(event.target.value); // check if the email is valid
 
 
         this.setState({

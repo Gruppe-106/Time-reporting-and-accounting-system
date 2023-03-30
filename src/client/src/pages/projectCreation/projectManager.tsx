@@ -28,7 +28,7 @@ class ProjectMenu extends Component<any, ProjectMenuState>{
     render() {
         return (
             <>
-               <BaseNavBar/>
+                <BaseNavBar/>
                 <Container>
                     <h1>Project Manager</h1>
                     <Button href="/project/menu" variant="outline-secondary">Back</Button>{''}

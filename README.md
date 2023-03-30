@@ -22,7 +22,7 @@ Project by **CS-23-DAT-01**
    1. Basic version button that generates monthly report and allows the user to download it as csv
 8. Create user - \[{(Andreas)}\]
    1. Form for creating user and save(POST to server)
-9. Login
+9. Login - \[{(Mads v2)}\]
    1. Make functioned and remove navbar
 10. Admin panel
     1. Create user
