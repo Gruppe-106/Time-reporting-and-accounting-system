@@ -55,7 +55,7 @@ export class ApiRouter extends BaseRouter {
         this.router.post("/login",                (req: Request, res:Response) => new LoginEndpoint().postRoute(req, res));
 
         this.router.post("/user/creation/post",   (req: Request, res:Response) => new UserCreationEndpoint().postRoute(req, res));
-        this.router.post("/user/edit/post",       (req: Request, res:Response) => new UserEditEndpoint().postRoute(req, res));
+        this.router.put( "/user/edit/put",       (req: Request, res:Response) => new UserEditEndpoint().postRoute(req, res));
         this.router.post("/project/creation/post",(req: Request, res:Response) => new ProjectCreationEndpoint().postRoute(req, res));
     }
 
