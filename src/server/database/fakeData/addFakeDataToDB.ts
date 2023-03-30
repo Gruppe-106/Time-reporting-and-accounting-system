@@ -41,7 +41,7 @@ class AddFakeDataToDB {
             values.push([user.email, user.firstName, user.lastName, user.group.toString()]);
         }
 
-        this.mysql.insert("users", ["email", "firstName", "lastName", "groupId"], values);
+        this.mysql.insert("USERS", ["email", "firstName", "lastName", "groupId"], values);
     }
 
     public addAUTHS() {
@@ -52,7 +52,7 @@ class AddFakeDataToDB {
             values.push([auth.email, auth.authKey, this.dateFormatter(auth.authKeyEndDate), auth.userId.toString(), auth.password]);
         }
 
-        this.mysql.insert("auth", ["email", "authKey", "authKeyEndDate", "userId", "password"], values)
+        this.mysql.insert("AUTH", ["email", "authKey", "authKeyEndDate", "userId", "password"], values)
     }
 
     public addGROUP() {
@@ -63,7 +63,7 @@ class AddFakeDataToDB {
             values.push([group.manager.toString(), group.id.toString()]);
         }
 
-        this.mysql.insert("groups_connector", ["managerId", "groupId"], values)
+        this.mysql.insert("GROUPS_CONNECTOR", ["managerId", "groupId"], values)
     }
 
     public addPROJECT() {
@@ -74,7 +74,7 @@ class AddFakeDataToDB {
             values.push([project.id.toString(), project.superProject.toString(), project.name, this.dateFormatter(project.startDate), this.dateFormatter(project.endDate)]);
         }
 
-        this.mysql.insert("projects", ["id", "superProjectId", "name", "startDate", "endDate"], values)
+        this.mysql.insert("PROJECTS", ["id", "superProjectId", "name", "startDate", "endDate"], values)
     }
 
     public addROLES() {
@@ -85,7 +85,7 @@ class AddFakeDataToDB {
             values.push([role.id.toString(), role.name]);
         }
 
-        this.mysql.insert("roles", ["id", "name"], values)
+        this.mysql.insert("ROLES", ["id", "name"], values)
     }
 
     public addTIMETYPES() {
@@ -96,7 +96,7 @@ class AddFakeDataToDB {
             values.push([timetype.id.toString(), timetype.name]);
         }
 
-        this.mysql.insert("timetypes", ["id", "name"], values)
+        this.mysql.insert("TIMETYPES", ["id", "name"], values)
     }
 
     public addTASKS() {
@@ -107,7 +107,7 @@ class AddFakeDataToDB {
             values.push([task.id.toString(), task.name, this.dateFormatter(task.startDate), this.dateFormatter(task.endDate), task.timeType.toString()]);
         }
 
-        this.mysql.insert("tasks", ["id", "name", "startDate", "endDate", "timeType"], values)
+        this.mysql.insert("TASKS", ["id", "name", "startDate", "endDate", "timeType"], values)
     }
 
     public addTASKPROJECT() {
@@ -118,7 +118,7 @@ class AddFakeDataToDB {
             values.push([con.taskId.toString(), con.projectId.toString()]);
         }
 
-        this.mysql.insert("tasks_projects_connector", ["taskId", "projectId"], values)
+        this.mysql.insert("TASK_PROJECTS_CONNECTOR", ["taskId", "projectId"], values)
     }
 
     public addUSERROLE() {
@@ -129,7 +129,7 @@ class AddFakeDataToDB {
             values.push([con.role.toString(), con.user.toString()]);
         }
 
-        this.mysql.insert("users_roles_connector", ["roleId", "userId"], values)
+        this.mysql.insert("USER_ROLES_CONNECTOR", ["roleId", "userId"], values)
     }
 
     public addUSERTASKTIMEREGISTER() {
@@ -140,7 +140,7 @@ class AddFakeDataToDB {
             values.push([this.dateFormatter(con.date), con.taskId.toString(), con.userId.toString(), con.time.toString(), con.approved ? "1" : "0", con.managerLogged ? "1" : "0"]);
         }
 
-        this.mysql.insert("users_tasks_time_register", ["date", "taskId", "userId", "time", "approved", "managerLogged"], values)
+        this.mysql.insert("USERS_TASKS_TIME_REGISTER", ["date", "taskId", "userId", "time", "approved", "managerLogged"], values)
     }
 
     public addUSERSTASKS() {
@@ -151,7 +151,7 @@ class AddFakeDataToDB {
             values.push([con.userId.toString(), con.taskId.toString()]);
         }
 
-        this.mysql.insert("users_tasks_connector", ["userId", "taskId"], values)
+        this.mysql.insert("USERS_TASKS_CONNECTOR", ["userId", "taskId"], values)
     }
 
     public addPROJECTSMANAGER() {
@@ -162,7 +162,7 @@ class AddFakeDataToDB {
             values.push([con.userId.toString(), con.projectId.toString()]);
         }
 
-        this.mysql.insert("projects_manager_connector", ["userId", "projectId"], values)
+        this.mysql.insert("PROJECTS_MANAGER_CONNECTOR", ["userId", "projectId"], values)
     }
 }
 

@@ -13,3 +13,5 @@
 ## Other
 1. Add auth system and cookies _/
 2. Get name of timetype in tasks
+3. Get project manager with project
+4. Change data export to manager instead of project leader
