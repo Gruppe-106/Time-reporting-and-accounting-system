@@ -84,12 +84,21 @@ Optional:
 </details>
 
 <details>
-<summary>Edit ( Not Implemented )</summary>
+<summary>Edit</summary>
 
 ## /api/project/edit/put
 ### Body
 ```
 {
+    projectId            : number,
+    superProjectId      ?: number,
+    name                ?: string,
+    startDate           ?: number,
+    endDate             ?: number,
+    ProjectLeaderAdd    ?: number[],
+    projectLeaderRemove ?: number[],
+    taskAdd             ?: TaskData[],
+    taskRemove          ?: number[]
 }
 ```
 ### Structure Of Object Returned
