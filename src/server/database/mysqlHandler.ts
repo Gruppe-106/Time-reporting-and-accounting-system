@@ -87,7 +87,7 @@ class MysqlHandler {
     }
 
     /**
-     * Creates a string with the sql query condition based on a list of wheres
+     * Creates a string with the sql query condition based on a list of where's
      * @param where Where[]: A list of conditions which includes column to check and what to check against
      * @return String: of the condition or an empty string if where is empty
      * @private
@@ -165,7 +165,7 @@ class MysqlHandler {
      * @param columns String[]?: column(s) to retrieve
      * @param where Where?: condition for the selection of data
      */
-    public select(table: string, columns?: string[], where?:Where): Promise<MySQLResponse> {
+    public select(table: string, columns?: string[], where?: Where): Promise<MySQLResponse> {
         let queryString = `SELECT ${columns !== undefined ? columns : "*"} FROM ${table} ${this.createWhereString(where)}`;
         return this.sendQuery(queryString);
     }
