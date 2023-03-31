@@ -30,12 +30,11 @@ interface ProjectCreateProp {
 
 class ProjectCreate extends Component<ProjectCreateProp> {
     state = {
-        pageInformation: {id: -1, superProject: -1, name: "", startDate: "", endDate: "", assignedToManager: {"managerId": Infinity, "managerName": "" }}
+        pageInformation: [{id: -1, superProject: -1, name: "", startDate: "", endDate: "", assignedToManager: {"managerId": Infinity, "managerName": "" }}]
     }
 
     constructor(props:ProjectCreateProp) {
         super(props);
-        this.state.pageInformation.id = props.id;
         this.HandleManager = this.HandleManager.bind(this)
     }
 
@@ -44,12 +43,12 @@ class ProjectCreate extends Component<ProjectCreateProp> {
         let apiHandler = new BaseApiHandler("test");
         //Run the get or post function depending on need only neccesarry argument is the path aka what comes after the hostname
         //Callbacks can be used to tell what to do with the data once it's been retrieved
-        apiHandler.get(`/api/project/get?ids=${this.state.pageInformation.id}`, {},(value) => {
+        apiHandler.get(`/api/project/get?ids=*`, {},(value) => {
             console.log(value)
             //Then convert the string to the expected object(eg. )
             let json:Api = JSON.parse(JSON.stringify(value))
             //Then update states or variables or whatever you want with the information
-            this.setState({pageInformation: json.data[0]})
+            this.setState({pageInformation: json.data})
             console.log(json.data)
         })
     }
@@ -88,16 +87,34 @@ class ProjectCreate extends Component<ProjectCreateProp> {
                                             </Form.Group>
                                         </Col>
                                         <Col>
-                                            <Form.Group className="mb-3" controlId="formBasicProjectId">
-                                                <Form.Label>Project ID</Form.Label>
-                                                <Form.Control type="number" placeholder="New Project ID (number)" />
-                                            </Form.Group>
-                                        </Col>
-                                        <Col>
-                                            <Form.Group className="mb-3" controlId="formBasicSuperProjectId">
-                                                <Form.Label>Parent Project ID</Form.Label>
-                                                <Form.Control type="number" placeholder="New Parent Project ID (number)" />
-                                            </Form.Group>
+                                            <Form.Group className="mb-3" controlId="formBasicChangeManager">
+                                        <Form.Label>Assign Parent Project</Form.Label>
+                                        <Typeahead
+                                            id="chooseParent"
+                                            labelKey="name"
+                                            options={
+                                                this.state.pageInformation.map(row =>({id: row.id, name: row.name}))
+                                            }
+                                            placeholder="Choose Parent Project..."
+                                            onChange={this.HandleManager}
+                                            filterBy={(option: any, props: any): boolean => {
+                                                const query: string = props.text.toLowerCase().trim();
+                                                const name: string = option.name.toLowerCase();
+                                                const id: string = option.id.toString();
+                                                return name.includes(query) || id.includes(query);
+                                            }}
+                                            renderMenuItemChildren={(option: any, props: any) => (
+                                                <>
+                                                    <Highlighter search={props.text}>
+                                                        {option.name}
+                                                    </Highlighter>
+                                                    <div>
+                                                        <small>Project ID: {option.id}</small>
+                                                    </div>
+                                                </>
+                                            )}
+                                        />
+                                    </Form.Group>
                                         </Col>
                                     </Row>
                                     <Row>
@@ -116,9 +133,9 @@ class ProjectCreate extends Component<ProjectCreateProp> {
                                     </Row>
 
                                     <Form.Group className="mb-3" controlId="formBasicChangeManager">
-                                        <Form.Label>Assign Manager</Form.Label>
+                                        <Form.Label>Assign Team Leader</Form.Label>
                                         <Typeahead
-                                            id="changeManager"
+                                            id="chooseLeader"
                                             labelKey="name"
                                             options={[
                                                 { id: 1, name: "Andreas Monster addict" },
@@ -126,7 +143,7 @@ class ProjectCreate extends Component<ProjectCreateProp> {
                                                 { id: 3, name: "Mikkel the mikkelman" },
                                                 { id: 4, name: "Alexander 👌" }
                                             ]}
-                                            placeholder="Choose Manager..."
+                                            placeholder="Choose Team Leader..."
                                             onChange={this.HandleManager}
                                             filterBy={(option: any, props: any): boolean => {
                                                 const query: string = props.text.toLowerCase().trim();
