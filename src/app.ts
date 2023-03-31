@@ -2,15 +2,17 @@ import {Server} from "./server/server";
 import express from "express";
 import AddFakeDataToDB from "./server/database/fakeData/addFakeDataToDB";
 
+export interface MySQLConfig {
+    host    : string,
+    user    : string,
+    password: string,
+    database: string
+}
+
 // --- Config ---
 const app = express();
 const port = 8080;
-const mySQLConnectionConfig = {
-    host     : "localhost",
-    user     : "nodejs",
-    password : "qoqnlF899SkkFTR4",
-    database : "timemanagerdatabase"
-}
+const mySQLConnectionConfig: MySQLConfig = require("mysqlConnectionConfig.json");
 
 // Allows to add specific fake data to server
 // This is only for dev and testing purposes

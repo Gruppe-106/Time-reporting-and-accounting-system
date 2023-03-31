@@ -1,5 +1,6 @@
 import * as mysql from "mysql";
 import {Connection, FieldInfo, MysqlError} from "mysql";
+import {MySQLConfig} from "../../app";
 
 export interface Where {
     column: string,
@@ -21,7 +22,7 @@ class MysqlHandler {
     private static connectionConfig: object = undefined;
     private static connection: Connection   = undefined;
 
-    constructor(connectionConfig?:object, mysqlOnConnectCallback?: () => void) {
+    constructor(connectionConfig?:MySQLConfig, mysqlOnConnectCallback?: () => void) {
         if (connectionConfig !== undefined) { MysqlHandler.connectionConfig = connectionConfig; }
         this.hasOrCreateConnection(mysqlOnConnectCallback);
     }
