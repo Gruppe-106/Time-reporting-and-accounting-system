@@ -1,69 +1,107 @@
 /*
     Login screen & nothing else
  */
+import React, {Component, FormEvent} from "react";
+import FloatingLabel from 'react-bootstrap/FloatingLabel';
+import {Button, Container, Form, Row} from "react-bootstrap";
+import Spinner from "react-bootstrap/Spinner";
+import Col from "react-bootstrap/Col";
+import BaseApiHandler from "../../network/baseApiHandler";
+import forge from "node-forge";
+import Cookies from "js-cookie";
 
-import React, {Component} from "react";
-import BaseNavBar from "../../components/navBar";
-import {Alert, Button, Container, Form} from "react-bootstrap";
+interface AuthApi {
+    status: number,
+    data: string[]
+}
 
 class Login extends Component<any>{
-    constructor(props:any) {
-        super(props);
+    state = {
+        submitting: false,
+        failed: false,
+        email: "",
+        password: ""
+    }
+
+    private login(): void {
+        let apiHandler = new BaseApiHandler("test");
+        apiHandler.post("/api/login", {body: {email: this.state.email, password: forge.md.sha256.create().update(this.state.password).digest().toHex()}}, (value) => {
+            let response: AuthApi = JSON.parse(JSON.stringify(value));
+            if (response.status === 200) {
+                Cookies.set("auth", response.data[1], {expires: Number(response.data[2])});
+                window.location.reload();
+            } else {
+                this.setState({failed: true, submitting: false})
+            }
+        })
+    }
+
+    private LoginFormRender(): JSX.Element {
+        const handleSubmit = (event: FormEvent) => {
+            event.preventDefault();
+            this.setState({submitting: true, failed: false});
+            this.login();
+        }
+        return (
+            <Form onSubmit={handleSubmit} >
+                <Row className="justify-content-md-center py-3">
+                    <Col md="auto">
+                        <h1 style={{textAlign: "center"}}>Login</h1>
+                    </Col>
+                </Row>
+                {this.state.failed ? (
+                    <Row className="justify-content-md-center">
+                        <Col md="auto">
+                            <h5 className={"text-danger"} style={{textAlign: "center"}}>Email or password incorrect</h5>
+                        </Col>
+                    </Row>
+                ) : ""}
+                <Container>
+                    <Row className="justify-content-md-center py-3">
+                        <Col style={{maxWidth: "500px"}}>
+                            <Form.Group className="mb-3" controlId="formBasicEmail">
+                                <FloatingLabel controlId="floatingInputEmail" label="Email address" className="mb-3">
+                                    <Form.Control type="email" placeholder="name@example.com" required onChange={(e) => { this.setState({email: e.target.value})} } isInvalid={this.state.failed}/>
+                                </FloatingLabel>
+                            </Form.Group>
+                        </Col>
+                    </Row>
+                    <Row className="justify-content-md-center">
+                        <Col style={{maxWidth: "500px"}}>
+                            <Form.Group className="mb-3" controlId="formBasicPassword">
+                                <FloatingLabel controlId="floatingInputPassword" label="Password" className="mb-3">
+                                    <Form.Control type="password" placeholder="Password" required onChange={(e) => { this.setState({password: e.target.value})} } isInvalid={this.state.failed}/>
+                                </FloatingLabel>
+                            </Form.Group>
+                        </Col>
+                    </Row>
+                    <Row className="justify-content-md-center py-3">
+                        <Col md="auto">
+                            <Button variant="primary" type="submit" size={"lg"} disabled={this.state.submitting} style={{minWidth: "125px"}}>
+                                {this.state.submitting ? (<Spinner
+                                    as="span"
+                                    animation="border"
+                                    size="sm"
+                                    role="status"
+                                    aria-hidden="true"
+                                />) : "Login"}
+                            </Button>
+                        </Col>
+                    </Row>
+                </Container>
+            </Form>
+        );
     }
 
     render() {
         return (
             <>
-                <BaseNavBar/>
-                <Container className={"py-3"}>
-                    <h1>Login page:</h1>
-                    <BasicLoginForm />
-                </Container>
-                <Container className={"py-3"}>
-                    <IncompleteWarning />
+                <Container className={"py-5"}>
+                    {this.LoginFormRender()}
                 </Container>
             </>
         );
     }
-}
-
-function BasicLoginForm() {
-    return (
-        <Form>
-            <Form.Group className="mb-3" controlId="formBasicEmail">
-                <Form.Label>Email address</Form.Label>
-                <Form.Control type="email" placeholder="Enter email" />
-                <Form.Text className="text-muted">
-                    Definitely not copy pasta.
-                </Form.Text>
-            </Form.Group>
-
-            <Form.Group className="mb-3" controlId="formBasicPassword">
-                <Form.Label>Password</Form.Label>
-                <Form.Control type="password" placeholder="Password" />
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="formBasicCheckbox">
-                <Form.Check type="checkbox" label="Save me?!" />
-            </Form.Group>
-            <Button variant="success" type="submit">
-                Log in!
-            </Button>
-        </Form>
-    );
-}
-
-function IncompleteWarning() {
-    return (
-        <Alert variant="danger">
-            <Alert.Heading>Oh snap! It's not implemented!</Alert.Heading>
-            <p>
-                Form submission is not handled, and login will definitely not work.
-                Please implement this, and discuss what is actually needed for login. Only e-mail or username
-                as well? I'd argument only e-mail, since employees would likely have a work-email and not
-                need a username.
-            </p>
-        </Alert>
-    );
 }
 
 export default Login;
