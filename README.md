@@ -39,6 +39,12 @@ Project by **CS-23-DAT-01**
    1. For now send dummy
 2. API  - \[{(Mikkel)}\]
 
+# Server commands
+Start Node WebServer
+```
+pm2 start app.js --watch && pm2 monit app
+```
+
 # First time setup for development
 ## Setup Node:
 ### Open terminal in '../src'

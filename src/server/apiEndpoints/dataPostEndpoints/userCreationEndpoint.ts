@@ -1,4 +1,7 @@
+import PostEndpointBase from "../postEndpointBase";
 import {Request, Response} from "express";
+import {MySQLResponse} from "../../database/mysqlHandler";
+import {AuthKey, authKeyCreate} from "../../utility/authKeyCreator";
 
 interface UserCreationData {
     firstName   : string,
@@ -9,56 +12,49 @@ interface UserCreationData {
     roles       : number[]
 }
 
-const requiredIndexes = [
-    "firstName",
-    "lastName",
-    "email",
-    "password",
-    "manager",
-    "roles"
-]
+class UserCreationEndpoint extends PostEndpointBase {
+    requiredRole: number = 4;
 
-export default class UserCreationEndpoint {
-    /**
-     * Ensures all necessary data is present and removes unwanted
-     * @param body Any: the body of the POST request
-     * @return String[]: list of missing entries or UserCreationData: sanitized data
-     * @private
-     */
-    private dataConverter(body: any): UserCreationData | string[] {
-        let data: UserCreationData = body;
-        let sanitizedData: UserCreationData = {
-            email: "",
-            firstName: "",
-            lastName: "",
-            manager: 0,
-            password: "",
-            roles: []
-        };
-        let missing: string[] = [];
-        //Go through all necessary entries add them if present otherwise add them to missing
-        for (const index of requiredIndexes) {
-            if (data[index] !== undefined) sanitizedData[index] = data[index];
-            else missing.push(index);
-        }
-        if (missing.length !== 0) return missing;
-        return sanitizedData;
-    }
+    allowedColumns: string[];
 
-    /**
-     * The POST called for "/api/user/creation/post".
-     * This for the creation of users in the system
-     * @param req Request: request from the HTTP request
-     * @param res Response: response for the HTTP request
-     */
-    public postRoute(req:Request, res:Response):void {
-        let data:UserCreationData | string[] = this.dataConverter(req.body)
-        if (data.constructor === Array) {
-            res.status(404).json({status: 404, success: false, missing: data });
-            res.end();
-            return;
+    async submitData(req: Request, res: Response): Promise<string[]> {
+        //Get data from the user creation form
+        let user: UserCreationData = req.body;
+
+        // Input validate email address
+        const emailValid:boolean = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(user.email);
+        if (emailValid) return Promise.resolve(["Email not valid"]);
+
+        // Get the group id the manager presides over
+        let groupResponse: MySQLResponse = await this.mySQL.select("GROUPS_CONNECTOR", ["groupId"], {column: "managerId", equals: [user.manager.toString()]})
+        if (groupResponse.error !== null) throw new Error("[MySQL] Failed to retrieve data");
+        let groupId = groupResponse.results[0].groupId;
+
+        let userResponse: MySQLResponse = await this.mySQL.insert("USERS",
+            ["email", "firstName", "lastName", "groupId"],
+            [user.email, user.firstName, user.lastName, groupId.toString()])
+        if (userResponse.error !== null) throw new Error("[MySQL] Failed insert data");
+        let userId: number = userResponse.results.insertId
+
+        // Make a list of all user roles to add to connector
+        let userRoles: string[][] = [];
+        for (const userRole of user.roles) {
+            userRoles.push([userId.toString(), userRole.toString()])
         }
-        res.status(200).json({status: 200, success: true});
-        res.end();
+
+        // Append all roles the user has to the user role connector table
+        let userRoleResponse: MySQLResponse = await this.mySQL.insert("USERS_ROLES_CONNECTOR", ["userId", "roleId"], userRoles);
+        if (userRoleResponse.error !== null) throw new Error("[MySQL] Failed insert data");
+
+        // Add user to the authentication table
+        let authKey: AuthKey = authKeyCreate(userId);
+        let authResponse: MySQLResponse = await this.mySQL.insert("AUTH",
+            ["email", "authKey", "authKeyEndDate", "userId", "password"],
+            [user.email, authKey.key, this.mySQL.dateFormatter(authKey.valid), userId.toString(), user.password]);
+        if (authResponse.error !== null) throw new Error("[MySQL] Failed insert data");
+
+        return Promise.resolve(["success"]);
     }
 }
+
+export default UserCreationEndpoint;

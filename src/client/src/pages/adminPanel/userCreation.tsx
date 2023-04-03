@@ -125,7 +125,6 @@ class UserCreation extends Component<any, CustomTypes>{
             name: string;
         }[] = (await APICalls.getAllManagers()).data
         this.handleLoader("All done")
-
         this.setState({
             dbRoles: dbRoles,
             dbManagers: dbManagers,
