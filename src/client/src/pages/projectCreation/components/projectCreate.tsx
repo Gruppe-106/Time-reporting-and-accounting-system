@@ -3,7 +3,7 @@ import Col from 'react-bootstrap/Col';
 import Nav from 'react-bootstrap/Nav';
 import Row from 'react-bootstrap/Row';
 import Tab from 'react-bootstrap/Tab';
-import {Form} from "react-bootstrap";
+import {Button, Form} from "react-bootstrap";
 import BaseApiHandler from "../../../network/baseApiHandler";
 import {Highlighter, Typeahead} from "react-bootstrap-typeahead";
 import ProjectCreateTask from "./projectCreateTasks";
@@ -52,17 +52,40 @@ class ProjectCreate extends Component<ProjectCreateProp> {
             console.log(json.data)
         })
     }
+
     private HandleManager(manager: any): void {
         this.setState({
             assignedToManager: manager[0]
         })
     }
 
+    handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) =>{
+        event.preventDefault();
+        const formData = new FormData(event.currentTarget)
+        const projectName = (document.getElementById("formBasicProjectName") as HTMLInputElement).value
+        const parentProject = parseInt(formData.get("chooseParent") as string)
+        const startDate = new Date((document.getElementById("formBasicStartDate") as HTMLInputElement).value)
+        const endDate = new Date((document.getElementById("formBasicEndDate") as HTMLInputElement).value)
+        const teamLeader = formData.get("chooseLeader") as string
+
+
+        const post_data = {
+            name: projectName,
+            startDate: startDate,
+            endDate: endDate,
+            projectLeader: teamLeader,
+            superProjectId: parentProject
+        }
+
+        let apiHandler = new BaseApiHandler("posttest");
+        apiHandler.post(`/api/project/creation/post`, {body:post_data}, (value) =>{
+            console.log(value);
+        })
+    }
 
     private informationRender():JSX.Element {
         return (
             <Tab.Container id="left-tabs-example" defaultActiveKey="first">
-
                 <Row>
                     <Col sm={2}>
                         <Nav variant="pills" className="flex-column">
@@ -78,11 +101,11 @@ class ProjectCreate extends Component<ProjectCreateProp> {
                         <Tab.Content>
                             <Tab.Pane eventKey="first">
                                 <h1>Create a project</h1>
-                                <Form>
+                                <Form onSubmit={this.handleFormSubmit}>
                                     <Row>
                                         <Col>
                                             <Form.Group className="mb-3" controlId="formBasicProjectName">
-                                                <Form.Label>Project Name</Form.Label>
+                                                <Form.Label>Project Name*</Form.Label>
                                                 <Form.Control type="text" placeholder="Project Name" />
                                             </Form.Group>
                                         </Col>
@@ -120,20 +143,20 @@ class ProjectCreate extends Component<ProjectCreateProp> {
                                     <Row>
                                         <Col>
                                             <Form.Group className="mb-3" controlId="formBasicStartDate">
-                                                <Form.Label>Start Date</Form.Label>
+                                                <Form.Label>Start Date*</Form.Label>
                                                 <Form.Control type="date" placeholder="1/20/1970" />
                                             </Form.Group>
                                         </Col>
                                         <Col>
                                             <Form.Group className="mb-3" controlId="formBasicEndDate">
-                                                <Form.Label>End Date</Form.Label>
+                                                <Form.Label>End Date*</Form.Label>
                                                 <Form.Control type="date" placeholder="1/20/1970" />
                                             </Form.Group>
                                         </Col>
                                     </Row>
 
                                     <Form.Group className="mb-3" controlId="formBasicChangeManager">
-                                        <Form.Label>Assign Team Leader</Form.Label>
+                                        <Form.Label>Assign Team Leader*</Form.Label>
                                         <Typeahead
                                             id="chooseLeader"
                                             labelKey="name"
@@ -163,6 +186,9 @@ class ProjectCreate extends Component<ProjectCreateProp> {
                                             )}
                                         />
                                     </Form.Group>
+                                    <Col>
+                        <Button variant="success" type="submit">Create Project</Button>
+                            </Col>
                                 </Form>
                             </Tab.Pane>
                             <Tab.Pane eventKey="second">

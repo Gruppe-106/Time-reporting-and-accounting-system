@@ -18,7 +18,7 @@ interface Api{
     status:number,
     data: {
         id?: number,
-        superProject?: number,
+        superProjectId?: number,
         name?: string,
         startDate?: string,
         endDate?: string
@@ -27,15 +27,16 @@ interface Api{
 
 interface ProjectInformationProp {
     id:number
-    superProject?:number
+    superProjectId?:number
     name?:string
     startDate?:string
     endDate?:string
+
 }
 
 class ProjectInformation extends Component<ProjectInformationProp> {
     state = {
-        pageInformation: {id: -1, superProject: -1, name: "", startDate: "", endDate: ""}
+        pageInformation: {id: -1, superProjectId: -1, name: "", startDate: "", endDate: ""}
     }
 
     constructor(props:ProjectInformationProp) {
@@ -90,7 +91,7 @@ class ProjectInformation extends Component<ProjectInformationProp> {
                                     </tr>
                                     <tr>
                                         <th>Project Number: {this.state.pageInformation.id}</th>
-                                        <th>Parent Project: {this.state.pageInformation.superProject}</th>
+                                        <th>Parent Project: {this.state.pageInformation.superProjectId}</th>
                                     </tr>
                                     <tr>
                                         <th>Project Manager: no one</th>
