@@ -18,6 +18,8 @@ import AuthEndpoint from "../apiEndpoints/dataGetEndpoints/authEndpoint";
 import ProjectEditEndpoint from "../apiEndpoints/dataPutEndpoints/projectEditEndpoint";
 import TaskCreationEndpoint from "../apiEndpoints/dataPostEndpoints/taskCreationEndpoint";
 import TaskEditEndpoint from "../apiEndpoints/dataPutEndpoints/taskEditEndpoint";
+import UserTimeRegisterEndpoint from "../apiEndpoints/dataPostEndpoints/UserTimeRegisterEndpoint";
+import UserTimeRegisterEditEndpoint from "../apiEndpoints/dataPutEndpoints/UserTimeRegisterEditEndpoint";
 
 export class ApiRouter extends BaseRouter {
     /**
@@ -56,11 +58,13 @@ export class ApiRouter extends BaseRouter {
             res.status(200).json({message: "Api POST gotten"});
         })
 
-        this.router.post("/login",                (req: Request, res:Response) => new LoginEndpoint().postRoute(req, res));
+        this.router.post("/login",                (req: Request, res: Response) => new LoginEndpoint().postRoute(req, res));
 
-        this.router.post("/user/creation/post",   (req: Request, res:Response) => new UserCreationEndpoint().postRoute(req, res));
-        this.router.post("/project/creation/post",(req: Request, res:Response) => new ProjectCreationEndpoint().postRoute(req, res));
-        this.router.post("/task/creation/post",   (req: Request, res:Response) => new TaskCreationEndpoint().postRoute(req, res));
+        this.router.post("/user/creation/post",   (req: Request, res: Response) => new UserCreationEndpoint().postRoute(req, res));
+        this.router.post("/project/creation/post",(req: Request, res: Response) => new ProjectCreationEndpoint().postRoute(req, res));
+        this.router.post("/task/creation/post",   (req: Request, res: Response) => new TaskCreationEndpoint().postRoute(req, res));
+        this.router.post("/time/register/post",   (req: Request, res: Response) => new UserTimeRegisterEndpoint().postRoute(req, res));
+
     }
 
     /**
@@ -75,9 +79,10 @@ export class ApiRouter extends BaseRouter {
             res.status(200).json({message: "Api PUT gotten"});
         })
 
-        this.router.put("/user/edit/put",   (req: Request, res:Response) => new UserEditEndpoint().postRoute(req, res));
-        this.router.put("/project/edit/put",(req: Request, res:Response) => new ProjectEditEndpoint().postRoute(req, res));
-        this.router.put("/task/edit/put",   (req: Request, res:Response) => new TaskEditEndpoint().postRoute(req, res));
+        this.router.put("/user/edit/put",         (req: Request, res: Response) => new UserEditEndpoint().postRoute(req, res));
+        this.router.put("/project/edit/put",      (req: Request, res: Response) => new ProjectEditEndpoint().postRoute(req, res));
+        this.router.put("/task/edit/put",         (req: Request, res: Response) => new TaskEditEndpoint().postRoute(req, res));
+        this.router.put("/time/register/edit/put",(req: Request, res: Response) => new UserTimeRegisterEditEndpoint().postRoute(req, res));
     }
 
     /**

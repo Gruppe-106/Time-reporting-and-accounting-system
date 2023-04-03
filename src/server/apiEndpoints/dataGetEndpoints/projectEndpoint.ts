@@ -25,8 +25,8 @@ class ProjectEndpoint extends  GetEndpointBase {
 
         //Convert dates to number format
         for (const result of response.results) {
-            if (result.startDate) result.startDate = this.mySQL.dateToNumber(result.startDate);
-            if (result.endDate)   result.endDate   = this.mySQL.dateToNumber(result.endDate);
+            if (result.startDate) result.startDate = this.mySQL.dateToNumber(new Date(result.startDate));
+            if (result.endDate)   result.endDate   = this.mySQL.dateToNumber(new Date(result.endDate));
         }
 
         return response.results;

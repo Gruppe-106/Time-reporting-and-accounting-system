@@ -96,7 +96,7 @@ class MysqlHandler {
         let whereString: string = "WHERE ";
         for (let i = 0; i < where.length; i++) {
             if (i !== 0) whereString += " AND "
-            whereString += where[i].column + "=" + where[i].equals[0].toString();
+            whereString += where[i].column + "='" + where[i].equals[0].toString() + "'";
         }
         return whereString;
     }
@@ -192,8 +192,13 @@ class MysqlHandler {
      * @param updateSet UpdateSet[]?: columns and the value to alter in the table
      * @param where Where?: condition for which rows to edit in table
      */
-    public update(table: string, updateSet: UpdateSet[], where:Where): Promise<MySQLResponse> {
-        let queryString = `UPDATE ${table} SET ${this.createUpdateSetString(updateSet)} ${this.createWhereString(where)}`;
+    public update(table: string, updateSet: UpdateSet[], where: Where |  Where[]): Promise<MySQLResponse> {
+        let queryString: string;
+        if (Array.isArray(where)) {
+            queryString = `UPDATE ${table} SET ${this.createUpdateSetString(updateSet)} ${this.createWhereListString(where)}`;
+        } else {
+            queryString = `UPDATE ${table} SET ${this.createUpdateSetString(updateSet)} ${this.createWhereString(where)}`;
+        }
         return this.sendQuery(queryString);
     }
 
@@ -214,7 +219,7 @@ class MysqlHandler {
      * Converts date to a date in numeric form
      * @param date Date: a date...
      */
-    public dateToNumber(date:Date): number {
+    public dateToNumber(date: Date): number {
         return date.getTime();
     }
 }

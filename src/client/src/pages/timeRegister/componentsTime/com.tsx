@@ -339,7 +339,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
   // apiHandler to get data from "database", the data is passed to the data array
   public componentDidMount() {
     const { userId } = this.props;
-    let apiHandler = new BaseApiHandler("fuldstændigligemeget");
+    let apiHandler = new BaseApiHandler();
     apiHandler.get(
       `/api/time/register/get?user=${userId}&var=taskName,taskId,projectName,time,date`,{},
       (value) => {

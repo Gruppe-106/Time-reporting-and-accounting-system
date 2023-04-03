@@ -48,7 +48,7 @@ Optional:
     name           : string,
     startDate      : number,
     endDate        : number,
-    projectLeader  : number,
+    projectLeader  : number[],
     task?: {
         name       : string,
         userId     : number[],
@@ -518,7 +518,7 @@ Optional:
 <details>
 <summary>Get</summary>
 
-## /api/timetype/get
+## /api/time/register/get
 ```
 Required:
     user=number | number,number,...
@@ -557,6 +557,52 @@ Optional:
   ]
 }
 ```
+
+</details>
+
+<details>
+<summary>Post</summary>
+
+## /api/time/register/post
+### Body
+```
+{
+    firstName   : string,
+    lastName    : string,
+    email       : string,
+    password    : string,
+    manager     : number,
+    roles       : number[]
+}
+```
+### Structure Of Object Returned
+```
+    {
+        status: number,
+        data: {
+            success? : boolean, 
+            error?   : string, 
+            message? : string[], 
+            reason?  : string[]
+        }
+    }
+```
+### Example return:
+
+```json
+{
+  "success": true,
+  "data": {
+    "success": "true", 
+    "message": ["success"]
+  }
+}
+```
+</details>
+
+<details>
+<summary>Edit</summary>
+
 </details>
 
 # Login
