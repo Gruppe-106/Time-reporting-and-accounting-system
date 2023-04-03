@@ -5,12 +5,7 @@ import BaseApiHandler from "../../../network/baseApiHandler";
 
 interface Api{
   status:number,
-  data: {
-    projectName:string;
-    taskName:string;
-    time:number;
-    date:number;
-  }[]
+  data: TimeSheetRowData[]
 }
 
 /*
