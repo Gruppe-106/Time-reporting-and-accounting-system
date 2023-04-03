@@ -16,14 +16,24 @@ interface ProjectEditData {
     endDate             ?: number,
     ProjectLeaderAdd    ?: number[],
     projectLeaderRemove ?: number[],
-    taskAdd             ?: TaskData[],
+    taskAdd             ?: number[],
     taskRemove          ?: number[]
+}
+
+export async function addMultiTaskToProject(taskIds:number[], projectId:number) {
+    for (const taskId of taskIds) {
+        try {
+            await taskProjectConnector.call(this, taskId, projectId);
+        } catch (e) {
+            //Ignore
+        }
+    }
 }
 
 export async function removeTaskFromProject(taskIds: number[], projectId: number) {
     let taskIdsString: string[] = taskIds.map<string>((value) => { return value.toString();} )
     let taskProjectResponse: MySQLResponse = await this.mySQL.remove("TASKS_PROJECTS_CONNECTOR", [{
-        column: "taskIds",
+        column: "taskId",
         equals: taskIdsString
     }, {
         column: "projectId",
@@ -70,7 +80,7 @@ class ProjectEditEndpoint extends PostEndpointBase {
         // Remove project leaders from the connector table if any
         if (projectData.projectLeaderRemove) await removeProjectLeader.call(this, projectData.projectLeaderRemove, projectData.projectId);
         // Create task and add it to the connector table if any
-        if (projectData.taskAdd) await addTaskToProject.call(this, projectData.taskAdd);
+        if (projectData.taskAdd) await addMultiTaskToProject.call(this, projectData.taskAdd, projectData.projectId);
         // Remove task project connection if any
         if (projectData.taskRemove) await removeTaskFromProject.call(this, projectData.taskRemove, projectData.projectId);
 

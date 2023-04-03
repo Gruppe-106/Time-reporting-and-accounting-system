@@ -50,7 +50,7 @@ class Router extends Component<any> {
         if (authCookie === undefined) {
             this.setState({ requireLogin: true });
         } else {
-            let apiHandler:BaseApiHandler = new BaseApiHandler("test");
+            let apiHandler:BaseApiHandler = new BaseApiHandler();
             apiHandler.get("/api/auth", {}, (value) => {
                 let response: AuthApi = JSON.parse(JSON.stringify(value));
                 if (response.data.success && response.data.userId && response.data.userRoles) {

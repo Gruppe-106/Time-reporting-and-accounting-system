@@ -3,9 +3,9 @@
 1. UserCreation _/
 2. UserEdit _/
 3. ProjectCreation _/
-4. ProjectEdit 
-5. TaskCreation 
-6. TaskEdit 
+4. ProjectEdit _/ 
+5. TaskCreation _/
+6. TaskEdit _/
 7. UserTimeRegistration 
 8. UserTimeEdit 
 9. GroupEdit

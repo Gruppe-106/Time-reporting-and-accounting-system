@@ -16,10 +16,11 @@ interface ProjectCreationData {
     startDate      : number,
     endDate        : number,
     projectLeader  : number[],
-    task?: TaskData[]
+    task          ?: TaskData[]
 }
 
 export async function addUsersToTask(users: number[], taskId: number) {
+    console.log(users);
     let userTask: string[][] = [];
     for (const user of users) {
         userTask.push([user.toString(), taskId.toString()]);
@@ -78,7 +79,7 @@ class ProjectCreationEndpoint extends PostEndpointBase {
         let projectId: number = projectResponse.results.insertId;
         await addProjectLeader.call(this, project.projectLeader, projectId);
 
-        if (project.task) await addTaskToProject.call(this, project.task);
+        if (project.task) await addTaskToProject.call(this, project.task, projectId);
 
         return Promise.resolve(["success"]);
     }

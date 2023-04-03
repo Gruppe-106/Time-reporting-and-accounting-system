@@ -2,20 +2,13 @@ import {Server} from "../server";
 import {Request, Response} from "express";
 import AuthEndpoint, {AuthData} from "./dataGetEndpoints/authEndpoint";
 
-enum Roles {
-    NORMAL,
-    MANAGER,
-    PROJECT_MANAGER,
-    ADMIN
-}
-
 abstract class EndpointBase {
     protected readonly mySQL = Server.mysql;
     abstract requiredRole: number;
 
     /**
      * Ensures the user is authorised to access page or api
-     * @param req Request: request object of the re3quest
+     * @param req Request: request object of the request
      * @protected
      * @return Boolean: whether the user is allowed
      */
@@ -26,7 +19,10 @@ abstract class EndpointBase {
             // If all users have access and the user has been authenticated return true
             if (this.requiredRole === 1 && authData.userId) return true;
             // Otherwise check if the role match or user is administrator
-            let roles: boolean[] = authData.userRoles.map((value) => { return value.roleId === this.requiredRole || value.roleId === Roles.ADMIN } );
+            let roles: boolean[] = authData.userRoles.map((value) => {
+                return value.roleId === this.requiredRole || value.roleId === 4
+            });
+            console.log(roles, authData.userRoles);
             return roles.indexOf(true) !== -1;
         } catch (e) { }
         return false;
