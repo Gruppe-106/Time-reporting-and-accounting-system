@@ -19,7 +19,7 @@ import LoadingOverlay from 'react-loading-overlay-ts';
 import React, { Component } from "react";
 import { Highlighter, Typeahead } from 'react-bootstrap-typeahead';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
-import Spinner from 'react-bootstrap/Spinner';
+
 
 //Forge import
 import forge from 'node-forge';
@@ -45,8 +45,10 @@ interface CustomTypes {
     //Input varriables
 
     // * Controlling components
-    loading: boolean,
+    loading: boolean
+    editing: boolean
 
+    //* database varriables
     dbUsers: User[]
 
 
@@ -70,7 +72,7 @@ class AdminPanel extends Component<any, CustomTypes> {
         this.state = {
             // * Component controllers
             loading: false,
-
+            editing: false,
             //* database varriables
             dbUsers: [],
 
@@ -93,7 +95,7 @@ class AdminPanel extends Component<any, CustomTypes> {
         this.handleRowClick = this.handleRowClick.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.renderRow = this.renderRow.bind(this);
-        
+
     }
 
     async componentDidMount() {
@@ -112,7 +114,7 @@ class AdminPanel extends Component<any, CustomTypes> {
             this.setState({ buttonText: "Bulk edit" });
         } else if (this.state.selectedUsersId.length === 1 && this.state.buttonText !== "Edit") {
             this.setState({ buttonText: "Edit" });
-        } 
+        }
     }
 
     /**
@@ -135,7 +137,7 @@ class AdminPanel extends Component<any, CustomTypes> {
         }
     }
 
-    private handleRowClick(id: number,user:User) {
+    private handleRowClick(id: number, user: User) {
         const { selectedUsersId, selectedUsers } = this.state;
         const index = selectedUsersId.indexOf(id);
         if (index === -1) {
@@ -160,7 +162,19 @@ class AdminPanel extends Component<any, CustomTypes> {
         const className = rowClassNames?.includes('table-primary') ? rowClassNames : isSelected ? 'table-primary' : '';
 
         return (
-            <tr key={user.id} onClick={() => this.handleRowClick(user.id,user)} className={className}>
+            <tr key={user.id} onClick={() => this.handleRowClick(user.id, user)} className={className}>
+                <td>{user.id}</td>
+                <td>{user.email}</td>
+                <td>{user.firstName}</td>
+                <td>{user.lastName}</td>
+                <td>{user.group}</td>
+            </tr>
+        );
+    }
+
+    private renderEditingRow(user: User) {
+        return (
+            <tr key={user.id}>
                 <td>{user.id}</td>
                 <td>{user.email}</td>
                 <td>{user.firstName}</td>
@@ -171,9 +185,11 @@ class AdminPanel extends Component<any, CustomTypes> {
     }
 
 
-    private handleSubmit(){
-
-        console.log(this.state.selectedUsers)
+    private handleSubmit() {
+        this.setState({
+            editing: !this.state.editing
+        })
+        
     }
 
 
@@ -216,7 +232,7 @@ class AdminPanel extends Component<any, CustomTypes> {
                                 </tr>
                             </thead>
                             <tbody>
-                                {this.state.dbUsers
+                                {this.state.editing ? (this.state.dbUsers
                                     .filter((user) =>
                                         user.id.toString().includes(this.state.searchQuery) ||
                                         user.email.includes(this.state.searchQuery) ||
@@ -224,7 +240,16 @@ class AdminPanel extends Component<any, CustomTypes> {
                                         user.lastName.includes(this.state.searchQuery) ||
                                         user.group.toString().includes(this.state.searchQuery)
                                     )
-                                    .map((user) => this.renderRow(user))}
+                                    .map((user) => this.renderRow(user))) :
+                                    (this.state.selectedUsers
+                                        .filter((user) =>
+                                            user.id.toString().includes(this.state.searchQuery) ||
+                                            user.email.includes(this.state.searchQuery) ||
+                                            user.firstName.includes(this.state.searchQuery) ||
+                                            user.lastName.includes(this.state.searchQuery) ||
+                                            user.group.toString().includes(this.state.searchQuery)
+                                        )
+                                        .map((user) => this.renderEditingRow(user)))}
                             </tbody>
 
                         </Table>
