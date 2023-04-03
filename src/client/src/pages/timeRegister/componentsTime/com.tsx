@@ -270,6 +270,7 @@ interface TimeSheetProp {
 // Variable states in TimeSheetPage
 interface TimeSheetState {
   data: TimeSheetRowData[];
+  status:number;
   selectedProject: TimeSheetRowData | null;
   loadedProjects: TimeSheetRowData | null;
   showAddRowModal: boolean;
@@ -287,6 +288,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     // Initialise states
     this.state = {
       data: [],
+      status: 0,
       loadedProjects: null,
       selectedProject: null,
       showAddRowModal: false,
@@ -334,7 +336,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     const { userId } = this.props;
     let apiHandler = new BaseApiHandler("fuldstændigligemeget");
     apiHandler.get(
-      `api/time/register/get?user=${userId}&var=taskName,taskId,projectName,time,date`,{},
+      `/api/time/register/get?user=${userId}&var=taskName,taskId,projectName,time,date`,{},
       (value) => {
         let json: TimeSheetRowData[] = JSON.parse(JSON.stringify(value));
         this.setState({data: json});
