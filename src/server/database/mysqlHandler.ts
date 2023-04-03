@@ -165,8 +165,13 @@ class MysqlHandler {
      * @param columns String[]?: column(s) to retrieve
      * @param where Where?: condition for the selection of data
      */
-    public select(table: string, columns?: string[], where?: Where): Promise<MySQLResponse> {
-        let queryString = `SELECT ${columns !== undefined ? columns : "*"} FROM ${table} ${this.createWhereString(where)}`;
+    public select(table: string, columns?: string[], where?: Where | Where[]): Promise<MySQLResponse> {
+        let queryString: string;
+        if (Array.isArray(where)) {
+            queryString = `SELECT ${columns !== undefined ? columns : "*"} FROM ${table} ${this.createWhereListString(where)}`;
+        } else {
+            queryString = `SELECT ${columns !== undefined ? columns : "*"} FROM ${table} ${this.createWhereString(where)}`;
+        }
         return this.sendQuery(queryString);
     }
 
