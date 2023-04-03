@@ -3,6 +3,16 @@ import {Container, Table, Form, InputGroup, Button, Modal} from "react-bootstrap
 import { Highlighter, Typeahead } from 'react-bootstrap-typeahead';
 import BaseApiHandler from "../../../network/baseApiHandler";
 
+interface Api{
+  status:number,
+  data: {
+    projectName:string;
+    taskName:string;
+    time:number;
+    date:number;
+  }[]
+}
+
 /*
 
     * TODO:
@@ -338,8 +348,8 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     apiHandler.get(
       `/api/time/register/get?user=${userId}&var=taskName,taskId,projectName,time,date`,{},
       (value) => {
-        let json: TimeSheetRowData[] = JSON.parse(JSON.stringify(value));
-        this.setState({data: json});
+        let json: Api = JSON.parse(JSON.stringify(value));
+        this.setState({data: json.data});
       }
     );
   }
