@@ -13,10 +13,6 @@ import UserTimeSheet from "./componentsTime/adminCom";
 import { userInfo } from '../../utility/router';
 
 class UserTimeRegister extends Component<any>{
-/*    constructor(props:any) {
-        super(props);
-    }*/
-
     printUserInfo() {
         return console.log(userInfo);
     }
