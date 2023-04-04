@@ -7,13 +7,18 @@ import React, {Component} from "react";
 //import ReactDOM from "react-dom/client";
 import BaseNavBar from "../../components/navBar";
 import {Container} from "react-bootstrap";
-import UserTimeSheet from "./componentsTime/com";
+import TimeSheetPage from "./componentsTime/userCom";
 
+import { userInfo } from '../../utility/router';
 
 class UserTimeRegister extends Component<any>{
 /*    constructor(props:any) {
         super(props);
     }*/
+
+    printUserInfo() {
+        return console.log(userInfo);
+    }
 
     render() {
         return (
@@ -22,7 +27,8 @@ class UserTimeRegister extends Component<any>{
                 <Container fluid="sm">
                     <h1>User Time Register: Nine and Two works for now</h1>
                 </Container>
-                <UserTimeSheet/>
+                <TimeSheetPage userId={userInfo.userId} />
+                {this.printUserInfo()}
             </>
         );
     }

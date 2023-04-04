@@ -3,6 +3,8 @@ import { Container, Table, Form, InputGroup, Button, Modal } from "react-bootstr
 import { Highlighter, Typeahead } from 'react-bootstrap-typeahead';
 import BaseApiHandler from "../../../network/baseApiHandler";
 
+import { userInfo } from '../../../utility/router';
+
 interface Api {
   status: number,
   data: TimeSheetRowData[]
@@ -10,13 +12,16 @@ interface Api {
 
 /*
 
-    * TODO:
-      * Fix add row (with popup modal) (have pop up, but fix loading of data so only data(rows) with time is loaded)
+    * TODO: Admin component (Choose user)
+      * Fix add row, fix loading of data so only data(rows) with time is loaded.
       * Only render table row if there is time for said table, otherwise be able to create a row for that task.
-      * Show TimeSheet for different users (Working)
-      * Load "time" and "date" form data to timeSheet (done, but have to fix data , and how and where data is loaded)
+      * (Need api for project name and task name connected to user).
+      * 
+      * Load "time" proberly from data to correct date.
+      * 
+      * Show TimeSheet for logged in user (Working)
+      * Make it so admin, can see all timesheets.
       * Submit button (Post data)
-      * Clean up code
 
 */
 
@@ -342,6 +347,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
         let json: Api = JSON.parse(JSON.stringify(value));
         this.setState({ stateRowData: json.data });
         //console.log(json.data);
+        console.log(userInfo);
       }
     );
   }
