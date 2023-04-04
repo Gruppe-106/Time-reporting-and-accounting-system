@@ -339,12 +339,13 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
   // apiHandler to get data from "database", the data is passed to the data array
   public componentDidMount() {
     const { userId } = this.props;
-    let apiHandler = new BaseApiHandler();
+    let apiHandler = new BaseApiHandler("test");
     apiHandler.get(
       `/api/time/register/get?user=${userId}&var=taskName,taskId,projectName,time,date`,{},
       (value) => {
         let json: Api = JSON.parse(JSON.stringify(value));
         this.setState({data: json.data});
+        //console.log(json.data);
       }
     );
   }
@@ -389,9 +390,9 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
       if (Utility.makeDateFromNum(item.date) === dates[0]) {
         return <TimeSheetRow key={index} data={item} onDelete={() => this.handleDeleteRow(index)} />;
       } else {
-        console.log(dates[0]);
-        console.log((item.date).toString());
-        console.log("Dates dosent match")
+        //console.log(dates[0]);
+        //console.log((item.date).toString());
+        //console.log("Dates dosent match");
         return null; // if the date dosent match, don't render the row
       }
     });
