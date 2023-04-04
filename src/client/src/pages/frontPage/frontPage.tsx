@@ -3,6 +3,7 @@ import BaseNavBar from "../../components/navBar";
 import {Button, Container} from "react-bootstrap";
 import BaseApiHandler from "../../network/baseApiHandler";
 import baseApiHandler from "../../network/baseApiHandler";
+import {userInfo} from "../../utility/router";
 
 class FrontPage extends Component<any> {
 
@@ -25,19 +26,8 @@ class FrontPage extends Component<any> {
     }
 
     private test() {
-        const projectData = {
-            projectId: 1,
-            task: {
-                name: "Redesign Website",
-                userId: [1, 2, 3],
-                startDate: 1683120000000, // May 1st, 2023 00:00:00 GMT
-                endDate: 1687296000000,   // June 18th, 2023 00:00:00 GMT
-                timeType: 1
-            }
-        }
-
         let apiHandler: baseApiHandler = new BaseApiHandler();
-        apiHandler.post("/api/task/creation/post", {body: projectData}, (value) => {
+        apiHandler.get("/api/task/user/get?id=1", {}, (value) => {
             console.log(value)
         })
     }
@@ -49,7 +39,7 @@ class FrontPage extends Component<any> {
                 <Container>
                     <h1>Front</h1>
                     { this.state.test === "" ? "" : (<p>{this.state.test}</p>) }
-                    <Button onClick={this.test}></Button>
+                    { userInfo.isAdmin ? (<Button onClick={this.test}></Button>) : null }
                 </Container>
             </>
         );

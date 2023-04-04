@@ -20,6 +20,7 @@ import TaskCreationEndpoint from "../apiEndpoints/dataPostEndpoints/taskCreation
 import TaskEditEndpoint from "../apiEndpoints/dataPutEndpoints/taskEditEndpoint";
 import UserTimeRegisterEndpoint from "../apiEndpoints/dataPostEndpoints/UserTimeRegisterEndpoint";
 import UserTimeRegisterEditEndpoint from "../apiEndpoints/dataPutEndpoints/UserTimeRegisterEditEndpoint";
+import UserTaskEndpoint from "../apiEndpoints/dataGetEndpoints/userTaskEndpoint";
 
 export class ApiRouter extends BaseRouter {
     /**
@@ -38,6 +39,7 @@ export class ApiRouter extends BaseRouter {
         this.router.get("/project/get",      (req: Request, res: Response) => new ProjectEndpoint().getRoute(req, res));
         this.router.get("/user/get",         (req: Request, res: Response) => new UserEndpoint().getRoute(req, res));
         this.router.get("/task/get",         (req: Request, res: Response) => new TaskEndpoint().getRoute(req, res));
+        this.router.get("/task/user/get",    (req: Request, res: Response) => new UserTaskEndpoint().getRoute(req, res, "userId", "id"));
         this.router.get("/task/project/get", (req: Request, res: Response) => new TaskProjectEndpoint().getRoute(req, res));
         this.router.get("/timetype/get",     (req: Request, res: Response) => new TimeTypeEndpoint().getRoute(req, res));
         this.router.get("/role/get",         (req: Request, res: Response) => new RoleEndpoint().getRoute(req, res));
