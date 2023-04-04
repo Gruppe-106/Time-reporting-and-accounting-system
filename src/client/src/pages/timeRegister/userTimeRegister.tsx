@@ -8,6 +8,7 @@ import React, {Component} from "react";
 import BaseNavBar from "../../components/navBar";
 import {Container} from "react-bootstrap";
 import TimeSheetPage from "./componentsTime/userCom";
+import UserTimeSheet from "./componentsTime/adminCom";
 
 import { userInfo } from '../../utility/router';
 
@@ -25,10 +26,11 @@ class UserTimeRegister extends Component<any>{
             <>
                 <BaseNavBar/>
                 <Container fluid="sm">
-                    <h1>User Time Register: Nine and Two works for now</h1>
+                    <h1>User Time Register: Joe and John's dates work</h1>
                 </Container>
-                <TimeSheetPage userId={userInfo.userId} />
+                <TimeSheetPage userId={userInfo.userId} /> 
                 {this.printUserInfo()}
+                {userInfo.isAdmin ? (<UserTimeSheet/>) : null} {/*Button to adminCom*/}
             </>
         );
     }
