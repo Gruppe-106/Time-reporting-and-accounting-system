@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import {Container, Table, Form, InputGroup, Button, Modal} from "react-bootstrap";
+import { Container, Table, Form, InputGroup, Button, Modal } from "react-bootstrap";
 import { Highlighter, Typeahead } from 'react-bootstrap-typeahead';
 import BaseApiHandler from "../../../network/baseApiHandler";
 
-interface Api{
-  status:number,
+interface Api {
+  status: number,
   data: TimeSheetRowData[]
 }
 
@@ -27,42 +27,42 @@ interface Api{
 
 */
 class Utility {
-  public static getCurrentWeekDates(dates:string[]){
+  public static getCurrentWeekDates(dates: string[]) {
     // Get the current date
-  const today = new Date();
+    const today = new Date();
 
-  // Get the start date of the current week (Monday)
-  const monday = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay() + 1);
-  
-  dates.push(Utility.makeDateFromNum(1679356800000));
+    // Get the start date of the current week (Monday)
+    const monday = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay() + 1);
 
-  // Create an array of date strings for each day of the week
-  for (let i = 1; i < 7; i++) {
-    const currentDate = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + i);
-    dates.push(currentDate.toLocaleDateString());
+    dates.push(Utility.makeDateFromNum(1679356800000));
+
+    // Create an array of date strings for each day of the week
+    for (let i = 1; i < 7; i++) {
+      const currentDate = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + i);
+      dates.push(currentDate.toLocaleDateString());
+    }
+    return dates;
   }
-  return dates;
-  }
 
-  public static makeDateFromNum(date:number){
+  public static makeDateFromNum(date: number) {
     const newDate = new Date(date);
 
     const secNewDate = new Date(newDate.getFullYear(), newDate.getMonth(), newDate.getDay());
-    
+
     return secNewDate.toLocaleDateString();
   }
 
-  public static makeDateFromString(date:string){
+  public static makeDateFromString(date: string) {
     const newDate = new Date(Number(date));
 
     const secNewDate = new Date(newDate.getFullYear(), newDate.getMonth(), newDate.getDay());
-    
+
     return secNewDate.toLocaleDateString();
   }
 }
 
 // Empty prop to indicate that the component will not recive a prop.
-interface EmptyProps {}
+interface EmptyProps { }
 
 interface TableHeaderState {
   headerDates: string[];
@@ -72,7 +72,7 @@ interface TableHeaderState {
 
     * Creating the table header
 
-*/ 
+*/
 class TableHeader extends React.Component<EmptyProps, TableHeaderState> {
   constructor(props: EmptyProps) {
     super(props);
@@ -87,33 +87,33 @@ class TableHeader extends React.Component<EmptyProps, TableHeaderState> {
 
   render() {
     return (
-          <thead>
-            <tr>
-              <th>Project Name</th>
-              <th>Task Name</th>
-              {/* Gets the dates, and maps each date with an index to a table header, creating 7 <th>, all dates in a week */}
-              {this.state.headerDates.map((date, index) => (
-                <th key={index}>{date}</th>
-              ))}
-              <th>Total Time</th>
-              <th>&#128465;</th> {/* Trashcan, HTML Entity: */}
-            </tr>
-          </thead> 
+      <thead>
+        <tr>
+          <th>Project Name</th>
+          <th>Task Name</th>
+          {/* Gets the dates, and maps each date with an index to a table header, creating 7 <th>, all dates in a week */}
+          {this.state.headerDates.map((date, index) => (
+            <th key={index}>{date}</th>
+          ))}
+          <th>Total Time</th>
+          <th>&#128465;</th> {/* Trashcan, HTML Entity: */}
+        </tr>
+      </thead>
     );
   }
 }
 
 // Loaded data from database, used in TimeSheetRow and TimeSheetPage
 interface TimeSheetRowData {
-    projectName:string;
-    taskName:string;
-    time:number;
-    date:number;
+  projectName: string;
+  taskName: string;
+  time: number;
+  date: number;
 }
 
 // The props given to TimeSheetRow
 interface TimeSheetRowProps {
-  data: TimeSheetRowData; 
+  rowData: TimeSheetRowData;
   onDelete: () => void
 }
 
@@ -135,7 +135,7 @@ interface TimeSheetRowState {
 class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
   // Inilisie all states
   state: TimeSheetRowState = {
-    dataTotal: this.props.data.time,
+    dataTotal: this.props.rowData.time,
     times: ["0", "0", "0", "0", "0", "0", "0"],
     total: 0,
     minTimes: ["0", "0", "0", "0", "0", "0", "0"],
@@ -198,12 +198,12 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
   /*
       * Calculates total hours and minutes.
    */
-  private displayTimeTotal = ():JSX.Element => {
+  private displayTimeTotal = (): JSX.Element => {
     const { dataTotal } = this.state;
     const { total } = this.state;
     const { minTotal } = this.state;
 
-    let newDataTotal = dataTotal * 60;  
+    let newDataTotal = dataTotal * 60;
 
     const totalMinutes = total + minTotal + newDataTotal;
     const hours = Math.floor(totalMinutes / 60);
@@ -214,57 +214,57 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
     )
   }
 
-    render() {
-        // Defining data as this.prop, it reprensents the data (prop) passed to TimeSheetRow
-        const { data } = this.props;
-        // Loades the initial state
-        const { times, showDeleteRowModal } = this.state;
-        // arr to create a input field for all 7 dates
-        let arr = ['1', '2', '3', '4', '5', '6', '7'];
-        return (
-            <tr>
-                <td>{data.projectName}</td>
-                        <td>{data.taskName}</td>
-                        {arr.map((num, index) => (<td key={index}>
-                          <InputGroup size="sm">
-                            <Form.Control 
-                              type="number" 
-                              placeholder="0" 
-                              value={times[index]}
-                              onChange={(e) => this.handleControlTimeChange(index, e.target.value)}
-                              />
-                            <InputGroup.Text id={`basic-addon-${num}`}>:</InputGroup.Text>
-                            <Form.Select onChange={(e) => this.handleSelectTimeChange(index, e.target.value)}>
-                                <option value="0">0</option>
-                                <option value="15">15</option>
-                                <option value="30">30</option>
-                                <option value="45">45</option>
-                            </Form.Select>
-                        </InputGroup></td>))}
-                        <td>{this.displayTimeTotal()}</td> {/* Total time */}
-                        <td>
-                        <Button variant="danger" type="button" onClick={this.handleShowModal}>-</Button>
-                        </td>
-                        <Modal show={showDeleteRowModal} onHide={this.handleCloseModal}>
-                          <Modal.Header closeButton>
-                              <Modal.Title>Delete Row?</Modal.Title>
-                          </Modal.Header>
-                          <Modal.Body>
-                              <p>Are you sure you want to delete:</p>
-                              <p>{data.projectName}, {data.taskName} ?</p>
-                          </Modal.Body>
-                          <Modal.Footer>
-                            <Button variant="secondary" onClick={this.handleCloseModal}>
-                              Cancel
-                            </Button>
-                            <Button variant="danger" onClick={this.handleDeleteClick}>
-                              Delete
-                            </Button>
-                          </Modal.Footer>
-                        </Modal>
-            </tr>
-        )
-    }
+  render() {
+    // Defining data as this.prop, it reprensents the data (prop) passed to TimeSheetRow
+    const { rowData } = this.props;
+    // Loades the initial state
+    const { times, showDeleteRowModal } = this.state;
+    // arr to create a input field for all 7 dates
+    let arr = ['1', '2', '3', '4', '5', '6', '7'];
+    return (
+      <tr>
+        <td>{rowData.projectName}</td>
+        <td>{rowData.taskName}</td>
+        {arr.map((num, index) => (<td key={index}>
+          <InputGroup size="sm">
+            <Form.Control
+              type="number"
+              placeholder="0"
+              value={times[index]}
+              onChange={(e) => this.handleControlTimeChange(index, e.target.value)}
+            />
+            <InputGroup.Text id={`basic-addon-${num}`}>:</InputGroup.Text>
+            <Form.Select onChange={(e) => this.handleSelectTimeChange(index, e.target.value)}>
+              <option value="0">0</option>
+              <option value="15">15</option>
+              <option value="30">30</option>
+              <option value="45">45</option>
+            </Form.Select>
+          </InputGroup></td>))}
+        <td>{this.displayTimeTotal()}</td> {/* Total time */}
+        <td>
+          <Button variant="danger" type="button" onClick={this.handleShowModal}>-</Button>
+        </td>
+        <Modal show={showDeleteRowModal} onHide={this.handleCloseModal}>
+          <Modal.Header closeButton>
+            <Modal.Title>Delete Row?</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <p>Are you sure you want to delete:</p>
+            <p>{rowData.projectName}, {rowData.taskName} ?</p>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={this.handleCloseModal}>
+              Cancel
+            </Button>
+            <Button variant="danger" onClick={this.handleDeleteClick}>
+              Delete
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      </tr>
+    )
+  }
 }
 
 // Props used in TimeSheetPage
@@ -274,10 +274,8 @@ interface TimeSheetProp {
 
 // Variable states in TimeSheetPage
 interface TimeSheetState {
-  data: TimeSheetRowData[];
-  status:number;
+  stateRowData: TimeSheetRowData[];
   selectedProject: TimeSheetRowData | null;
-  loadedProjects: TimeSheetRowData | null;
   showAddRowModal: boolean;
 }
 
@@ -292,9 +290,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
 
     // Initialise states
     this.state = {
-      data: [],
-      status: 0,
-      loadedProjects: null,
+      stateRowData: [],
       selectedProject: null,
       showAddRowModal: false,
     };
@@ -328,23 +324,23 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
    * @param index : number, which represents the index of the row that needs to be deleted from the data array in the component's state.
    */
   private handleDeleteRow = (index: number) => {
-    const { data } = this.state;
+    const { stateRowData } = this.state;
 
-      this.setState({
-          data: [...data.slice(0, index), ...data.slice(index + 1)],
-        });
-  };  
+    this.setState({
+      stateRowData: [...stateRowData.slice(0, index), ...stateRowData.slice(index + 1)],
+    });
+  };
 
-  
+
   // apiHandler to get data from "database", the data is passed to the data array
   public componentDidMount() {
     const { userId } = this.props;
     let apiHandler = new BaseApiHandler("test");
     apiHandler.get(
-      `/api/time/register/get?user=${userId}&var=taskName,taskId,projectName,time,date`,{},
+      `/api/time/register/get?user=${userId}&var=taskName,taskId,projectName,time,date`, {},
       (value) => {
         let json: Api = JSON.parse(JSON.stringify(value));
-        this.setState({data: json.data});
+        this.setState({ stateRowData: json.data });
         //console.log(json.data);
       }
     );
@@ -354,41 +350,41 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
    * First, the current state's data array is destructured from this.state. This array is then copied using the spread operator (...) and a new object representing the new row is added to the end of the array. The new row object contains default values for projectName and taskName.
    */
   private handleAddRow() {
-    const { data, selectedProject } = this.state;
-  
+    const { stateRowData, selectedProject } = this.state;
+
     if (!selectedProject) {
       // No project is selected, do not add a new row
       return;
     }
-  
+
     const newProjectName = selectedProject.projectName;
     const newTaskName = selectedProject.taskName;
-  
+
     this.setState({
-      data: [
-        ...data,
+      stateRowData: [
+        ...stateRowData,
         { projectName: newProjectName, taskName: newTaskName, time: 0, date: 1679356800000 },
       ],
       selectedProject: null, // clear the selectedProject state after adding a new row
     });
-  
+
     this.handleCloseAddModal();
   }
-  
+
 
   /**
    * It is used to generate an array of TimeSheetRow components based on the data array in the component's state.
    * @returns class component. <TimeSheetRow>
    */
   private renderRows() {
-    const { data } = this.state;
+    const { stateRowData } = this.state;
 
-    const dates:string[] = [];
+    const dates: string[] = [];
     Utility.getCurrentWeekDates(dates);
-    
-    return data.map((item, index) => {
+
+    return stateRowData.map((item, index) => {
       if (Utility.makeDateFromNum(item.date) === dates[0]) {
-        return <TimeSheetRow key={index} data={item} onDelete={() => this.handleDeleteRow(index)} />;
+        return <TimeSheetRow key={index} rowData={item} onDelete={() => this.handleDeleteRow(index)} />;
       } else {
         //console.log(dates[0]);
         //console.log((item.date).toString());
@@ -403,49 +399,48 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     return (
       <Container fluid="sm">
         <Table bordered size="sm">
-            <TableHeader />
-            <tbody>
-                {this.renderRows()}
-            </tbody>
+          <TableHeader />
+          <tbody>
+            {this.renderRows()}
+          </tbody>
         </Table>
         <Button variant="primary" type="button" onClick={() => this.handleShowAddModal()}>Add Row</Button>
         <Modal show={showAddRowModal} onHide={this.handleCloseAddModal}>
-        <Modal.Header closeButton>
-         <Modal.Title>Add Row?</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-         <p>Which task do you want to add?</p>
-         <Form.Group className="mb-3" controlId="formBasicAssignManager">
-        <Form.Label>Find project</Form.Label>
-          <Typeahead
-            id="findProject"
-            labelKey={(option: any) => `${option.projectName}  ${option.taskName}`}
-            options={this.state.data}
-            placeholder="Pick a project"
-            filterBy={(option: any, props: any): boolean => {
-              const query: string = props.text.toLowerCase().trim();
-              const name: string = option.projectName.toLowerCase() + option.taskName.toLowerCase();
-              return name.includes(query);
-            }}
-              renderMenuItemChildren={(option: any, props: any) => (
-              <>
-                <Highlighter search={props.text}>
-                  {option.projectName + ", " + option.taskName}
-                </Highlighter>
-              </>
-            )}
-            onChange={(selected: any) => {
-              // Set selectedProject state to the first selected option (if any)
-              this.setState({ selectedProject: selected[0] || null });
-            }}
-            selected={this.state.selectedProject ? [this.state.selectedProject] : []}
-          />
-        </Form.Group>
-         </Modal.Body>
-         <Modal.Footer>
-          <Button variant="secondary" onClick={this.handleCloseAddModal}>Cancel</Button>
-          <Button variant="primary" onClick={this.handleAddRow}>Add</Button>
-         </Modal.Footer>
+          <Modal.Header closeButton>
+            <Modal.Title>Add Row?</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <p>Which task do you want to add?</p>
+            <Form.Group className="mb-3" controlId="formBasicAssignManager">
+              <Typeahead
+                id="findProject"
+                labelKey={(option: any) => `${option.projectName}  ${option.taskName}`}
+                options={this.state.stateRowData}
+                placeholder="Pick a project"
+                filterBy={(option: any, props: any): boolean => {
+                  const query: string = props.text.toLowerCase().trim();
+                  const name: string = option.projectName.toLowerCase() + option.taskName.toLowerCase();
+                  return name.includes(query);
+                }}
+                renderMenuItemChildren={(option: any, props: any) => (
+                  <>
+                    <Highlighter search={props.text}>
+                      {option.projectName + ", " + option.taskName}
+                    </Highlighter>
+                  </>
+                )}
+                onChange={(selected: any) => {
+                  // Set selectedProject state to the first selected option (if any)
+                  this.setState({ selectedProject: selected[0] || null });
+                }}
+                selected={this.state.selectedProject ? [this.state.selectedProject] : []}
+              />
+            </Form.Group>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={this.handleCloseAddModal}>Cancel</Button>
+            <Button variant="primary" onClick={this.handleAddRow}>Add</Button>
+          </Modal.Footer>
         </Modal>
       </Container>
     );
@@ -466,7 +461,7 @@ class UserTimeSheet extends Component<EmptyProps, UserState> {
     };
   }
 
-  private handleSelectChange(value:string) {
+  private handleSelectChange(value: string) {
     const newId = parseInt(value);
     this.setState({ userId: newId });
   }
@@ -478,7 +473,7 @@ class UserTimeSheet extends Component<EmptyProps, UserState> {
     if (selectedUser > 0) {
       return <TimeSheetPage key={selectedUser} userId={selectedUser} />;
     }
-  }  
+  }
 
   render() {
     return (
