@@ -30,7 +30,9 @@ interface ProjectCreateProp {
 
 class ProjectCreate extends Component<ProjectCreateProp> {
     state = {
-        pageInformation: [{id: -1, superProject: -1, name: "", startDate: "", endDate: "", assignedToManager: {"managerId": Infinity, "managerName": "" }}]
+        assignedToManager: {"id": Infinity, "name": "" },
+        selectedParentProject: {"id": Infinity, "name": ""},
+        pageInformation: [{id: -1, superProject: -1, name: "", startDate: "", endDate: ""}]
     }
 
     constructor(props:ProjectCreateProp) {
@@ -55,35 +57,45 @@ class ProjectCreate extends Component<ProjectCreateProp> {
 
     private HandleManager(manager: any): void {
         this.setState({
-            assignedToManager: manager[0]
+            assignedToManager: manager[0] ? manager[0] : null
         })
     }
+    private HandleParent(selected: any): void {
+        this.setState({
+        selectedParentProject: selected[0] ? selected[0] : null
+         });
+    }
+
+
+
 
     handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) =>{
         event.preventDefault();
-        const formData = new FormData(event.currentTarget)
+        //const formData = new FormData(event.currentTarget)
         const projectName = (document.getElementById("formBasicProjectName") as HTMLInputElement).value
-        const parentProject = parseInt(formData.get("chooseParent") as string)
+        const parentProject = this.state.selectedParentProject.id
         const startDate = new Date((document.getElementById("formBasicStartDate") as HTMLInputElement).value)
         const endDate = new Date((document.getElementById("formBasicEndDate") as HTMLInputElement).value)
-        const teamLeader = formData.get("chooseLeader") as string
+        const teamLeader = this.state.assignedToManager.id
 
 
         const post_data = {
             name: projectName,
             startDate: startDate,
             endDate: endDate,
-            projectLeader: teamLeader,
+            projectLeader: [teamLeader],
             superProjectId: parentProject
         }
 
         let apiHandler = new BaseApiHandler("posttest");
         apiHandler.post(`/api/project/creation/post`, {body:post_data}, (value) =>{
             console.log(value);
+
         })
     }
 
     private informationRender():JSX.Element {
+
         return (
             <Tab.Container id="left-tabs-example" defaultActiveKey="first">
                 <Row>
@@ -110,7 +122,7 @@ class ProjectCreate extends Component<ProjectCreateProp> {
                                             </Form.Group>
                                         </Col>
                                         <Col>
-                                            <Form.Group className="mb-3" controlId="formBasicChangeManager">
+                                            <Form.Group className="mb-3" controlId="formBasicParent">
                                         <Form.Label>Assign Parent Project</Form.Label>
                                         <Typeahead
                                             id="chooseParent"
@@ -119,7 +131,7 @@ class ProjectCreate extends Component<ProjectCreateProp> {
                                                 this.state.pageInformation.map(row =>({id: row.id, name: row.name}))
                                             }
                                             placeholder="Choose Parent Project..."
-                                            onChange={this.HandleManager}
+                                            onChange={(value) => this.HandleParent.call(this, value)}
                                             filterBy={(option: any, props: any): boolean => {
                                                 const query: string = props.text.toLowerCase().trim();
                                                 const name: string = option.name.toLowerCase();
@@ -155,7 +167,7 @@ class ProjectCreate extends Component<ProjectCreateProp> {
                                         </Col>
                                     </Row>
 
-                                    <Form.Group className="mb-3" controlId="formBasicChangeManager">
+                                    <Form.Group className="mb-3" controlId="formBasicManager">
                                         <Form.Label>Assign Team Leader*</Form.Label>
                                         <Typeahead
                                             id="chooseLeader"
@@ -167,7 +179,7 @@ class ProjectCreate extends Component<ProjectCreateProp> {
                                                 { id: 4, name: "Alexander 👌" }
                                             ]}
                                             placeholder="Choose Team Leader..."
-                                            onChange={this.HandleManager}
+                                            onChange={(value) => this.HandleManager.call(this, value)}
                                             filterBy={(option: any, props: any): boolean => {
                                                 const query: string = props.text.toLowerCase().trim();
                                                 const name: string = option.name.toLowerCase();
