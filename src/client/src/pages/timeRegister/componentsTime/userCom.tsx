@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Container, Table, Form, InputGroup, Button, Modal } from "react-bootstrap";
 import { Highlighter, Typeahead } from 'react-bootstrap-typeahead';
 import BaseApiHandler from "../../../network/baseApiHandler";
-import TimeUtility from "../../../utility/timeConverter"
+import { getCurrentWeekDates, dateStringFormatter } from "../../../utility/timeConverter"
 
 interface Api {
   status: number,
@@ -42,7 +42,7 @@ class TableHeader extends React.Component<EmptyProps, TableHeaderState> {
 
     // Set the initial state
     this.state = {
-      headerDates: TimeUtility.getCurrentWeekDates(dates),
+      headerDates: getCurrentWeekDates(dates),
     };
   }
 
@@ -341,10 +341,10 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     const { stateRowData } = this.state;
 
     const dates: string[] = [];
-    TimeUtility.getCurrentWeekDates(dates);
+    getCurrentWeekDates(dates);
 
     return stateRowData.map((item, index) => {
-      if (TimeUtility.makeDateFromNum(item.date) === dates[0]) {
+      if (dateStringFormatter(item.date) === dates[0]) {
         console.log(dates[0]);
         return <TimeSheetRow key={index} rowData={item} onDelete={() => this.handleDeleteRow(index)} />;
       } else {
