@@ -23,7 +23,12 @@ Optional:
         superProject? : number,
         name?         : string,
         startDate?    : number,
-        endDate?      : number
+        endDate?      : number,
+        projectLeader : {
+            id        : number,
+            lastName  : string,
+            firstName : string
+        }
       }[]
   }
 ```

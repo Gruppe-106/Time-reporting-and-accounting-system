@@ -12,7 +12,7 @@ class FrontPage extends Component<any> {
 
     private test() {
         let apiHandler: baseApiHandler = new BaseApiHandler();
-        apiHandler.get("/api/project/info/get?ids=1,2", {}, (value) => {
+        apiHandler.get("/api/project/get?ids=1,2", {}, (value) => {
             console.log(value)
         })
     }

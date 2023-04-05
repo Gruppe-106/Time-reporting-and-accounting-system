@@ -82,7 +82,7 @@ class Router extends Component<any> {
                                 <Route path={"/"} Component={FrontPage}/>
                                 { userInfo.isAdmin ? <Route path={"/admin"} Component={AdminPanel}/> : ""}
                                 { userInfo.isAdmin ? <Route path={"/admin/create-user"} Component={UserCreation}/> : ""}
-                                { userInfo.isProjectLeader ?  <Route path={"/data-export"} Component={DataExport}/> : ""}
+                                { userInfo.isManager ?  <Route path={"/data-export"} Component={DataExport}/> : ""}
                                 { userInfo.isProjectLeader ?  <Route path={"/project/create"} Component={ProjectCreator}/> : ""}
                                 { userInfo.isProjectLeader ? <Route path={"/project/manage"} Component={ProjectManager}/> : ""}
                                 <Route path={"/project/menu"} Component={ProjectMenu}/>
