@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Container, Table, Form, InputGroup, Button, Modal } from "react-bootstrap";
 import { Highlighter, Typeahead } from 'react-bootstrap-typeahead';
 import BaseApiHandler from "../../../network/baseApiHandler";
+import TimeUtility from "../../../utility/timeConverter"
 
 interface Api {
   status: number,
@@ -20,46 +21,6 @@ interface Api {
       * Submit button (Post data)
 
 */
-
-/*
-
-       * Utility
-
-*/
-class Utility {
-  public static getCurrentWeekDates(dates: string[]) {
-    // Get the current date
-    const today = new Date();
-
-    // Get the start date of the current week (Monday)
-    const monday = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay() + 1);
-
-    dates.push(Utility.makeDateFromNum(1679356800000));
-
-    // Create an array of date strings for each day of the week
-    for (let i = 1; i < 7; i++) {
-      const currentDate = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + i);
-      dates.push(currentDate.toLocaleDateString());
-    }
-    return dates;
-  }
-
-  public static makeDateFromNum(date: number) {
-    const newDate = new Date(date);
-
-    const secNewDate = new Date(newDate.getFullYear(), newDate.getMonth(), newDate.getDay());
-
-    return secNewDate.toLocaleDateString();
-  }
-
-  public static makeDateFromString(date: string) {
-    const newDate = new Date(Number(date));
-
-    const secNewDate = new Date(newDate.getFullYear(), newDate.getMonth(), newDate.getDay());
-
-    return secNewDate.toLocaleDateString();
-  }
-}
 
 // Empty prop to indicate that the component will not recive a prop.
 interface EmptyProps { }
@@ -81,7 +42,7 @@ class TableHeader extends React.Component<EmptyProps, TableHeaderState> {
 
     // Set the initial state
     this.state = {
-      headerDates: Utility.getCurrentWeekDates(dates),
+      headerDates: TimeUtility.getCurrentWeekDates(dates),
     };
   }
 
@@ -380,10 +341,10 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     const { stateRowData } = this.state;
 
     const dates: string[] = [];
-    Utility.getCurrentWeekDates(dates);
+    TimeUtility.getCurrentWeekDates(dates);
 
     return stateRowData.map((item, index) => {
-      if (Utility.makeDateFromNum(item.date) === dates[0]) {
+      if (TimeUtility.makeDateFromNum(item.date) === dates[0]) {
         console.log(dates[0]);
         return <TimeSheetRow key={index} rowData={item} onDelete={() => this.handleDeleteRow(index)} />;
       } else {
