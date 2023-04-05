@@ -62,22 +62,32 @@ class ProjectCreate extends Component<ProjectCreateProp> {
     }
     private HandleParent(selected: any): void {
         this.setState({
-        selectedParentProject: selected[0] ? selected[0] : null
-         });
+            selectedParentProject: selected[0] ? selected[0] : null
+        });
     }
 
+    private handleValidity() {
+        const button = document.getElementById("submitbutton") as HTMLInputElement | null;
+        const projectName = (document.getElementById("formBasicProjectName") as HTMLInputElement).value
+        const startDate = new Date((document.getElementById("formBasicStartDate") as HTMLInputElement).value)
+        const endDate = new Date((document.getElementById("formBasicEndDate") as HTMLInputElement).value)
+        const teamLeader = this.state.assignedToManager
 
-
+        if (/^\s/g.test(projectName) || projectName === '' || !/\d/g.test(startDate.toString()) || !/\d/g.test(endDate.toString()) || teamLeader?.name === '' || teamLeader?.id == null || /\d/g.test(teamLeader.name) || /\D/g.test(teamLeader.id.toString())){
+            button?.setAttribute('disabled', '')
+        }
+        else{
+            button?.removeAttribute('disabled')
+        }
+    }
 
     handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) =>{
         event.preventDefault();
-        //const formData = new FormData(event.currentTarget)
         const projectName = (document.getElementById("formBasicProjectName") as HTMLInputElement).value
         const parentProject = this.state.selectedParentProject.id
         const startDate = new Date((document.getElementById("formBasicStartDate") as HTMLInputElement).value)
         const endDate = new Date((document.getElementById("formBasicEndDate") as HTMLInputElement).value)
         const teamLeader = this.state.assignedToManager.id
-
 
         const post_data = {
             name: projectName,
@@ -116,51 +126,51 @@ class ProjectCreate extends Component<ProjectCreateProp> {
                                 <Form onSubmit={this.handleFormSubmit}>
                                     <Row>
                                         <Col>
-                                            <Form.Group className="mb-3" controlId="formBasicProjectName">
+                                            <Form.Group className="mb-3" controlId="formBasicProjectName" onChange={() => {this.handleValidity.call(this)}}>
                                                 <Form.Label>Project Name*</Form.Label>
-                                                <Form.Control type="text" placeholder="Project Name" />
+                                                <Form.Control type="text" placeholder="Project Name" maxLength={49} />
                                             </Form.Group>
                                         </Col>
                                         <Col>
                                             <Form.Group className="mb-3" controlId="formBasicParent">
-                                        <Form.Label>Assign Parent Project</Form.Label>
-                                        <Typeahead
-                                            id="chooseParent"
-                                            labelKey="name"
-                                            options={
-                                                this.state.pageInformation.map(row =>({id: row.id, name: row.name}))
-                                            }
-                                            placeholder="Choose Parent Project..."
-                                            onChange={(value) => this.HandleParent.call(this, value)}
-                                            filterBy={(option: any, props: any): boolean => {
-                                                const query: string = props.text.toLowerCase().trim();
-                                                const name: string = option.name.toLowerCase();
-                                                const id: string = option.id.toString();
-                                                return name.includes(query) || id.includes(query);
-                                            }}
-                                            renderMenuItemChildren={(option: any, props: any) => (
-                                                <>
-                                                    <Highlighter search={props.text}>
-                                                        {option.name}
-                                                    </Highlighter>
-                                                    <div>
-                                                        <small>Project ID: {option.id}</small>
-                                                    </div>
-                                                </>
-                                            )}
-                                        />
-                                    </Form.Group>
+                                                <Form.Label>Assign Parent Project (optional)</Form.Label>
+                                                <Typeahead
+                                                    id="chooseParent"
+                                                    labelKey="name"
+                                                    options={
+                                                        this.state.pageInformation.map(row =>({id: row.id, name: row.name}))
+                                                    }
+                                                    placeholder="Choose Parent Project..."
+                                                    onChange={(value) => this.HandleParent.call(this, value)}
+                                                    filterBy={(option: any, props: any): boolean => {
+                                                        const query: string = props.text.toLowerCase().trim();
+                                                        const name: string = option.name.toLowerCase();
+                                                        const id: string = option.id.toString();
+                                                        return name.includes(query) || id.includes(query);
+                                                    }}
+                                                    renderMenuItemChildren={(option: any, props: any) => (
+                                                        <>
+                                                            <Highlighter search={props.text}>
+                                                                {option.name}
+                                                            </Highlighter>
+                                                            <div>
+                                                                <small>Project ID: {option.id}</small>
+                                                            </div>
+                                                        </>
+                                                    )}
+                                                />
+                                            </Form.Group>
                                         </Col>
                                     </Row>
                                     <Row>
                                         <Col>
-                                            <Form.Group className="mb-3" controlId="formBasicStartDate">
+                                            <Form.Group className="mb-3" controlId="formBasicStartDate" onChange={() => {this.handleValidity.call(this)}}>
                                                 <Form.Label>Start Date*</Form.Label>
                                                 <Form.Control type="date" placeholder="1/20/1970" />
                                             </Form.Group>
                                         </Col>
                                         <Col>
-                                            <Form.Group className="mb-3" controlId="formBasicEndDate">
+                                            <Form.Group className="mb-3" controlId="formBasicEndDate" onChange={() => {this.handleValidity.call(this)}}>
                                                 <Form.Label>End Date*</Form.Label>
                                                 <Form.Control type="date" placeholder="1/20/1970" />
                                             </Form.Group>
@@ -179,7 +189,9 @@ class ProjectCreate extends Component<ProjectCreateProp> {
                                                 { id: 4, name: "Alexander 👌" }
                                             ]}
                                             placeholder="Choose Team Leader..."
-                                            onChange={(value) => this.HandleManager.call(this, value)}
+                                            onMenuToggle={() => {this.handleValidity.call(this)}}
+                                            onChange={(value) => {this.HandleManager.call(this, value);
+                                                this.handleValidity.call(this)}}
                                             filterBy={(option: any, props: any): boolean => {
                                                 const query: string = props.text.toLowerCase().trim();
                                                 const name: string = option.name.toLowerCase();
@@ -199,8 +211,8 @@ class ProjectCreate extends Component<ProjectCreateProp> {
                                         />
                                     </Form.Group>
                                     <Col>
-                        <Button variant="success" type="submit">Create Project</Button>
-                            </Col>
+                                        <Button variant="success" type="submit" disabled={true} id="submitbutton">Create Project</Button>
+                                    </Col>
                                 </Form>
                             </Tab.Pane>
                             <Tab.Pane eventKey="second">

@@ -1,10 +1,7 @@
 import {Table} from "react-bootstrap";
 import React, {Component} from "react";
 import BaseApiHandler from "../../../network/baseApiHandler";
-/*
-NEED TO ADD SO IT SHOWS BY GROUP AND NOT JUST EVERYONE.
-NUMBER FOR THE GROUP SHOULD CORRESPOND TO THE ID OF THE PROJECT AND PROJECT PAGE
- */
+
 interface Api{
     status:number,
     data:{

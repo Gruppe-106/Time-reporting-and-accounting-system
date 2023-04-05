@@ -7,12 +7,6 @@ import {Table} from "react-bootstrap";
 import BaseApiHandler from "../../../network/baseApiHandler";
 import ProjectMemberTable from "./projectInformationMembers";
 import ProjectTaskTable from "./projectInformationTasks";
-/*
-TO DO HERE
-CHANGE TO CREATE A "PAGE" FROM ID
-THEN SHOW INFORMATION ABOUT PROJECT
-IMPORT MEMBERS AND ROLES
-*/
 
 interface Api{
     status:number,
