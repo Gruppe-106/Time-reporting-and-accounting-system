@@ -384,6 +384,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
 
     return stateRowData.map((item, index) => {
       if (Utility.makeDateFromNum(item.date) === dates[0]) {
+        console.log(dates[0]);
         return <TimeSheetRow key={index} rowData={item} onDelete={() => this.handleDeleteRow(index)} />;
       } else {
         //console.log(dates[0]);
