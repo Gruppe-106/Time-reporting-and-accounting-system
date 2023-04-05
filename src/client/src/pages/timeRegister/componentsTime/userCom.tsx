@@ -343,23 +343,31 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
    */
   private renderRows() {
     const { stateRowData } = this.state;
-
+  
     const dates: string[] = [];
     getCurrentWeekDates(dates);
-
-    return stateRowData.map((item, index) => {
-      if (dateStringFormatter(item.date) === dates[1]) {
-        //console.log(dates[1]);
-        //console.log(Date.parse(dates[1]));
-        return <TimeSheetRow key={index} rowData={item} onDelete={() => this.handleDeleteRow(index)} />;
-      } else {
-        //console.log(dates[0]);
-        //console.log((item.date).toString());
-        //console.log("Dates dosent match");
-        return null; // if the date dosent match, don't render the row
-      }
-    });
+  
+    return dates.map(date => {
+      const matchingRows = stateRowData.filter(item => dateStringFormatter(item.date) === date);
+      return matchingRows.map((item, index) => (
+        <TimeSheetRow key={`${date}-${index}`} rowData={item} onDelete={() => this.handleDeleteRow(index)} />
+      ));
+    }).flat();
   }
+
+  /*private renderRows() {
+  const { stateRowData } = this.state;
+
+  const dates: string[] = [];
+  getCurrentWeekDates(dates);
+
+  return dates.map(date => {
+    const matchingRows = stateRowData.filter(item => dateStringFormatter(item.date) === date);
+    return matchingRows.map((item, index) => (
+      <TimeSheetRow key={`${date}-${index}`} rowData={item} onDelete={() => this.handleDeleteRow(index)} />
+    ));
+  }).flat();
+} */
 
   render() {
     const { showAddRowModal } = this.state;
