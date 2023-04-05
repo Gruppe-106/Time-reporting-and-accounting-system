@@ -3,7 +3,6 @@ import BaseNavBar from "../../components/navBar";
 import {Button, Container} from "react-bootstrap";
 import BaseApiHandler from "../../network/baseApiHandler";
 import baseApiHandler from "../../network/baseApiHandler";
-import {userInfo} from "../../utility/router";
 
 class FrontPage extends Component<any> {
 
@@ -11,23 +10,9 @@ class FrontPage extends Component<any> {
         test: ""
     }
 
-    constructor(props:any) {
-        super(props);
-    }
-
-    componentDidMount() {
-        let apiHandler = new BaseApiHandler();
-        apiHandler.get("/api", {},(value) => {
-            if (typeof value === "string") {
-                let json:{message: string} = JSON.parse(value)
-                this.setState({test: json.message});
-            }
-        })
-    }
-
     private test() {
         let apiHandler: baseApiHandler = new BaseApiHandler();
-        apiHandler.get("/api/task/user/get?id=1", {}, (value) => {
+        apiHandler.get("/api/project/info/get?ids=1,2", {}, (value) => {
             console.log(value)
         })
     }
@@ -39,7 +24,7 @@ class FrontPage extends Component<any> {
                 <Container>
                     <h1>Front</h1>
                     { this.state.test === "" ? "" : (<p>{this.state.test}</p>) }
-                    { userInfo.isAdmin ? (<Button onClick={this.test}></Button>) : null }
+                    <Button disabled={false} onClick={this.test}></Button>
                 </Container>
             </>
         );

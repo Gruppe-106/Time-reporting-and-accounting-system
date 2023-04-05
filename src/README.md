@@ -125,6 +125,44 @@ Optional:
 }
 ```
 </details>
+<details>
+<summary>Information</summary>
+
+## /api/project/information/get
+```
+Required:
+    ids=number
+```
+### Structure Of Object Returned
+
+```
+  {
+  status: number,
+  data:
+      {
+        taskId: number,
+        firstName: string,
+        lastName: string,
+        id: number
+      }[]
+  }
+```
+### Example return:
+
+```json
+{
+  "status":200,
+  "data": [
+    {"taskId":1,"id":5,"firstName":"Sarah","lastName":"Doe"},
+    {"taskId":1,"id":6,"firstName":"Matt","lastName":"Brown"},
+    {"taskId":1,"id":7,"firstName":"Alex","lastName":"Johnson"},
+    {"taskId":6,"id":8,"firstName":"Jill","lastName":"Jones"},
+    {"taskId":6,"id":9,"firstName":"John","lastName":"Adams"},
+    {"taskId":6,"id":10,"firstName":"Dave","lastName":"Brown"}
+  ]
+}
+```
+</details>
 
 # Task
 

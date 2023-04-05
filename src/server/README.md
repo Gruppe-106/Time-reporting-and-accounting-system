@@ -21,3 +21,4 @@
 3. Get project manager with project
 4. Change data export to manager instead of project leader
 5. Add period to user time register
+6. Change date format for usertimeregister
