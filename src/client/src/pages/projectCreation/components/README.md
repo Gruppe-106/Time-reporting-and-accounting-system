@@ -5,3 +5,5 @@
 * Add correct members to project rather than showing every user.
 * Edit project
 * Send tasks along with create project info
+* Confirmation for create project
+* Redirect to Project receipt?
