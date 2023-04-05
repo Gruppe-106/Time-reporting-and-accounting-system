@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Container, Table, Form, InputGroup, Button, Modal } from "react-bootstrap";
 import { Highlighter, Typeahead } from 'react-bootstrap-typeahead';
 import BaseApiHandler from "../../../network/baseApiHandler";
-import { getCurrentWeekDates, dateStringFormatter } from "../../../utility/timeConverter"
+import { getCurrentWeekDates, dateStringFormatter, dateToNumber } from "../../../utility/timeConverter"
 
 interface Api {
   status: number,
@@ -47,6 +47,10 @@ class TableHeader extends React.Component<EmptyProps, TableHeaderState> {
   }
 
   render() {
+    const today = new Date();
+    const stringToday = dateStringFormatter(dateToNumber(today));
+
+
     return (
       <thead>
         <tr>
@@ -54,7 +58,7 @@ class TableHeader extends React.Component<EmptyProps, TableHeaderState> {
           <th>Task Name</th>
           {/* Gets the dates, and maps each date with an index to a table header, creating 7 <th>, all dates in a week */}
           {this.state.headerDates.map((date, index) => (
-            <th key={index}>{date}</th>
+            <th key={index} className={date === stringToday ? "bg-light" : ""}>{date}</th>
           ))}
           <th>Total Time</th>
           <th>&#128465;</th> {/* Trashcan, HTML Entity: */}
@@ -344,8 +348,9 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     getCurrentWeekDates(dates);
 
     return stateRowData.map((item, index) => {
-      if (dateStringFormatter(item.date) === dates[0]) {
-        console.log(dates[0]);
+      if (dateStringFormatter(item.date) === dates[1]) {
+        //console.log(dates[1]);
+        //console.log(Date.parse(dates[1]));
         return <TimeSheetRow key={index} rowData={item} onDelete={() => this.handleDeleteRow(index)} />;
       } else {
         //console.log(dates[0]);
