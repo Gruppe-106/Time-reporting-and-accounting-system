@@ -21,4 +21,4 @@
 4. Change data export to manager instead of project leader _/
 5. Add period to user time register
 6. Change date format for usertimeregister
-7. Fix parenthesis in values as e.g. a name like "hej Mikkel :))" fucks it up
+7. Fix parenthesis in values as e.g. a name like "hej Mikkel :))" fucks it up _/
