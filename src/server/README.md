@@ -16,7 +16,7 @@
 
 ## Other
 1. Add auth system and cookies _/
-2. Get name of timetype in tasks
+2. Get name of timetype in tasks _/
 3. Get project manager with project _/
 4. Change data export to manager instead of project leader _/
 5. Add period to user time register
