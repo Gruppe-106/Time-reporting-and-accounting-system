@@ -101,29 +101,37 @@ class MysqlHandler {
         return whereString;
     }
 
+    private stringListToStringConverter(list: string[]): string {
+        let string: string = "";
+        for (let i = 0; i < list.length; i++) {
+            if (i !== 0) string += ","
+            string += `'${list[i].replace(/\'/g, '"')}'`;
+        }
+        return string;
+    }
+
     /**
      * Creates a string of all insert values
      * @param values string[][] | string[]: a list of all values to insert
      * @return String: string of all insert values
      * @private
      */
-    private createValuesString(values: string[][] | string[]): string {
-        let valuesString: string;
+    public createValuesString(values: string[][] | string[]): string {
+        let valuesString: string = "";
         if (Array.isArray(values[0])) {
-            let valueList: string[] = [];
-            for (const value of values) {
-                valueList.push(`(${value})`);
+            for (let i = 0; i < values.length; i++) {
+                if (Array.isArray(values[i])) {
+                    if (i !== 0) valuesString += ",";
+                    // @ts-ignore
+                    valuesString += `(${this.stringListToStringConverter(values[i])})`;
+                }
             }
-            valuesString = `${valueList}`;
         } else {
-            valuesString = `(${values})`;
+            // @ts-ignore
+            valuesString += `(${this.stringListToStringConverter(values)})`;
         }
 
-        /* Each value in the list has to have '' around them e.g. 1 has to be '1'
-           This ensures all variable in the string has the quotes (There is definitely a better solution to this)*/
-        return valuesString.replace(/\((?!['])/g, "('")
-                           .replace(/(?<!['])\)/g, "')")
-                           .replace(/(?<![\)']),'|(?<![\)']),(?![\('])|',(?![\('])/g, "','");
+        return valuesString;
     }
 
     private createUpdateSetString(updateSet: UpdateSet[]): string[] {
