@@ -13,6 +13,7 @@
 11. Project-task connector _/
 12. User-task-project info _/
 13. Project-manager connector edit (Is done through project edit) _/
+14. Group creation _/
 
 ## Other
 1. Add auth system and cookies _/
