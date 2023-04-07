@@ -1,6 +1,7 @@
 import {Server} from "../server";
 import {Request, Response} from "express";
 import AuthEndpoint, {AuthData} from "./dataGetEndpoints/authEndpoint";
+import {Where} from "../database/mysqlHandler";
 
 abstract class EndpointBase {
     protected readonly mySQL = Server.mysql;
@@ -26,6 +27,12 @@ abstract class EndpointBase {
             return roles.indexOf(true) !== -1;
         } catch (e) { }
         return false;
+    }
+
+    protected createWhere(primaryKey: string, keyEqual: string[]): Where | undefined {
+        if (keyEqual.indexOf("*") === -1) {
+            return  {column: primaryKey, equals: keyEqual};
+        }
     }
 
     /**
