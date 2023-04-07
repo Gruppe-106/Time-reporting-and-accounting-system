@@ -18,11 +18,12 @@ import AuthEndpoint from "../apiEndpoints/dataGetEndpoints/authEndpoint";
 import ProjectEditEndpoint from "../apiEndpoints/dataPutEndpoints/projectEditEndpoint";
 import TaskCreationEndpoint from "../apiEndpoints/dataPostEndpoints/taskCreationEndpoint";
 import TaskEditEndpoint from "../apiEndpoints/dataPutEndpoints/taskEditEndpoint";
-import UserTimeRegisterEndpoint from "../apiEndpoints/dataPostEndpoints/UserTimeRegisterEndpoint";
-import UserTimeRegisterEditEndpoint from "../apiEndpoints/dataPutEndpoints/UserTimeRegisterEditEndpoint";
+import UserTimeRegisterEndpoint from "../apiEndpoints/dataPostEndpoints/userTimeRegisterEndpoint";
+import UserTimeRegisterEditEndpoint from "../apiEndpoints/dataPutEndpoints/userTimeRegisterEditEndpoint";
 import UserTaskEndpoint from "../apiEndpoints/dataGetEndpoints/userTaskEndpoint";
 import ProjectInformationEndpoint from "../apiEndpoints/dataGetEndpoints/projectInformationEndpoint";
 import GroupCreationEndpoint from "../apiEndpoints/dataPostEndpoints/groupCreationEndpoint";
+import GroupEditEndpoint from "../apiEndpoints/dataPutEndpoints/groupEditEndpoint";
 
 export class ApiRouter extends BaseRouter {
     /**
@@ -86,6 +87,7 @@ export class ApiRouter extends BaseRouter {
         })
 
         this.router.put("/user/edit/put",         (req: Request, res: Response) => new UserEditEndpoint().postRoute(req, res));
+        this.router.put("/group/edit/put",        (req: Request, res: Response) => new GroupEditEndpoint().postRoute(req, res));
         this.router.put("/project/edit/put",      (req: Request, res: Response) => new ProjectEditEndpoint().postRoute(req, res));
         this.router.put("/task/edit/put",         (req: Request, res: Response) => new TaskEditEndpoint().postRoute(req, res));
         this.router.put("/time/register/edit/put",(req: Request, res: Response) => new UserTimeRegisterEditEndpoint().postRoute(req, res));

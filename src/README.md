@@ -467,6 +467,44 @@ If the group id is 0, then no new group was created as manager already has a gro
 ```
 </details>
 
+<details>
+<summary>Edit</summary>
+
+## /api/group/edit/put
+Note the edit can only change the manager for said group, not the group id.
+If the group id needs to change go through user edit
+### Body
+```
+{
+    groupId: number,
+    managerId: number
+}
+```
+### Structure Of Object Returned
+```
+    {
+        status: number,
+        data: {
+            success? : boolean, 
+            error?   : string, 
+            message? : string[], 
+            reason?  : string[]
+        }
+    }
+```
+### Example return:
+
+```json
+{
+  "success": true,
+  "data": {
+    "success": "true", 
+    "message": ["success"]
+  }
+}
+```
+</details>
+
 # Role
 
 <details>
