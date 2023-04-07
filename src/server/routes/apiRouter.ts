@@ -22,6 +22,7 @@ import UserTimeRegisterEndpoint from "../apiEndpoints/dataPostEndpoints/UserTime
 import UserTimeRegisterEditEndpoint from "../apiEndpoints/dataPutEndpoints/UserTimeRegisterEditEndpoint";
 import UserTaskEndpoint from "../apiEndpoints/dataGetEndpoints/userTaskEndpoint";
 import ProjectInformationEndpoint from "../apiEndpoints/dataGetEndpoints/projectInformationEndpoint";
+import GroupCreationEndpoint from "../apiEndpoints/dataPostEndpoints/groupCreationEndpoint";
 
 export class ApiRouter extends BaseRouter {
     /**
@@ -65,6 +66,7 @@ export class ApiRouter extends BaseRouter {
         this.router.post("/login",                (req: Request, res: Response) => new LoginEndpoint().postRoute(req, res));
 
         this.router.post("/user/creation/post",   (req: Request, res: Response) => new UserCreationEndpoint().postRoute(req, res));
+        this.router.post("/group/creation/post",  (req: Request, res: Response) => new GroupCreationEndpoint().postRoute(req, res));
         this.router.post("/project/creation/post",(req: Request, res: Response) => new ProjectCreationEndpoint().postRoute(req, res));
         this.router.post("/task/creation/post",   (req: Request, res: Response) => new TaskCreationEndpoint().postRoute(req, res));
         this.router.post("/time/register/post",   (req: Request, res: Response) => new UserTimeRegisterEndpoint().postRoute(req, res));

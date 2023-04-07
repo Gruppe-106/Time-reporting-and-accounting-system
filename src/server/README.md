@@ -8,11 +8,11 @@
 6. TaskEdit _/
 7. UserTimeRegistration _/
 8. UserTimeEdit _/
-9. GroupEdit
+9. GroupEdit 
 10. User-task connector _/
 11. Project-task connector _/
 12. User-task-project info _/
-13. Project-manager connector edit
+13. Project-manager connector edit (Is done through project edit) _/
 
 ## Other
 1. Add auth system and cookies _/

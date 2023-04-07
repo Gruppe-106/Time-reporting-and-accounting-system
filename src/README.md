@@ -430,6 +430,43 @@ Optional:
 ```
 </details>
 
+<details>
+<summary>Create</summary>
+
+## /api/group/creation/post
+### Body
+```
+{
+    managerId: number
+}
+```
+### Structure Of Object Returned
+If successful message will include the group id in index 1. 
+If the group id is 0, then no new group was created as manager already has a group
+```
+    {
+        status: number,
+        data: {
+            success? : boolean, 
+            error?   : string, 
+            message? : string[], 
+            reason?  : string[]
+        }
+    }
+```
+### Example return:
+
+```json
+{
+  "success": true,
+  "data": {
+    "success": "true", 
+    "message": ["success", "7"]
+  }
+}
+```
+</details>
+
 # Role
 
 <details>
