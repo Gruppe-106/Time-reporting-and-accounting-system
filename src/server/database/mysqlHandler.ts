@@ -19,6 +19,7 @@ export interface MySQLResponse {
 }
 
 class MysqlHandler {
+    private logQueries: boolean = false;
     private static connectionConfig: object = undefined;
     private static connection: Connection   = undefined;
 
@@ -161,7 +162,7 @@ class MysqlHandler {
                     });
                 });
             })
-            console.log("[MySQL] Retrieving data from DB, query: ", sqlQuery);
+            if (this.logQueries) console.log("[MySQL] Retrieving data from DB, query: ", sqlQuery);
             return promise;
         }
         return {error: undefined, results: undefined, fields: undefined};
