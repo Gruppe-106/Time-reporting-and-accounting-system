@@ -19,7 +19,8 @@ import LoadingOverlay from 'react-loading-overlay-ts';
 import React, { Component } from "react";
 import { Highlighter, Typeahead } from 'react-bootstrap-typeahead';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faTrash } from '@fortawesome/free-solid-svg-icons'
 
 //Forge import
 import forge from 'node-forge';
@@ -34,7 +35,7 @@ interface User {
     email: string;
     firstName: string;
     lastName: string;
-    group: number;
+    groupId: number;
 }
 
 /**
@@ -94,6 +95,9 @@ class AdminPanel extends Component<any, CustomTypes> {
         this.handleLoader = this.handleLoader.bind(this);
         this.handleRowClick = this.handleRowClick.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleCancel = this.handleCancel.bind(this)
+        this.handleChanges = this.handleChanges.bind(this)
+        this.handleDelete = this.handleDelete.bind(this)
         this.renderRow = this.renderRow.bind(this);
 
     }
@@ -167,19 +171,20 @@ class AdminPanel extends Component<any, CustomTypes> {
                 <td>{user.email}</td>
                 <td>{user.firstName}</td>
                 <td>{user.lastName}</td>
-                <td>{user.group}</td>
+                <td>{user.groupId}</td>
             </tr>
         );
     }
 
-    private renderEditingRow(user: User) {
+    private renderEditingRow(user: User) { //TODO: fix the prop
         return (
             <tr key={user.id}>
                 <td>{user.id}</td>
-                <td>{user.email}</td>
-                <td>{user.firstName}</td>
-                <td>{user.lastName}</td>
-                <td>{user.group}</td>
+                <td><input type="text" value={user.email}/></td>
+                <td><input type="text" value={user.firstName}/></td>
+                <td><input type="text" value={user.lastName}/></td>
+                <td><input type="text" value={user.groupId}/></td>
+                <td  style={{ textAlign: 'center' }}><FontAwesomeIcon onClick={() => this.handleDelete(user)} icon={faTrash} /> </td>
             </tr>
         );
     }
@@ -189,7 +194,23 @@ class AdminPanel extends Component<any, CustomTypes> {
         this.setState({
             editing: !this.state.editing
         })
-        
+
+    }
+
+
+
+    private handleCancel() {
+        this.setState({
+            editing: false
+        })
+    }
+
+    private handleChanges() {
+
+    }
+
+    private handleDelete(user: User) {
+        console.log(user)
     }
 
 
@@ -229,33 +250,50 @@ class AdminPanel extends Component<any, CustomTypes> {
                                     <th>First Name</th>
                                     <th>Last Name</th>
                                     <th>Group</th>
+                                    <th style={{ display: !this.state.editing ? "none" : "table-cell" }}>Delete</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {this.state.editing ? (this.state.dbUsers
+                                {!this.state.editing ? (this.state.dbUsers
                                     .filter((user) =>
                                         user.id.toString().includes(this.state.searchQuery) ||
                                         user.email.includes(this.state.searchQuery) ||
                                         user.firstName.includes(this.state.searchQuery) ||
                                         user.lastName.includes(this.state.searchQuery) ||
-                                        user.group.toString().includes(this.state.searchQuery)
+                                        user.groupId.toString().includes(this.state.searchQuery)
                                     )
                                     .map((user) => this.renderRow(user))) :
-                                    (this.state.selectedUsers
+                                    (this.state.selectedUsers.sort((a, b) => a.id - b.id)
                                         .filter((user) =>
                                             user.id.toString().includes(this.state.searchQuery) ||
                                             user.email.includes(this.state.searchQuery) ||
                                             user.firstName.includes(this.state.searchQuery) ||
                                             user.lastName.includes(this.state.searchQuery) ||
-                                            user.group.toString().includes(this.state.searchQuery)
+                                            user.groupId.toString().includes(this.state.searchQuery)
                                         )
                                         .map((user) => this.renderEditingRow(user)))}
                             </tbody>
 
                         </Table>
-                        <Button variant="primary" onClick={this.handleSubmit}>
-                            {this.state.buttonText}
-                        </Button>
+                        {!this.state.editing ?
+                            <Button variant="primary" onClick={this.handleSubmit}>
+                                {this.state.buttonText}
+                            </Button> :
+                            (<div style={{ display: 'flex', gap: '10px' }}>
+
+                                <Button variant="primary" onClick={this.handleChanges}>
+                                    Submit
+                                </Button>
+
+                                <Button variant="danger" onClick={this.handleCancel}>
+                                    Cancel
+                                </Button>
+                            </div>
+                            )
+
+                        }
+
+
                     </Container>
 
                 </LoadingOverlay>
