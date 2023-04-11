@@ -17,12 +17,11 @@ interface RequesterSettings {
 }
 
 class BaseApiHandler {
+    // Only useful if another api is needed
     private baseUrl: string;
-    private authKey: string;
 
-    constructor(authKey?: string, baseUrl?: string) {
+    constructor(baseUrl?: string) {
         this.baseUrl = baseUrl === undefined ? /*window.location.host*/ "" : baseUrl; //Commented out to work in dev environment
-        this.authKey = authKey === undefined ? "" : authKey;
     }
 
     /**
@@ -32,8 +31,6 @@ class BaseApiHandler {
      * @param settings GetSettings: settings for get request
      */
     public get(urlPath: string, settings: GetSettings, callback?: (value: Object) => void): boolean {
-        //Check if required authKey is present
-        if (this.authKey === "") { return false; }
         this.requester(urlPath, {
             baseUrl: settings.baseUrl || this.baseUrl,
             method: "GET",
@@ -50,12 +47,28 @@ class BaseApiHandler {
      * @param callback Callback?: an anonymous function to run after data is received, the value will be the json object or void
      */
     public post(urlPath: string, settings: PostSettings, callback?: (value: Object) => void,): boolean {
-        //Check if required authKey is present
-        if (this.authKey === "") { return false; }
         this.requester(urlPath,
             {
                 baseUrl: settings.baseUrl || this.baseUrl,
                 method: "POST",
+                body: settings.body || "",
+                headers: settings.headers || {}
+            })
+            .then(callback);
+        return true;
+    }
+
+    /**
+     * Sent PUT request to url
+     * @param urlPath String: path of the url meaning not hostname
+     * @param settings PostSettings: settings for post request
+     * @param callback Callback?: an anonymous function to run after data is received, the value will be the json object or void
+     */
+    public put(urlPath: string, settings: PostSettings, callback?: (value: Object) => void,): boolean {
+        this.requester(urlPath,
+            {
+                baseUrl: settings.baseUrl || this.baseUrl,
+                method: "PUT",
                 body: settings.body || "",
                 headers: settings.headers || {}
             })
@@ -75,7 +88,6 @@ class BaseApiHandler {
 
         //Setup standard headers
         settings.headers["Content-Type"] = "application/json";
-        settings.headers["Auth-Key"] = this.authKey;
         settings.headers["Accept"] = "application/json";
 
         let body = settings.body === null ? null : JSON.stringify(settings.body)
