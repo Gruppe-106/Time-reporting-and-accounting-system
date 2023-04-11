@@ -1,0 +1,6 @@
+{
+    "host"     : "localhost",
+    "user"     : "root",
+    "password" : "CS-23-DAT-01",
+    "database" : "timemanagerdatabase"
+}

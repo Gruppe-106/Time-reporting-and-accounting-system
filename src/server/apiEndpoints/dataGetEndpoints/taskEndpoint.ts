@@ -18,7 +18,15 @@ class TaskEndpoint extends  GetEndpointBase {
 
     async getData(requestValues: string[], primaryKey: string, keyEqual?: string[], data?: string[]): Promise<object[]> {
         //Get all projects that fulfill the given request
-        let response:MySQLResponse = await this.mySQL.select("TASKS", this.createColumns(requestValues), this.createWhere(primaryKey, keyEqual));
+        let join: string = "";
+        let columns: string = `${this.createColumns(requestValues)}`;
+        if (requestValues.indexOf("timeTypeName") !== -1) {
+            join += ` JOIN TIMETYPES tt where tt.id=t.timeType`;
+            columns += ",tt.name"
+        }
+        let queryString: string = `SELECT ${columns} FROM TASKS t ${this.mySQL.createWhereString(this.createWhere(primaryKey, keyEqual))} ${join}`;
+
+        let response:MySQLResponse = await this.mySQL.sendQuery(queryString);
 
         //Check if there was an error and throw if so
         if (response.error !== null) throw new Error("[MySQL] Failed to retrieve data");

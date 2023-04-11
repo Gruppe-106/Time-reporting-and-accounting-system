@@ -23,7 +23,12 @@ Optional:
         superProject? : number,
         name?         : string,
         startDate?    : number,
-        endDate?      : number
+        endDate?      : number,
+        projectLeader : {
+            id        : number,
+            lastName  : string,
+            firstName : string
+        }
       }[]
   }
 ```
@@ -48,7 +53,7 @@ Optional:
     name           : string,
     startDate      : number,
     endDate        : number,
-    projectLeader  : number,
+    projectLeader  : number[],
     task?: {
         name       : string,
         userId     : number[],
@@ -84,12 +89,21 @@ Optional:
 </details>
 
 <details>
-<summary>Edit ( Not Implemented )</summary>
+<summary>Edit</summary>
 
 ## /api/project/edit/put
 ### Body
 ```
 {
+    projectId            : number,
+    superProjectId      ?: number,
+    name                ?: string,
+    startDate           ?: number,
+    endDate             ?: number,
+    ProjectLeaderAdd    ?: number[],
+    projectLeaderRemove ?: number[],
+    taskAdd             ?: TaskData[],
+    taskRemove          ?: number[]
 }
 ```
 ### Structure Of Object Returned
@@ -113,6 +127,44 @@ Optional:
     "success": "true", 
     "message": ["success"]
   }
+}
+```
+</details>
+<details>
+<summary>Information</summary>
+
+## /api/project/information/get
+```
+Required:
+    ids=number
+```
+### Structure Of Object Returned
+
+```
+  {
+  status: number,
+  data:
+      {
+        taskId: number,
+        firstName: string,
+        lastName: string,
+        id: number
+      }[]
+  }
+```
+### Example return:
+
+```json
+{
+  "status":200,
+  "data": [
+    {"taskId":1,"id":5,"firstName":"Sarah","lastName":"Doe"},
+    {"taskId":1,"id":6,"firstName":"Matt","lastName":"Brown"},
+    {"taskId":1,"id":7,"firstName":"Alex","lastName":"Johnson"},
+    {"taskId":6,"id":8,"firstName":"Jill","lastName":"Jones"},
+    {"taskId":6,"id":9,"firstName":"John","lastName":"Adams"},
+    {"taskId":6,"id":10,"firstName":"Dave","lastName":"Brown"}
+  ]
 }
 ```
 </details>
@@ -378,6 +430,81 @@ Optional:
 ```
 </details>
 
+<details>
+<summary>Create</summary>
+
+## /api/group/creation/post
+### Body
+```
+{
+    managerId: number
+}
+```
+### Structure Of Object Returned
+If successful message will include the group id in index 1. 
+If the group id is 0, then no new group was created as manager already has a group
+```
+    {
+        status: number,
+        data: {
+            success? : boolean, 
+            error?   : string, 
+            message? : string[], 
+            reason?  : string[]
+        }
+    }
+```
+### Example return:
+
+```json
+{
+  "success": true,
+  "data": {
+    "success": "true", 
+    "message": ["success", "7"]
+  }
+}
+```
+</details>
+
+<details>
+<summary>Edit</summary>
+
+## /api/group/edit/put
+Note the edit can only change the manager for said group, not the group id.
+If the group id needs to change go through user edit
+### Body
+```
+{
+    groupId: number,
+    managerId: number
+}
+```
+### Structure Of Object Returned
+```
+    {
+        status: number,
+        data: {
+            success? : boolean, 
+            error?   : string, 
+            message? : string[], 
+            reason?  : string[]
+        }
+    }
+```
+### Example return:
+
+```json
+{
+  "success": true,
+  "data": {
+    "success": "true", 
+    "message": ["success"]
+  }
+}
+```
+</details>
+
 # Role
 
 <details>
@@ -509,7 +636,7 @@ Optional:
 <details>
 <summary>Get</summary>
 
-## /api/timetype/get
+## /api/time/register/get
 ```
 Required:
     user=number | number,number,...
@@ -548,6 +675,52 @@ Optional:
   ]
 }
 ```
+
+</details>
+
+<details>
+<summary>Post</summary>
+
+## /api/time/register/post
+### Body
+```
+{
+    firstName   : string,
+    lastName    : string,
+    email       : string,
+    password    : string,
+    manager     : number,
+    roles       : number[]
+}
+```
+### Structure Of Object Returned
+```
+    {
+        status: number,
+        data: {
+            success? : boolean, 
+            error?   : string, 
+            message? : string[], 
+            reason?  : string[]
+        }
+    }
+```
+### Example return:
+
+```json
+{
+  "success": true,
+  "data": {
+    "success": "true", 
+    "message": ["success"]
+  }
+}
+```
+</details>
+
+<details>
+<summary>Edit</summary>
+
 </details>
 
 # Login
