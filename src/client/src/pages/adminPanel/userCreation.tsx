@@ -11,6 +11,8 @@ import LoadingOverlay from 'react-loading-overlay-ts';
 import React, { Component } from "react";
 import { Highlighter, Typeahead } from 'react-bootstrap-typeahead';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
+
+//@ts-ignore
 import Spinner from 'react-bootstrap/Spinner';
 
 //Forge import
@@ -552,7 +554,7 @@ class UserCreation extends Component<any, CustomTypes>{
                             </Modal.Footer>
                         </Modal>
                     </Container>
-
+                  
 
                 </>
             </LoadingOverlay>

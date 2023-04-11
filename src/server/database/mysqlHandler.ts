@@ -1,5 +1,6 @@
 import * as mysql from "mysql";
 import {Connection, FieldInfo, MysqlError} from "mysql";
+import {MySQLConfig} from "../../app";
 
 export interface Where {
     column: string,
@@ -18,10 +19,11 @@ export interface MySQLResponse {
 }
 
 class MysqlHandler {
+    private logQueries: boolean = false;
     private static connectionConfig: object = undefined;
     private static connection: Connection   = undefined;
 
-    constructor(connectionConfig?:object, mysqlOnConnectCallback?: () => void) {
+    constructor(connectionConfig?:MySQLConfig, mysqlOnConnectCallback?: () => void) {
         if (connectionConfig !== undefined) { MysqlHandler.connectionConfig = connectionConfig; }
         this.hasOrCreateConnection(mysqlOnConnectCallback);
     }
@@ -86,7 +88,7 @@ class MysqlHandler {
     }
 
     /**
-     * Creates a string with the sql query condition based on a list of wheres
+     * Creates a string with the sql query condition based on a list of where's
      * @param where Where[]: A list of conditions which includes column to check and what to check against
      * @return String: of the condition or an empty string if where is empty
      * @private
@@ -95,9 +97,18 @@ class MysqlHandler {
         let whereString: string = "WHERE ";
         for (let i = 0; i < where.length; i++) {
             if (i !== 0) whereString += " AND "
-            whereString += where[i].column + "=" + where[i].equals[0].toString();
+            whereString += where[i].column + "='" + where[i].equals[0].toString() + "'";
         }
         return whereString;
+    }
+
+    private stringListToStringConverter(list: string[]): string {
+        let string: string = "";
+        for (let i = 0; i < list.length; i++) {
+            if (i !== 0) string += ","
+            string += `'${list[i].replace(/\'/g, '"')}'`;
+        }
+        return string;
     }
 
     /**
@@ -106,23 +117,22 @@ class MysqlHandler {
      * @return String: string of all insert values
      * @private
      */
-    private createValuesString(values: string[][] | string[]): string {
-        let valuesString: string;
+    public createValuesString(values: string[][] | string[]): string {
+        let valuesString: string = "";
         if (Array.isArray(values[0])) {
-            let valueList: string[] = [];
-            for (const value of values) {
-                valueList.push(`(${value})`);
+            for (let i = 0; i < values.length; i++) {
+                if (Array.isArray(values[i])) {
+                    if (i !== 0) valuesString += ",";
+                    // @ts-ignore
+                    valuesString += `(${this.stringListToStringConverter(values[i])})`;
+                }
             }
-            valuesString = `${valueList}`;
         } else {
-            valuesString = `(${values})`;
+            // @ts-ignore
+            valuesString += `(${this.stringListToStringConverter(values)})`;
         }
 
-        /* Each value in the list has to have '' around them e.g. 1 has to be '1'
-           This ensures all variable in the string has the quotes (There is definitely a better solution to this)*/
-        return valuesString.replace(/\((?!['])/g, "('")
-                           .replace(/(?<!['])\)/g, "')")
-                           .replace(/(?<![\)']),'|(?<![\)']),(?![\('])|',(?![\('])/g, "','");
+        return valuesString;
     }
 
     private createUpdateSetString(updateSet: UpdateSet[]): string[] {
@@ -152,7 +162,7 @@ class MysqlHandler {
                     });
                 });
             })
-            console.log("[MySQL] Retrieving data from DB, query: ", sqlQuery);
+            if (this.logQueries) console.log("[MySQL] Retrieving data from DB, query: ", sqlQuery);
             return promise;
         }
         return {error: undefined, results: undefined, fields: undefined};
@@ -164,8 +174,13 @@ class MysqlHandler {
      * @param columns String[]?: column(s) to retrieve
      * @param where Where?: condition for the selection of data
      */
-    public select(table: string, columns?: string[], where?:Where): Promise<MySQLResponse> {
-        let queryString = `SELECT ${columns !== undefined ? columns : "*"} FROM ${table} ${this.createWhereString(where)}`;
+    public select(table: string, columns?: string[], where?: Where | Where[]): Promise<MySQLResponse> {
+        let queryString: string;
+        if (Array.isArray(where)) {
+            queryString = `SELECT ${columns !== undefined ? columns : "*"} FROM ${table} ${this.createWhereListString(where)}`;
+        } else {
+            queryString = `SELECT ${columns !== undefined ? columns : "*"} FROM ${table} ${this.createWhereString(where)}`;
+        }
         return this.sendQuery(queryString);
     }
 
@@ -186,8 +201,13 @@ class MysqlHandler {
      * @param updateSet UpdateSet[]?: columns and the value to alter in the table
      * @param where Where?: condition for which rows to edit in table
      */
-    public update(table: string, updateSet: UpdateSet[], where:Where): Promise<MySQLResponse> {
-        let queryString = `UPDATE ${table} SET ${this.createUpdateSetString(updateSet)} ${this.createWhereString(where)}`;
+    public update(table: string, updateSet: UpdateSet[], where: Where |  Where[]): Promise<MySQLResponse> {
+        let queryString: string;
+        if (Array.isArray(where)) {
+            queryString = `UPDATE ${table} SET ${this.createUpdateSetString(updateSet)} ${this.createWhereListString(where)}`;
+        } else {
+            queryString = `UPDATE ${table} SET ${this.createUpdateSetString(updateSet)} ${this.createWhereString(where)}`;
+        }
         return this.sendQuery(queryString);
     }
 
@@ -208,7 +228,7 @@ class MysqlHandler {
      * Converts date to a date in numeric form
      * @param date Date: a date...
      */
-    public dateToNumber(date:Date): number {
+    public dateToNumber(date: Date): number {
         return date.getTime();
     }
 }

@@ -138,3 +138,6 @@ src/client/yarn-debug.log*
 src/client/yarn-error.log*
 
 # test
+
+src/mysqlConnectionConfig.json
+src/client/package.json
