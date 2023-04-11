@@ -17,7 +17,6 @@ import { Container, Modal, Table } from "react-bootstrap";
 import Form from 'react-bootstrap/Form';
 import LoadingOverlay from 'react-loading-overlay-ts';
 import React, { Component } from "react";
-import { Highlighter, Typeahead } from 'react-bootstrap-typeahead';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTrash } from '@fortawesome/free-solid-svg-icons'
@@ -36,6 +35,7 @@ interface User {
     firstName: string;
     lastName: string;
     groupId: number;
+    orginalGroupId?: number
 }
 
 /**
@@ -51,7 +51,8 @@ interface CustomTypes {
 
     //* database varriables
     dbUsers: User[]
-
+    groupMin: number | undefined,
+    groupMax: number | undefined,
 
 
     // * Search Varriables
@@ -76,6 +77,8 @@ class AdminPanel extends Component<any, CustomTypes> {
             editing: false,
             //* database varriables
             dbUsers: [],
+            groupMax: undefined,
+            groupMin: undefined,
 
 
             // * Search varriables
@@ -105,10 +108,16 @@ class AdminPanel extends Component<any, CustomTypes> {
     async componentDidMount() {
         this.handleLoader("Getting users")
         const dbUsers: User[] = await APICalls.getAllUsers()
+        const groups: number[] = []
+        dbUsers.forEach((ele: User) => groups.push(ele.groupId))
+        dbUsers.forEach((ele: User) => ele.orginalGroupId = ele.groupId)
+
         this.handleLoader("All done")
         this.setState(
             {
                 dbUsers: dbUsers,
+                groupMax: Math.max(...groups),
+                groupMin: Math.min(...groups),
                 loading: false
             });
     }
@@ -166,7 +175,7 @@ class AdminPanel extends Component<any, CustomTypes> {
         const className = rowClassNames?.includes('table-primary') ? rowClassNames : isSelected ? 'table-primary' : '';
 
         return (
-            <tr key={user.id} onClick={() => this.handleRowClick(user.id, user)} className={className}>
+            <tr style={{ textAlign: "center" }} key={user.id} onClick={() => this.handleRowClick(user.id, user)} className={className}>
                 <td>{user.id}</td>
                 <td>{user.email}</td>
                 <td>{user.firstName}</td>
@@ -178,15 +187,80 @@ class AdminPanel extends Component<any, CustomTypes> {
 
     private renderEditingRow(user: User) { //TODO: fix the prop
         return (
-            <tr key={user.id}>
-                <td>{user.id}</td>
-                <td><input type="text" value={user.email}/></td>
-                <td><input type="text" value={user.firstName}/></td>
-                <td><input type="text" value={user.lastName}/></td>
-                <td><input type="text" value={user.groupId}/></td>
-                <td  style={{ textAlign: 'center' }}><FontAwesomeIcon onClick={() => this.handleDelete(user)} icon={faTrash} /> </td>
+            <tr key={user.id} style={{ textAlign: "center" }}>
+                <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>{user.id}</td>
+                <td> <Form style={{ width: '181px' }}>
+                    <Form.Group >
+                        <Form.Control
+                            type="text"
+                            style={{ textAlign: 'center' }}
+                            placeholder="Enter eamil"
+                            defaultValue={user.email}
+
+                        />
+                    </Form.Group>
+                </Form></td>
+                <td><Form style={{ width: '181px' }}>
+                    <Form.Group >
+                        <Form.Control
+                            type="text"
+                            style={{ textAlign: 'center' }}
+                            placeholder="Enter first name"
+                            defaultValue={user.firstName}
+
+                        />
+                    </Form.Group>
+                </Form></td>
+                <td><Form style={{ width: '181px' }}>
+                    <Form.Group >
+                        <Form.Control
+                            type="text"
+                            style={{ textAlign: 'center' }}
+                            placeholder="Enter last name"
+                            defaultValue={user.lastName}
+
+                        />
+                    </Form.Group>
+                </Form></td>
+                <td><Form style={{ width: '60px' }}>
+                    <Form.Group >
+                        <Form.Control
+                            type="text"
+                            placeholder="Enter group"
+                            style={{ textAlign: 'center' }}
+                            defaultValue={user.groupId}
+                            onChange={(e) => this.handleGroupInput(user, e)}
+                        />
+                    </Form.Group>
+                </Form></td>
+                <td style={{ textAlign: 'center', verticalAlign: 'middle' }}><FontAwesomeIcon onClick={() => this.handleDelete(user)} icon={faTrash} /> </td>
             </tr>
         );
+    }
+
+    private handleDelete(user: User) {
+        console.log(user)
+    }
+
+
+    //TODO: FIX THE INPUT THINGS
+    private handleGroupInput(user: User, inputField: any) {
+        const newValue: number = parseInt(inputField.target.value)
+
+        if (isNaN(newValue) && inputField.target.value !== "") {
+            inputField.target.value = user.orginalGroupId
+        } else if (newValue > this.state.groupMax!) {
+            inputField.target.value = user.orginalGroupId
+        } else if (newValue < this.state.groupMin!) {
+            inputField.target.value = user.orginalGroupId
+        } else {
+            const updatedUser = { ...user, groupId: newValue };
+            this.setState({
+                dbUsers: this.state.dbUsers.map((u) => u.id === user.id ? updatedUser : u)
+            });
+        }
+
+
     }
 
 
@@ -196,7 +270,6 @@ class AdminPanel extends Component<any, CustomTypes> {
         })
 
     }
-
 
 
     private handleCancel() {
@@ -209,9 +282,7 @@ class AdminPanel extends Component<any, CustomTypes> {
 
     }
 
-    private handleDelete(user: User) {
-        console.log(user)
-    }
+
 
 
     render() {
@@ -244,7 +315,7 @@ class AdminPanel extends Component<any, CustomTypes> {
                         </Form>
                         <Table striped bordered hover responsive>
                             <thead>
-                                <tr>
+                                <tr style={{ textAlign: "center" }}>
                                     <th>ID</th>
                                     <th>Email</th>
                                     <th>First Name</th>

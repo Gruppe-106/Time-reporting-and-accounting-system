@@ -18,11 +18,6 @@ export default class APICalls {
         lastName: string;
         groupId: number;
     }[]> {
-        // let users: any[] = []
-        // const APIhandler: BaseApiHandler = new BaseApiHandler("Test")
-        // const call: boolean = APIhandler.get("/api/user/get?ids=*", {}, (ele: object) => {
-        //     users  = ele;
-        // })
 
         return fetch(`/api/user/get?ids=*`, {
             method: 'GET',
