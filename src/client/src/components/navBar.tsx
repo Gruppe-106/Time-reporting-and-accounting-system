@@ -1,5 +1,8 @@
-import {Button, Container, Nav, Navbar, NavDropdown, Offcanvas} from "react-bootstrap";
+import {Button, Container, Nav, Navbar, NavDropdown, Offcanvas, Modal, Row} from "react-bootstrap";
 import React, {Component} from "react";
+import Col from "react-bootstrap/Col";
+import Cookies from "js-cookie";
+import {userInfo} from "../utility/router";
 
 interface DropDownItem {
     href: string;
@@ -8,6 +11,10 @@ interface DropDownItem {
 
 class BaseNavBar extends Component<any>{
     currentPage: string;
+
+    state = {
+        logOutConfirmationShow: false
+    }
 
     constructor(props:any) {
         super(props);
@@ -20,7 +27,7 @@ class BaseNavBar extends Component<any>{
      * @param title String: the displayed text in navbar
      * @private
      */
-    private linkRender(href:string, title:string):JSX.Element {
+    private linkRender(href:string, title:string): JSX.Element {
         let active = false;
         //Set active if href is the same as the current loaded page
         if (href === this.currentPage) { active = true; }
@@ -33,7 +40,7 @@ class BaseNavBar extends Component<any>{
      * @param links DropDownItem[]: list of {href:String, title:String} used to create links in dropdown
      * @private
      */
-    private dropDownRender(title:string, links:DropDownItem[]):JSX.Element {
+    private dropDownRender(title:string, links:DropDownItem[]): JSX.Element {
         let active = false;
 
         //Creating an item in the dropdown for each item given
@@ -49,6 +56,41 @@ class BaseNavBar extends Component<any>{
                 {linksElement}
             </NavDropdown>
         )
+    }
+
+    private logOutRender(): JSX.Element {
+        return (
+            <Modal
+                show={this.state.logOutConfirmationShow}
+                size="sm"
+                onHide={() => {this.setState({logOutConfirmationShow: false})}}
+                backdrop="static"
+                keyboard={true}
+                >
+                <Modal.Header closeButton>
+                    <Modal.Title>Are you sure?</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Container>
+                        <Row>
+                            <Col md="auto">
+                                <Button size="lg" variant="secondary" onClick={() => {this.setState({logOutConfirmationShow: false})}}>
+                                    No
+                                </Button>
+                            </Col>
+                            <Col md="auto">
+                                <Button size="lg" variant="primary" onClick={this.logOut}>Yes</Button>
+                            </Col>
+                        </Row>
+                    </Container>
+                </Modal.Body>
+            </Modal>
+        );
+    }
+
+    private logOut(): void {
+        Cookies.remove("auth");
+        window.location.reload();
     }
 
     render() {
@@ -68,25 +110,33 @@ class BaseNavBar extends Component<any>{
                         </Offcanvas.Header>
                         <Offcanvas.Body>
                             <Nav className="me-auto">
-                                { this.dropDownRender("Project", [
+                                { userInfo.isProjectLeader ? this.dropDownRender("Project", [
                                     {href:"/project/create", title:"Create Project"},
                                     {href:"/project/menu"  , title:"Project Menu"},
-                                ])}
+                                ]) : this.linkRender("/project/menu", "Project Menu")
+                                }
+
                                 { this.linkRender("/user-register", "Register time") }
-                                { this.linkRender("/group/manager", "Group Manager") }
-                                { this.linkRender("/group/time-approval", "Time Approval") }
-                                { this.linkRender("/data-export", "Data") }
+
+                                { userInfo.isManager ?
+                                    this.linkRender("/group/manager", "Group Manager") &&
+                                    this.linkRender("/group/time-approval", "Time Approval")
+                                    : ""
+                                }
+
+                                { userInfo.isProjectLeader ? this.linkRender("/data-export", "Data") : "" }
                             </Nav>
-                            <Nav className="me-auto">
+                            { userInfo.isAdmin ? <Nav className="me-auto">
                                 { this.linkRender("/admin", "Admin") }
                                 { this.linkRender("/admin/create-user", "Create User") }
-                            </Nav>
+                            </Nav> : "" }
                             <Nav>
-                                <Button variant={"primary"} href={"/login"}>Login</Button>
+                                <Button variant={"danger"} onClick={() => {this.setState({logOutConfirmationShow: true})}}>Log Out</Button>
                             </Nav>
                         </Offcanvas.Body>
                     </Navbar.Offcanvas>
                 </Container>
+                {this.logOutRender()}
             </Navbar>
         );
     }

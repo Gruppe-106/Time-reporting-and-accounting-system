@@ -35,7 +35,11 @@ class ProjectManageTask extends Component<any> {
         super(props);
 
         this.handleFocus = this.handleFocus.bind(this);
+        this.handleEndFocus = this.handleEndFocus.bind(this);
+
         this.handleBlur = this.handleBlur.bind(this);
+        this.handleEndBlur = this.handleEndBlur.bind(this);
+
     }
     state = {
         tableRows: [ {
@@ -44,15 +48,22 @@ class ProjectManageTask extends Component<any> {
             startDate: -1,
             endDate: -1,
             timeType: -1,
-            isFocused: false
+            isFocused: false,
+            isEndFocused: false
         } ],
     }
     handleFocus(){
         this.setState({isFocused: true});
     }
-
     handleBlur(){
         this.setState({isFocused: false});
+    }
+     handleEndFocus(){
+        this.setState({isEndFocused: true});
+    }
+
+    handleEndBlur(){
+        this.setState({isEndFocused: false});
     }
 
 
@@ -76,6 +87,8 @@ class ProjectManageTask extends Component<any> {
     private tableRender():JSX.Element[] {
         // @ts-ignore
         const { isFocused } = this.state
+        // @ts-ignore
+        const { isEndFocused } = this.state
         return this.state.tableRows.map(row => (
             <tr key={row.id}>
                 <td><InputGroup size="sm">
@@ -105,24 +118,24 @@ class ProjectManageTask extends Component<any> {
                     onFocus={this.handleFocus}
                 />)}
                 </InputGroup></td>
-                <td><InputGroup size="sm"> {isFocused ?(
+                <td><InputGroup size="sm"> {isEndFocused ?(
                     <Form.Control
                         type="date"
                         placeholder=""
                         id="endDate"
-                        onBlur={this.handleBlur}
+                        onBlur={this.handleEndBlur}
                     />):(<Form.Control
                     type="text"
                     placeholder={new Date(row.endDate).toLocaleDateString()}
                     id="endDate"
-                    onFocus={this.handleFocus}
+                    onFocus={this.handleEndFocus}
                 />)}
                 </InputGroup></td>
                 <td><InputGroup size="sm">
                     <Form.Control
-                        type="text"
+                        type="number"
                         placeholder={row.timeType.toString()}
-                        id="task"
+                        id="timeType"
                     />
                 </InputGroup></td>
             </tr>
