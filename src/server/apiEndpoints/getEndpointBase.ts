@@ -28,12 +28,6 @@ abstract class GetEndpointBase extends EndpointBase{
         }
     }
 
-    protected createWhere(primaryKey: string, keyEqual: string[]): Where | undefined {
-        if (keyEqual.indexOf("*") === -1) {
-            return  {column: primaryKey, equals: keyEqual};
-        }
-    }
-
     protected createColumns(requestValues: string[]): string[] {
         if (requestValues.indexOf("*") === -1) {
             return  requestValues.filter((value) => {

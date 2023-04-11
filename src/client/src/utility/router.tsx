@@ -50,7 +50,7 @@ class Router extends Component<any> {
         if (authCookie === undefined) {
             this.setState({ requireLogin: true });
         } else {
-            let apiHandler:BaseApiHandler = new BaseApiHandler("test");
+            let apiHandler:BaseApiHandler = new BaseApiHandler();
             apiHandler.get("/api/auth", {}, (value) => {
                 let response: AuthApi = JSON.parse(JSON.stringify(value));
                 if (response.data.success && response.data.userId && response.data.userRoles) {
@@ -82,7 +82,7 @@ class Router extends Component<any> {
                                 <Route path={"/"} Component={FrontPage}/>
                                 { userInfo.isAdmin ? <Route path={"/admin"} Component={AdminPanel}/> : ""}
                                 { userInfo.isAdmin ? <Route path={"/admin/create-user"} Component={UserCreation}/> : ""}
-                                { userInfo.isProjectLeader ?  <Route path={"/data-export"} Component={DataExport}/> : ""}
+                                { userInfo.isManager ?  <Route path={"/data-export"} Component={DataExport}/> : ""}
                                 { userInfo.isProjectLeader ?  <Route path={"/project/create"} Component={ProjectCreator}/> : ""}
                                 { userInfo.isProjectLeader ? <Route path={"/project/manage"} Component={ProjectManager}/> : ""}
                                 <Route path={"/project/menu"} Component={ProjectMenu}/>
