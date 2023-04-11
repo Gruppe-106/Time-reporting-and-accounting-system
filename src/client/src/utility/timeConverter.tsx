@@ -12,7 +12,7 @@ export function dateStringFormatter(date: number): string {
 export function getCurrentWeekDates(dates: string[]): string[] {
     const today = new Date(); // Get the current date
 
-    const monday = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay() - 12); // Get the start date of the current week (Monday)
+    const monday = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay() - 19); // Get the start date of the current week (Monday)
 
     for (let i = 0; i < 7; i++) { // Create an array of date strings for each day of the week
       const currentDate = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + i);

@@ -349,10 +349,16 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
   
     return dates.map(date => {
       const matchingRows = stateRowData.filter(item => dateStringFormatter(item.date) === date);
+      
+
+      // Need to find matching project names, and then matching task names.
+      // Then find all time stored in project and their date.
+      // Create array to store time at position.
+      // Ex. ["0","0","2"] for time at date 3 in a project.
       return matchingRows.map((item, index) => (
         <TimeSheetRow key={`${date}-${index}`} rowData={item} onDelete={() => this.handleDeleteRow(index)} />
       ));
-    }).flat();
+    })
   }
 
   /*private renderRows() {
