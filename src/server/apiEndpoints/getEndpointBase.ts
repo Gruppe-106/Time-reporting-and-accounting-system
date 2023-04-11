@@ -19,7 +19,7 @@ abstract class GetEndpointBase extends EndpointBase{
     public async processRequest(req: Request, requestValues: string[], primaryKey:string, keyEqual?:string[], data?:string[]):Promise<{status:number, data: object[]}> {
         try {
             if (await this.ensureAuth(req)) {
-                return {status: 200, data: await this.getData(requestValues, primaryKey, keyEqual)};
+                return {status: 200, data: await this.getData(requestValues, primaryKey, keyEqual, data)};
             }
             return {status: 401, data: [{error: "Not authorized"}]};
         } catch (e) {

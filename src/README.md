@@ -642,6 +642,7 @@ Required:
     user=number | number,number,...
 Optional:
     var=taskId,taskName,projectName,projectId,date,userId,time,approved,managerLogged
+    period=number,number
     Can be any and/or all
 ```
 ### Structure Of Object Returned
@@ -721,6 +722,41 @@ Optional:
 <details>
 <summary>Edit</summary>
 
+## /api/time/register/edit/put
+### Body
+```
+{
+    date          : number,
+    taskId        : number,
+    userId        : number,
+    time         ?: number,
+    approved     ?: boolean,
+    managerLogged?: boolean
+}
+```
+### Structure Of Object Returned
+```
+    {
+        status: number,
+        data: {
+            success? : boolean, 
+            error?   : string, 
+            message? : string[], 
+            reason?  : string[]
+        }
+    }
+```
+### Example return:
+
+```json
+{
+  "success": true,
+  "data": {
+    "success": "true", 
+    "message": ["success"]
+  }
+}
+```
 </details>
 
 # Login

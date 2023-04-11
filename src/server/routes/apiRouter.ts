@@ -49,7 +49,7 @@ export class ApiRouter extends BaseRouter {
         this.router.get("/role/get",         (req: Request, res: Response) => new RoleEndpoint().getRoute(req, res));
         this.router.get("/role/user/get",    (req: Request, res: Response) => new UserRoleEndpoint().getRoute(req, res));
         this.router.get("/group/manager/get",(req: Request, res: Response) => new ManagerGroupEndpoint().getRoute(req, res));
-        this.router.get("/time/register/get",(req: Request, res: Response) => new TaskTimeRegisterEndpoint().getRoute(req, res, "userId", "user"));
+        this.router.get("/time/register/get",(req: Request, res: Response) => new TaskTimeRegisterEndpoint().getRoute(req, res));
     }
 
     /**
