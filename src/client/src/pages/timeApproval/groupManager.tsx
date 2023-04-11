@@ -2,109 +2,276 @@
     Show all users that a group leader resides over
  */
 
-import React, { Component } from "react";
-import ReactDOM from "react-dom/client";
+import React, {Component} from "react";
 import BaseNavBar from "../../components/navBar";
-import { Button, Container, Table } from "react-bootstrap";
-import { useParams } from "react-router-dom";
+import {Button, ButtonGroup, Container, Table} from "react-bootstrap";
+import BaseApiHandler from "../../network/baseApiHandler";
 
-interface GroupManagerProp {
+interface TSRecData {
+    taskId: number;
+    taskName: string;
+    projectName: string;
+    projectId: number;
+    date: number;
+    userId: number;
+    time: number;
+    approved: boolean;
+    managerLogged: boolean;
 }
 
-interface EmployeeData {
-    id: number;
+interface TSData {
+    empLastName: string;
+    empFirstName: string;
+    tasks: TSTaskData[];
+}
+
+interface TSTaskData {
+    taskId: number;
+    projectName: string;
+    projectId: number;
+    taskName: string;
+    userId: number;
+    [key: number]: TSDateRegistration;
+}
+
+interface TSDateRegistration {
+    time: number;
+    managerLogged: boolean;
+    approved: boolean;
+    date: number;
+}
+
+interface EmpRecData {
+    manager: number,
     firstName: string;
     lastName: string;
-    email: string;
+    group: number;
+    employees: {
+        id: number,
+        firstName: string,
+        lastName: string,
+        email: string
+    }[];
 }
 
-class GroupManager extends Component<GroupManagerProp>{
-    managerId: number;
-    employees: EmployeeData[];
-    state = { empDataLoaded: false }
+class GroupManager extends Component<any>{
+    state = {dataReceived: false}
+    empData:EmpRecData | null;
+    tsData: TSRecData[] | null;
+    tsParsedData: TSData | null;
+    sentReq:boolean;
 
-    constructor(props: GroupManagerProp) {
+    constructor(props:any) {
         super(props);
-        this.managerId = 0;
-        this.employees = [];
+        this.tsParsedData = null;
+        this.empData = null;
+        this.tsData = null;
+        this.sentReq = false;
     }
 
-    async GetDataAsync(): Promise<EmployeeData[]> {
-        return new Promise<EmployeeData[]>((resolve, reject) => {
-            let empData: EmployeeData[] = [];
-            setTimeout(() => {
-                let JSON_REC_FILE =
-                {
-                    "manager_group":
-                        [
-                            { "manager": 0, "id": 1, "firstName": "Mads", "lastName": "Mads", "email": "madshbyriel@gmail.com" },
-                            { "manager": 0, "id": 2, "firstName": "Alexander", "lastName": "Alexander", "email": "madshbyriel@gmail.com" },
-                            { "manager": 0, "id": 3, "firstName": "Christian", "lastName": "Christian", "email": "madshbyriel@gmail.com" },
-                            { "manager": 0, "id": 4, "firstName": "Mads", "lastName": "Mads", "email": "madshbyriel@gmail.com" },
-                            { "manager": 0, "id": 5, "firstName": "Mikkel", "lastName": "Mikkel", "email": "madshbyriel@gmail.com" },
-                            { "manager": 0, "id": 6, "firstName": "Andreas", "lastName": "Andreas", "email": "madshbyriel@gmail.com" },
-                        ],
-                };
-                for (let i = 0; i < 6; i++) {
-                    let emp: EmployeeData = {
-                        firstName: JSON_REC_FILE.manager_group[i].firstName,
-                        lastName: JSON_REC_FILE.manager_group[i].lastName,
-                        id: JSON_REC_FILE.manager_group[i].id,
-                        email: JSON_REC_FILE.manager_group[i].email,
-                    };
-                    empData.push(emp);
+    componentDidMount() {
+        this.UpdateEmpData();
+    }
+
+    private UpdateTSData(empId:number, empFirstName:string, empLastName: string):void {
+        let api:BaseApiHandler = new BaseApiHandler("test");
+        api.get(`/api/time/register/get?user=${empId}`, {},(apiData) => {
+            this.tsData = JSON.parse(JSON.stringify(apiData));
+            let tsRawData: TSRecData[] | null = JSON.parse(JSON.stringify(apiData));
+
+            // Convert the received data:
+            if (tsRawData != null) {
+                let tasks: TSTaskData[] = [];
+
+                // For each piece of data received, we want to append the information to our own better structure.
+                for (let i = 0; i < tsRawData.length; i++) {
+                    let dayOfWeek: number = new Date(tsRawData[i].date).getDay();
+                    let tsExists: boolean = false;
+                    for (let j = 0; j < tasks.length; j++) {
+                        // If the task already exist, push the date registration to registrations
+                        if (tasks[j].taskId === tsRawData[i].taskId) {
+                            tsExists = true;
+                            tasks[j][dayOfWeek] = this.TSRawToDateRegistration(tsRawData[i]);
+                        }
+                    }
+
+                    // If the task didn't exist, register it and the time as well:
+                    if (!tsExists) {
+                        let newTaskReg: TSTaskData = this.TSRawToTask(tsRawData[i]);
+                        newTaskReg[dayOfWeek] = this.TSRawToDateRegistration(tsRawData[i]);
+                        tasks.push(newTaskReg);
+                    }
                 }
-                this.setState({ empDataLoaded: true })
-                resolve(empData);
-            }, 3000);
-        })
+
+                this.tsParsedData = {tasks: tasks, empFirstName: empFirstName, empLastName: empLastName};
+            }
+
+            this.setState({tsDataReceived: true});
+        });
+        return;
+    }
+
+    private TSRawToDateRegistration(rawData:TSRecData):TSDateRegistration {
+        let date:number = Date.now();
+        return {
+            approved: rawData.approved,
+            time: rawData.time,
+            managerLogged: rawData.managerLogged,
+            date: date,
+        }
+    }
+
+    private TSRawToTask(rawData:TSRecData):TSTaskData {
+        return {
+            taskId: rawData.taskId,
+            taskName: rawData.taskName,
+            userId: rawData.userId,
+            projectId: rawData.projectId,
+            projectName: rawData.projectName,
+        }
+    }
+
+    private UpdateEmpData():void {
+        if (!this.sentReq) {
+            this.sentReq = true;
+            let api:BaseApiHandler = new BaseApiHandler("test");
+            api.get("/api/group/manager/get?manager=9",  {}, (apiData) => {
+                this.empData = JSON.parse(JSON.stringify(apiData))[0];
+                this.setState({dataReceived: true});
+            });
+        }
+        return;
+    }
+
+    private EmployeeTable():JSX.Element {
+        return (
+            <>
+                <h1>Group manager</h1>
+                {
+                    !this.state.dataReceived?(
+                        <h4>Loading empdata...</h4>
+                    ):(
+                        <>
+                            <h4>Displaying members of group, for group leader {this.empData?.firstName} {this.empData?.lastName}</h4>
+                            <Table>
+                                <thead>
+                                <tr>
+                                    <th className={"col-sm-3"}>First name</th>
+                                    <th className={"col-sm-3"}>Last name</th>
+                                    <th className={"col-sm-4"}>Email</th>
+                                    <th className={"col-sm-2"}></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {
+                                    this.empData?.employees.map(e => (
+                                        <tr>
+                                            <td className={"col-sm-3"}>{e.firstName}</td>
+                                            <td className={"col-sm-3"}>{e.lastName}</td>
+                                            <td className={"col-sm-4"}>{e.email}</td>
+                                            <td className={"col-sm-2"}><center><Button onClick={() => this.UpdateTSData(e.id, e.firstName, e.lastName)}>Inspect timesheet</Button></center></td>
+                                        </tr>
+                                    ))
+                                }
+                                </tbody>
+                            </Table>
+                        </>
+                    )
+                }
+            </>
+        )
+    }
+
+    private SelectedEmployeeTimesheetTable():JSX.Element {
+        if (!this.tsParsedData) return (<></>);
+
+        for (let i = 0; i < 7; i++) {
+            console.log(this.tsParsedData.tasks[0][i]);
+        }
+
+        return (
+            <>
+                {
+                    !this.tsParsedData?(
+                        <h4>Loading empdata...</h4>
+                    ):(
+                        <>
+                            <h4>Displaying timesheet {this.tsParsedData?.empFirstName} {this.tsParsedData?.empLastName}</h4>
+                            <Table>
+                                <thead>
+                                <tr>
+                                    <th className={"col-sm-1"}>Project</th>
+                                    <th className={"col-sm-1"}>Task</th>
+                                    <th>Sun</th>
+                                    <th></th>
+                                    <th>Mon</th>
+                                    <th></th>
+                                    <th>Tue</th>
+                                    <th></th>
+                                    <th>Wed</th>
+                                    <th></th>
+                                    <th>Thu</th>
+                                    <th></th>
+                                    <th>Fri</th>
+                                    <th></th>
+                                    <th>Sat</th>
+                                    <th></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {
+                                    this.tsParsedData.tasks.map(t => (
+                                        <tr>
+                                            <td className={"col-sm-1"}>{t.projectName}</td>
+                                            <td className={"col-sm-1"}>{t.taskName}</td>
+                                            {
+                                                [0,1,2,3,4,5,6].map(i => (
+                                                    <>
+                                                        {
+                                                            t[i]?(
+                                                                <>
+                                                                    <td>{t[i].time}</td>
+                                                                    <td>
+                                                                        <ButtonGroup aria-label="Basic example">
+                                                                            <Button variant="success" disabled={t[i].approved && t[i].managerLogged}>✓</Button>
+                                                                            <Button variant="danger" disabled={t[i].approved && t[i].managerLogged}>🗙</Button>
+                                                                        </ButtonGroup>
+                                                                    </td>
+                                                                </>
+                                                            ):(
+                                                                <>
+                                                                    <td>{0}</td>
+                                                                    <td>
+                                                                        <ButtonGroup aria-label="Basic example">
+                                                                            <Button variant="success" disabled={true}>✓</Button>
+                                                                            <Button variant="danger" disabled={true}>🗙</Button>
+                                                                        </ButtonGroup>
+                                                                    </td>
+                                                                </>
+                                                            )
+                                                        }
+                                                    </>
+                                                ))
+                                            }
+                                        </tr>
+                                    ))
+                                }
+                                </tbody>
+                            </Table>
+                        </>
+                    )
+                }
+            </>
+        )
     }
 
     render() {
-        this.GetDataAsync().then(data => {
-            this.employees = data;
-        });
-        //const { id } = useParams(); // ! THIS GIVES ERRORS
-        /**
-         * ! Specific error src\pages\timeApproval\groupManager.tsx
-         * ! Line 67:24:  React Hook "useParams" cannot be called in a class component.
-         * ! React Hooks must be called in a React function component or a custom React Hook function  react-hooks/rules-of-hooks
-         */
-        //this.managerId = Number(id);
         return (
             <>
                 <BaseNavBar />
                 <Container className={"py-3"}>
-                    <h1>Group Manager</h1>
-                    {
-                        (this.state.empDataLoaded) ? (
-                            <>
-                                <h4 className={"col-sm-3"}>{this.managerId}</h4>
-                                <Table striped hover bordered>
-                                    <thead>
-                                        <tr>
-                                            <th className={"col-sm-3"}>First Name</th>
-                                            <th className={"col-sm-3"}>Last Name</th>
-                                            <th className={"col-sm-4"}>Email</th>
-                                            <th className={"col-sm-2"}></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {this.employees.map(e => (
-                                            <tr>
-                                                <td className={"col-sm-3"}>{e.firstName}</td>
-                                                <td className={"col-sm-3"}>{e.lastName}</td>
-                                                <td className={"col-sm-4"}>{e.email}</td>
-                                                <td className={"col-sm-2"}><center><Button href={"/#"} className={"col-sm-12"}>Inspect timesheet</Button></center></td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </Table>
-                            </>
-                        ) : (
-                            <h4>Loading...</h4>
-                        )
-                    }
+                    {this.EmployeeTable()}
+                    {this.SelectedEmployeeTimesheetTable()}
                 </Container>
             </>
         );
@@ -112,19 +279,3 @@ class GroupManager extends Component<GroupManagerProp>{
 }
 
 export default GroupManager;
-
-/*
-Data I am looking to get when I search the database of manager-employee connections, a.k.a. all employee with the same
-manager, a.k.a. a group.
-let JSON_REC_FILE =
-    { "manager_group":
-            [
-                {"manager": 0, "id": 1, "firstName": "Mads", "lastName": "Mads", "email": "madshbyriel@gmail.com"},
-                {"manager": 0, "id": 2, "firstName": "Alexander", "lastName": "Alexander", "email": "madshbyriel@gmail.com"},
-                {"manager": 0, "id": 3, "firstName": "Christian", "lastName": "Christian", "email": "madshbyriel@gmail.com"},
-                {"manager": 0, "id": 4, "firstName": "Mads", "lastName": "Mads", "email": "madshbyriel@gmail.com"},
-                {"manager": 0, "id": 5, "firstName": "Mikkel", "lastName": "Mikkel", "email": "madshbyriel@gmail.com"},
-                {"manager": 0, "id": 6, "firstName": "Andreas", "lastName": "Andreas", "email": "madshbyriel@gmail.com"},
-            ],
-    };
- */
