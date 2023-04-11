@@ -526,7 +526,7 @@ class UserCreation extends Component<any, CustomTypes>{
                             </Form.Group>
 
 
-                            <Button variant="primary" type="button" onClick={this.handleSubmit} disabled={this.state.submitDisabled} >
+                            <Button variant="primary" type="button" onClick={this.handleSubmit} disabled={this.state.submitDisabled || !this.state.emailValid} >
                                 {this.state.submitDisabled ? (
                                     <Spinner
                                         as="span"

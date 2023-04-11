@@ -35,7 +35,11 @@ interface User {
     firstName: string;
     lastName: string;
     groupId: number;
-    orginalGroupId?: number
+    orginalGroupId?: number,
+    orginalEmail?: string,
+    orginalFirstName?: string,
+    orginalLastName?: string,
+    validEmail?: boolean
 }
 
 /**
@@ -48,6 +52,7 @@ interface CustomTypes {
     // * Controlling components
     loading: boolean
     editing: boolean
+    validEmail: boolean
 
     //* database varriables
     dbUsers: User[]
@@ -75,6 +80,8 @@ class AdminPanel extends Component<any, CustomTypes> {
             // * Component controllers
             loading: false,
             editing: false,
+            validEmail: true,
+
             //* database varriables
             dbUsers: [],
             groupMax: undefined,
@@ -101,6 +108,9 @@ class AdminPanel extends Component<any, CustomTypes> {
         this.handleCancel = this.handleCancel.bind(this)
         this.handleChanges = this.handleChanges.bind(this)
         this.handleDelete = this.handleDelete.bind(this)
+        this.handleGroupInput = this.handleGroupInput.bind(this)
+        this.handleEmailInput = this.handleEmailInput.bind(this)
+
         this.renderRow = this.renderRow.bind(this);
 
     }
@@ -110,7 +120,13 @@ class AdminPanel extends Component<any, CustomTypes> {
         const dbUsers: User[] = await APICalls.getAllUsers()
         const groups: number[] = []
         dbUsers.forEach((ele: User) => groups.push(ele.groupId))
-        dbUsers.forEach((ele: User) => ele.orginalGroupId = ele.groupId)
+        dbUsers.forEach((ele: User) => {
+            ele.orginalGroupId = ele.groupId
+            ele.orginalEmail = ele.email
+            ele.orginalFirstName = ele.firstName
+            ele.orginalLastName = ele.lastName
+            ele.validEmail = true
+        })
 
         this.handleLoader("All done")
         this.setState(
@@ -187,20 +203,25 @@ class AdminPanel extends Component<any, CustomTypes> {
 
     private renderEditingRow(user: User) { //TODO: fix the prop
         return (
-            <tr key={user.id} style={{ textAlign: "center" }}>
-                <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>{user.id}</td>
-                <td> <Form style={{ width: '181px' }}>
+            <tr key={user.id}   >
+                <td style={{ textAlign: 'center', verticalAlign: "middle" }}>{user.id}</td>
+                <td > <Form style={{ width: '100%', margin: "auto", minWidth: "183px" }}>
                     <Form.Group >
                         <Form.Control
                             type="text"
                             style={{ textAlign: 'center' }}
                             placeholder="Enter eamil"
                             defaultValue={user.email}
+                            isInvalid={!user.validEmail}
+                            onChange={(e) => this.handleEmailInput(user, e)}
 
                         />
                     </Form.Group>
+                    <Form.Control.Feedback type="invalid">
+                        Please enter a valid email address.
+                    </Form.Control.Feedback>
                 </Form></td>
-                <td><Form style={{ width: '181px' }}>
+                <td><Form style={{ width: '100%', margin: "auto", minWidth: "183px" }}>
                     <Form.Group >
                         <Form.Control
                             type="text"
@@ -211,7 +232,7 @@ class AdminPanel extends Component<any, CustomTypes> {
                         />
                     </Form.Group>
                 </Form></td>
-                <td><Form style={{ width: '181px' }}>
+                <td><Form style={{ width: '100%', margin: "auto", minWidth: "183px" }}>
                     <Form.Group >
                         <Form.Control
                             type="text"
@@ -222,7 +243,7 @@ class AdminPanel extends Component<any, CustomTypes> {
                         />
                     </Form.Group>
                 </Form></td>
-                <td><Form style={{ width: '60px' }}>
+                <td><Form style={{ width: '69px', margin: "auto" }}>
                     <Form.Group >
                         <Form.Control
                             type="text"
@@ -238,13 +259,10 @@ class AdminPanel extends Component<any, CustomTypes> {
         );
     }
 
-    private handleDelete(user: User) {
-        console.log(user)
-    }
 
 
     //TODO: FIX THE INPUT THINGS
-    private handleGroupInput(user: User, inputField: any) {
+    private handleGroupInput(user: User, inputField: any): void {
         const newValue: number = parseInt(inputField.target.value)
 
         if (isNaN(newValue) && inputField.target.value !== "") {
@@ -263,8 +281,29 @@ class AdminPanel extends Component<any, CustomTypes> {
 
     }
 
+    private handleEmailInput(user: User, input: any): void {
+        const email = input.target.value;
+        const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-    private handleSubmit() {
+        const updatedUser = { ...user, email, validEmail: isValidEmail };
+        const updatedUsers = this.state.dbUsers.map((u) =>
+            u.id === user.id ? updatedUser : u
+        );
+
+        this.setState({
+            dbUsers: updatedUsers,
+        });
+    }
+
+
+
+    private handleDelete(user: User): void {
+        console.log(user)
+    }
+
+
+
+    private handleSubmit(): void {
         this.setState({
             editing: !this.state.editing
         })
@@ -272,13 +311,13 @@ class AdminPanel extends Component<any, CustomTypes> {
     }
 
 
-    private handleCancel() {
+    private handleCancel(): void {
         this.setState({
             editing: false
         })
     }
 
-    private handleChanges() {
+    private handleChanges(): void {
 
     }
 
@@ -352,7 +391,7 @@ class AdminPanel extends Component<any, CustomTypes> {
                             </Button> :
                             (<div style={{ display: 'flex', gap: '10px' }}>
 
-                                <Button variant="primary" onClick={this.handleChanges}>
+                                <Button disabled={!this.state.validEmail} variant="primary" onClick={this.handleChanges}>
                                     Submit
                                 </Button>
 
