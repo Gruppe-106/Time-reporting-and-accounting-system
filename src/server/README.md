@@ -8,7 +8,7 @@
 6. TaskEdit _/
 7. UserTimeRegistration _/
 8. UserTimeEdit _/
-9. GroupEdit 
+9. GroupEdit  _/
 10. User-task connector _/
 11. Project-task connector _/
 12. User-task-project info _/
