@@ -6,6 +6,7 @@ import React, {Component} from "react";
 import BaseNavBar from "../../components/navBar";
 import {Button, ButtonGroup, Container, Table} from "react-bootstrap";
 import BaseApiHandler from "../../network/baseApiHandler";
+import {userInfo} from '../../utility/router'
 
 interface TSRecData {
     taskId: number;
@@ -132,11 +133,24 @@ class GroupManager extends Component<any>{
     }
 
     private UpdateEmpData():void {
+        if (userInfo.isManager) {
+            if (!this.sentReq) {
+                this.sentReq = true
+                console.log("IS MANAGER")
+                let api:BaseApiHandler = new BaseApiHandler();
+                console.log("f")
+                api.get(`/api/group/manager/get?manager=${userInfo.userId}`,  {}, (apiData) => {
+                    this.empData = JSON.parse(JSON.stringify(apiData))['data'][0];
+                    this.setState({dataReceived: true});
+                });
+            }
+        }
+
         if (!this.sentReq) {
             this.sentReq = true;
             let api:BaseApiHandler = new BaseApiHandler("test");
-            api.get("/api/group/manager/get?manager=9",  {}, (apiData) => {
-                this.empData = JSON.parse(JSON.stringify(apiData))[0];
+            api.get(`/api/group/manager/get?manager=${userInfo.userId}`,  {}, (apiData) => {
+                this.empData = JSON.parse(JSON.stringify(apiData))['data'][0];
                 this.setState({dataReceived: true});
             });
         }
