@@ -130,6 +130,8 @@ class AdminPanel extends Component<any, CustomTypes> {
             ele.orginalFirstName = ele.firstName
             ele.orginalLastName = ele.lastName
             ele.validEmail = true
+            ele.validFirstName = true
+            ele.validLastName = true
         })
 
         this.handleLoader("All done")
@@ -232,6 +234,8 @@ class AdminPanel extends Component<any, CustomTypes> {
                             style={{ textAlign: 'center' }}
                             placeholder="Enter first name"
                             defaultValue={user.firstName}
+                            isInvalid={!user.validFirstName}
+                            onChange={(e) => this.handleFirstName(user,e)}
 
                         />
                     </Form.Group>
@@ -243,6 +247,8 @@ class AdminPanel extends Component<any, CustomTypes> {
                             style={{ textAlign: 'center' }}
                             placeholder="Enter last name"
                             defaultValue={user.lastName}
+                            isInvalid={!user.validLastName}
+                            onChange={(e) => this.handleLastName(user,e)}
 
                         />
                     </Form.Group>
@@ -254,6 +260,7 @@ class AdminPanel extends Component<any, CustomTypes> {
                             placeholder="Enter group"
                             style={{ textAlign: 'center' }}
                             defaultValue={user.groupId}
+                            isInvalid={!user.validEmail}
                             onChange={(e) => this.handleGroupInput(user, e)}
                         />
                     </Form.Group>
@@ -352,6 +359,16 @@ class AdminPanel extends Component<any, CustomTypes> {
     }
 
 
+    /**
+
+       Handles updating the last name of a given user.
+
+       @param {User} user - The user to update.
+
+       @param {any} input - The input field containing the new last name.
+
+       @returns {void}
+   */
     private handleLastName(user: User, input: any): void {
         const lastName: string = input.target.value;
         const validLastName: boolean = lastName !== ""
@@ -463,7 +480,7 @@ class AdminPanel extends Component<any, CustomTypes> {
                             </Button> :
                             (<div style={{ display: 'flex', gap: '10px' }}>
 
-                                <Button disabled={!this.state.validEmail} variant="primary" onClick={this.handleChanges}>
+                                <Button disabled={!this.state.validEmail || !this.state.validName} variant="primary" onClick={this.handleChanges}>
                                     Submit
                                 </Button>
 
