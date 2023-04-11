@@ -40,6 +40,9 @@ interface User {
     orginalFirstName?: string,
     orginalLastName?: string,
     validEmail?: boolean
+    validFirstName?: boolean
+    validLastName?: boolean
+
 }
 
 /**
@@ -53,6 +56,7 @@ interface CustomTypes {
     loading: boolean
     editing: boolean
     validEmail: boolean
+    validName: boolean
 
     //* database varriables
     dbUsers: User[]
@@ -81,7 +85,7 @@ class AdminPanel extends Component<any, CustomTypes> {
             loading: false,
             editing: false,
             validEmail: true,
-
+            validName: true,
             //* database varriables
             dbUsers: [],
             groupMax: undefined,
@@ -261,7 +265,18 @@ class AdminPanel extends Component<any, CustomTypes> {
 
 
 
-    //TODO: FIX THE INPUT THINGS
+    /**
+
+        TODO: FIX THE INPUT THINGS
+
+        Handles updating the group ID of a given user.
+
+        @param {User} user - The user to update.
+
+        @param {any} inputField - The input field containing the new group ID.
+
+        @returns {void}
+    */
     private handleGroupInput(user: User, inputField: any): void {
         const newValue: number = parseInt(inputField.target.value)
 
@@ -274,27 +289,84 @@ class AdminPanel extends Component<any, CustomTypes> {
         } else {
             const updatedUser = { ...user, groupId: newValue };
             this.setState({
-                dbUsers: this.state.dbUsers.map((u) => u.id === user.id ? updatedUser : u)
+                selectedUsers: this.state.selectedUsers.map((u) => u.id === user.id ? updatedUser : u)
             });
         }
 
 
     }
 
-    private handleEmailInput(user: User, input: any): void {
-        const email = input.target.value;
-        const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-        const updatedUser = { ...user, email, validEmail: isValidEmail };
-        const updatedUsers = this.state.dbUsers.map((u) =>
+    /**
+
+        Handles updating the email address of a given user.
+
+        @param {User} user - The user to update.
+
+        @param {any} input - The input field containing the new email address.
+
+        @returns {void}
+    */
+    private handleEmailInput(user: User, input: any): void {
+        const email: string = input.target.value;
+        const isValidEmail: boolean = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+        const updatedUser: User = { ...user, email, validEmail: isValidEmail };
+        const updatedUsers: User[] = this.state.selectedUsers.map((u) =>
             u.id === user.id ? updatedUser : u
         );
 
         this.setState({
-            dbUsers: updatedUsers,
+            selectedUsers: updatedUsers,
+            validEmail: isValidEmail
+        });
+
+
+    }
+
+
+    /**
+
+        Handles updating the first name of a given user.
+
+        @param {User} user - The user to update.
+
+        @param {any} input - The input field containing the new first name.
+
+        @returns {void}
+    */
+    private handleFirstName(user: User, input: any): void {
+        const firstName: string = input.target.value;
+        const validFirstName: boolean = firstName !== ""
+
+
+        const updatedUser: User = { ...user, firstName, validFirstName: validFirstName };
+        const updatedUsers: User[] = this.state.selectedUsers.map((u) =>
+            u.id === user.id ? updatedUser : u
+        );
+
+        this.setState({
+            selectedUsers: updatedUsers,
+            validName: validFirstName
         });
     }
 
+
+    private handleLastName(user: User, input: any): void {
+        const lastName: string = input.target.value;
+        const validLastName: boolean = lastName !== ""
+
+
+        const updatedUser: User = { ...user, lastName, validFirstName: validLastName };
+        const updatedUsers: User[] = this.state.selectedUsers.map((u) =>
+            u.id === user.id ? updatedUser : u
+        );
+
+        this.setState({
+            selectedUsers: updatedUsers,
+            validName: validLastName
+        });
+    }
 
 
     private handleDelete(user: User): void {
