@@ -42,7 +42,7 @@ class TableHeader extends React.Component<EmptyProps, TableHeaderState> {
 
     // Set the initial state
     this.state = {
-      headerDates: getCurrentWeekDates(dates, -19),
+      headerDates: getCurrentWeekDates(dates, -21),
     };
   }
 
