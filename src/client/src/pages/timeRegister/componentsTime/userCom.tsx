@@ -137,12 +137,12 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
 
   renderRows() {
     const { rowData, dates } = this.props;
-    let arr = ['1', '2', '3', '4', '5', '6', '7'];
-  
+    let arr = [1, 2, 3, 4, 5, 6, 7];
+
     const uniqueTaskNames = new Set();
-  
+
     console.log(rowData);
-  
+
     return rowData.filter(item => {
       // Filter out tasks with duplicate task names
       if (uniqueTaskNames.has(item.taskName)) {
@@ -155,8 +155,8 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
         <td>{item.projectName}</td>
         <td>{item.taskName}</td>
         {arr.map((num, index) => {
-          const currentDate = new Date(item.date).getDate();
-          const matchDate = new Date(dates[parseInt(num) - 1]).getDate();
+          const currentDate = dateStringFormatter(item.date);
+          const matchDate = dates[num - 1];
           if (currentDate === matchDate) {
             return (
               <td key={index}>
@@ -178,21 +178,21 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
             );
           } else {
             return <td key={index}>
-            <InputGroup size="sm">
-              <Form.Control
-                type="number"
-                placeholder="0"
-                value={0}
-              />
-              <InputGroup.Text id={`basic-addon-${num}`}>:</InputGroup.Text>
-              <Form.Select>
-                <option value="0">0</option>
-                <option value="15">15</option>
-                <option value="30">30</option>
-                <option value="45">45</option>
-              </Form.Select>
-            </InputGroup>
-          </td>
+              <InputGroup size="sm">
+                <Form.Control
+                  type="number"
+                  placeholder="0"
+                  value={0}
+                />
+                <InputGroup.Text id={`basic-addon-${num}`}>:</InputGroup.Text>
+                <Form.Select>
+                  <option value="0">0</option>
+                  <option value="15">15</option>
+                  <option value="30">30</option>
+                  <option value="45">45</option>
+                </Form.Select>
+              </InputGroup>
+            </td>
           }
         })}
         <td>0</td>
@@ -205,7 +205,7 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
       </tr>
     ));
   }
-  
+
 
 
 
@@ -215,8 +215,8 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
     return (
       <Container>
         <Table bordered size="sm">
-            <TableHeader />
-            <tbody>{this.renderRows()}</tbody>
+          <TableHeader />
+          <tbody>{this.renderRows()}</tbody>
         </Table>
         <Modal show={showDeleteRowModal} onHide={this.handleCloseModal}>
           <Modal.Header closeButton>
@@ -313,17 +313,17 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
    */
   private renderRows() {
     const { stateRowData } = this.state;
-  
+
     const dates: string[] = [];
     getCurrentWeekDates(dates, -21);
-  
+
     const matchingRows: any[] = [];
     dates.forEach(date => {
       const rows = stateRowData.filter(item => dateStringFormatter(item.date) === date);
       matchingRows.push(...rows);
     });
 
-      return <TimeSheetRow dates={dates} rowData={matchingRows} />;
+    return <TimeSheetRow dates={dates} rowData={matchingRows} />;
   }
 
 
