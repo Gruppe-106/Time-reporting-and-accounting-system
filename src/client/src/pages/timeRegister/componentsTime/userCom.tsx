@@ -84,9 +84,6 @@ interface TimeSheetRowProps {
 // State of variables in TimeSheetRow
 interface TimeSheetRowState {
   times: number[];
-  total: number;
-  minTimes: string[];
-  minTotal: number;
   showDeleteRowModal: boolean;
 }
 
@@ -100,8 +97,6 @@ interface IRowData {
   }[]
 }
 
-
-
 /*
 
     * Creating a tablerow for the table body, takes in 2 props, data and onDelete
@@ -114,9 +109,6 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
     // Inilisie all states
     this.state = {
       times: [0, 0, 0, 0, 0, 0, 0],
-      total: 0,
-      minTimes: ["0", "0", "0", "0", "0", "0", "0"],
-      minTotal: 0,
       showDeleteRowModal: false,
     };
   }
@@ -131,7 +123,7 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
   /*
       * Opens the modal
    */
-  private handleShowModal = () => {
+  private handleShowDelModal = () => {
     this.setState({ showDeleteRowModal: true });
   };
 
@@ -206,13 +198,15 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
               );
             })}
             <td>{arr.reduce((partialSum, a) => partialSum + a, 0)}</td>
-            <td>{data.taskId}</td>
+            <td><Button variant="danger" size="sm" onClick={() => this.handleShowDelModal()}>-</Button></td>
           </tr>
         ))
       }
     }
     return rows;
   }
+  //<td>{data.taskId}</td>
+  //<Button variant="danger" size="sm" onClick={() => this.handleShowDelModal(data.taskId)}>Delete</Button>
 
   render() {
     const { showDeleteRowModal } = this.state;
@@ -223,6 +217,7 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
           <TableHeader />
           <tbody>{this.renderRows()}</tbody>
         </Table>
+        <></>
         <Modal show={showDeleteRowModal} onHide={this.handleCloseModal}>
           <Modal.Header closeButton>
             <Modal.Title>Delete Row?</Modal.Title>
@@ -319,6 +314,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
       <Container fluid="lg">
         <TimeSheetRow rowData={stateRowData} />
         <Button variant="primary" type="button" onClick={() => this.handleShowAddModal()}>Add Row</Button>
+        <></>
         <Modal show={showAddModal} onHide={this.handleCloseModal}>
           <Modal.Header closeButton>
             <Modal.Title>Add Row?</Modal.Title>
@@ -334,42 +330,3 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
 }
 
 export default TimeSheetPage;
-
-
-/*<Modal show={showAddRowModal} onHide={this.handleCloseAddModal}>
-          <Modal.Header closeButton>
-            <Modal.Title>Add Row?</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <p>Which task do you want to add?</p>
-            <Form.Group className="mb-3" controlId="formBasicAssignManager">
-              <Typeahead
-                id="findProject"
-                labelKey={(option: any) => `${option.projectName}  ${option.taskName}`}
-                options={this.state.stateRowData}
-                placeholder="Pick a project"
-                filterBy={(option: any, props: any): boolean => {
-                  const query: string = props.text.toLowerCase().trim();
-                  const name: string = option.projectName.toLowerCase() + option.taskName.toLowerCase();
-                  return name.includes(query);
-                }}
-                renderMenuItemChildren={(option: any, props: any) => (
-                  <>
-                    <Highlighter search={props.text}>
-                      {option.projectName + ", " + option.taskName}
-                    </Highlighter>
-                  </>
-                )}
-                onChange={(selected: any) => {
-                  // Set selectedProject state to the first selected option (if any)
-                  this.setState({ selectedProject: selected[0] || null });
-                }}
-                selected={this.state.selectedProject ? [this.state.selectedProject] : []}
-              />
-            </Form.Group>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={this.handleCloseAddModal}>Cancel</Button>
-            <Button variant="primary" onClick={this.handleAddRow}>Add</Button>
-          </Modal.Footer>
-        </Modal> */
