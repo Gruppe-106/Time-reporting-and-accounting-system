@@ -77,6 +77,22 @@ class BaseApiHandler {
     }
 
     /**
+     * Sent DELETE request to url
+     * @param urlPath String: path of the url meaning not hostname
+     * @param callback Callback?: an anonymous function to run after data is received, the value will be the json object
+     * @param settings GetSettings: settings for get request
+     */
+    public delete(urlPath: string, settings: GetSettings, callback?: (value: Object) => void): boolean {
+        this.requester(urlPath, {
+            baseUrl: settings.baseUrl || this.baseUrl,
+            method: "DELETE",
+            body: null,
+            headers: settings.headers || {}
+        }).then(callback);
+        return true;
+    }
+
+    /**
      * Sent request to url
      * @param urlPath String: path of the url meaning not hostname
      * @param settings RequesterSettings: settings for request

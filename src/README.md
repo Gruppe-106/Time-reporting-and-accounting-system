@@ -376,6 +376,34 @@ Optional:
 ```
 </details>
 
+<details>
+<summary>Delete</summary>
+
+## /api/user/delete
+```
+Required:
+    user=number | number,number...
+```
+### Structure Of Object Returned
+
+```
+  {
+  status: number,
+  data: [
+        { error: "Failed to delete user" } | null
+    ]
+  }
+```
+### Example return:
+
+```json
+{
+  "success": true,
+  "data": [{ "error": "Failed to delete user"}]
+}
+```
+</details>
+
 # Manager Group
 
 <details>
