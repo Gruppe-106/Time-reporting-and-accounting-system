@@ -57,6 +57,7 @@ interface CustomTypes {
     editing: boolean
     validEmail: boolean
     validName: boolean
+    showPopup: boolean
 
     //* database varriables
     dbUsers: User[]
@@ -72,9 +73,12 @@ interface CustomTypes {
     selectedUsersId: number[]
 
 
-    // * Component Varriables
+    // * Component variables
+    popupMessage: string,
+    popupTitle: string,
     loadingText: string
     buttonText: string,
+
 }
 
 class AdminPanel extends Component<any, CustomTypes> {
@@ -86,6 +90,7 @@ class AdminPanel extends Component<any, CustomTypes> {
             editing: false,
             validEmail: true,
             validName: true,
+            showPopup: false,
             //* database varriables
             dbUsers: [],
             groupMax: undefined,
@@ -100,6 +105,8 @@ class AdminPanel extends Component<any, CustomTypes> {
             selectedUsersId: [],
 
             // * Component varriables
+            popupMessage: "",
+            popupTitle: "",
             loadingText: "",
             buttonText: "Edit",
 
@@ -114,7 +121,11 @@ class AdminPanel extends Component<any, CustomTypes> {
         this.handleDelete = this.handleDelete.bind(this)
         this.handleGroupInput = this.handleGroupInput.bind(this)
         this.handleEmailInput = this.handleEmailInput.bind(this)
-
+        this.handleShow = this.handleShow.bind(this);
+        this.handleShowMessage = this.handleShowMessage.bind(this);
+        this.handleShowTitle = this.handleShowTitle.bind(this);
+        this.handleClose = this.handleClose.bind(this);
+        this.postChanges = this.postChanges.bind(this)
         this.renderRow = this.renderRow.bind(this);
 
     }
@@ -415,9 +426,63 @@ class AdminPanel extends Component<any, CustomTypes> {
 
     /**
      * Submits any changes being made to the component.
-     */
+    */
     private handleSubmit(): void {
-        
+        let hasShown: boolean = false;
+
+        if (!this.state.validName || !this.state.validEmail) {
+            if (!hasShown) {
+                this.handleShowTitle("Missing field")
+                this.handleShowMessage("This error should not happen contact IT")
+                this.handleShow()
+                hasShown = true;
+            }
+        }
+
+
+    }
+
+    /**
+        * Handles modal opening
+    */
+    private handleShow(): void {
+        this.setState({ showPopup: true });
+    }
+
+    /**
+        * Handles modal message state setting
+        * @param message The message to be shown to the user
+    */
+    private handleShowMessage(message: string): void {
+        this.setState({
+            popupMessage: message
+        })
+    }
+
+    /**
+        * Handles modal message title setting
+        * @param title The message to be shown to the user
+    */
+    private handleShowTitle(title: string): void {
+        this.setState({
+            popupTitle: title
+        })
+    }
+
+    /**
+        * Handles modal closing
+    */
+    private handleClose(): void {
+        this.setState({
+            showPopup: false,
+            popupTitle: "",
+            popupMessage: ""
+        });
+    }
+
+
+    private postChanges() {
+
     }
 
 
@@ -503,6 +568,19 @@ class AdminPanel extends Component<any, CustomTypes> {
 
 
                     </Container>
+                    <Modal show={this.state.showPopup} onHide={this.handleClose}>
+                        <Modal.Header closeButton>
+                            <Modal.Title>{this.state.popupTitle}</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            {this.state.popupMessage}
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <Button variant="secondary" onClick={this.handleClose}>
+                                Close
+                            </Button>
+                        </Modal.Footer>
+                    </Modal>
 
                 </LoadingOverlay>
             </>
