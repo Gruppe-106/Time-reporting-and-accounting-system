@@ -20,14 +20,14 @@ import React, { Component } from "react";
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTrash } from '@fortawesome/free-solid-svg-icons'
+import { Highlighter, Typeahead } from 'react-bootstrap-typeahead';
 
-//Forge import
-import forge from 'node-forge';
 
 //Custom import
 import BaseApiHandler from "../../network/baseApiHandler";
-import Utility from './utility/userCreation/userCreation'
+
 import APICalls from "./utility/userCreation/apiCalls";
+
 
 interface User {
     id: number;
@@ -42,7 +42,16 @@ interface User {
     validEmail?: boolean
     validFirstName?: boolean
     validLastName?: boolean
+    manager?: Manager[]
 
+}
+
+
+interface Manager {
+    id: number,
+    firstName: string,
+    lastName: string,
+    groupId: number
 }
 
 /**
@@ -61,6 +70,7 @@ interface CustomTypes {
 
     //* database varriables
     dbUsers: User[]
+    dbManagers: Manager[],
     groupMin: number | undefined,
     groupMax: number | undefined,
 
@@ -79,6 +89,7 @@ interface CustomTypes {
     loadingText: string
     buttonText: string,
 
+    test: any[]
 }
 
 class AdminPanel extends Component<any, CustomTypes> {
@@ -93,6 +104,7 @@ class AdminPanel extends Component<any, CustomTypes> {
             showPopup: false,
             //* database varriables
             dbUsers: [],
+            dbManagers: [],
             groupMax: undefined,
             groupMin: undefined,
 
@@ -109,6 +121,7 @@ class AdminPanel extends Component<any, CustomTypes> {
             popupTitle: "",
             loadingText: "",
             buttonText: "Edit",
+            test: []
 
 
 
@@ -132,6 +145,9 @@ class AdminPanel extends Component<any, CustomTypes> {
 
     async componentDidMount() {
         this.handleLoader("Getting users")
+
+        const dbManagers: Manager[] = (await APICalls.getAllManagerGroups()).data
+
         const dbUsers: User[] = await APICalls.getAllUsers()
         const groups: number[] = []
         dbUsers.forEach((ele: User) => groups.push(ele.groupId))
@@ -143,16 +159,21 @@ class AdminPanel extends Component<any, CustomTypes> {
             ele.validEmail = true
             ele.validFirstName = true
             ele.validLastName = true
+            ele.manager = this.state.dbManagers.filter((man: Manager) => man.groupId === ele.groupId).concat(this.state.dbManagers.filter((man: Manager) => man.groupId !== ele.groupId))
         })
+
 
         this.handleLoader("All done")
         this.setState(
             {
                 dbUsers: dbUsers,
+                dbManagers: dbManagers,
                 groupMax: Math.max(...groups),
                 groupMin: Math.min(...groups),
                 loading: false
             });
+
+        console.log(dbManagers)
     }
 
     componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<CustomTypes>): void {
@@ -221,7 +242,10 @@ class AdminPanel extends Component<any, CustomTypes> {
     }
 
     private renderEditingRow(user: User) { //TODO: fix the prop
+
+
         return (
+
             <tr key={user.id}   >
                 <td style={{ textAlign: 'center', verticalAlign: "middle" }}>{user.id}</td>
                 <td > <Form style={{ width: '100%', margin: "auto", minWidth: "183px" }}>
@@ -277,11 +301,51 @@ class AdminPanel extends Component<any, CustomTypes> {
                         />
                     </Form.Group>
                 </Form></td>
+                <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
+                    <Typeahead
+                        id={`manager${user.id}`}
+
+                        labelKey={(option: any) => `${option.firstName}  ${option.lastName}`}
+                        options={user.manager!}
+                        defaultSelected={user.manager!}
+
+                        onChange={(selected) => {
+                            console.log(selected)
+
+                        }}
+                        filterBy={(option: any, props: any): boolean => {
+                            const query: string = props.text.toLowerCase().trim();
+                            const name: string = option.firstName.toLowerCase() + option.lastName.toLowerCase();
+                            const id: string = option.managerId.toString();
+                            const groupId: string = option.groupId.toString()
+                            return name.includes(query) || id.includes(query) || groupId.includes(query);
+                        }}
+                        renderMenuItemChildren={(option: any, props: any) => (
+                            <>
+                                <Highlighter search={props.text}>
+                                    {option.firstName + " " + option.lastName}
+                                </Highlighter>
+                                <div>
+                                    <small>Manager id: {option.managerId}</small>
+                                </div>
+                                <div>
+                                    <small>Group id: {option.groupId}</small>
+                                </div>
+                            </>
+                        )} />
+                </td>
                 <td style={{ textAlign: 'center', verticalAlign: 'middle' }}><FontAwesomeIcon onClick={() => this.handleDelete(user)} icon={faTrash} /> </td>
             </tr>
         );
     }
 
+
+
+    private handleManagerInput(manager: any, user: User,) {
+        if (manager.length === 0) {
+
+        }
+    }
 
 
     /**
@@ -437,6 +501,8 @@ class AdminPanel extends Component<any, CustomTypes> {
                 this.handleShow()
                 hasShown = true;
             }
+        } else {
+            this.postChanges()
         }
 
 
@@ -472,16 +538,91 @@ class AdminPanel extends Component<any, CustomTypes> {
     /**
         * Handles modal closing
     */
-    private handleClose(): void {
-        this.setState({
-            showPopup: false,
-            popupTitle: "",
-            popupMessage: ""
-        });
+    private async handleClose() {
+
+        this.handleLoader("Updating users")
+
+        const dbUsers: User[] = await APICalls.getAllUsers()
+        const groups: number[] = []
+        dbUsers.forEach((ele: User) => groups.push(ele.groupId))
+        dbUsers.forEach((ele: User) => {
+            ele.orginalGroupId = ele.groupId
+            ele.orginalEmail = ele.email
+            ele.orginalFirstName = ele.firstName
+            ele.orginalLastName = ele.lastName
+            ele.validEmail = true
+            ele.validFirstName = true
+            ele.validLastName = true
+        })
+
+
+        this.handleLoader("All done")
+        this.setState(
+            {
+                dbUsers: dbUsers,
+                groupMax: Math.max(...groups),
+                groupMin: Math.min(...groups),
+                loading: false,
+                editing: false,
+                selectedUsers: [],
+                selectedUsersId: [],
+                showPopup: false,
+                popupTitle: "",
+                popupMessage: ""
+            });
+    }
+
+    private delay(ms: number) {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 
 
-    private postChanges() {
+    private async postChanges() {
+        let hasShown: boolean = false;
+
+        const userData: {
+            userId: number,
+            firstName: string,
+            lastName: string,
+            email: string,
+            // manager: number
+        }[] = []
+
+        for (const user of this.state.selectedUsers) {
+            userData.push({
+                userId: user.id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+                // manager: user.groupId
+            })
+        }
+
+
+        const apiHandler: BaseApiHandler = new BaseApiHandler()
+
+        this.handleLoader("Posting changes")
+        const responses = await Promise.all(userData.map(ele => apiHandler.put("/api/user/edit/put", { body: ele })))
+        this.handleLoader("All done")
+
+
+        if (responses.filter(ele => ele === false).length > 0) {
+            if (!hasShown) {
+                this.handleShowTitle("Error")
+                this.handleShowMessage("This error should not happen contact IT")
+                this.handleShow()
+                hasShown = true;
+            }
+        } else {
+            if (!hasShown) {
+                this.handleShowTitle("Success")
+                this.handleShowMessage("Successfully posted changes")
+                this.handleShow()
+                hasShown = true;
+            }
+        }
+
+
 
     }
 
@@ -523,7 +664,9 @@ class AdminPanel extends Component<any, CustomTypes> {
                                     <th>First Name</th>
                                     <th>Last Name</th>
                                     <th>Group</th>
+                                    <th style={{ display: !this.state.editing ? "none" : "table-cell" }}>Manager</th>
                                     <th style={{ display: !this.state.editing ? "none" : "table-cell" }}>Delete</th>
+
                                 </tr>
                             </thead>
                             <tbody>

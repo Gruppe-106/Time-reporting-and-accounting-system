@@ -121,11 +121,13 @@ class UserCreation extends Component<any, CustomTypes>{
             id: number;
             name: string;
         }[] = (await APICalls.getAllRoles()).data
+       
         this.handleLoader("Getting managers", true)
         const dbManagers: {
             id: number;
             name: string;
         }[] = (await APICalls.getAllManagers()).data
+        console.log(dbManagers)
         this.handleLoader("All done")
         this.setState({
             dbRoles: dbRoles,
@@ -376,7 +378,7 @@ class UserCreation extends Component<any, CustomTypes>{
         assignedToManager: { roleName: string, roleId: number, userId: number, firstName: string, lastName: string } | null
         roles: { id: number, name: string }[] | null
     }) {
-        const apiHandler: BaseApiHandler = new BaseApiHandler("test")
+        const apiHandler: BaseApiHandler = new BaseApiHandler()
 
         let roles: number[] = []
         userObject.roles?.forEach((ele: { id: number, name: string }) => roles.push(ele.id))
@@ -505,7 +507,7 @@ class UserCreation extends Component<any, CustomTypes>{
                                                 {option.firstName + " " + option.lastName}
                                             </Highlighter>
                                             <div>
-                                                <small>Manager user id: {option.userId}</small>
+                                                <small>Manager id: {option.userId}</small>
                                             </div>
                                         </>
                                     )}
