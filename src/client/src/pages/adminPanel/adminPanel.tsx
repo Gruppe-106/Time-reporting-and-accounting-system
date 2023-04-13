@@ -108,9 +108,9 @@ class AdminPanel extends Component<any, CustomTypes> {
         };
         this.handleLoader = this.handleLoader.bind(this);
         this.handleRowClick = this.handleRowClick.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleEditing = this.handleEditing.bind(this);
         this.handleCancel = this.handleCancel.bind(this)
-        this.handleChanges = this.handleChanges.bind(this)
+        this.handleSubmit = this.handleSubmit.bind(this)
         this.handleDelete = this.handleDelete.bind(this)
         this.handleGroupInput = this.handleGroupInput.bind(this)
         this.handleEmailInput = this.handleEmailInput.bind(this)
@@ -175,6 +175,8 @@ class AdminPanel extends Component<any, CustomTypes> {
     private handleRowClick(id: number, user: User) {
         const { selectedUsersId, selectedUsers } = this.state;
         const index = selectedUsersId.indexOf(id);
+        console.log(selectedUsersId)
+        console.log(selectedUsers)
         if (index === -1) {
             // If user is not already selected, add it to the state
             this.setState({ selectedUsersId: [...selectedUsersId, id] });
@@ -235,7 +237,7 @@ class AdminPanel extends Component<any, CustomTypes> {
                             placeholder="Enter first name"
                             defaultValue={user.firstName}
                             isInvalid={!user.validFirstName}
-                            onChange={(e) => this.handleFirstName(user,e)}
+                            onChange={(e) => this.handleFirstName(user, e)}
 
                         />
                     </Form.Group>
@@ -248,7 +250,7 @@ class AdminPanel extends Component<any, CustomTypes> {
                             placeholder="Enter last name"
                             defaultValue={user.lastName}
                             isInvalid={!user.validLastName}
-                            onChange={(e) => this.handleLastName(user,e)}
+                            onChange={(e) => this.handleLastName(user, e)}
 
                         />
                     </Form.Group>
@@ -260,7 +262,6 @@ class AdminPanel extends Component<any, CustomTypes> {
                             placeholder="Enter group"
                             style={{ textAlign: 'center' }}
                             defaultValue={user.groupId}
-                            isInvalid={!user.validEmail}
                             onChange={(e) => this.handleGroupInput(user, e)}
                         />
                     </Form.Group>
@@ -374,7 +375,7 @@ class AdminPanel extends Component<any, CustomTypes> {
         const validLastName: boolean = lastName !== ""
 
 
-        const updatedUser: User = { ...user, lastName, validFirstName: validLastName };
+        const updatedUser: User = { ...user, lastName, validLastName: validLastName };
         const updatedUsers: User[] = this.state.selectedUsers.map((u) =>
             u.id === user.id ? updatedUser : u
         );
@@ -385,31 +386,39 @@ class AdminPanel extends Component<any, CustomTypes> {
         });
     }
 
-
+    /**
+     * Deletes a user.
+     *
+     * @param user The user to be deleted.
+     */
     private handleDelete(user: User): void {
-        console.log(user)
+        console.log(user);
     }
 
-
-
-    private handleSubmit(): void {
+    /**
+     * Toggles the editing state of the component.
+     */
+    private handleEditing(): void {
         this.setState({
             editing: !this.state.editing
-        })
-
+        });
     }
 
-
+    /**
+     * Cancels any changes being made to the component.
+     */
     private handleCancel(): void {
         this.setState({
             editing: false
-        })
+        });
     }
 
-    private handleChanges(): void {
-
+    /**
+     * Submits any changes being made to the component.
+     */
+    private handleSubmit(): void {
+        
     }
-
 
 
 
@@ -475,12 +484,12 @@ class AdminPanel extends Component<any, CustomTypes> {
 
                         </Table>
                         {!this.state.editing ?
-                            <Button variant="primary" onClick={this.handleSubmit}>
+                            <Button variant="primary" onClick={this.handleEditing}>
                                 {this.state.buttonText}
                             </Button> :
                             (<div style={{ display: 'flex', gap: '10px' }}>
 
-                                <Button disabled={!this.state.validEmail || !this.state.validName} variant="primary" onClick={this.handleChanges}>
+                                <Button disabled={!this.state.validEmail || !this.state.validName} variant="primary" onClick={this.handleSubmit}>
                                     Submit
                                 </Button>
 
