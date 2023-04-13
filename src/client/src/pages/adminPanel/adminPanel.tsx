@@ -159,7 +159,7 @@ class AdminPanel extends Component<any, CustomTypes> {
             ele.validEmail = true
             ele.validFirstName = true
             ele.validLastName = true
-            ele.manager = this.state.dbManagers.filter((man: Manager) => man.groupId === ele.groupId).concat(this.state.dbManagers.filter((man: Manager) => man.groupId !== ele.groupId))
+            ele.manager = this.state.dbManagers.filter((man: Manager) => man.groupId === ele.groupId && man.managerId !== ele.id).concat(this.state.dbManagers.filter((man: Manager) => man.groupId !== ele.groupId))
         })
 
 
@@ -230,15 +230,19 @@ class AdminPanel extends Component<any, CustomTypes> {
         const rowClassNames = document.getElementById(user.id.toString())?.className;
         const className = rowClassNames?.includes('table-primary') ? rowClassNames : isSelected ? 'table-primary' : '';
 
-        return (
-            <tr style={{ textAlign: "center" }} key={user.id} onClick={() => this.handleRowClick(user.id, user)} className={className}>
-                <td>{user.id}</td>
-                <td>{user.email}</td>
-                <td>{user.firstName}</td>
-                <td>{user.lastName}</td>
-                <td>{user.groupId}</td>
-            </tr>
-        );
+        if (user.manager?.length !== 0) {
+            return (
+                <tr style={{ textAlign: "center" }} key={user.id} onClick={() => this.handleRowClick(user.id, user)} className={className}>
+                    <td>{user.id}</td>
+                    <td>{user.email}</td>
+                    <td>{user.firstName}</td>
+                    <td>{user.lastName}</td>
+                    <td>{user.manager![0].firstName + " " + user.manager![0].lastName}</td>
+                    <td>{user.groupId}</td>
+                </tr>
+            );
+        }
+
     }
 
     private renderEditingRow(user: User) { //TODO: fix the prop
@@ -290,29 +294,19 @@ class AdminPanel extends Component<any, CustomTypes> {
                         />
                     </Form.Group>
                 </Form></td>
-                <td><Form style={{ width: '69px', margin: "auto" }}>
-                    <Form.Group >
-                        <Form.Control
-                            type="text"
-                            placeholder="Enter group"
-                            style={{ textAlign: 'center' }}
-                            defaultValue={user.groupId}
-                            onChange={(e) => this.handleGroupInput(user, e)}
-                        />
-                    </Form.Group>
-                </Form></td>
+
                 <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
                     <Typeahead
                         id={`manager${user.id}`}
-
+                        style={{ width: '100%', margin: "auto", minWidth: "183px" }}
                         labelKey={(option: any) => `${option.firstName}  ${option.lastName}`}
-                        options={user.manager!.filter((ele:Manager) => ele.managerId !== user.id)}
-                        defaultSelected={[user.manager!.filter((ele:Manager) => ele.managerId !== user.id)[0]]}
+                        options={user.manager!.filter((ele: Manager) => ele.managerId !== user.id)}
+                        defaultSelected={[user.manager!.filter((ele: Manager) => ele.managerId !== user.id)[0]]}
 
                         onChange={(selected => this.handleManagerInput(selected, user))}
                         filterBy={(option: any, props: any): boolean => {
                             const query: string = props.text.toLowerCase().trim();
-                            const name: string = option.firstName.toLowerCase() + option.lastName.toLowerCase();
+                            const name: string = (option.firstName + " " + option.lastName).toLowerCase().trim();
                             const id: string = option.managerId.toString();
                             const groupId: string = option.groupId.toString()
                             return name.includes(query) || id.includes(query) || groupId.includes(query);
@@ -331,6 +325,17 @@ class AdminPanel extends Component<any, CustomTypes> {
                             </>
                         )} />
                 </td>
+                <td><Form style={{ width: '69px', margin: "auto" }}>
+                    <Form.Group >
+                        <Form.Control
+                            type="text"
+                            placeholder="Enter group"
+                            style={{ textAlign: 'center' }}
+                            defaultValue={user.groupId}
+                            onChange={(e) => this.handleGroupInput(user, e)}
+                        />
+                    </Form.Group>
+                </Form></td>
                 <td style={{ textAlign: 'center', verticalAlign: 'middle' }}><FontAwesomeIcon onClick={() => this.handleDelete(user)} icon={faTrash} /> </td>
             </tr>
         );
@@ -342,17 +347,17 @@ class AdminPanel extends Component<any, CustomTypes> {
 
         if (manager.length === 1) {
 
-            const updatedUser: User = { ...user, manager:this.state.dbManagers.filter((man: Manager) => man.groupId === manager[0].groupId).concat(this.state.dbManagers.filter((man: Manager) => man.groupId !== manager[0].groupId))};
+            const updatedUser: User = { ...user, manager: this.state.dbManagers.filter((man: Manager) => man.groupId === manager[0].groupId && manager[0].managerId ==! user.id).concat(this.state.dbManagers.filter((man: Manager) => man.groupId !== manager[0].groupId)) };
             const updatedUsers: User[] = this.state.selectedUsers.map((u) =>
                 u.id === user.id ? updatedUser : u
             );
             this.setState({
                 selectedUsers: updatedUsers
             })
-          
-        } 
 
-      
+        }
+
+
     }
 
 
@@ -562,7 +567,7 @@ class AdminPanel extends Component<any, CustomTypes> {
             ele.validEmail = true
             ele.validFirstName = true
             ele.validLastName = true
-            ele.manager = this.state.dbManagers.filter((man: Manager) => man.groupId === ele.groupId).concat(this.state.dbManagers.filter((man: Manager) => man.groupId !== ele.groupId))
+            ele.manager = this.state.dbManagers.filter((man: Manager) => man.groupId === ele.groupId && man.managerId !== ele.id).concat(this.state.dbManagers.filter((man: Manager) => man.groupId !== ele.groupId))
 
         })
 
@@ -596,10 +601,10 @@ class AdminPanel extends Component<any, CustomTypes> {
             firstName: string,
             lastName: string,
             email: string,
-            manager : number
+            manager: number
         }[] = []
 
-        
+
 
         for (const user of this.state.selectedUsers) {
             console.log(user.manager![0].managerId)
@@ -666,7 +671,7 @@ class AdminPanel extends Component<any, CustomTypes> {
                                     type="text"
                                     placeholder="Enter search query"
                                     value={this.state.searchQuery}
-                                    onChange={(e) => this.setState({ searchQuery: e.target.value })}
+                                    onChange={(e) => this.setState({ searchQuery: e.target.value.toLowerCase() })}
                                 />
                             </Form.Group>
                         </Form>
@@ -677,8 +682,8 @@ class AdminPanel extends Component<any, CustomTypes> {
                                     <th>Email</th>
                                     <th>First Name</th>
                                     <th>Last Name</th>
+                                    <th >Manager</th>
                                     <th>Group</th>
-                                    <th style={{ display: !this.state.editing ? "none" : "table-cell" }}>Manager</th>
                                     <th style={{ display: !this.state.editing ? "none" : "table-cell" }}>Delete</th>
 
                                 </tr>
@@ -686,20 +691,20 @@ class AdminPanel extends Component<any, CustomTypes> {
                             <tbody>
                                 {!this.state.editing ? (this.state.dbUsers
                                     .filter((user) =>
-                                        user.id.toString().includes(this.state.searchQuery) ||
-                                        user.email.includes(this.state.searchQuery) ||
-                                        user.firstName.includes(this.state.searchQuery) ||
-                                        user.lastName.includes(this.state.searchQuery) ||
-                                        user.groupId.toString().includes(this.state.searchQuery)
+                                        user.id.toString().trim().toLowerCase().includes(this.state.searchQuery.trim()) ||
+                                        user.email.toLowerCase().trim().includes(this.state.searchQuery.trim()) ||
+                                        user.groupId.toString().trim().toLowerCase().includes(this.state.searchQuery.trim()) ||
+                                        (user.manager![0].firstName + " " + user.manager![0].lastName).trim().toLowerCase().includes(this.state.searchQuery.trim())
+                                        || (user.firstName + " " + user.lastName).trim().toLowerCase().includes(this.state.searchQuery.trim())
                                     )
                                     .map((user) => this.renderRow(user))) :
                                     (this.state.selectedUsers.sort((a, b) => a.id - b.id)
                                         .filter((user) =>
-                                            user.id.toString().includes(this.state.searchQuery) ||
-                                            user.email.includes(this.state.searchQuery) ||
-                                            user.firstName.includes(this.state.searchQuery) ||
-                                            user.lastName.includes(this.state.searchQuery) ||
-                                            user.groupId.toString().includes(this.state.searchQuery)
+                                            user.id.toString().trim().toLowerCase().includes(this.state.searchQuery.trim()) ||
+                                            user.email.toLowerCase().trim().includes(this.state.searchQuery.trim()) ||
+                                            user.groupId.toString().trim().toLowerCase().includes(this.state.searchQuery.trim()) ||
+                                            (user.manager![0].firstName + " " + user.manager![0].lastName).trim().toLowerCase().includes(this.state.searchQuery.trim())
+                                            || (user.firstName + " " + user.lastName).trim().toLowerCase().includes(this.state.searchQuery.trim())
                                         )
                                         .map((user) => this.renderEditingRow(user)))}
                             </tbody>
