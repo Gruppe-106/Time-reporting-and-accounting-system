@@ -12,7 +12,6 @@ interface Api {
 /*
 
     * TODO: User timeSheet
-      * Fix add row, fix loading of data so only data(rows) with time is loaded.
       * Only render table row if there is time for said table, otherwise be able to create a row for that task.
       * (Need api for project name and task name connected to user).
       * 
@@ -78,7 +77,7 @@ interface TimeSheetRowData {
 
 // The props given to TimeSheetRow
 interface TimeSheetRowProps {
-  rowData: Map<number, IRowData>;
+  rowData: Map<number, TaskRowData>;
   onDelete: (rowId: number) => void;
 }
 
@@ -88,7 +87,7 @@ interface TimeSheetRowState {
   showDeleteRowModal: boolean;
 }
 
-interface IRowData {
+interface TaskRowData {
   projectName: string;
   taskName: string;
   taskId: number;
@@ -167,7 +166,7 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
   }
 
 
-  renderRows() {
+  renderTaskRows() {
     const { rowData } = this.props;
 
     let arr: number[] = [];
@@ -209,7 +208,7 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
   //<td>{data.taskId}</td>
   //<Button variant="danger" size="sm" onClick={() => this.handleShowDelModal(data.taskId)}>Delete</Button>
 
-  
+
 
   render() {
     const { showDeleteRowModal } = this.state;
@@ -218,7 +217,7 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
       <Container>
         <Table bordered size="sm" className="fixed-table ellipses">
           <TableHeader />
-          <tbody>{this.renderRows()}</tbody>
+          <tbody>{this.renderTaskRows()}</tbody>
         </Table>
         <></>
         <Modal show={showDeleteRowModal} onHide={this.handleCloseModal}>
@@ -249,7 +248,7 @@ interface TimeSheetProp {
 
 // Variable states in TimeSheetPage
 interface TimeSheetState {
-  stateRowData: Map<number, IRowData>;
+  stateRowData: Map<number, TaskRowData>;
   showAddModal: boolean;
 }
 
@@ -264,7 +263,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
 
     // Initialise states
     this.state = {
-      stateRowData: new Map<number, IRowData>(),
+      stateRowData: new Map<number, TaskRowData>(),
       showAddModal: false,
     };
   }
@@ -277,20 +276,20 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
       `/api/time/register/get?user=${userId}&period=${0},${Date.now()}&var=taskName,taskId,projectName,time,date`, {},
       (value) => {
         let json: Api = JSON.parse(JSON.stringify(value));
-        let importData: Map<number, IRowData> = new Map<number, IRowData>();
+        let taskData: Map<number, TaskRowData> = new Map<number, TaskRowData>();
         if (json.status === 200) {
           for (const task of json.data) {
-            if (importData.has(task.taskId)) {
-              let data = importData.get(task.taskId);
+            if (taskData.has(task.taskId)) {
+              let data = taskData.get(task.taskId);
               if (data) {
                 data?.objectData.push({ date: task.date, time: task.time });
-                importData.set(task.taskId, data);
+                taskData.set(task.taskId, data);
               }
             } else {
-              importData.set(task.taskId, { projectName: task.projectName, taskName: task.taskName, taskId: task.taskId, objectData: [{ date: task.date, time: task.time }] })
+              taskData.set(task.taskId, { projectName: task.projectName, taskName: task.taskName, taskId: task.taskId, objectData: [{ date: task.date, time: task.time }] })
             }
           }
-          this.setState({ stateRowData: importData })
+          this.setState({ stateRowData: taskData })
         }
       }
     );
@@ -309,7 +308,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
 
     this.handleCloseModal();
   }
-  handleDeleteRow = (rowId:number) => {
+  handleDeleteRow = (rowId: number) => {
     const { stateRowData } = this.state;
     stateRowData.delete(rowId); // Delete the row from rowData map based on rowId
     this.setState({ stateRowData }); // Update the state to trigger re-render
