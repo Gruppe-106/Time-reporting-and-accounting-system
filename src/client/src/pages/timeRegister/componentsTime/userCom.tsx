@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Container, Table, Form, InputGroup, Button, Modal } from "react-bootstrap";
-import { Highlighter, Typeahead } from 'react-bootstrap-typeahead';
+//import { Highlighter, Typeahead } from 'react-bootstrap-typeahead';
 import BaseApiHandler from "../../../network/baseApiHandler";
 import { getCurrentWeekDates, dateStringFormatter, dateToNumber } from "../../../utility/timeConverter"
 
@@ -16,7 +16,6 @@ interface Api {
       * Only render table row if there is time for said table, otherwise be able to create a row for that task.
       * (Need api for project name and task name connected to user).
       * 
-      * Load "time" proberly from data to correct date.
       * 
       * Submit button (Post data)
 
@@ -167,6 +166,7 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
               timeArr[i] = item.time;
             }
           }
+          return true;
         })
       }
     }
@@ -190,23 +190,23 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
             <td>{data.projectName}</td>
             <td>{data.taskName}</td>
             {arr.map((num, index) => {
-                  return (
-                    <td key={index}>
-                      <InputGroup size="sm">
-                        <Form.Control type="number" placeholder="0" value={num} />
-                        <InputGroup.Text id={`basic-addon-${index}`}>:</InputGroup.Text>
-                        <Form.Select>
-                          <option value="0">0</option>
-                          <option value="15">15</option>
-                          <option value="30">30</option>
-                          <option value="45">45</option>
-                        </Form.Select>
-                      </InputGroup>
-                    </td>
-                  );
-                })}
-                <td>{arr.reduce((partialSum, a) => partialSum + a, 0)}</td>
-                <td>{data.taskId}</td>
+              return (
+                <td key={index}>
+                  <InputGroup size="sm">
+                    <Form.Control type="number" placeholder="0" value={num} />
+                    <InputGroup.Text id={`basic-addon-${index}`}>:</InputGroup.Text>
+                    <Form.Select>
+                      <option value="0">0</option>
+                      <option value="15">15</option>
+                      <option value="30">30</option>
+                      <option value="45">45</option>
+                    </Form.Select>
+                  </InputGroup>
+                </td>
+              );
+            })}
+            <td>{arr.reduce((partialSum, a) => partialSum + a, 0)}</td>
+            <td>{data.taskId}</td>
           </tr>
         ))
       }
@@ -252,8 +252,7 @@ interface TimeSheetProp {
 // Variable states in TimeSheetPage
 interface TimeSheetState {
   stateRowData: Map<number, IRowData>;
-  selectedProject: TimeSheetRowData | null;
-  showAddRowModal: boolean;
+  showAddModal: boolean;
 }
 
 /*
@@ -268,27 +267,9 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     // Initialise states
     this.state = {
       stateRowData: new Map<number, IRowData>(),
-      selectedProject: null,
-      showAddRowModal: false,
+      showAddModal: false,
     };
-
-    // Bind (TODO: Add description)
-    this.handleAddRow = this.handleAddRow.bind(this);
   }
-
-  /*
-      * Closes the modal 
-   */
-  private handleCloseAddModal = () => {
-    this.setState({ showAddRowModal: false });
-  };
-
-  /*
-      * Opens the modal
-   */
-  private handleShowAddModal = () => {
-    this.setState({ showAddRowModal: true });
-  };
 
   // apiHandler to get data from "database", the data is passed to the data array
   public componentDidMount() {
@@ -317,21 +298,36 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     );
   }
 
-  /**
-   * First, the current state's data array is destructured from this.state. This array is then copied using the spread operator (...) and a new object representing the new row is added to the end of the array. The new row object contains default values for projectName and taskName.
-   */
-  private handleAddRow() {
-    this.handleCloseAddModal();
+  handleShowAddModal = () => {
+    this.setState({ showAddModal: true })
+  }
+  handleCloseModal = () => {
+    this.setState({ showAddModal: false })
+  }
+  handleAddModal = () => {
+    const { stateRowData } = this.state
+
+    stateRowData.set(-1, { projectName: "NewName", taskName: "NewName", taskId: -1, objectData: [{ date: 1679616000, time: 10 }] })
+
+    this.handleCloseModal();
   }
 
-
   render() {
-    const { stateRowData } = this.state;
+    const { stateRowData, showAddModal } = this.state;
 
     return (
       <Container fluid="lg">
         <TimeSheetRow rowData={stateRowData} />
         <Button variant="primary" type="button" onClick={() => this.handleShowAddModal()}>Add Row</Button>
+        <Modal show={showAddModal} onHide={this.handleCloseModal}>
+          <Modal.Header closeButton>
+            <Modal.Title>Add Row?</Modal.Title>
+          </Modal.Header>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={this.handleCloseModal}>Cancel</Button>
+            <Button variant="primary" onClick={this.handleAddModal}>Add</Button>
+          </Modal.Footer>
+        </Modal>
       </Container>
     );
   }
