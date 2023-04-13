@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Container, Table, Form, InputGroup, Button, Modal, Row, Col } from "react-bootstrap";
+import { Container, Table, Form, InputGroup, Button, Modal } from "react-bootstrap";
 import { Highlighter, Typeahead } from 'react-bootstrap-typeahead';
 import BaseApiHandler from "../../../network/baseApiHandler";
 import { getCurrentWeekDates, dateStringFormatter, dateToNumber } from "../../../utility/timeConverter"
@@ -79,8 +79,7 @@ interface TimeSheetRowData {
 
 // The props given to TimeSheetRow
 interface TimeSheetRowProps {
-  rowData: TimeSheetRowData[];
-  dates: string[];
+  rowData: Map<number,IRowData>;
 }
 
 // State of variables in TimeSheetRow
@@ -91,6 +90,18 @@ interface TimeSheetRowState {
   minTotal: number;
   showDeleteRowModal: boolean;
 }
+
+interface IRowData {
+  projectName: string;
+  taskName: string;
+  taskId: number;
+  objectData: {
+    time: number;
+    date: number;
+  }[]
+}
+
+
 
 /*
 
@@ -136,74 +147,23 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
   };
 
   renderRows() {
-    const { rowData, dates } = this.props;
+    const { rowData } = this.props;
     let arr = [1, 2, 3, 4, 5, 6, 7];
 
-    const uniqueTaskNames = new Set();
+    let rows:JSX.Element[] = [];
 
-    console.log(rowData);
-
-    return rowData.filter(item => {
-      // Filter out tasks with duplicate task names
-      if (uniqueTaskNames.has(item.taskName)) {
-        return false;
+    for (const key of Array.from(rowData.keys())) {
+      let data = rowData.get(key);
+      if(data) {
+        rows.push((
+          <tr>
+            <td>{data.projectName}</td>
+            <td>{data.taskName}</td>
+          </tr>
+        ))
       }
-      uniqueTaskNames.add(item.taskName);
-      return true;
-    }).map((item) => (
-      <tr key={item.taskId}>
-        <td>{item.projectName}</td>
-        <td>{item.taskName}</td>
-        {arr.map((num, index) => {
-          const currentDate = dateStringFormatter(item.date);
-          const matchDate = dates[num - 1];
-          if (currentDate === matchDate) {
-            return (
-              <td key={index}>
-                <InputGroup size="sm">
-                  <Form.Control
-                    type="number"
-                    placeholder="0"
-                    value={item.time}
-                  />
-                  <InputGroup.Text id={`basic-addon-${num}`}>:</InputGroup.Text>
-                  <Form.Select>
-                    <option value="0">0</option>
-                    <option value="15">15</option>
-                    <option value="30">30</option>
-                    <option value="45">45</option>
-                  </Form.Select>
-                </InputGroup>
-              </td>
-            );
-          } else {
-            return <td key={index}>
-              <InputGroup size="sm">
-                <Form.Control
-                  type="number"
-                  placeholder="0"
-                  value={0}
-                />
-                <InputGroup.Text id={`basic-addon-${num}`}>:</InputGroup.Text>
-                <Form.Select>
-                  <option value="0">0</option>
-                  <option value="15">15</option>
-                  <option value="30">30</option>
-                  <option value="45">45</option>
-                </Form.Select>
-              </InputGroup>
-            </td>
-          }
-        })}
-        <td>0</td>
-        <td>
-          <Button variant="danger" type="button" onClick={() => this.handleShowModal()}>
-            -
-          </Button>
-        </td>
-        <td>{item.taskId}</td>
-      </tr>
-    ));
+    }
+    return rows;
   }
 
 
@@ -246,7 +206,7 @@ interface TimeSheetProp {
 
 // Variable states in TimeSheetPage
 interface TimeSheetState {
-  stateRowData: TimeSheetRowData[];
+  stateRowData: Map<number,IRowData>;
   selectedProject: TimeSheetRowData | null;
   showAddRowModal: boolean;
 }
@@ -262,7 +222,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
 
     // Initialise states
     this.state = {
-      stateRowData: [],
+      stateRowData: new Map<number,IRowData>(),
       selectedProject: null,
       showAddRowModal: false,
     };
@@ -293,8 +253,21 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
       `/api/time/register/get?user=${userId}&period=${0},${Date.now()}&var=taskName,taskId,projectName,time,date`, {},
       (value) => {
         let json: Api = JSON.parse(JSON.stringify(value));
-        this.setState({ stateRowData: json.data });
-        //console.log(json.data);
+        let importData: Map<number,IRowData> = new Map<number,IRowData>(); 
+        if (json.status === 200) {
+          for (const task of json.data) {
+            if(importData.has(task.taskId)) {
+              let data = importData.get(task.taskId);
+              if (data) {
+                data?.objectData.push({date: task.date, time: task.time});
+                importData.set(task.taskId, data);
+              }
+            } else {
+              importData.set(task.taskId, {projectName: task.projectName, taskName:task.taskName, taskId: task.taskId, objectData: [{date: task.date, time: task.time}] })
+            }
+          }
+          this.setState({stateRowData: importData})
+        }
       }
     );
   }
@@ -307,35 +280,22 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
   }
 
 
-  /**
-   * It is used to generate an array of TimeSheetRow components based on the data array in the component's state.
-   * @returns class component. <TimeSheetRow>
-   */
-  private renderRows() {
-    const { stateRowData } = this.state;
-
-    const dates: string[] = [];
-    getCurrentWeekDates(dates, -21);
-
-    const matchingRows: any[] = [];
-    dates.forEach(date => {
-      const rows = stateRowData.filter(item => dateStringFormatter(item.date) === date);
-      matchingRows.push(...rows);
-    });
-
-    return <TimeSheetRow dates={dates} rowData={matchingRows} />;
-  }
-
-
   render() {
-    const { showAddRowModal } = this.state;
-    const data = this.renderRows()
+    const { stateRowData } = this.state;
 
     return (
       <Container fluid="lg">
-        {this.renderRows()}
+        <TimeSheetRow rowData={stateRowData} />
         <Button variant="primary" type="button" onClick={() => this.handleShowAddModal()}>Add Row</Button>
-        <Modal show={showAddRowModal} onHide={this.handleCloseAddModal}>
+      </Container>
+    );
+  }
+}
+
+export default TimeSheetPage;
+
+
+/*<Modal show={showAddRowModal} onHide={this.handleCloseAddModal}>
           <Modal.Header closeButton>
             <Modal.Title>Add Row?</Modal.Title>
           </Modal.Header>
@@ -371,10 +331,4 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
             <Button variant="secondary" onClick={this.handleCloseAddModal}>Cancel</Button>
             <Button variant="primary" onClick={this.handleAddRow}>Add</Button>
           </Modal.Footer>
-        </Modal>
-      </Container>
-    );
-  }
-}
-
-export default TimeSheetPage;
+        </Modal> */
