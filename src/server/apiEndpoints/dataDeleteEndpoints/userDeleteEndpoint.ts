@@ -29,7 +29,3 @@ class UserDeleteEndpoint extends GetEndpointBase {
 }
 
 export default UserDeleteEndpoint;
-
-interface test<t>{
-    t: 
-}

@@ -24,6 +24,7 @@ import UserTaskEndpoint from "../apiEndpoints/dataGetEndpoints/userTaskEndpoint"
 import ProjectInformationEndpoint from "../apiEndpoints/dataGetEndpoints/projectInformationEndpoint";
 import GroupCreationEndpoint from "../apiEndpoints/dataPostEndpoints/groupCreationEndpoint";
 import GroupEditEndpoint from "../apiEndpoints/dataPutEndpoints/groupEditEndpoint";
+import UserDeleteEndpoint from "../apiEndpoints/dataDeleteEndpoints/userDeleteEndpoint";
 
 export class ApiRouter extends BaseRouter {
     /**
@@ -58,7 +59,6 @@ export class ApiRouter extends BaseRouter {
      * @private
      */
     private postRoutes() {
-        this.router.use(express.json());
         this.router.post("/", (req: Request, res: Response): void => {
             res.setHeader('Content-Type', 'application/json');
             res.status(200).json({message: "Api POST gotten"});
@@ -80,7 +80,6 @@ export class ApiRouter extends BaseRouter {
      * @private
      */
     private putRoutes() {
-        this.router.use(express.json());
         this.router.post("/", (req: Request, res: Response): void => {
             res.setHeader('Content-Type', 'application/json');
             res.status(200).json({message: "Api PUT gotten"});
@@ -93,13 +92,24 @@ export class ApiRouter extends BaseRouter {
         this.router.put("/time/register/edit/put",(req: Request, res: Response) => new UserTimeRegisterEditEndpoint().postRoute(req, res));
     }
 
+    private deleteRoutes() {
+        this.router.delete("/", (req: Request, res: Response): void => {
+            res.setHeader('Content-Type', 'application/json');
+            res.status(200).json({message: "Api DELETE gotten"});
+        })
+
+        this.router.delete("/user/remove", (req: Request, res: Response) => new UserDeleteEndpoint().getRoute(req, res));
+    }
+
     /**
      * Returns the api router
      */
     public routes(): Router {
+        this.router.use(express.json());
         this.getRoutes();
         this.postRoutes();
         this.putRoutes();
+        this.deleteRoutes();
         return this.router;
     }
 }

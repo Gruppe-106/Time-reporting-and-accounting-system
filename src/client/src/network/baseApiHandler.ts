@@ -51,7 +51,7 @@ class BaseApiHandler {
             {
                 baseUrl: settings.baseUrl || this.baseUrl,
                 method: "POST",
-                body: settings.body || "",
+                body: settings.body || null,
                 headers: settings.headers || {}
             })
             .then(callback);
@@ -69,7 +69,7 @@ class BaseApiHandler {
             {
                 baseUrl: settings.baseUrl || this.baseUrl,
                 method: "PUT",
-                body: settings.body || "",
+                body: settings.body || null,
                 headers: settings.headers || {}
             })
             .then(callback);

@@ -21,6 +21,7 @@ abstract class GetEndpointBase extends EndpointBase{
             if (await this.ensureAuth(req)) {
                 return {status: 200, data: await this.getData(requestValues, primaryKey, keyEqual, data)};
             }
+            console.log(req.headers.cookie, {status: 401, data: [{error: "Not authorized"}]});
             return {status: 401, data: [{error: "Not authorized"}]};
         } catch (e) {
             console.error(e);

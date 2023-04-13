@@ -19,6 +19,10 @@ abstract class PostEndpointBase extends EndpointBase{
      */
     public async processRequest(req:Request, res:Response):Promise<{status:number, data: object}> {
         try {
+            // Check if the body is empty
+            if(req.body.constructor === Object && Object.keys(req.body).length === 0) {
+                return {status: 404, data: {success: "false", message: "Missing Body"}};
+            }
             // First check if user is authorised
             if (await this.ensureAuth(req)) {
                 // Try to submit data to DB

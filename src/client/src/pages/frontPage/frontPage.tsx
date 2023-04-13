@@ -12,9 +12,15 @@ class FrontPage extends Component<any> {
 
     private test() {
         let apiHandler: baseApiHandler = new BaseApiHandler();
-        apiHandler.get("/api/project/get?ids=1,2", {}, (value) => {
+        let bodySuccess = {
+            name: "test",
+            startDate: 1735689600000, //2025-01-01
+            endDate: 1764547200000,   //2025-12-01
+            projectLeader: [2]
+        }
+        apiHandler.post("/api/project/creation/post", {body: bodySuccess}, (value) => {
             console.log(value)
-        })
+        });
     }
 
     render() {

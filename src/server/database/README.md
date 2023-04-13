@@ -67,7 +67,8 @@ CREATE TABLE USERS_TASKS_TIME_REGISTER (
     managerLogged BOOLEAN NOT NULL,
     PRIMARY KEY (date , taskId , userId),
     FOREIGN KEY (userId)
-        REFERENCES USERS (id),
+        REFERENCES USERS (id)
+        ON DELETE CASCADE,
     FOREIGN KEY (taskId)
         REFERENCES TASKS (id)
 );
@@ -94,6 +95,7 @@ CREATE TABLE USERS_ROLES_CONNECTOR (
         REFERENCES ROLES (id),
     FOREIGN KEY (userId)
         REFERENCES USERS (id)
+        ON DELETE CASCADE
 );
 ALTER TABLE USERS_ROLES_CONNECTOR ADD UNIQUE urc_row_unique(roleId, userId);
 
@@ -123,7 +125,8 @@ CREATE TABLE PROJECTS_MANAGER_CONNECTOR (
     userId INT UNSIGNED NOT NULL,
     projectId INT UNSIGNED NOT NULL,
     FOREIGN KEY (userId)
-        REFERENCES USERS (id),
+        REFERENCES USERS (id)
+        ON DELETE CASCADE,
     FOREIGN KEY (projectId)
         REFERENCES PROJECTS (id)
 );
@@ -134,7 +137,8 @@ CREATE TABLE USERS_TASKS_CONNECTOR (
     taskId INT UNSIGNED NOT NULL,
     PRIMARY KEY (userId , taskId),
     FOREIGN KEY (userId)
-        REFERENCES USERS (id),
+        REFERENCES USERS (id)
+        ON DELETE CASCADE,
     FOREIGN KEY (taskId)
         REFERENCES TASKS (id)
 );

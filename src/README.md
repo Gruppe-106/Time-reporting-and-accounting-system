@@ -133,7 +133,7 @@ Optional:
 <details>
 <summary>Information</summary>
 
-## /api/project/information/get
+## /api/project/info/get
 ```
 Required:
     ids=number
