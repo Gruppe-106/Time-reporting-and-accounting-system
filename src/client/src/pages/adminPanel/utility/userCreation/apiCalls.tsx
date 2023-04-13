@@ -16,7 +16,7 @@ export default class APICalls {
         email: string;
         firstName: string;
         lastName: string;
-        group: number;
+        groupId: number;
     }[]> {
         // let users: any[] = []
         // const APIhandler: BaseApiHandler = new BaseApiHandler("Test")

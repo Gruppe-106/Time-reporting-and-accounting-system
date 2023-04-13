@@ -24,7 +24,7 @@ class Login extends Component<any>{
     }
 
     private login(): void {
-        let apiHandler = new BaseApiHandler("test");
+        let apiHandler = new BaseApiHandler();
         apiHandler.post("/api/login", {body: {email: this.state.email, password: forge.md.sha256.create().update(this.state.password).digest().toHex()}}, (value) => {
             let response: AuthApi = JSON.parse(JSON.stringify(value));
             if (response.status === 200) {

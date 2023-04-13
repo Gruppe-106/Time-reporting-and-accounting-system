@@ -1,11 +1,11 @@
 import GetEndpointBase from "../getEndpointBase";
-import {MySQLResponse} from "../../database/mysqlHandler";
+import {MySQLResponse, Where} from "../../database/mysqlHandler";
 import {Request, Response} from "express";
 
 /**
  * Endpoint for .../api/task/project/get
  */
-class TaskProjectEndpoint extends  GetEndpointBase {
+class TaskProjectEndpoint extends GetEndpointBase {
     requiredRole: number = 1;
 
     allowedColumns: string[] = [
@@ -36,7 +36,8 @@ class TaskProjectEndpoint extends  GetEndpointBase {
         }
 
         //Query the data for all group that satisfies conditions
-        let query: string = `SELECT ${select} FROM (SELECT * FROM TASKS_PROJECTS_CONNECTOR ${this.mySQL.createWhereString(this.createWhere(primaryKey, keyEqual))}) tp ${join}`;
+        let where: Where = this.createWhere(primaryKey, keyEqual);
+        let query: string = `SELECT ${select} FROM (SELECT * FROM TASKS_PROJECTS_CONNECTOR ${this.mySQL.createWhereString(where)}) tp ${join}`;
         let response:MySQLResponse = await this.mySQL.sendQuery(query);
         //Check if there was an error and throw if so
         if (response.error !== null) throw new Error("[MySQL] Failed to retrieve data");

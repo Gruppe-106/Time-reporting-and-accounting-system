@@ -3,6 +3,7 @@ import {MainRouter} from "./mainRouter";
 import * as http from "http";
 import readline from "readline";
 import MysqlHandler from "./database/mysqlHandler";
+import {MySQLConfig} from "../app";
 
 export class Server {
     private app: Express;
@@ -12,7 +13,7 @@ export class Server {
     public static server: http.Server;
     public static mysql: MysqlHandler;
 
-    constructor(app: Express, mySQLConnectionConfig: object, port: number, mysqlOnConnectCallback?: () => void) {
+    constructor(app: Express, mySQLConnectionConfig: MySQLConfig, port: number, mysqlOnConnectCallback?: () => void) {
         this.app = app;
         this.router = new MainRouter();
         app.use('/', this.router.routes());
