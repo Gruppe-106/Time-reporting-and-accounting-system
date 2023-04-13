@@ -18,7 +18,7 @@ class FrontPage extends Component<any> {
             endDate: 1764547200000,   //2025-12-01
             projectLeader: [2]
         }
-        apiHandler.post("/api/project/creation/post", {body: bodySuccess}, (value) => {
+        apiHandler.post("/api/", {body: bodySuccess}, (value) => {
             console.log(value)
         });
     }

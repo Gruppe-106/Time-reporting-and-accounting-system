@@ -115,6 +115,4 @@ test("Testing project edit api", async () => {
         expect(value["data"]["message"]).toMatch("Missing Body");
         expect(value["data"]["success"]).toMatch("false");
     })
-
-
 })
