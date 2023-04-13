@@ -1,6 +1,6 @@
 import {Server} from "./server/server";
 import express from "express";
-import AddFakeDataToDB, {mysqlCallback} from "./server/database/fakeData/addFakeDataToDB";
+import {mysqlCallback} from "./server/database/fakeData/addFakeDataToDB";
 import * as fs from "fs";
 
 export interface MySQLConfig {
