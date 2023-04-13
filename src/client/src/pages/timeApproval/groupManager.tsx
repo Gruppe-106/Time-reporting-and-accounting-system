@@ -7,6 +7,8 @@ import BaseNavBar from "../../components/navBar";
 import {Button, ButtonGroup, Container, Table} from "react-bootstrap";
 import BaseApiHandler from "../../network/baseApiHandler";
 import {userInfo} from '../../utility/router'
+import EmployeeTable from "./employeeTable";
+
 
 interface TSRecData {
     taskId: number;
@@ -75,36 +77,58 @@ class GroupManager extends Component<any>{
     }
 
     private UpdateTSData(empId:number, empFirstName:string, empLastName: string):void {
-        let api:BaseApiHandler = new BaseApiHandler("test");
-        api.get(`/api/time/register/get?user=${empId}`, {},(apiData) => {
+        let api:BaseApiHandler = new BaseApiHandler();
+        api.get(`/api/time/register/get?user=${empId}&period=${0},${Date.now()}`, {},(apiData) => {
             this.tsData = JSON.parse(JSON.stringify(apiData));
-            let tsRawData: TSRecData[] | null = JSON.parse(JSON.stringify(apiData));
-
+            let tsRawData: TSRecData[] | null = JSON.parse(JSON.stringify(apiData))['data'];
             // Convert the received data:
             if (tsRawData != null) {
                 let tasks: TSTaskData[] = [];
 
                 // For each piece of data received, we want to append the information to our own better structure.
-                for (let i = 0; i < tsRawData.length; i++) {
-                    let dayOfWeek: number = new Date(tsRawData[i].date).getDay();
-                    let tsExists: boolean = false;
-                    for (let j = 0; j < tasks.length; j++) {
-                        // If the task already exist, push the date registration to registrations
-                        if (tasks[j].taskId === tsRawData[i].taskId) {
-                            tsExists = true;
-                            tasks[j][dayOfWeek] = this.TSRawToDateRegistration(tsRawData[i]);
-                        }
-                    }
+                // for (let i = 0; i < tsRawData.length; i++) {
+                //     let dayOfWeek: number = new Date(tsRawData[i].date).getDay();
+                //     let tsExists: boolean = false;
+                //     for (let j = 0; j < tasks.length; j++) {
+                //         // If the task already exist, push the date registration to registrations
+                //         if (tasks[j].taskId === tsRawData[i].taskId) {
+                //             tsExists = true;
+                //             tasks[j][dayOfWeek] = this.TSRawToDateRegistration(tsRawData[i]);
+                //         }
+                //     }
+                //     
+                //     // If the task didn't exist, register it and the time as well:
+                //     if (!tsExists) {
+                //         let newTaskReg: TSTaskData = this.TSRawToTask(tsRawData[i]);
+                //         newTaskReg[dayOfWeek] = this.TSRawToDateRegistration(tsRawData[i]);
+                //         tasks.push(newTaskReg);
+                //     }
+                // }
 
-                    // If the task didn't exist, register it and the time as well:
-                    if (!tsExists) {
-                        let newTaskReg: TSTaskData = this.TSRawToTask(tsRawData[i]);
-                        newTaskReg[dayOfWeek] = this.TSRawToDateRegistration(tsRawData[i]);
-                        tasks.push(newTaskReg);
+                for (let i = 0; i < tsRawData.length; i++) {
+                    let date: number = tsRawData[i].date;
+                    let dayOfWeek: number = (new Date(date).getDay() + 1) % 7
+
+                    if (true) {
+                        let tsExists: boolean = false
+                        for (let j = 0; j < tasks.length; j++) {
+                            // Check if the task already exists. Add the information.
+                            if (tasks[j].taskId === tsRawData[i].taskId) {
+                                tsExists = true;
+                                tasks[j][dayOfWeek] = this.TSRawToDateRegistration(tsRawData[i]);
+                            }
+                        }
+
+                        if (!tsExists) {
+                            let newTaskReg: TSTaskData = this.TSRawToTask(tsRawData[i]);
+                            newTaskReg[dayOfWeek] = this.TSRawToDateRegistration(tsRawData[i]);
+                            tasks.push(newTaskReg);
+                        }
                     }
                 }
 
                 this.tsParsedData = {tasks: tasks, empFirstName: empFirstName, empLastName: empLastName};
+                console.log(this.tsParsedData)
             }
 
             this.setState({tsDataReceived: true});
@@ -136,9 +160,7 @@ class GroupManager extends Component<any>{
         if (userInfo.isManager) {
             if (!this.sentReq) {
                 this.sentReq = true
-                console.log("IS MANAGER")
                 let api:BaseApiHandler = new BaseApiHandler();
-                console.log("f")
                 api.get(`/api/group/manager/get?manager=${userInfo.userId}`,  {}, (apiData) => {
                     this.empData = JSON.parse(JSON.stringify(apiData))['data'][0];
                     this.setState({dataReceived: true});
@@ -146,63 +168,22 @@ class GroupManager extends Component<any>{
             }
         }
 
-        if (!this.sentReq) {
-            this.sentReq = true;
-            let api:BaseApiHandler = new BaseApiHandler("test");
-            api.get(`/api/group/manager/get?manager=${userInfo.userId}`,  {}, (apiData) => {
-                this.empData = JSON.parse(JSON.stringify(apiData))['data'][0];
-                this.setState({dataReceived: true});
-            });
-        }
+        // if (!this.sentReq) {
+        //     this.sentReq = true;
+        //     let api:BaseApiHandler = new BaseApiHandler("test");
+        //     api.get(`/api/group/manager/get?manager=${userInfo.userId}`,  {}, (apiData) => {
+        //         this.empData = JSON.parse(JSON.stringify(apiData))['data'][0];
+        //         this.setState({dataReceived: true});
+        //     });
+        // }
         return;
-    }
-
-    private EmployeeTable():JSX.Element {
-        return (
-            <>
-                <h1>Group manager</h1>
-                {
-                    !this.state.dataReceived?(
-                        <h4>Loading empdata...</h4>
-                    ):(
-                        <>
-                            <h4>Displaying members of group, for group leader {this.empData?.firstName} {this.empData?.lastName}</h4>
-                            <Table>
-                                <thead>
-                                <tr>
-                                    <th className={"col-sm-3"}>First name</th>
-                                    <th className={"col-sm-3"}>Last name</th>
-                                    <th className={"col-sm-4"}>Email</th>
-                                    <th className={"col-sm-2"}></th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {
-                                    this.empData?.employees.map(e => (
-                                        <tr>
-                                            <td className={"col-sm-3"}>{e.firstName}</td>
-                                            <td className={"col-sm-3"}>{e.lastName}</td>
-                                            <td className={"col-sm-4"}>{e.email}</td>
-                                            <td className={"col-sm-2"}><center><Button onClick={() => this.UpdateTSData(e.id, e.firstName, e.lastName)}>Inspect timesheet</Button></center></td>
-                                        </tr>
-                                    ))
-                                }
-                                </tbody>
-                            </Table>
-                        </>
-                    )
-                }
-            </>
-        )
     }
 
     private SelectedEmployeeTimesheetTable():JSX.Element {
         if (!this.tsParsedData) return (<></>);
 
-        for (let i = 0; i < 7; i++) {
-            console.log(this.tsParsedData.tasks[0][i]);
-        }
-
+        console.log(this.tsParsedData);
+        
         return (
             <>
                 {
@@ -284,8 +265,7 @@ class GroupManager extends Component<any>{
             <>
                 <BaseNavBar />
                 <Container className={"py-3"}>
-                    {this.EmployeeTable()}
-                    {this.SelectedEmployeeTimesheetTable()}
+                    <EmployeeTable managerID={userInfo.userId}></EmployeeTable>
                 </Container>
             </>
         );
