@@ -48,7 +48,7 @@ interface User {
 
 
 interface Manager {
-    id: number,
+    managerId: number,
     firstName: string,
     lastName: string,
     groupId: number
@@ -306,13 +306,10 @@ class AdminPanel extends Component<any, CustomTypes> {
                         id={`manager${user.id}`}
 
                         labelKey={(option: any) => `${option.firstName}  ${option.lastName}`}
-                        options={user.manager!}
-                        defaultSelected={user.manager!}
+                        options={user.manager!.filter((ele:Manager) => ele.managerId !== user.id)}
+                        defaultSelected={[user.manager!.filter((ele:Manager) => ele.managerId !== user.id)[0]]}
 
-                        onChange={(selected) => {
-                            console.log(selected)
-
-                        }}
+                        onChange={(selected => this.handleManagerInput(selected, user))}
                         filterBy={(option: any, props: any): boolean => {
                             const query: string = props.text.toLowerCase().trim();
                             const name: string = option.firstName.toLowerCase() + option.lastName.toLowerCase();
@@ -342,9 +339,20 @@ class AdminPanel extends Component<any, CustomTypes> {
 
 
     private handleManagerInput(manager: any, user: User,) {
-        if (manager.length === 0) {
 
-        }
+        if (manager.length === 1) {
+
+            const updatedUser: User = { ...user, manager:this.state.dbManagers.filter((man: Manager) => man.groupId === manager[0].groupId).concat(this.state.dbManagers.filter((man: Manager) => man.groupId !== manager[0].groupId))};
+            const updatedUsers: User[] = this.state.selectedUsers.map((u) =>
+                u.id === user.id ? updatedUser : u
+            );
+            this.setState({
+                selectedUsers: updatedUsers
+            })
+          
+        } 
+
+      
     }
 
 
@@ -543,6 +551,7 @@ class AdminPanel extends Component<any, CustomTypes> {
         this.handleLoader("Updating users")
 
         const dbUsers: User[] = await APICalls.getAllUsers()
+        console.log(dbUsers)
         const groups: number[] = []
         dbUsers.forEach((ele: User) => groups.push(ele.groupId))
         dbUsers.forEach((ele: User) => {
@@ -553,6 +562,8 @@ class AdminPanel extends Component<any, CustomTypes> {
             ele.validEmail = true
             ele.validFirstName = true
             ele.validLastName = true
+            ele.manager = this.state.dbManagers.filter((man: Manager) => man.groupId === ele.groupId).concat(this.state.dbManagers.filter((man: Manager) => man.groupId !== ele.groupId))
+
         })
 
 
@@ -585,16 +596,19 @@ class AdminPanel extends Component<any, CustomTypes> {
             firstName: string,
             lastName: string,
             email: string,
-            // manager: number
+            manager : number
         }[] = []
 
+        
+
         for (const user of this.state.selectedUsers) {
+            console.log(user.manager![0].managerId)
             userData.push({
                 userId: user.id,
                 firstName: user.firstName,
                 lastName: user.lastName,
                 email: user.email,
-                // manager: user.groupId
+                manager: user.manager![0].managerId
             })
         }
 
