@@ -79,6 +79,7 @@ interface TimeSheetRowData {
 // The props given to TimeSheetRow
 interface TimeSheetRowProps {
   rowData: Map<number, IRowData>;
+  onDelete: (rowId: number) => void;
 }
 
 // State of variables in TimeSheetRow
@@ -131,9 +132,9 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
   /*
       * Calles the onDelete function/method, and then closes the modal 
    */
-  private handleDeleteClick = () => {
-    /*const { onDelete } = this.state;
-    onDelete();*/
+  private handleDeleteClick = (rowId: number) => {
+    const { onDelete } = this.props;
+    onDelete(rowId);
     this.handleCloseModal();
   };
 
@@ -208,6 +209,8 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
   //<td>{data.taskId}</td>
   //<Button variant="danger" size="sm" onClick={() => this.handleShowDelModal(data.taskId)}>Delete</Button>
 
+  
+
   render() {
     const { showDeleteRowModal } = this.state;
 
@@ -229,7 +232,7 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
             <Button variant="secondary" onClick={this.handleCloseModal}>
               Cancel
             </Button>
-            <Button variant="danger" onClick={this.handleDeleteClick}>
+            <Button variant="danger" onClick={() => this.handleDeleteClick(2)}> {/* This 2 is the row number (taskId) */}
               Delete
             </Button>
           </Modal.Footer>
@@ -306,13 +309,18 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
 
     this.handleCloseModal();
   }
+  handleDeleteRow = (rowId:number) => {
+    const { stateRowData } = this.state;
+    stateRowData.delete(rowId); // Delete the row from rowData map based on rowId
+    this.setState({ stateRowData }); // Update the state to trigger re-render
+  }
 
   render() {
     const { stateRowData, showAddModal } = this.state;
 
     return (
       <Container fluid="lg">
-        <TimeSheetRow rowData={stateRowData} />
+        <TimeSheetRow rowData={stateRowData} onDelete={this.handleDeleteRow} />
         <Button variant="primary" type="button" onClick={() => this.handleShowAddModal()}>Add Row</Button>
         <></>
         <Modal show={showAddModal} onHide={this.handleCloseModal}>
