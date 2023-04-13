@@ -79,12 +79,12 @@ interface TimeSheetRowData {
 
 // The props given to TimeSheetRow
 interface TimeSheetRowProps {
-  rowData: Map<number,IRowData>;
+  rowData: Map<number, IRowData>;
 }
 
 // State of variables in TimeSheetRow
 interface TimeSheetRowState {
-  times: string[];
+  times: number[];
   total: number;
   minTimes: string[];
   minTotal: number;
@@ -114,7 +114,7 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
 
     // Inilisie all states
     this.state = {
-      times: ["0", "0", "0", "0", "0", "0", "0"],
+      times: [0, 0, 0, 0, 0, 0, 0],
       total: 0,
       minTimes: ["0", "0", "0", "0", "0", "0", "0"],
       minTotal: 0,
@@ -146,19 +146,67 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
     this.handleCloseModal();
   };
 
-  renderRows() {
+  getTimeData(id: number, timeArr: number[]): number[] {
     const { rowData } = this.props;
-    let arr = [1, 2, 3, 4, 5, 6, 7];
 
-    let rows:JSX.Element[] = [];
+    for (let j = 0; j < 7; j++) {
+      timeArr[j] = 0;
+    }
+
+    let dates: string[] = [];
+    getCurrentWeekDates(dates, -21);
 
     for (const key of Array.from(rowData.keys())) {
       let data = rowData.get(key);
-      if(data) {
+      if (data && id === data.taskId) {
+        data.objectData.map((item) => {
+          for (let i = 0; i < dates.length; i++) {
+            const currentDate = dateStringFormatter(item.date);
+            const matchDate = dates[i];
+            if (currentDate === matchDate) {
+              timeArr[i] = item.time;
+            }
+          }
+        })
+      }
+    }
+    return timeArr;
+  }
+
+
+  renderRows() {
+    const { rowData } = this.props;
+
+    let arr: number[] = [];
+
+    let rows: JSX.Element[] = [];
+
+    for (const key of Array.from(rowData.keys())) {
+      let data = rowData.get(key);
+      if (data) {
+        this.getTimeData(data.taskId, arr)
         rows.push((
           <tr>
             <td>{data.projectName}</td>
             <td>{data.taskName}</td>
+            {arr.map((num, index) => {
+                  return (
+                    <td key={index}>
+                      <InputGroup size="sm">
+                        <Form.Control type="number" placeholder="0" value={num} />
+                        <InputGroup.Text id={`basic-addon-${index}`}>:</InputGroup.Text>
+                        <Form.Select>
+                          <option value="0">0</option>
+                          <option value="15">15</option>
+                          <option value="30">30</option>
+                          <option value="45">45</option>
+                        </Form.Select>
+                      </InputGroup>
+                    </td>
+                  );
+                })}
+                <td>{arr.reduce((partialSum, a) => partialSum + a, 0)}</td>
+                <td>{data.taskId}</td>
           </tr>
         ))
       }
@@ -166,15 +214,12 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
     return rows;
   }
 
-
-
-
   render() {
     const { showDeleteRowModal } = this.state;
 
     return (
       <Container>
-        <Table bordered size="sm">
+        <Table bordered size="sm" className="fixed-table ellipses">
           <TableHeader />
           <tbody>{this.renderRows()}</tbody>
         </Table>
@@ -206,7 +251,7 @@ interface TimeSheetProp {
 
 // Variable states in TimeSheetPage
 interface TimeSheetState {
-  stateRowData: Map<number,IRowData>;
+  stateRowData: Map<number, IRowData>;
   selectedProject: TimeSheetRowData | null;
   showAddRowModal: boolean;
 }
@@ -222,7 +267,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
 
     // Initialise states
     this.state = {
-      stateRowData: new Map<number,IRowData>(),
+      stateRowData: new Map<number, IRowData>(),
       selectedProject: null,
       showAddRowModal: false,
     };
@@ -253,20 +298,20 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
       `/api/time/register/get?user=${userId}&period=${0},${Date.now()}&var=taskName,taskId,projectName,time,date`, {},
       (value) => {
         let json: Api = JSON.parse(JSON.stringify(value));
-        let importData: Map<number,IRowData> = new Map<number,IRowData>(); 
+        let importData: Map<number, IRowData> = new Map<number, IRowData>();
         if (json.status === 200) {
           for (const task of json.data) {
-            if(importData.has(task.taskId)) {
+            if (importData.has(task.taskId)) {
               let data = importData.get(task.taskId);
               if (data) {
-                data?.objectData.push({date: task.date, time: task.time});
+                data?.objectData.push({ date: task.date, time: task.time });
                 importData.set(task.taskId, data);
               }
             } else {
-              importData.set(task.taskId, {projectName: task.projectName, taskName:task.taskName, taskId: task.taskId, objectData: [{date: task.date, time: task.time}] })
+              importData.set(task.taskId, { projectName: task.projectName, taskName: task.taskName, taskId: task.taskId, objectData: [{ date: task.date, time: task.time }] })
             }
           }
-          this.setState({stateRowData: importData})
+          this.setState({ stateRowData: importData })
         }
       }
     );

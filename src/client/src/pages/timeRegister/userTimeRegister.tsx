@@ -26,7 +26,6 @@ class UserTimeRegister extends Component<any>{
                     <h1>User Time Register: Joe and John's dates work</h1>
                 </Container>
                 <TimeSheetPage userId={userInfo.userId} /> 
-                {this.printUserInfo()}
                 {userInfo.isAdmin ? (<UserTimeSheet/>) : null} {/*Button to adminCom*/}
             </>
         );
