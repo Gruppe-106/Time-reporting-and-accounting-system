@@ -291,7 +291,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     // Initialise states
     this.state = {
       stateRowData: new Map<number, TaskRowData>(),
-      offsetState: 0,
+      offsetState: -21,
       isUpdating: false,
       showAddModal: false,
     };
@@ -354,22 +354,25 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
   handleButtonClick = (increment: boolean): Promise<void> => {
     return new Promise((resolve) => {
       this.setState({ isUpdating: true }, () => {
-        const { offsetState } = this.state;
-        const incrementValue = increment ? 7 : -7;
-        this.setState(
-          { offsetState: offsetState + incrementValue },
-          () => {
-            this.getData(offsetState);
-            this.setState({ isUpdating: false }, resolve);
-            console.log(offsetState);
-          }
-        );
+        setTimeout(() => {
+          const { offsetState } = this.state;
+          const incrementValue = increment ? 7 : -7;
+          const updatedOffset = offsetState + incrementValue;
+          this.setState(
+            { offsetState: updatedOffset, isUpdating: false},
+            () => {
+              this.getData(offsetState);
+              console.log(offsetState);
+              resolve();
+            }
+          );
+        }, 1000);
       });
     });
   };
 
   render() {
-    const { stateRowData, showAddModal, isUpdating } = this.state;
+    const { stateRowData, showAddModal, isUpdating, offsetState } = this.state;
 
     return (
       <Container fluid="lg">
@@ -379,17 +382,18 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
         <ButtonGroup aria-label="Basic example">
           <Button
             onClick={() => {
-              if (!isUpdating) {this.handleButtonClick(false);}
+              if (!isUpdating) { this.handleButtonClick(false); }
             }} disabled={isUpdating}
             variant="primary"><FontAwesomeIcon icon={faArrowLeft} />
           </Button>
           <Button
             onClick={() => {
-              if (!isUpdating) {this.handleButtonClick(true);}
+              if (!isUpdating) { this.handleButtonClick(true); }
             }} disabled={isUpdating}
             variant="primary"><FontAwesomeIcon icon={faArrowRight} />
           </Button>
         </ButtonGroup>
+        <p>{offsetState}</p>
         <></>
         <Modal show={showAddModal} onHide={this.handleCloseModal}>
           <Modal.Header closeButton>
