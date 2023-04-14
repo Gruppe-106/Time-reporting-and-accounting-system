@@ -80,6 +80,7 @@ interface TimeSheetRowData {
 // The props given to TimeSheetRow
 interface TimeSheetRowProps {
   rowData: Map<number, TaskRowData>;
+  timeSheetOffset: number;
   onDelete: (rowId: number) => void;
 }
 
@@ -188,7 +189,7 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
 
 
   renderTaskRows() {
-    const { rowData } = this.props;
+    const { rowData, timeSheetOffset } = this.props;
 
     let arr: number[] = [];
 
@@ -197,7 +198,7 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
     for (const key of Array.from(rowData.keys())) {
       let data = rowData.get(key);
       if (data) {
-        this.getTimeData(data.taskId, arr, -21)
+        this.getTimeData(data.taskId, arr, timeSheetOffset)
         rows.push((
           <tr>
             <td>{data.projectName}</td>
@@ -232,12 +233,13 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
 
 
   render() {
+    const { timeSheetOffset } = this.props
     const { showDeleteRowModal , deleteRow } = this.state;
 
     return (
       <Container>
         <Table bordered size="sm" className="fixed-table ellipses">
-          <TableHeader timeOffset={-21} />
+          <TableHeader timeOffset={timeSheetOffset} />
           <tbody>{this.renderTaskRows()}</tbody>
         </Table>
         <></>
@@ -271,7 +273,7 @@ interface TimeSheetProp {
 // Variable states in TimeSheetPage
 interface TimeSheetState {
   stateRowData: Map<number, TaskRowData>;
-  timeSheetDate: string[];
+  timeSheetDateOffset: number;
   showAddModal: boolean;
 }
 
@@ -287,7 +289,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     // Initialise states
     this.state = {
       stateRowData: new Map<number, TaskRowData>(),
-      timeSheetDate: [],
+      timeSheetDateOffset: -14,
       showAddModal: false,
     };
   }
@@ -295,11 +297,12 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
   // apiHandler to get data from "database", the data is passed to the data array
   public componentDidMount() {
     const { userId } = this.props;
-    const { timeSheetDate } = this.state
-    getCurrentWeekDates(timeSheetDate, -21);
+    const { timeSheetDateOffset } = this.state
+    let timeSheetDate: string[] = []
+    getCurrentWeekDates(timeSheetDate, timeSheetDateOffset);
     let apiHandler = new BaseApiHandler();
     apiHandler.get(
-      `/api/time/register/get?user=${userId}&period=${Date.parse(timeSheetDate[0])},${Date.parse(timeSheetDate[6])}&var=taskName,taskId,projectName,time,date`, {},
+      `/api/time/register/get?user=${userId}&period=${0},${Date.parse(timeSheetDate[6])}&var=taskName,taskId,projectName,time,date`, {},
       (value) => {
         let json: Api = JSON.parse(JSON.stringify(value));
         let taskData: Map<number, TaskRowData> = new Map<number, TaskRowData>();
@@ -341,11 +344,11 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
   }
 
   render() {
-    const { stateRowData, showAddModal } = this.state;
+    const { stateRowData, showAddModal, timeSheetDateOffset } = this.state;
 
     return (
       <Container fluid="lg">
-        <TimeSheetRow rowData={stateRowData} onDelete={this.handleDeleteRow} />
+        <TimeSheetRow timeSheetOffset={timeSheetDateOffset} rowData={stateRowData} onDelete={this.handleDeleteRow} />
         <Button variant="primary" type="button" onClick={() => this.handleShowAddModal()}>Add Row</Button>
         <></>
         <Modal show={showAddModal} onHide={this.handleCloseModal}>
