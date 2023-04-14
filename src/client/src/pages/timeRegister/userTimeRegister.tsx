@@ -9,15 +9,10 @@ import BaseNavBar from "../../components/navBar";
 import {Container} from "react-bootstrap";
 import TimeSheetPage from "./componentsTime/userCom";
 import UserTimeSheet from "./componentsTime/adminCom";
-//import App from "./componentsTime/testCom";
 
 import { userInfo } from '../../utility/router';
 
 class UserTimeRegister extends Component<any>{
-    printUserInfo() {
-        return console.log(userInfo);
-    }
-
     render() {
         return (
             <>

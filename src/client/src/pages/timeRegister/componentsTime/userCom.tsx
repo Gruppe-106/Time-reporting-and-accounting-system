@@ -3,7 +3,7 @@ import { Container, Table, Form, InputGroup, Button, ButtonGroup, Modal } from "
 //import { Highlighter, Typeahead } from 'react-bootstrap-typeahead';
 import BaseApiHandler from "../../../network/baseApiHandler";
 import { getCurrentWeekDates, dateStringFormatter, dateToNumber } from "../../../utility/timeConverter"
-import {faArrowLeft, faArrowRight} from '@fortawesome/free-solid-svg-icons'
+import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 
 interface Api {
@@ -24,8 +24,8 @@ interface Api {
 
 // Empty prop to indicate that the component will not recive a prop.
 interface TableHeaderProp {
-  timeOffset:number,
- }
+  timeOffset: number,
+}
 
 interface TableHeaderState {
   headerDates: string[];
@@ -93,9 +93,9 @@ interface TimeSheetRowState {
 }
 
 type delRow = {
-  projectName:string | undefined,
-  taskName:string | undefined,
-  taskId:number | undefined,
+  projectName: string | undefined,
+  taskName: string | undefined,
+  taskId: number | undefined,
 }
 
 interface TaskRowData {
@@ -121,9 +121,9 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
     this.state = {
       times: [0, 0, 0, 0, 0, 0, 0],
       deleteRow: {
-        projectName:"",
-        taskName:"",
-        taskId:-1
+        projectName: "",
+        taskName: "",
+        taskId: -1
       },
       showDeleteRowModal: false,
     };
@@ -140,12 +140,12 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
   /*
       * Opens the modal
    */
-  private handleShowDelModal = (taskToDel:delRow) => {
+  private handleShowDelModal = (taskToDel: delRow) => {
     const { deleteRow } = this.state
 
     deleteRow.taskId = taskToDel.taskId;
 
-    this.setState({deleteRow: taskToDel})
+    this.setState({ deleteRow: taskToDel })
     this.setState({ showDeleteRowModal: true });
   };
 
@@ -157,11 +157,11 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
     const { onDelete } = this.props;
     const { deleteRow } = this.state
 
-    if(deleteRow.taskId) onDelete(deleteRow.taskId);
+    if (deleteRow.taskId) onDelete(deleteRow.taskId);
     this.handleCloseModal();
   };
 
-  getTimeData(id: number, timeArr: number[], timeOffset: number = 0 ): number[] {
+  getTimeData(id: number, timeArr: number[], timeOffset: number = 0): number[] {
     const { rowData } = this.props;
 
     for (let j = 0; j < 7; j++) {
@@ -222,7 +222,7 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
               );
             })}
             <td>{arr.reduce((partialSum, a) => partialSum + a, 0)}</td>
-            <td><Button variant="danger" onClick={() => this.handleShowDelModal({projectName:data?.projectName, taskName:data?.taskName, taskId:data?.taskId})}>-</Button></td>
+            <td><Button variant="danger" onClick={() => this.handleShowDelModal({ projectName: data?.projectName, taskName: data?.taskName, taskId: data?.taskId })}>-</Button></td>
           </tr>
         ))
       }
@@ -235,7 +235,7 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
 
 
   render() {
-    const { showDeleteRowModal , deleteRow } = this.state;
+    const { showDeleteRowModal, deleteRow } = this.state;
 
     return (
       <Container>
@@ -275,6 +275,7 @@ interface TimeSheetProp {
 interface TimeSheetState {
   stateRowData: Map<number, TaskRowData>;
   offsetState: number;
+  isUpdating: boolean;
   showAddModal: boolean;
 }
 
@@ -290,12 +291,13 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     // Initialise states
     this.state = {
       stateRowData: new Map<number, TaskRowData>(),
-      offsetState: -21,
+      offsetState: 0,
+      isUpdating: false,
       showAddModal: false,
     };
   }
 
-  getData (timeOffset: number = 0) {
+  getData(timeOffset: number = 0) {
     const { userId } = this.props;
     let timeSheetDate: string[] = []
     getCurrentWeekDates(timeSheetDate, timeOffset);
@@ -349,35 +351,45 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     this.setState({ stateRowData }); // Update the state to trigger re-render
   }
 
-  private weekSelectorRender(): JSX.Element {
-    return (
-            <ButtonGroup aria-label="Basic example">
-              <Button onClick={() => this.handleGetWeekButton(-7)} variant="primary"><FontAwesomeIcon icon={faArrowLeft} /></Button>
-              <Button onClick={() => this.handleGetWeekButton(+7)} variant="primary"><FontAwesomeIcon icon={faArrowRight} /></Button>
-            </ButtonGroup>
-    )
-}
-
-handleGetWeekButton = (num:number) => {
-  const { offsetState } = this.state
-
-  let newOffsetState = offsetState + num;
-
-  this.setState({offsetState: newOffsetState})
-
-  console.log(offsetState)
-
-  this.getData( offsetState )
-}
+  handleButtonClick = (increment: boolean): Promise<void> => {
+    return new Promise((resolve) => {
+      this.setState({ isUpdating: true }, () => {
+        const { offsetState } = this.state;
+        const incrementValue = increment ? 7 : -7;
+        this.setState(
+          { offsetState: offsetState + incrementValue },
+          () => {
+            this.getData(offsetState);
+            this.setState({ isUpdating: false }, resolve);
+            console.log(offsetState);
+          }
+        );
+      });
+    });
+  };
 
   render() {
-    const { stateRowData, showAddModal } = this.state;
+    const { stateRowData, showAddModal, isUpdating } = this.state;
 
     return (
       <Container fluid="lg">
         <TimeSheetRow rowData={stateRowData} onDelete={this.handleDeleteRow} />
         <Button variant="primary" type="button" onClick={() => this.handleShowAddModal()}>Add Row</Button>
-        {this.weekSelectorRender()}
+        <></>
+        <ButtonGroup aria-label="Basic example">
+          <Button
+            onClick={() => {
+              if (!isUpdating) {this.handleButtonClick(false);}
+            }} disabled={isUpdating}
+            variant="primary"><FontAwesomeIcon icon={faArrowLeft} />
+          </Button>
+          <Button
+            onClick={() => {
+              if (!isUpdating) {this.handleButtonClick(true);}
+            }} disabled={isUpdating}
+            variant="primary"><FontAwesomeIcon icon={faArrowRight} />
+          </Button>
+        </ButtonGroup>
         <></>
         <Modal show={showAddModal} onHide={this.handleCloseModal}>
           <Modal.Header closeButton>
@@ -394,3 +406,19 @@ handleGetWeekButton = (num:number) => {
 }
 
 export default TimeSheetPage;
+
+
+/*handleGetWeekButton = (increment: boolean): Promise<void> => {
+  return new Promise((resolve) => {
+    this.setState({ isUpdating: true }, () => {
+      const { offsetState } = this.state;
+      const incrementValue = increment ? 7 : -7;
+      this.setState(
+        { offsetState: offsetState + incrementValue },
+        () => {
+          this.setState({ isUpdating: false }, resolve);
+        }
+      );
+    });
+  });
+} */
