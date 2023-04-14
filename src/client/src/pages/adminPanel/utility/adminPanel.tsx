@@ -28,7 +28,12 @@ interface Manager {
 
 export default class AdminUtil {
 
-    public static async updateUsers(managers: Manager[]): Promise<{ users: User[], groups: number[] }> {
+    /**
+     * Helper function to get updated users
+     * @param managers The managers from the state
+     * @returns Te users and the groups on the server
+    */
+    public static async getUpdatedUsers(managers: Manager[]): Promise<{ users: User[], groups: number[] }> {
 
 
         const dbUsers: User[] = await APICalls.getAllUsers()
@@ -45,7 +50,7 @@ export default class AdminUtil {
             ele.manager = managers.filter((man: Manager) => man.groupId === ele.groupId && man.managerId !== ele.id).concat(managers.filter((man: Manager) => man.groupId !== ele.groupId))
         })
 
-        return {users:dbUsers,groups}
+        return { users: dbUsers, groups }
 
     }
 }

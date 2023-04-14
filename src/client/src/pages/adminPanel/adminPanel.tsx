@@ -149,7 +149,7 @@ class AdminPanel extends Component<any, CustomTypes> {
         this.handleLoader("Getting users")
 
         const dbManagers: Manager[] = (await APICalls.getAllManagerGroups()).data
-        const updates: {users: User[],groups:number[]} = await AdminUtil.updateUsers(this.state.dbManagers)
+        const updates: {users: User[],groups:number[]} = await AdminUtil.getUpdatedUsers(this.state.dbManagers)
         const dbUsers: User[] = updates.users
 
 
@@ -550,7 +550,7 @@ class AdminPanel extends Component<any, CustomTypes> {
 
         this.handleLoader("Updating users")
 
-        const updates: {users: User[],groups:number[]} = await AdminUtil.updateUsers(this.state.dbManagers)
+        const updates: {users: User[],groups:number[]} = await AdminUtil.getUpdatedUsers(this.state.dbManagers)
         const dbUsers: User[] = updates.users
 
 
