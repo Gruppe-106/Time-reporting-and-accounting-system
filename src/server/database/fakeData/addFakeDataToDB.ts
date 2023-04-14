@@ -45,10 +45,9 @@ class AddFakeDataToDB {
         return new Date(date).toISOString().slice(0, 19).replace('T', ' ');
     }
 
-    public addAll() {
-        this.addUSERS();
+    public async addAll() {
+        await this.addUSERSGROUPS()
         this.addAUTHS();
-        this.addGROUP();
         this.addPROJECT();
         this.addROLES();
         this.addTIMETYPES();
@@ -58,6 +57,24 @@ class AddFakeDataToDB {
         this.addUSERTASKTIMEREGISTER();
         this.addUSERSTASKS();
         this.addPROJECTSMANAGER()
+    }
+
+    public async addUSERSGROUPS () {
+        let users = USERS.data;
+        let values: string[][] = [];
+
+        for (const user of users) {
+            values.push([user.email, user.firstName, user.lastName]);
+        }
+
+        await this.mysql.insert("USERS", ["email", "firstName", "lastName"], values);
+        this.addGROUP();
+        values = [];
+
+        for (const user of users) {
+            await this.mysql.update("USERS", [{column: "groupId", value: user.group.toString()}], {column: "id", equals: [user.id.toString()]})
+        }
+
     }
 
     public addUSERS() {
