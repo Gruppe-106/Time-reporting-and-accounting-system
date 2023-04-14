@@ -21,7 +21,9 @@ interface Api {
 */
 
 // Empty prop to indicate that the component will not recive a prop.
-interface EmptyProps { }
+interface TableHeaderProp {
+  timeOffset:number,
+ }
 
 interface TableHeaderState {
   headerDates: string[];
@@ -32,15 +34,15 @@ interface TableHeaderState {
     * Creating the table header
 
 */
-class TableHeader extends React.Component<EmptyProps, TableHeaderState> {
-  constructor(props: EmptyProps) {
+class TableHeader extends React.Component<TableHeaderProp, TableHeaderState> {
+  constructor(props: TableHeaderProp) {
     super(props);
 
     const dates: string[] = [];
 
     // Set the initial state
     this.state = {
-      headerDates: getCurrentWeekDates(dates, -21),
+      headerDates: getCurrentWeekDates(dates, this.props.timeOffset),
     };
   }
 
@@ -84,7 +86,14 @@ interface TimeSheetRowProps {
 // State of variables in TimeSheetRow
 interface TimeSheetRowState {
   times: number[];
+  deleteRow: delRow
   showDeleteRowModal: boolean;
+}
+
+type delRow = {
+  projectName:string | undefined,
+  taskName:string | undefined,
+  taskId:number | undefined,
 }
 
 interface TaskRowData {
@@ -109,6 +118,11 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
     // Inilisie all states
     this.state = {
       times: [0, 0, 0, 0, 0, 0, 0],
+      deleteRow: {
+        projectName:"",
+        taskName:"",
+        taskId:-1
+      },
       showDeleteRowModal: false,
     };
   }
@@ -123,7 +137,12 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
   /*
       * Opens the modal
    */
-  private handleShowDelModal = () => {
+  private handleShowDelModal = (taskToDel:delRow) => {
+    const { deleteRow } = this.state
+
+    deleteRow.taskId = taskToDel.taskId;
+
+    this.setState({deleteRow: taskToDel})
     this.setState({ showDeleteRowModal: true });
   };
 
@@ -131,13 +150,15 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
   /*
       * Calles the onDelete function/method, and then closes the modal 
    */
-  private handleDeleteClick = (rowId: number) => {
+  private handleDeleteClick = () => {
     const { onDelete } = this.props;
-    onDelete(rowId);
+    const { deleteRow } = this.state
+
+    if(deleteRow.taskId) onDelete(deleteRow.taskId);
     this.handleCloseModal();
   };
 
-  getTimeData(id: number, timeArr: number[]): number[] {
+  getTimeData(id: number, timeArr: number[], timeOffset: number = 0 ): number[] {
     const { rowData } = this.props;
 
     for (let j = 0; j < 7; j++) {
@@ -145,7 +166,7 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
     }
 
     let dates: string[] = [];
-    getCurrentWeekDates(dates, -21);
+    getCurrentWeekDates(dates, timeOffset);
 
     for (const key of Array.from(rowData.keys())) {
       let data = rowData.get(key);
@@ -176,7 +197,7 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
     for (const key of Array.from(rowData.keys())) {
       let data = rowData.get(key);
       if (data) {
-        this.getTimeData(data.taskId, arr)
+        this.getTimeData(data.taskId, arr, -21)
         rows.push((
           <tr>
             <td>{data.projectName}</td>
@@ -198,7 +219,7 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
               );
             })}
             <td>{arr.reduce((partialSum, a) => partialSum + a, 0)}</td>
-            <td><Button variant="danger" size="sm" onClick={() => this.handleShowDelModal()}>-</Button></td>
+            <td><Button variant="danger" onClick={() => this.handleShowDelModal({projectName:data?.projectName, taskName:data?.taskName, taskId:data?.taskId})}>-</Button></td>
           </tr>
         ))
       }
@@ -211,12 +232,12 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
 
 
   render() {
-    const { showDeleteRowModal } = this.state;
+    const { showDeleteRowModal , deleteRow } = this.state;
 
     return (
       <Container>
         <Table bordered size="sm" className="fixed-table ellipses">
-          <TableHeader />
+          <TableHeader timeOffset={-21} />
           <tbody>{this.renderTaskRows()}</tbody>
         </Table>
         <></>
@@ -225,13 +246,14 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
             <Modal.Title>Delete Row?</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <p>Are you sure you want to delete:</p>
+            <p>Are you sure you want to delete: {deleteRow.taskName}</p>
+            <p>{deleteRow.taskName}, in {deleteRow.projectName}</p>
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={this.handleCloseModal}>
               Cancel
             </Button>
-            <Button variant="danger" onClick={() => this.handleDeleteClick(2)}> {/* This 2 is the row number (taskId) */}
+            <Button variant="danger" onClick={() => this.handleDeleteClick()}> {/* This 2 is the row number (taskId) */}
               Delete
             </Button>
           </Modal.Footer>
@@ -249,6 +271,7 @@ interface TimeSheetProp {
 // Variable states in TimeSheetPage
 interface TimeSheetState {
   stateRowData: Map<number, TaskRowData>;
+  timeSheetDate: string[];
   showAddModal: boolean;
 }
 
@@ -264,6 +287,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     // Initialise states
     this.state = {
       stateRowData: new Map<number, TaskRowData>(),
+      timeSheetDate: [],
       showAddModal: false,
     };
   }
@@ -271,9 +295,11 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
   // apiHandler to get data from "database", the data is passed to the data array
   public componentDidMount() {
     const { userId } = this.props;
+    const { timeSheetDate } = this.state
+    getCurrentWeekDates(timeSheetDate, -21);
     let apiHandler = new BaseApiHandler();
     apiHandler.get(
-      `/api/time/register/get?user=${userId}&period=${0},${Date.now()}&var=taskName,taskId,projectName,time,date`, {},
+      `/api/time/register/get?user=${userId}&period=${Date.parse(timeSheetDate[0])},${Date.parse(timeSheetDate[6])}&var=taskName,taskId,projectName,time,date`, {},
       (value) => {
         let json: Api = JSON.parse(JSON.stringify(value));
         let taskData: Map<number, TaskRowData> = new Map<number, TaskRowData>();
