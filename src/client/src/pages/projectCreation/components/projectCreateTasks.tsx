@@ -74,7 +74,7 @@ class TaskCreateRow extends Component<TaskCreateRowProps> {
 
     componentDidMount() {
         //First make an instance of the api handler, give it the auth key of the user once implemented
-        let apiHandler = new BaseApiHandler("test");
+        let apiHandler = new BaseApiHandler();
         //Run the get or post function depending on need only neccesarry argument is the path aka what comes after the hostname
         //Callbacks can be used to tell what to do with the data once it's been retrieved
         apiHandler.get(`/api/user/get?ids=*`,{}, (value) => {
