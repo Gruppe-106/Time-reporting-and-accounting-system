@@ -50,6 +50,8 @@ export default class AdminUtil {
             ele.manager = managers.filter((man: Manager) => man.groupId === ele.groupId && man.managerId !== ele.id).concat(managers.filter((man: Manager) => man.groupId !== ele.groupId))
         })
 
+        console.log(dbUsers)
+
         return { users: dbUsers, groups }
 
     }

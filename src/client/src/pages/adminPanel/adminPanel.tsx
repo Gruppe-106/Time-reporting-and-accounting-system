@@ -149,8 +149,20 @@ class AdminPanel extends Component<any, CustomTypes> {
         this.handleLoader("Getting users")
 
         const dbManagers: Manager[] = (await APICalls.getAllManagerGroups()).data
-        const updates: {users: User[],groups:number[]} = await AdminUtil.getUpdatedUsers(this.state.dbManagers)
-        const dbUsers: User[] = updates.users
+        const dbUsers: User[] = await APICalls.getAllUsers()
+        const groups: number[] = []
+        dbUsers.forEach((ele: User) => groups.push(ele.groupId))
+        dbUsers.forEach((ele: User) => {
+            ele.orginalGroupId = ele.groupId
+            ele.orginalEmail = ele.email
+            ele.orginalFirstName = ele.firstName
+            ele.orginalLastName = ele.lastName
+            ele.validEmail = true
+            ele.validFirstName = true
+            ele.validLastName = true
+            ele.manager = this.state.dbManagers.filter((man: Manager) => man.groupId === ele.groupId && man.managerId !== ele.id).concat(this.state.dbManagers.filter((man: Manager) => man.groupId !== ele.groupId))
+        })
+
 
 
         this.handleLoader("All done")
@@ -158,8 +170,8 @@ class AdminPanel extends Component<any, CustomTypes> {
             {
                 dbUsers: dbUsers,
                 dbManagers: dbManagers,
-                groupMax: Math.max(...updates.groups),
-                groupMin: Math.min(...updates.groups),
+                groupMax: Math.max(...groups),
+                groupMin: Math.min(...groups),
                 loading: false
             });
 
@@ -341,7 +353,7 @@ class AdminPanel extends Component<any, CustomTypes> {
             //@ts-ignore
             document.getElementById(`user${user.id}`).value = manager[0].groupId
 
-            const updatedUser: User = { ...user,groupId:manager[0].groupId, manager: this.state.dbManagers.filter((man: Manager) => man.groupId === manager[0].groupId).concat(this.state.dbManagers.filter((man: Manager) => man.groupId !== manager[0].groupId)) };
+            const updatedUser: User = { ...user, groupId: manager[0].groupId, manager: this.state.dbManagers.filter((man: Manager) => man.groupId === manager[0].groupId).concat(this.state.dbManagers.filter((man: Manager) => man.groupId !== manager[0].groupId)) };
             const updatedUsers: User[] = this.state.selectedUsers.map((u) =>
                 u.id === user.id ? updatedUser : u
             );
@@ -550,7 +562,7 @@ class AdminPanel extends Component<any, CustomTypes> {
 
         this.handleLoader("Updating users")
 
-        const updates: {users: User[],groups:number[]} = await AdminUtil.getUpdatedUsers(this.state.dbManagers)
+        const updates: { users: User[], groups: number[] } = await AdminUtil.getUpdatedUsers(this.state.dbManagers)
         const dbUsers: User[] = updates.users
 
 
