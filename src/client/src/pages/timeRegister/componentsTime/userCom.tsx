@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
-import { Container, Table, Form, InputGroup, Button, Modal } from "react-bootstrap";
+import { Container, Table, Form, InputGroup, Button, ButtonGroup, Modal } from "react-bootstrap";
 //import { Highlighter, Typeahead } from 'react-bootstrap-typeahead';
 import BaseApiHandler from "../../../network/baseApiHandler";
 import { getCurrentWeekDates, dateStringFormatter, dateToNumber } from "../../../utility/timeConverter"
+import {faArrowLeft, faArrowRight} from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 
 interface Api {
   status: number,
@@ -80,7 +82,6 @@ interface TimeSheetRowData {
 // The props given to TimeSheetRow
 interface TimeSheetRowProps {
   rowData: Map<number, TaskRowData>;
-  timeSheetOffset: number;
   onDelete: (rowId: number) => void;
 }
 
@@ -126,6 +127,7 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
       },
       showDeleteRowModal: false,
     };
+
   }
 
   /*
@@ -189,7 +191,7 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
 
 
   renderTaskRows() {
-    const { rowData, timeSheetOffset } = this.props;
+    const { rowData } = this.props;
 
     let arr: number[] = [];
 
@@ -198,7 +200,7 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
     for (const key of Array.from(rowData.keys())) {
       let data = rowData.get(key);
       if (data) {
-        this.getTimeData(data.taskId, arr, timeSheetOffset)
+        this.getTimeData(data.taskId, arr)
         rows.push((
           <tr>
             <td>{data.projectName}</td>
@@ -233,13 +235,12 @@ class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
 
 
   render() {
-    const { timeSheetOffset } = this.props
     const { showDeleteRowModal , deleteRow } = this.state;
 
     return (
       <Container>
         <Table bordered size="sm" className="fixed-table ellipses">
-          <TableHeader timeOffset={timeSheetOffset} />
+          <TableHeader timeOffset={-21} />
           <tbody>{this.renderTaskRows()}</tbody>
         </Table>
         <></>
@@ -273,7 +274,7 @@ interface TimeSheetProp {
 // Variable states in TimeSheetPage
 interface TimeSheetState {
   stateRowData: Map<number, TaskRowData>;
-  timeSheetDateOffset: number;
+  offsetState: number;
   showAddModal: boolean;
 }
 
@@ -289,20 +290,18 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     // Initialise states
     this.state = {
       stateRowData: new Map<number, TaskRowData>(),
-      timeSheetDateOffset: -14,
+      offsetState: -21,
       showAddModal: false,
     };
   }
 
-  // apiHandler to get data from "database", the data is passed to the data array
-  public componentDidMount() {
+  getData (timeOffset: number = 0) {
     const { userId } = this.props;
-    const { timeSheetDateOffset } = this.state
     let timeSheetDate: string[] = []
-    getCurrentWeekDates(timeSheetDate, timeSheetDateOffset);
+    getCurrentWeekDates(timeSheetDate, timeOffset);
     let apiHandler = new BaseApiHandler();
     apiHandler.get(
-      `/api/time/register/get?user=${userId}&period=${0},${Date.parse(timeSheetDate[6])}&var=taskName,taskId,projectName,time,date`, {},
+      `/api/time/register/get?user=${userId}&period=${Date.parse(timeSheetDate[0])},${Date.parse(timeSheetDate[6])}&var=taskName,taskId,projectName,time,date`, {},
       (value) => {
         let json: Api = JSON.parse(JSON.stringify(value));
         let taskData: Map<number, TaskRowData> = new Map<number, TaskRowData>();
@@ -324,6 +323,13 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     );
   }
 
+  // apiHandler to get data from "database", the data is passed to the data array
+  public componentDidMount() {
+    const { offsetState } = this.state
+    console.log(offsetState)
+    this.getData(offsetState);
+  }
+
   handleShowAddModal = () => {
     this.setState({ showAddModal: true })
   }
@@ -343,13 +349,35 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     this.setState({ stateRowData }); // Update the state to trigger re-render
   }
 
+  private weekSelectorRender(): JSX.Element {
+    return (
+            <ButtonGroup aria-label="Basic example">
+              <Button onClick={() => this.handleGetWeekButton(-7)} variant="primary"><FontAwesomeIcon icon={faArrowLeft} /></Button>
+              <Button onClick={() => this.handleGetWeekButton(+7)} variant="primary"><FontAwesomeIcon icon={faArrowRight} /></Button>
+            </ButtonGroup>
+    )
+}
+
+handleGetWeekButton = (num:number) => {
+  const { offsetState } = this.state
+
+  let newOffsetState = offsetState + num;
+
+  this.setState({offsetState: newOffsetState})
+
+  console.log(offsetState)
+
+  this.getData( offsetState )
+}
+
   render() {
-    const { stateRowData, showAddModal, timeSheetDateOffset } = this.state;
+    const { stateRowData, showAddModal } = this.state;
 
     return (
       <Container fluid="lg">
-        <TimeSheetRow timeSheetOffset={timeSheetDateOffset} rowData={stateRowData} onDelete={this.handleDeleteRow} />
+        <TimeSheetRow rowData={stateRowData} onDelete={this.handleDeleteRow} />
         <Button variant="primary" type="button" onClick={() => this.handleShowAddModal()}>Add Row</Button>
+        {this.weekSelectorRender()}
         <></>
         <Modal show={showAddModal} onHide={this.handleCloseModal}>
           <Modal.Header closeButton>
