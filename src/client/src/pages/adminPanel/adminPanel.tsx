@@ -145,7 +145,7 @@ class AdminPanel extends Component<any, CustomTypes> {
 
     }
 
-    async componentDidMount() {
+    async componentDidMount():Promise<void> {
         this.handleLoader("Getting users")
 
         const dbManagers: Manager[] = (await APICalls.getAllManagerGroups()).data
@@ -206,7 +206,14 @@ class AdminPanel extends Component<any, CustomTypes> {
         }
     }
 
-    private handleRowClick(id: number, user: User) {
+    /**
+     * Handle row click event and update selectedUsersId and selectedUsers states accordingly.
+     *
+     * @param {number} id - The id of the clicked row.
+     * @param {User} user - The User object of the clicked row.
+     * @returns {void}
+    */
+    private handleRowClick(id: number, user: User): void {
         const { selectedUsersId, selectedUsers } = this.state;
         const index = selectedUsersId.indexOf(id);
         console.log(selectedUsersId)
@@ -225,7 +232,13 @@ class AdminPanel extends Component<any, CustomTypes> {
 
     }
 
-    private renderRow(user: User) {
+    /**
+     * Render a row of the table for a given user object, with optional highlighting if the row is selected.
+     *
+     * @param {User} user - The User object to render a row for.
+     * @returns {JSX.Element | undefined} - A JSX Element for the row, or undefined if user has no manager.
+    */
+    private renderRow(user: User): JSX.Element | undefined {
         const { selectedUsersId } = this.state;
 
         const isSelected = selectedUsersId.indexOf(user.id) !== -1;
@@ -247,7 +260,14 @@ class AdminPanel extends Component<any, CustomTypes> {
 
     }
 
-    private renderEditingRow(user: User) { //TODO: fix the prop
+
+    /**
+        * Render a row of the table for a given user object, with optional highlighting if the row is selected.
+        *
+        * @param {User} user - The User object to render a row for.
+        * @returns {JSX.Element | undefined} - A JSX Element for the row, or undefined if user has no manager.
+   */
+    private renderEditingRow(user: User): JSX.Element | undefined { //TODO: fix the prop
 
 
         return (
@@ -346,8 +366,21 @@ class AdminPanel extends Component<any, CustomTypes> {
     }
 
 
+    /**
 
-    private handleManagerInput(manager: any, user: User,) {
+        Updates the user's group ID and manager based on the provided manager information.
+
+        @param {any} manager - The manager information to update the user's group ID and manager.
+
+        @param {User} user - The user whose group ID and manager are being updated.
+
+        @returns {void}
+
+        @memberOf ClassName
+
+        @private
+    */
+    private handleManagerInput(manager: any, user: User): void {
 
         if (manager.length === 1) {
             //@ts-ignore
@@ -558,7 +591,7 @@ class AdminPanel extends Component<any, CustomTypes> {
     /**
         * Handles modal closing
     */
-    private async handleClose() {
+    private async handleClose():Promise<void> {
 
         this.handleLoader("Updating users")
 
@@ -583,7 +616,10 @@ class AdminPanel extends Component<any, CustomTypes> {
     }
 
 
-    private async postChanges() {
+    /**
+     * Post the new changes to the server
+    */
+    private async postChanges(): Promise<void> {
         let hasShown: boolean = false;
 
         const userData: {
