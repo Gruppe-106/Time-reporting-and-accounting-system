@@ -28,6 +28,8 @@ import BaseApiHandler from "../../network/baseApiHandler";
 
 import APICalls from "./utility/userCreation/apiCalls";
 
+import AdminUtil from "./utility/adminPanel"
+
 
 interface User {
     id: number;
@@ -147,20 +149,8 @@ class AdminPanel extends Component<any, CustomTypes> {
         this.handleLoader("Getting users")
 
         const dbManagers: Manager[] = (await APICalls.getAllManagerGroups()).data
-
-        const dbUsers: User[] = await APICalls.getAllUsers()
-        const groups: number[] = []
-        dbUsers.forEach((ele: User) => groups.push(ele.groupId))
-        dbUsers.forEach((ele: User) => {
-            ele.orginalGroupId = ele.groupId
-            ele.orginalEmail = ele.email
-            ele.orginalFirstName = ele.firstName
-            ele.orginalLastName = ele.lastName
-            ele.validEmail = true
-            ele.validFirstName = true
-            ele.validLastName = true
-            ele.manager = this.state.dbManagers.filter((man: Manager) => man.groupId === ele.groupId && man.managerId !== ele.id).concat(this.state.dbManagers.filter((man: Manager) => man.groupId !== ele.groupId))
-        })
+        const updates: {users: User[],groups:number[]} = await AdminUtil.updateUsers(this.state.dbManagers)
+        const dbUsers: User[] = updates.users
 
 
         this.handleLoader("All done")
@@ -168,8 +158,8 @@ class AdminPanel extends Component<any, CustomTypes> {
             {
                 dbUsers: dbUsers,
                 dbManagers: dbManagers,
-                groupMax: Math.max(...groups),
-                groupMin: Math.min(...groups),
+                groupMax: Math.max(...updates.groups),
+                groupMin: Math.min(...updates.groups),
                 loading: false
             });
 
@@ -328,11 +318,13 @@ class AdminPanel extends Component<any, CustomTypes> {
                 <td><Form style={{ width: '69px', margin: "auto" }}>
                     <Form.Group >
                         <Form.Control
+                            id={`user${user.id}`}
                             type="text"
                             placeholder="Enter group"
                             style={{ textAlign: 'center' }}
                             defaultValue={user.groupId}
                             onChange={(e) => this.handleGroupInput(user, e)}
+                            disabled={true}
                         />
                     </Form.Group>
                 </Form></td>
@@ -346,11 +338,14 @@ class AdminPanel extends Component<any, CustomTypes> {
     private handleManagerInput(manager: any, user: User,) {
 
         if (manager.length === 1) {
+            //@ts-ignore
+            document.getElementById(`user${user.id}`).value = manager[0].groupId
 
-            const updatedUser: User = { ...user, manager: this.state.dbManagers.filter((man: Manager) => man.groupId === manager[0].groupId && manager[0].managerId ==! user.id).concat(this.state.dbManagers.filter((man: Manager) => man.groupId !== manager[0].groupId)) };
+            const updatedUser: User = { ...user,groupId:manager[0].groupId, manager: this.state.dbManagers.filter((man: Manager) => man.groupId === manager[0].groupId).concat(this.state.dbManagers.filter((man: Manager) => man.groupId !== manager[0].groupId)) };
             const updatedUsers: User[] = this.state.selectedUsers.map((u) =>
                 u.id === user.id ? updatedUser : u
             );
+
             this.setState({
                 selectedUsers: updatedUsers
             })
@@ -555,29 +550,16 @@ class AdminPanel extends Component<any, CustomTypes> {
 
         this.handleLoader("Updating users")
 
-        const dbUsers: User[] = await APICalls.getAllUsers()
-        console.log(dbUsers)
-        const groups: number[] = []
-        dbUsers.forEach((ele: User) => groups.push(ele.groupId))
-        dbUsers.forEach((ele: User) => {
-            ele.orginalGroupId = ele.groupId
-            ele.orginalEmail = ele.email
-            ele.orginalFirstName = ele.firstName
-            ele.orginalLastName = ele.lastName
-            ele.validEmail = true
-            ele.validFirstName = true
-            ele.validLastName = true
-            ele.manager = this.state.dbManagers.filter((man: Manager) => man.groupId === ele.groupId && man.managerId !== ele.id).concat(this.state.dbManagers.filter((man: Manager) => man.groupId !== ele.groupId))
-
-        })
+        const updates: {users: User[],groups:number[]} = await AdminUtil.updateUsers(this.state.dbManagers)
+        const dbUsers: User[] = updates.users
 
 
         this.handleLoader("All done")
         this.setState(
             {
                 dbUsers: dbUsers,
-                groupMax: Math.max(...groups),
-                groupMin: Math.min(...groups),
+                groupMax: Math.max(...updates.groups),
+                groupMin: Math.min(...updates.groups),
                 loading: false,
                 editing: false,
                 selectedUsers: [],
@@ -586,10 +568,6 @@ class AdminPanel extends Component<any, CustomTypes> {
                 popupTitle: "",
                 popupMessage: ""
             });
-    }
-
-    private delay(ms: number) {
-        return new Promise(resolve => setTimeout(resolve, ms));
     }
 
 
