@@ -1,6 +1,8 @@
 import * as mysql from "mysql";
 import {Connection, FieldInfo, MysqlError} from "mysql";
 import {MySQLConfig} from "../../app";
+import {wipe} from "./wipeDB";
+import {response} from "express";
 
 export interface Where {
     column: string,
@@ -22,10 +24,26 @@ class MysqlHandler {
     private logQueries: boolean = false;
     private static connectionConfig: object = undefined;
     private static connection: Connection   = undefined;
+    public readonly database: string = "timemanagerdatabase";
 
     constructor(connectionConfig?:MySQLConfig, mysqlOnConnectCallback?: () => void) {
         if (connectionConfig !== undefined) { MysqlHandler.connectionConfig = connectionConfig; }
         this.hasOrCreateConnection(mysqlOnConnectCallback);
+
+        // Check if database exists
+        this.sendQuery(`SHOW DATABASES LIKE '${this.database}';`).then((value) => {
+            // If not and wipe argument weren't given recreate it
+            if (value.results.length === 0 && process.argv.indexOf("wipe") === -1) {
+                console.log(`[MySQL] Database ${this.database} doesn't exist, creating clean version`);
+                wipe().then((success) => {
+                    if (!success) {
+                        process.exit(404)
+                    } else {
+                        console.log(`[MySQL] Database ${this.database} has been created`);
+                    }
+                });
+            }
+        })
     }
 
     /**
@@ -75,6 +93,10 @@ class MysqlHandler {
             return console.log("[MySQL] Connection to database destroyed");
         }
         console.log("[MySQL] No connection to destroy")
+    }
+
+    public selectDatabase(database: string = this.database): void {
+        MysqlHandler.connection.changeUser({database: database});
     }
 
     /**
