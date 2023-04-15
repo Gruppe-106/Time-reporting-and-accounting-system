@@ -1,8 +1,7 @@
 import {Server} from "./server/server";
 import express, {Express} from "express";
-import {addFakeMysqlCallback} from "./server/database/fakeData/addFakeDataToDB";
 import {fsReadJSON} from "./server/utility/jsonReader";
-import {wipe} from "./server/database/wipeDB";
+import {insertGeneric, wipeDatabase} from "./server/database/wipeDB";
 
 export interface MySQLConfig {
     host    : string,
@@ -20,9 +19,9 @@ const mySQLConnectionConfig: MySQLConfig = fsReadJSON("mysqlConnectionConfig.jso
 export const server: Server = new Server(app, mySQLConnectionConfig, port, async () => {
     let arg: string[] = process.argv;
     // Wipe database if arg is given
-    if (arg.indexOf("wipe") !== -1) await wipe();
+    if (arg.indexOf("wipe") !== -1) await wipeDatabase();
+    // Add fake data to database if arg is given
+    if (arg.indexOf("fake") !== -1) await insertGeneric();
     // Select the default database
     Server.mysql.selectDatabase();
-    // Add fake data if arg is given
-    addFakeMysqlCallback(arg);
 });

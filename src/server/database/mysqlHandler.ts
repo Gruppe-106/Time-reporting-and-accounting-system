@@ -1,7 +1,7 @@
 import * as mysql from "mysql";
 import {Connection, FieldInfo, MysqlError} from "mysql";
 import {MySQLConfig} from "../../app";
-import {wipe} from "./wipeDB";
+import {wipeDatabase} from "./wipeDB";
 import {response} from "express";
 
 export interface Where {
@@ -29,21 +29,7 @@ class MysqlHandler {
     constructor(connectionConfig?:MySQLConfig, mysqlOnConnectCallback?: () => void) {
         if (connectionConfig !== undefined) { MysqlHandler.connectionConfig = connectionConfig; }
         this.hasOrCreateConnection(mysqlOnConnectCallback);
-
-        // Check if database exists
-        this.sendQuery(`SHOW DATABASES LIKE '${this.database}';`).then((value) => {
-            // If not and wipe argument weren't given recreate it
-            if (value.results.length === 0 && process.argv.indexOf("wipe") === -1) {
-                console.log(`[MySQL] Database ${this.database} doesn't exist, creating clean version`);
-                wipe().then((success) => {
-                    if (!success) {
-                        process.exit(404)
-                    } else {
-                        console.log(`[MySQL] Database ${this.database} has been created`);
-                    }
-                });
-            }
-        })
+        this.databaseExists(this.database, true);
     }
 
     /**
@@ -97,6 +83,36 @@ class MysqlHandler {
 
     public selectDatabase(database: string = this.database): void {
         MysqlHandler.connection.changeUser({database: database});
+    }
+
+    /**
+     * Check if a database exists
+     * @param database String: name of the database
+     * @param createClean Boolean: Whether to create a clean database using the wipe SQL
+     */
+    public async databaseExists(database: string, createClean: boolean = false): Promise<boolean> {
+        return this.sendQuery(`SHOW DATABASES LIKE '${database}';`).then((value) => {
+            // If not and wipe argument weren't given recreate it
+            if (value.results.length === 0) {
+                console.log(`[MySQL] Database ${database} doesn't exist`);
+                if (createClean) {
+                    console.log(`[MySQL] Creating clean version`);
+                    wipeDatabase().then((success) => {
+                        if (success) {
+                            console.log(`[MySQL] Database ${database} couldn't be created`);
+                            return Promise.resolve(true);
+                        } else {
+                            console.log(`[MySQL] Database ${database} has been created`);
+                            return Promise.reject(false);
+                        }
+                    });
+                } else {
+                    return Promise.resolve(false);
+                }
+            } else {
+                return Promise.resolve(true);
+            }
+        });
     }
 
     /**
