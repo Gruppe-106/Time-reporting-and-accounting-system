@@ -3,6 +3,9 @@ import {Connection, FieldInfo, MysqlError} from "mysql";
 import {MySQLConfig} from "../../app";
 import {wipeDatabase} from "./wipeDB";
 import {response} from "express";
+import fs from "fs";
+import path from "path";
+import {Server} from "../server";
 
 export interface Where {
     column: string,
@@ -204,6 +207,32 @@ class MysqlHandler {
             return promise;
         }
         return {error: undefined, results: undefined, fields: undefined};
+    }
+
+    /**
+     * Reads an SQL file
+     * @param file String: path of file
+     * @private
+     */
+    private fsReadSQL(file: string): string {
+        return fs.readFileSync(path.join(__dirname, file), {encoding: "utf-8"})
+            .replace(/\$\{db\}/g, Server.mysql.database); // Replace db with actual db/schema name
+    }
+
+    /**
+     * Reads an SQL file and sends it as a query
+     * @param file String: path of file
+     * @constructor
+     */
+    public async SQLFileQuery(file: string): Promise<MySQLResponse> {
+        if (/.*\.SQL(?!.)/g.test(file)) {
+            let query: string = this.fsReadSQL(file);
+            return Server.mysql.sendQuery(query);
+        }
+        return {error: {
+            code: "404", errno: 404, fatal: true, name: "File not an SQL file", message: "File cannot be send, as it's not a MySQL file"},
+            results: null,
+            fields: null};
     }
 
     /**
