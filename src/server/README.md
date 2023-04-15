@@ -4,6 +4,7 @@
 2. TaskId,TaskName,ProjectName for a specific user id _/
 3. Server creation and wiping of database _/
 4. Use git to test and build directly to server
+5. Setup getting react client side from server
 
 ## Other
 1. Add period to userTimeRegister _/
