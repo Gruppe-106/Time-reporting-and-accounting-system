@@ -2,8 +2,8 @@
 ## Post
 1. User delete ?
 2. TaskId,TaskName,ProjectName for a specific user id _/
-3. Lav nodejs om til selv at oprette database
-4. Brug git til at builde og uploade til serveren hvor den kører tests først
+3. Server creation and wiping of database _/
+4. Use git to test and build directly to server
 
 ## Other
 1. Add period to userTimeRegister _/

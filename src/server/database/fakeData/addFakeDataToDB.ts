@@ -11,6 +11,8 @@ import {USER_TASK_CONNECTOR} from "./USER_TASK_CONNECTOR";
 import {PROJECTS_MANAGER_CONNECTOR} from "./PROJECTS_MANAGER_CONNECTOR";
 import {Server} from "../../server";
 
+// TODO Change fake data to a SQL file instead
+
 // Allows to add specific fake data to server
 // This is only for dev and testing purposes
 export const addFakeMysqlCallback = (arg: string[]) => {
