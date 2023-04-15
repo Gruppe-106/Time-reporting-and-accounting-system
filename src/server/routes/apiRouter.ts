@@ -25,6 +25,7 @@ import ProjectInformationEndpoint from "../apiEndpoints/dataGetEndpoints/project
 import GroupCreationEndpoint from "../apiEndpoints/dataPostEndpoints/groupCreationEndpoint";
 import GroupEditEndpoint from "../apiEndpoints/dataPutEndpoints/groupEditEndpoint";
 import UserDeleteEndpoint from "../apiEndpoints/dataDeleteEndpoints/userDeleteEndpoint";
+import UserTaskProjectEndpoint from "../apiEndpoints/dataGetEndpoints/userTaskProjectEndpoint";
 
 export class ApiRouter extends BaseRouter {
     /**
@@ -40,17 +41,18 @@ export class ApiRouter extends BaseRouter {
 
         this.router.get("/auth",             (req: Request, res: Response) => new AuthEndpoint().getRoute(req, res));
 
-        this.router.get("/project/get",      (req: Request, res: Response) => new ProjectEndpoint().getRoute(req, res));
-        this.router.get("/project/info/get", (req:Request, res: Response) => new ProjectInformationEndpoint().getRoute(req, res))
-        this.router.get("/user/get",         (req: Request, res: Response) => new UserEndpoint().getRoute(req, res));
-        this.router.get("/task/get",         (req: Request, res: Response) => new TaskEndpoint().getRoute(req, res));
-        this.router.get("/task/user/get",    (req: Request, res: Response) => new UserTaskEndpoint().getRoute(req, res, "userId", "id"));
-        this.router.get("/task/project/get", (req: Request, res: Response) => new TaskProjectEndpoint().getRoute(req, res));
-        this.router.get("/timetype/get",     (req: Request, res: Response) => new TimeTypeEndpoint().getRoute(req, res));
-        this.router.get("/role/get",         (req: Request, res: Response) => new RoleEndpoint().getRoute(req, res));
-        this.router.get("/role/user/get",    (req: Request, res: Response) => new UserRoleEndpoint().getRoute(req, res));
-        this.router.get("/group/manager/get",(req: Request, res: Response) => new ManagerGroupEndpoint().getRoute(req, res));
-        this.router.get("/time/register/get",(req: Request, res: Response) => new TaskTimeRegisterEndpoint().getRoute(req, res));
+        this.router.get("/project/get",          (req: Request, res: Response) => new ProjectEndpoint().getRoute(req, res));
+        this.router.get("/project/info/get",     (req:Request, res: Response) => new ProjectInformationEndpoint().getRoute(req, res))
+        this.router.get("/user/get",             (req: Request, res: Response) => new UserEndpoint().getRoute(req, res));
+        this.router.get("/task/get",             (req: Request, res: Response) => new TaskEndpoint().getRoute(req, res));
+        this.router.get("/task/user/get",        (req: Request, res: Response) => new UserTaskEndpoint().getRoute(req, res, "userId", "id"));
+        this.router.get("/task/project/get",     (req: Request, res: Response) => new TaskProjectEndpoint().getRoute(req, res));
+        this.router.get("/user/task/project/get", (req: Request, res: Response) => new UserTaskProjectEndpoint().getRoute(req, res));
+        this.router.get("/timetype/get",         (req: Request, res: Response) => new TimeTypeEndpoint().getRoute(req, res));
+        this.router.get("/role/get",             (req: Request, res: Response) => new RoleEndpoint().getRoute(req, res));
+        this.router.get("/role/user/get",        (req: Request, res: Response) => new UserRoleEndpoint().getRoute(req, res));
+        this.router.get("/group/manager/get",    (req: Request, res: Response) => new ManagerGroupEndpoint().getRoute(req, res));
+        this.router.get("/time/register/get",    (req: Request, res: Response) => new TaskTimeRegisterEndpoint().getRoute(req, res));
     }
 
     /**

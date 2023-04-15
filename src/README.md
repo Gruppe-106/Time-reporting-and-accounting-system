@@ -404,6 +404,39 @@ Required:
 ```
 </details>
 
+# User Task Project
+<details>
+<summary>Get</summary>
+
+## /api/user/task/project/get
+```
+Required:
+    user=number
+```
+### Structure Of Object Returned
+
+```
+  {
+  status: number,
+  data:
+      {
+        projectName: string,
+        projectId: number,
+        taskName: string,
+        taskId: number
+      }[]
+  }
+```
+### Example return:
+
+```json
+{
+  "success": true,
+  "data": [{"taskName": "Task Y", "taskId": 2, "projectId": 2, "projectName": "Project Beta"}]
+}
+```
+</details>
+
 # Manager Group
 
 <details>
