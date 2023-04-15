@@ -2,7 +2,6 @@ import {USERS} from "./USERS";
 import {AUTH} from "./AUTH";
 import {GROUP} from "./GROUP";
 import {PROJECTS} from "./PROJECTS";
-import {ROLES} from "./ROLES";
 import {TASKS} from "./TASKS";
 import {TIMETYPE} from "./TIMETYPE";
 import {TASK_PROJECTS_CONNECTOR} from "./TASK_PROJECTS_CONNECTOR";
@@ -12,12 +11,9 @@ import {USER_TASK_CONNECTOR} from "./USER_TASK_CONNECTOR";
 import {PROJECTS_MANAGER_CONNECTOR} from "./PROJECTS_MANAGER_CONNECTOR";
 import {Server} from "../../server";
 
-
-
 // Allows to add specific fake data to server
 // This is only for dev and testing purposes
-let arg: string[] = process.argv;
-export const mysqlCallback = () => {
+export const addFakeMysqlCallback = (arg: string[]) => {
     let addFakeDB = new AddFakeDataToDB();
     if (arg.length !== 0) {
         if (arg.indexOf("addfake") !== -1) {
@@ -27,7 +23,6 @@ export const mysqlCallback = () => {
             if (arg.indexOf("addauths")       !== -1) { addFakeDB.addAUTHS(); }
             if (arg.indexOf("addgroup")       !== -1) { addFakeDB.addGROUP(); }
             if (arg.indexOf("addproject")     !== -1) { addFakeDB.addPROJECT(); }
-            if (arg.indexOf("addroles")       !== -1) { addFakeDB.addROLES(); }
             if (arg.indexOf("addtimetypes")   !== -1) { addFakeDB.addTIMETYPES(); }
             if (arg.indexOf("addtasks")       !== -1) { addFakeDB.addTASKS(); }
             if (arg.indexOf("addtaskproject") !== -1) { addFakeDB.addTASKPROJECT(); }
@@ -49,7 +44,6 @@ class AddFakeDataToDB {
         await this.addUSERSGROUPS()
         this.addAUTHS();
         this.addPROJECT();
-        this.addROLES();
         this.addTIMETYPES();
         this.addTASKS();
         this.addTASKPROJECT();
@@ -119,17 +113,6 @@ class AddFakeDataToDB {
         }
 
         this.mysql.insert("PROJECTS", ["id", "superProjectId", "name", "startDate", "endDate"], values)
-    }
-
-    public addROLES() {
-        let roles = ROLES.data;
-        let values: string[][] = [];
-
-        for (const role of roles) {
-            values.push([role.id.toString(), role.name]);
-        }
-
-        this.mysql.insert("ROLES", ["id", "name"], values)
     }
 
     public addTIMETYPES() {
