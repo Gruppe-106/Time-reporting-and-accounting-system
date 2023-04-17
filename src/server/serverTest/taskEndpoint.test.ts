@@ -1,6 +1,6 @@
 import BaseApiHandler from "../../client/src/network/baseApiHandler";
 import {headers} from "./testBaseConfig";
-import {TaskData} from "../apiEndpoints/dataPostEndpoints/taskCreationEndpoint";
+import TaskCreationEndpoint, {TaskCreationData, TaskData} from "../apiEndpoints/dataPostEndpoints/taskCreationEndpoint";
 import {TaskEditData} from "../apiEndpoints/dataPutEndpoints/taskEditEndpoint";
 
 const apiHandler = new BaseApiHandler("http://localhost:8080");
@@ -34,12 +34,15 @@ test("Testing task get api", async () => {
 });
 
 test("Testing task creation api", async () => {
-    let bodySuccess: TaskData = {
-        name: "Task test",
-        userId: [1,2,3],
-        startDate: 1679266800000,
-        endDate: 1682460000000,
-        timeType: 1
+    let bodySuccess: TaskCreationData = {
+        projectId: 1,
+        task: {
+            name: "Task test",
+            userId: [1,2,3],
+            startDate: 1679266800000,
+            endDate: 1682460000000,
+            timeType: 1
+        }
     }
 
     apiHandler.post("/api/task/creation/post", {headers: headers, body: bodySuccess}, (value) => {
@@ -47,10 +50,7 @@ test("Testing task creation api", async () => {
     });
 
     let bodyFail = {
-        userId: [1,2,3],
-        startDate: 1679266800000,
-        endDate: 1682460000000,
-        timeType: 1
+        projectId: 1,
     }
 
     apiHandler.post("/api/task/creation/post", {headers: headers, body: bodyFail}, (value) => {

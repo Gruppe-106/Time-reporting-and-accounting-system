@@ -10,7 +10,7 @@ export interface TaskData {
     timeType  : number
 }
 
-interface TaskCreationData {
+export interface TaskCreationData {
     projectId: number,
     task: TaskData
 }
