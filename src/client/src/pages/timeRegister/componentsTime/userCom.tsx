@@ -55,7 +55,11 @@ interface TimeSheetState {
   headerDates: string[];
   times: number[];
   showDeleteRowModal: boolean;
-  deleteId: number | undefined;
+  deleteId: number | undefined,
+  delRowTaskProject: {
+    projectName: string | undefined,
+    taskName: string | undefined,
+  }
 }
 
 /*
@@ -77,6 +81,10 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
       times: [0, 0, 0, 0, 0, 0, 0],
       showDeleteRowModal: false,
       deleteId: -1,
+      delRowTaskProject: {
+        projectName: "",
+        taskName: "",
+      }
     };
   }
 
@@ -84,15 +92,20 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     this.setState({ showDeleteRowModal: false });
   };
   private handleShowDelModal = (rowId: number | undefined) => {
+    const { stateRowData } = this.state
+    if(rowId) {
+      const taskRowData: TaskRowData | undefined = stateRowData.get(rowId); 
+      this.setState({delRowTaskProject: {projectName: taskRowData?.projectName, taskName: taskRowData?.taskName}})
+    }
     this.setState({ deleteId: rowId });
     this.setState({ showDeleteRowModal: true });
   };
   private handleDeleteRow = () => {
     const { stateRowData, deleteId } = this.state;
     if (deleteId) {
-      stateRowData.delete(deleteId); // Delete the row from rowData map based on rowId
+      stateRowData.delete(deleteId); 
     }
-    this.setState({ stateRowData }); // Update the state to trigger re-render
+    this.setState({ stateRowData }); 
     this.handleCloseDelModal();
   }
   // ************************************************
@@ -150,7 +163,6 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     const dates: string[] = [];
     getCurrentWeekDates(dates, offsetState);
     this.setState({ headerDates: dates })
-    console.log(offsetState)
     this.getData(offsetState);
   }
 
@@ -254,7 +266,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
   }
 
   render() {
-    const { showAddModal, showDeleteRowModal } = this.state;
+    const { showAddModal, showDeleteRowModal, deleteId, delRowTaskProject } = this.state;
 
     return (
       <Container fluid="lg">
@@ -291,7 +303,8 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
             <Modal.Title>Delete Row?</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <p>Are you sure you want to delete:</p>
+            <p>Are you sure you want to delete, task Id: {deleteId}</p>
+            <p>{delRowTaskProject.projectName} and {delRowTaskProject.taskName}</p>
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={this.handleCloseDelModal}>
