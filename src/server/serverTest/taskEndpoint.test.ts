@@ -1,7 +1,6 @@
 import BaseApiHandler from "../../client/src/network/baseApiHandler";
 import {headers} from "./testBaseConfig";
-import {TaskCreationData, TaskData} from "../apiEndpoints/dataPostEndpoints/taskCreationEndpoint";
-import {TaskEditData} from "../apiEndpoints/dataPutEndpoints/taskEditEndpoint";
+import {TaskCreationData} from "../apiEndpoints/dataPostEndpoints/taskCreationEndpoint";
 
 const apiHandler = new BaseApiHandler("http://localhost:8080");
 
