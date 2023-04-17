@@ -1,6 +1,6 @@
 import BaseApiHandler from "../../client/src/network/baseApiHandler";
 import {headers} from "./testBaseConfig";
-import {TaskData} from "../apiEndpoints/dataPostEndpoints/taskCreationEndpoint";
+import {TaskCreationData, TaskData} from "../apiEndpoints/dataPostEndpoints/taskCreationEndpoint";
 import {TaskEditData} from "../apiEndpoints/dataPutEndpoints/taskEditEndpoint";
 
 const apiHandler = new BaseApiHandler("http://localhost:8080");
@@ -40,12 +40,15 @@ describe("Task API", () => {
 
     describe("Task Creation API", () => {
         test("Success case", async () => {
-            let bodySuccess: TaskData = {
-                name: "Task test",
-                userId: [1,2,3],
-                startDate: 1679266800000,
-                endDate: 1682460000000,
-                timeType: 1
+            let bodySuccess: TaskCreationData = {
+                projectId: 2,
+                task: {
+                    name: "Task test",
+                    userId: [1, 2, 3],
+                    startDate: 1679266800000,
+                    endDate: 1682460000000,
+                    timeType: 1
+                }
             }
 
             apiHandler.post("/api/task/creation/post", {headers: headers, body: bodySuccess}, (value) => {
@@ -62,7 +65,7 @@ describe("Task API", () => {
             }
 
             apiHandler.post("/api/task/creation/post", {headers: headers, body: bodyFail}, (value) => {
-                expect(value["status"]).toBe(400);
+                expect(value["status"]).toBe(404);
             });
         });
     });
