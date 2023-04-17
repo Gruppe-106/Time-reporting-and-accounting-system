@@ -26,8 +26,7 @@ import { Highlighter, Typeahead } from 'react-bootstrap-typeahead';
 //Custom import
 import BaseApiHandler from "../../network/baseApiHandler";
 
-import APICalls from "./utility/userCreation/apiCalls";
-
+import APICalls from "./utility/apiCalls";
 
 
 interface User {
@@ -144,7 +143,7 @@ class AdminPanel extends Component<any, CustomTypes> {
 
     }
 
-    async componentDidMount():Promise<void> {
+    async componentDidMount(): Promise<void> {
         this.handleLoader("Getting users")
 
         const dbManagers: Manager[] = (await APICalls.getAllManagerGroups()).data
@@ -590,7 +589,7 @@ class AdminPanel extends Component<any, CustomTypes> {
     /**
         * Handles modal closing
     */
-    private async handleClose():Promise<void> {
+    private async handleClose(): Promise<void> {
 
         this.handleLoader("Updating users")
 
