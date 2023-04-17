@@ -19,7 +19,7 @@ interface ProjectCreationData {
     task          ?: TaskData[]
 }
 
-export async function addUsersToTask(users: number[], taskId: number) {
+export async function addUsersToTask(users: number[], taskId: number): Promise<void> {
     console.log(users);
     let userTask: string[][] = [];
     for (const user of users) {
@@ -32,22 +32,22 @@ export async function addUsersToTask(users: number[], taskId: number) {
     if (userTaskResponse.error !== null) throw new Error("[MySQL] Failed insert data");
 }
 
-export async function taskProjectConnector(taskId: number, projectId: number) {
+export async function taskProjectConnector(taskId: number, projectId: number): Promise<void> {
     let taskProjectConnectorResponse: MySQLResponse = await this.mySQL.insert("TASKS_PROJECTS_CONNECTOR",
         ["taskId", "projectId"],
         [taskId.toString(), projectId.toString()]);
     if (taskProjectConnectorResponse.error !== null) throw new Error("[MySQL] Failed insert data");
 }
 
-export async function addTaskToProject(taskData: TaskData[], projectId: number) {
+export async function addTaskToProject(taskData: TaskData[], projectId?: number): Promise<void> {
     for (const task of taskData) {
         let taskResponse: MySQLResponse = await this.mySQL.insert("TASKS",
             ["name", "startDate", "endDate", "timeType"],
             [task.name, this.mySQL.dateFormatter(task.startDate), this.mySQL.dateFormatter(task.endDate), task.timeType.toString()]);
         if (taskResponse.error !== null) throw new Error("[MySQL] Failed insert data");
         let taskId: number = taskResponse.results.insertId;
-
-        await taskProjectConnector.call(this, taskId, projectId);
+        console.log(taskId);
+        if(projectId !== undefined) await taskProjectConnector.call(this, taskId, projectId);
         await addUsersToTask.call(this, task.userId, taskId);
     }
 }
