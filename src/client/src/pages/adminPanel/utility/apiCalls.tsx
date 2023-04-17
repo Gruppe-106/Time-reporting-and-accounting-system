@@ -1,10 +1,6 @@
 
 
 
-
-
-import BaseApiHandler from "../../../network/baseApiHandler";
-
 /**
  * Class containing methods for getting data from the server
 */
