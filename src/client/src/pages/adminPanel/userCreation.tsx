@@ -11,6 +11,8 @@ import LoadingOverlay from 'react-loading-overlay-ts';
 import React, { Component } from "react";
 import { Highlighter, Typeahead } from 'react-bootstrap-typeahead';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
+
+//@ts-ignore
 import Spinner from 'react-bootstrap/Spinner';
 
 //Forge import
@@ -19,8 +21,14 @@ import forge from 'node-forge';
 //Custom import
 import BaseApiHandler from "../../network/baseApiHandler";
 import Utility from './utility/userCreation/userCreation'
-import APICalls from "./utility/userCreation/apiCalls";
+import APICalls from "./utility/apiCalls";
 
+interface Manager {
+    managerId: number,
+    firstName: string,
+    lastName: string,
+    groupId: number
+}
 
 /**
  * Custom types
@@ -31,7 +39,7 @@ interface CustomTypes {
     lastName: string | null,
     email: string | null,
     password: string | null,
-    assignedToManager: { roleName: string, roleId: number, userId: number, firstName: string, lastName: string } | null,
+    assignedToManager: Manager | null,
     selectedRoles: { id: number, name: string }[] | null,
 
     // * Database variables
@@ -45,7 +53,8 @@ interface CustomTypes {
     submitDisabled: boolean,
     showPopup: boolean,
     loading: boolean,
-
+    reload:boolean,
+    
     // * Component variables
     popupMessage: string,
     popupTitle: string,
@@ -80,6 +89,7 @@ class UserCreation extends Component<any, CustomTypes>{
             showPopup: false,
             submitDisabled: false,
             loading: false,
+            reload: false,
 
             // * Component variables
             popupMessage: "",
@@ -119,17 +129,18 @@ class UserCreation extends Component<any, CustomTypes>{
             id: number;
             name: string;
         }[] = (await APICalls.getAllRoles()).data
+
         this.handleLoader("Getting managers", true)
-        const dbManagers: {
-            id: number;
-            name: string;
-        }[] = (await APICalls.getAllManagers()).data
+        const dbManagers: Manager[] = (await APICalls.getAllManagerGroups()).data
+
         this.handleLoader("All done")
         this.setState({
             dbRoles: dbRoles,
             dbManagers: dbManagers,
             loading: false
         })
+
+
 
     }
 
@@ -236,14 +247,14 @@ class UserCreation extends Component<any, CustomTypes>{
             lastName: string | null,
             email: string | null,
             password: string | null,
-            assignedToManager: { roleName: string, roleId: number, userId: number, firstName: string, lastName: string } | null
+            assignedToManager: number | null
             roles: { id: number, name: string }[] | null
         } = {
             firstName: this.state.firstName,
             lastName: this.state.lastName,
             email: this.state.email,
             password: this.state.password ? sha256.update(this.state.password).digest().toHex() : null,
-            assignedToManager: this.state.assignedToManager,
+            assignedToManager: this.state.assignedToManager!.managerId,
             roles: this.state.selectedRoles
         }
 
@@ -313,11 +324,15 @@ class UserCreation extends Component<any, CustomTypes>{
      * Handles modal closing
     */
     private handleClose(): void {
+        if(this.state.reload){
+            window.location.reload()
+        } 
         this.setState({
             showPopup: false,
             popupTitle: "",
-            popupMessage: ""
+            popupMessage: "",
         });
+
     }
 
     /**
@@ -365,16 +380,16 @@ class UserCreation extends Component<any, CustomTypes>{
      * Handles the sending of the user object to server
      * @param uerObject
      */
-    private sendUser(userObject: {
+    private async sendUser(userObject: {
         [key: string]: any,
         firstName: string | null,
         lastName: string | null,
         email: string | null
         password: string | null,
-        assignedToManager: { roleName: string, roleId: number, userId: number, firstName: string, lastName: string } | null
+        assignedToManager: number | null
         roles: { id: number, name: string }[] | null
     }) {
-        const apiHandler: BaseApiHandler = new BaseApiHandler("test")
+        const apiHandler: BaseApiHandler = new BaseApiHandler()
 
         let roles: number[] = []
         userObject.roles?.forEach((ele: { id: number, name: string }) => roles.push(ele.id))
@@ -392,7 +407,7 @@ class UserCreation extends Component<any, CustomTypes>{
             lastName: userObject.lastName,
             email: userObject.email,
             password: userObject.password,
-            manager: userObject.assignedToManager?.userId,
+            manager: userObject.assignedToManager,
             roles: roles
         }
 
@@ -401,30 +416,35 @@ class UserCreation extends Component<any, CustomTypes>{
             submitDisabled: true
         })
 
+        console.log(dataToSend)
+        const promise = new Promise((resolve, reject) => {
+            apiHandler.post("/api/user/creation/post", { body: dataToSend }, (value:any) => {
+                if (value.status === 200) {
+                    this.handleShowTitle("Success");
+                    this.handleShowMessage("User created");
+                    this.setState({
+                        reload:true
+                    })
+                    resolve("User created");
+                } else if (value.status === 400) {
+                    this.handleShowTitle("Error");
+                    this.handleShowMessage("Status 400 bad request");
+                    reject(new Error("Status 400 bad request"));
+                } else if (value.status === 404) {
+                    this.handleShowTitle("Error");
+                    this.handleShowMessage(`Status 404 missing fields: ${value.missing}`);
+                    reject(new Error("Status 404 missing fields"));
+                } else {
+                    this.handleShowTitle("Error");
+                    this.handleShowMessage(`Status ${value.status}`);
+                    reject(new Error(value.status));
+                }
+            });
+        });
+        await promise
+        this.handleLoader()
 
-        apiHandler.post("/api/user/creation/post", { body: dataToSend }, (value: any) => {
 
-            if (value.status === 200) {
-                this.handleShowTitle("Success")
-                this.handleShowMessage("User created")
-            } else if (value.status === 400) {
-                this.handleShowTitle("Error")
-                this.handleShowMessage("Status 400 bad request")
-                throw new Error("Status 400 bad request")
-            } else if (value.status === 404) {
-                this.handleShowTitle("Error")
-                this.handleShowMessage(`Status 404 missing fields: ${value.missing}`)
-                throw new Error("Status 404 missing fields")
-            } else {
-                this.handleShowTitle("Error")
-                this.handleShowMessage(`Status ${value.status}`)
-                throw new Error(value.status)
-
-
-            }
-
-
-        })
 
         this.setState({
             submitDisabled: false,
@@ -493,9 +513,10 @@ class UserCreation extends Component<any, CustomTypes>{
                                     onChange={this.handleManager}
                                     filterBy={(option: any, props: any): boolean => {
                                         const query: string = props.text.toLowerCase().trim();
-                                        const name: string = option.firstName.toLowerCase() + option.lastName.toLowerCase();
-                                        const id: string = option.userId.toString();
-                                        return name.includes(query) || id.includes(query);
+                                        const name: string = (option.firstName + " " + option.lastName).toLowerCase().trim();
+                                        const id: string = option.managerId.toString();
+                                        const groupId: string = option.groupId.toString()
+                                        return name.includes(query) || id.includes(query) || groupId.includes(query);
                                     }}
                                     renderMenuItemChildren={(option: any, props: any) => (
                                         <>
@@ -503,7 +524,10 @@ class UserCreation extends Component<any, CustomTypes>{
                                                 {option.firstName + " " + option.lastName}
                                             </Highlighter>
                                             <div>
-                                                <small>Manager user id: {option.userId}</small>
+                                                <small>Manager id: {option.managerId}</small>
+                                            </div>
+                                            <div>
+                                                <small>Group id: {option.groupId}</small>
                                             </div>
                                         </>
                                     )}
@@ -524,7 +548,7 @@ class UserCreation extends Component<any, CustomTypes>{
                             </Form.Group>
 
 
-                            <Button variant="primary" type="button" onClick={this.handleSubmit} disabled={this.state.submitDisabled} >
+                            <Button variant="primary" type="button" onClick={this.handleSubmit} disabled={this.state.submitDisabled || !this.state.emailValid} >
                                 {this.state.submitDisabled ? (
                                     <Spinner
                                         as="span"

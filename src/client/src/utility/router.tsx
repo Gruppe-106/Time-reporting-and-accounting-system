@@ -87,7 +87,7 @@ class Router extends Component<any> {
                                 { userInfo.isProjectLeader ? <Route path={"/project/manage"} Component={ProjectManager}/> : ""}
                                 <Route path={"/project/menu"} Component={ProjectMenu}/>
                                 <Route path={"/project/viewer"} Component={ProjectViewer}/>
-                                { userInfo.isManager ?  <Route path={"/group/manager"} Component={GroupManager}/> : ""}
+                                { userInfo.isManager && !userInfo.isAdmin ?  <Route path={"/group/manager"} Component={GroupManager}/> : ""}
                                 { userInfo.isManager ?  <Route path={"/group/time-approval"} Component={UserTimeApproval}/> : ""}
                                 <Route path={"/user-register"} Component={UserTimeRegister}/>
                                 <Route path="*" element={<Navigate to="/" replace />} />
