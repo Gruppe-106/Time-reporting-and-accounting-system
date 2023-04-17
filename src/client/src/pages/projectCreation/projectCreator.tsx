@@ -16,7 +16,7 @@ const queryString = window.location.search;
 const params = new URLSearchParams(queryString);
 const id = parseInt(params.get("id") as string);
 
-class ProjectMenu extends Component<any, ProjectMenuState>{
+class ProjectCreator extends Component<any, ProjectMenuState>{
 
     constructor(props:any) {
         super(props);
@@ -24,12 +24,6 @@ class ProjectMenu extends Component<any, ProjectMenuState>{
         this.state ={
             projects: []
         };
-    }
-
-    submitData(){
-        //Use this function to submit/create the project and post it to the database.
-        //Return an error if not all fields have been filled in
-
     }
 
     render() {
@@ -46,9 +40,7 @@ class ProjectMenu extends Component<any, ProjectMenuState>{
                         <Col sm={11}>
                             <ProjectCreate id={id}/>
                         </Col>
-                        <Col>
-                            <Button variant="success" type="button" onClick={() => this.submitData()}>Create Project</Button>
-                        </Col>
+
                     </Row>
                 </Container>
 
@@ -57,4 +49,4 @@ class ProjectMenu extends Component<any, ProjectMenuState>{
     }
 }
 
-export default ProjectMenu;
+export default ProjectCreator;

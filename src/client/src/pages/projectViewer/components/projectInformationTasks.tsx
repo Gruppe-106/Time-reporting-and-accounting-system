@@ -1,10 +1,7 @@
 import {Table} from "react-bootstrap";
 import React, {Component} from "react";
 import BaseApiHandler from "../../../network/baseApiHandler";
-/*
-NEED TO ADD SO IT SHOWS BY GROUP AND NOT JUST EVERYONE.
-NUMBER FOR THE GROUP SHOULD CORRESPOND TO THE ID OF THE PROJECT AND PROJECT PAGE
- */
+
 interface Api{
     status:number,
     data:{
@@ -17,10 +14,13 @@ interface Api{
 }
 
 interface TaskProjectApi{
+    status: number;
+    data: {
         taskId?: number,
         taskName?: string,
         projectId?: number,
         projectName?: string
+    }[]
 }
 
 const queryString = window.location.search;
@@ -47,18 +47,18 @@ class ProjectTaskTable extends Component<any> {
 
     componentDidMount() {
         //First make an instance of the api handler, give it the auth key of the user once implemented
-        let apiHandler = new BaseApiHandler("test");
+        let apiHandler = new BaseApiHandler();
         //Run the get or post function depending on need only neccesarry argument is the path aka what comes after the hostname
         //Callbacks can be used to tell what to do with the data once it's been retrieved
         apiHandler.get(`/api/task/project/get?project=${id}`,{}, (value) => {
             console.log(value)
             //Then convert the string to the expected object(eg. )
-            let json:TaskProjectApi[] = JSON.parse(JSON.stringify(value))
+            let json:TaskProjectApi = JSON.parse(JSON.stringify(value))
             //Then update states or variables or whatever you want with the information
-            this.setState({task: json})
+            this.setState({task: json.data})
             console.log(json)
             let id = []
-            for (const task of json) {
+            for (const task of json.data) {
                 id.push(task.taskId)
             }
             apiHandler.get(`/api/task/get?ids=${id}`, {}, (tasks) => {
