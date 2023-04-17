@@ -8,14 +8,13 @@ import {
 } from "../dataPostEndpoints/projectCreationEndpoint";
 import {MySQLResponse, UpdateSet} from "../../database/mysqlHandler";
 
-interface ProjectEditData {
+export interface ProjectEditData {
     projectId            : number,
     superProjectId      ?: number,
     name                ?: string,
     startDate           ?: number,
     endDate             ?: number,
-    ProjectLeaderAdd    ?: number[],
-    projectLeaderRemove ?: number[],
+    projectLeader       ?: number,
     taskAdd             ?: number[],
     taskRemove          ?: number[]
 }
@@ -42,18 +41,6 @@ export async function removeTaskFromProject(taskIds: number[], projectId: number
     if (taskProjectResponse.error !== null) throw new Error("[MySQL] Failed insert data");
 }
 
-export async function removeProjectLeader(projectLeaderRemove: number[], projectId: number) {
-    let projectLeaders: string[] = projectLeaderRemove.map<string>((value) => { return value.toString();} )
-    let projectManagerResponse: MySQLResponse = await this.mySQL.remove("PROJECTS_MANAGER_CONNECTOR", [{
-        column: "userId",
-        equals: projectLeaders
-    }, {
-        column: "projectId",
-        equals: [projectId.toString()]
-    }]);
-    if (projectManagerResponse.error !== null) throw new Error("[MySQL] Failed insert data");
-}
-
 class ProjectEditEndpoint extends PostEndpointBase {
     requiredRole: number = 3;
     async submitData(req: Request, res: Response): Promise<string[]> {
@@ -75,10 +62,7 @@ class ProjectEditEndpoint extends PostEndpointBase {
             if (userResponse.error !== null) message.push("Project couldn't be updated");
         }
 
-        // Add project leaders to the connector table if any
-        if (projectData.ProjectLeaderAdd) await addProjectLeader.call(this, projectData.ProjectLeaderAdd, projectData.projectId);
-        // Remove project leaders from the connector table if any
-        if (projectData.projectLeaderRemove) await removeProjectLeader.call(this, projectData.projectLeaderRemove, projectData.projectId);
+        if (projectData.projectLeader) await this.mySQL.update("PROJECTS_MANAGER_CONNECTOR", [{column: "userId", value: projectData.projectLeader.toString()}], {column: "projectId", equals: [projectData.projectId.toString()]})
         // Create task and add it to the connector table if any
         if (projectData.taskAdd) await addMultiTaskToProject.call(this, projectData.taskAdd, projectData.projectId);
         // Remove task project connection if any

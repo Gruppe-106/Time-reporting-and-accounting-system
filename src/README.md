@@ -130,6 +130,7 @@ Optional:
 }
 ```
 </details>
+
 <details>
 <summary>Information</summary>
 
@@ -208,6 +209,88 @@ Optional:
     {"id":5,"name":"Task B"},
     {"id":7,"name":"Task D"}
   ]
+}
+```
+</details>
+
+<details>
+<summary>Create</summary>
+
+## /api/task/creation/post
+### Body
+```
+export interface TaskData {
+    name      : string,
+    userId    : number[],
+    startDate : number,
+    endDate   : number,
+    timeType  : number
+}
+```
+### Structure Of Object Returned
+```
+    {
+        status: number,
+        data: {
+            success? : boolean, 
+            error?   : string, 
+            message? : string[], 
+            reason?  : string[]
+        }
+    }
+```
+### Example return:
+
+```json
+{
+  "success": true,
+  "data": {
+    "success": "true", 
+    "message": ["success"]
+  }
+}
+```
+</details>
+
+<details>
+<summary>Edit</summary>
+
+## /api/task/edit/put
+### Body
+```
+{
+    taskId     : number,
+    delete    ?: boolean,
+    name      ?: string,
+    startDate ?: number,
+    endDate   ?: number,
+    timeType  ?: number,
+    addUser   ?: number[],
+    removeUser?: number[],
+    projects  ?: number[]
+}
+```
+### Structure Of Object Returned
+```
+    {
+        status: number,
+        data: {
+            success? : boolean, 
+            error?   : string, 
+            message? : string[], 
+            reason?  : string[]
+        }
+    }
+```
+### Example return:
+
+```json
+{
+  "success": true,
+  "data": {
+    "success": "true", 
+    "message": ["success"]
+  }
 }
 ```
 </details>

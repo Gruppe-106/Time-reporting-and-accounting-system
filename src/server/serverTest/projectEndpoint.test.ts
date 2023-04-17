@@ -1,8 +1,8 @@
 import BaseApiHandler from "../../client/src/network/baseApiHandler";
+import {headers} from "./testBaseConfig";
+import {ProjectEditData} from "../apiEndpoints/dataPutEndpoints/projectEditEndpoint";
 
 const apiHandler = new BaseApiHandler("http://localhost:8080");
-let headers: Record<string, string> = {};
-headers["cookie"] = "auth=h1i2j3k4";
 
 interface PostReturnMessage {
     status: number,
@@ -43,8 +43,8 @@ test("Testing project get api", async () => {
         expect(project.id).toBe(1);
         expect(project.superProjectId).toBe(0);
         expect(project.name).toMatch('Project Alpha');
-        expect(project.startDate).toBe(1679266800000);
-        expect(project.endDate).toBe(1679439600000);
+        expect(project.startDate).toBe(1679266800000); // 2023-03-20 00:00:00
+        expect(project.endDate).toBe(1682114400000);   // 2023-04-22 00:00:00
     });
 
     // Try getting project 1 but only specified values
@@ -54,7 +54,7 @@ test("Testing project get api", async () => {
         expect(project.id).toBeUndefined();
         expect(project.superProjectId).toBeUndefined();
         expect(project.name).toMatch('Project Alpha');
-        expect(project.startDate).toBe(1679266800000);
+        expect(project.startDate).toBe(1679266800000); // 2023-03-20 00:00:00
         expect(project.endDate).toBeUndefined();
     });
 })
@@ -114,5 +114,51 @@ test("Testing project edit api", async () => {
         expect(value["status"]).toBe(404);
         expect(value["data"]["message"]).toMatch("Missing Body");
         expect(value["data"]["success"]).toMatch("false");
-    })
-})
+    });
+
+    let bodySuccess: ProjectEditData = {
+        projectId: 1,
+        superProjectId: 2,
+        name: "Project test",
+        startDate: 1684706400000,
+        endDate: 1687384800000,
+        projectLeader: 9,
+        taskAdd: [2,10],
+        taskRemove: [1,6]
+    }
+
+    apiHandler.put("/api/project/edit/put", {headers: headers, body: bodySuccess}, (value) => {
+        let data: PostReturnMessage = JSON.parse(JSON.stringify(value));
+        expect(data.data.success).toMatch("true");
+    });
+
+    let bodyFail = {
+        superProjectId: 3
+    }
+
+    apiHandler.put("/api/project/edit/put", {headers: headers, body: bodyFail}, (value) => {
+        let data: PostReturnMessage = JSON.parse(JSON.stringify(value));
+        expect(data.data.success).toBeUndefined();
+    });
+});
+
+test("Testing project information api", async () => {
+    apiHandler.get("/api/project/info/get?ids=1", {headers: headers}, (value) => {
+        expect(value).toStrictEqual(
+            {
+                "status":200,"data": [
+                    {"taskId":1,"id":5,"firstName":"Jill","lastName":"Jones"},
+                    {"taskId":1,"id":6,"firstName":"John","lastName":"Adams"},
+                    {"taskId":1,"id":7,"firstName":"Dave","lastName":"Brown"},
+                    {"taskId":6,"id":8,"firstName":"Sam","lastName":"Smith"},
+                    {"taskId":6,"id":9,"firstName":"Sarah","lastName":"Doe"},
+                    {"taskId":6,"id":10,"firstName":"Alex","lastName":"Johnson"}
+                ]
+            }
+        )
+    });
+
+    apiHandler.get("/api/project/info/get", {headers: headers}, (value) => {
+        expect(value["message"]).toMatch("Bad Request");
+    });
+});

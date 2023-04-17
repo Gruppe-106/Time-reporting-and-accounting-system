@@ -1,8 +1,7 @@
 import BaseApiHandler from "../../client/src/network/baseApiHandler";
+import {headers} from "./testBaseConfig";
 
 const apiHandler = new BaseApiHandler("http://localhost:8080");
-let headers: Record<string, string> = {};
-headers["cookie"] = "auth=h1i2j3k4";
 
 // Check if all base api routes exists
 test("Testing GET base api", () => {

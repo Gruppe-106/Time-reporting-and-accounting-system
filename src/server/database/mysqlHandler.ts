@@ -2,7 +2,6 @@ import * as mysql from "mysql";
 import {Connection, FieldInfo, MysqlError} from "mysql";
 import {MySQLConfig} from "../../app";
 import {wipeDatabase} from "./wipeDB";
-import {response} from "express";
 import fs from "fs";
 import path from "path";
 import {Server} from "../server";
