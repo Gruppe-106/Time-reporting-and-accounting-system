@@ -3,12 +3,56 @@
 
 
 
-import BaseApiHandler from "../../../../network/baseApiHandler";
+import BaseApiHandler from "../../../network/baseApiHandler";
 
 /**
  * Class containing methods for getting data from the server
 */
 export default class APICalls {
+
+
+    public static getUser(id: number) {
+        return fetch(`/api/user/get?ids=${id}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then((response: Response) => {
+                if (response.status === 400) {
+                    throw new Error("Status 400 bad request")
+                } else if (response.status === 200) {
+                    return response.json()
+                } else {
+                    throw new Error(`Unexpected response status: ${response.status}`)
+                }
+            })
+            .catch(error => {
+                throw new Error(error.Code);
+            });
+    }
+
+    public static getTasks(id: number) {
+
+        return fetch(`/api/user/task/project/get?user=${id}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then((response: Response) => {
+                if (response.status === 400) {
+                    throw new Error("Status 400 bad request")
+                } else if (response.status === 200) {
+                    return response.json()
+                } else {
+                    throw new Error(`Unexpected response status: ${response.status}`)
+                }
+            })
+            .catch(error => {
+                throw new Error(error.Code);
+            });
+    }
 
 
     public static getAllUsers(): Promise<{
@@ -97,7 +141,7 @@ export default class APICalls {
     }
 
     public static getAllManagerGroups() {
-        
+
         return fetch("/api/group/manager/get?manager=*", {
             method: 'GET',
             headers: {
