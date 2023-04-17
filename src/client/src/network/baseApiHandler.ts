@@ -30,7 +30,7 @@ class BaseApiHandler {
      * @param callback Callback?: an anonymous function to run after data is received, the value will be the json object
      * @param settings GetSettings: settings for get request
      */
-    public get(urlPath: string, settings: GetSettings, callback?: (value: Object) => void): boolean {
+    public async get(urlPath: string, settings: GetSettings, callback?: (value: Object) => void) {
         this.requester(urlPath, {
             baseUrl: settings.baseUrl || this.baseUrl,
             method: "GET",
