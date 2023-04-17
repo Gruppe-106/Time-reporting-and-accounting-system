@@ -16,7 +16,7 @@ import Button from 'react-bootstrap/Button';
 import { Container, Modal, Table } from "react-bootstrap";
 import Form from 'react-bootstrap/Form';
 import LoadingOverlay from 'react-loading-overlay-ts';
-import React, { Component } from "react";
+import { Component } from "react";
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTrash } from '@fortawesome/free-solid-svg-icons'
@@ -265,7 +265,7 @@ class AdminPanel extends Component<any, CustomTypes> {
         * @param {User} user - The User object to render a row for.
         * @returns {JSX.Element | undefined} - A JSX Element for the row, or undefined if user has no manager.
    */
-    private renderEditingRow(user: User): JSX.Element | undefined { //TODO: fix the prop
+    private renderEditingRow(user: User): JSX.Element | undefined { 
 
 
         return (
@@ -400,9 +400,6 @@ class AdminPanel extends Component<any, CustomTypes> {
 
 
     /**
-
-        TODO: FIX THE INPUT THINGS
-
         Handles updating the group ID of a given user.
 
         @param {User} user - The user to update.

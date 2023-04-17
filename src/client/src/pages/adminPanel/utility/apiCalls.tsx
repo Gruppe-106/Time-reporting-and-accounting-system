@@ -74,6 +74,11 @@ export default class APICalls {
     }
 
 
+
+    /**
+     * Gets all users
+     * @returns The users if any
+     */
     public static getAllUsers(): Promise<{
         id: number;
         email: string;
@@ -159,7 +164,19 @@ export default class APICalls {
 
     }
 
-    public static getAllManagerGroups() {
+
+    /**
+     * Gets all manager groups
+     * @returns the manager groups object
+     */
+    public static getAllManagerGroups(): Promise<{
+        status: number, data: {
+            managerId: number,
+            firstName: string,
+            lastName: string,
+            groupId: number
+        }[]
+    }> {
 
         return fetch("/api/group/manager/get?manager=*", {
             method: 'GET',
