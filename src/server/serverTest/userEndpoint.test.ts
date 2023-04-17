@@ -90,7 +90,7 @@ describe("User API", () => {
            };
 
            apiHandler.put("/api/user/edit/put", {headers: headers, body: bodyFail}, (value) => {
-               expect(value["data"]["success"]).toBeUndefined();
+               expect(value["data"]["success"]).toBe("false");
            });
        });
 

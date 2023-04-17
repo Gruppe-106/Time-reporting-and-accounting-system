@@ -31,7 +31,6 @@ class UserTimeRegisterEndpoint extends PostEndpointBase {
             ]
         )
         if (timeRegisterResponse.error !== null) throw new Error("[MySQL] Failed to insert data");
-        console.log(timeRegisterResponse.results)
         return Promise.resolve(["success"]);
     }
 }

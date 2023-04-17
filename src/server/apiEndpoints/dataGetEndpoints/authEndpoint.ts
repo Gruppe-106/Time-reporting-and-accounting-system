@@ -45,14 +45,14 @@ class AuthEndpoint {
     }
 
     public async getRoute(req:Request, res:Response): Promise<void> {
-        res.setHeader('Content-Type', 'application/json');
-        try {
-            let data: AuthData = await this.getAuthentication(req);
-            res.status(200).json({status: 200, data: data});
-            return;
-        } catch (e) {
-            res.status(404).json({status: 404, data: {success: false}});
-            return;
+        if (!res.writableEnded) {
+            res.setHeader('Content-Type', 'application/json');
+            try {
+                let data: AuthData = await this.getAuthentication(req);
+                res.status(200).json({status: 200, data: data});
+            } catch (e) {
+                res.status(404).json({status: 404, data: {success: false}});
+            }
         }
     }
 }

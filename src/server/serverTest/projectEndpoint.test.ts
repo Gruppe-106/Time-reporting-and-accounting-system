@@ -138,7 +138,7 @@ test("Testing project edit api", async () => {
 
     apiHandler.put("/api/project/edit/put", {headers: headers, body: bodyFail}, (value) => {
         let data: PostReturnMessage = JSON.parse(JSON.stringify(value));
-        expect(data.data.success).toBeUndefined();
+        expect(data.data.success).toMatch("false");
     });
 });
 

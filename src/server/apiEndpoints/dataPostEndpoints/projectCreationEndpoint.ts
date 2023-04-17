@@ -20,7 +20,6 @@ interface ProjectCreationData {
 }
 
 export async function addUsersToTask(users: number[], taskId: number): Promise<void> {
-    console.log(users);
     let userTask: string[][] = [];
     for (const user of users) {
         userTask.push([user.toString(), taskId.toString()]);
@@ -46,7 +45,6 @@ export async function addTaskToProject(taskData: TaskData[], projectId?: number)
             [task.name, this.mySQL.dateFormatter(task.startDate), this.mySQL.dateFormatter(task.endDate), task.timeType.toString()]);
         if (taskResponse.error !== null) throw new Error("[MySQL] Failed insert data");
         let taskId: number = taskResponse.results.insertId;
-        console.log(taskId);
         if(projectId !== undefined) await taskProjectConnector.call(this, taskId, projectId);
         await addUsersToTask.call(this, task.userId, taskId);
     }

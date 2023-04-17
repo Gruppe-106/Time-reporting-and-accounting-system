@@ -112,7 +112,7 @@ class ManagerGroupEndpoint extends GetEndpointBase {
             //If managers wasn't specified check if groups where
             requestKeys = this.urlParamsConversion(req.query.group, false, true, res);
             //If not return and send bad request
-            if (requestKeys === undefined) { return this.badRequest(res); }
+            if (requestKeys === undefined) { return this.badRequest(res, req); }
             primaryKey  = "groupId";
         }
 
@@ -120,8 +120,11 @@ class ManagerGroupEndpoint extends GetEndpointBase {
         let requestedValues:string[] = this.urlParamsConversion(req.query.var);
 
         this.processRequest(req, requestedValues, primaryKey, requestKeys).then((data) => {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(data.status).json(data);
+            if (!res.writableEnded) {
+                res.setHeader('Content-Type', 'application/json');
+                res.status(data.status).json(data);
+            }
+
         })
     }
 }
