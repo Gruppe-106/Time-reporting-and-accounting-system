@@ -14,7 +14,7 @@ export default class Utility {
         lastName: string | null,
         email: string | null,
         password: string | null,
-        assignedToManager: { roleName: string, roleId: number, userId: number, firstName: string, lastName: string } | null
+        assignedToManager: number | null
         roles: { id: number, name: string }[] | null
     }): {
         valid: boolean,
