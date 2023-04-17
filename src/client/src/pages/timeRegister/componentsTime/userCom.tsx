@@ -256,10 +256,16 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
 
     let rows: JSX.Element[] = [];
 
+    const handleTimeChange = (num: number, index: number) => {
+      arr[index] = num
+      // Perform any additional logic or state updates related to time change here
+    };
+
     for (const key of Array.from(stateRowData.keys())) {
       let data = stateRowData.get(key);
       if (data) {
         this.getTimeFromData(data.taskId, arr)
+        console.log(arr)
         rows.push((
           <tr>
             <td>{data.projectName}</td>
@@ -268,7 +274,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
               return (
                 <td key={index}>
                   <InputGroup size="sm">
-                    <Form.Control type="number" placeholder="0" value={num} />
+                    <Form.Control type="number" placeholder="0" value={num} onChange={(event) => handleTimeChange(parseInt(event.target.value), index)} />
                     <InputGroup.Text id={`basic-addon-${index}`}>:</InputGroup.Text>
                     <Form.Select>
                       <option value="0">0</option>
