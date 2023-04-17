@@ -33,6 +33,7 @@ interface Employee {
 
 interface EmployeeTableTypes {
     employees: Employee[];
+    selectedEmployee: Employee;
 }
 
 class EmployeeTable extends Component<TableProps, EmployeeTableTypes> {
@@ -47,6 +48,11 @@ class EmployeeTable extends Component<TableProps, EmployeeTableTypes> {
                 lastName: ""
             }
         ],
+        selectedEmployee: {
+            firstName: "",
+            lastName: "",
+            id: -1
+        }
     }
 
     constructor(props: TableProps) {
@@ -56,8 +62,9 @@ class EmployeeTable extends Component<TableProps, EmployeeTableTypes> {
         this.timesheetRef = React.createRef();
     }
 
-    private selectEmployee(id: number): void {
-        this.timesheetRef.current?.setState({employeeId: id});
+    private selectEmployee(emp: Employee): void {
+        this.setState({selectedEmployee: emp})
+        this.timesheetRef.current?.setState({selectedEmployee: emp});
     } 
 
     private updateEmpData():void {
@@ -72,7 +79,6 @@ class EmployeeTable extends Component<TableProps, EmployeeTableTypes> {
 
     private hasData(): boolean {
         return this.state.employees.length > 0;
-
     }
 
     componentDidMount(): void {
@@ -98,7 +104,7 @@ class EmployeeTable extends Component<TableProps, EmployeeTableTypes> {
                                     <td>{e.id}</td>
                                     <td>{e.firstName}</td>
                                     <td>{e.lastName}</td>
-                                    <td><center><Button onClick={() => this.selectEmployee(e.id)}>Timesheet</Button></center></td>
+                                    <td><center><Button onClick={() => this.selectEmployee(e)}>Timesheet</Button></center></td>
                                 </tr>
                             ))}
                         </tbody>
