@@ -81,10 +81,10 @@ export class ApiRouter extends BaseRouter {
      * @private
      */
     private putRoutes() {
-        this.router.post("/", (req: Request, res: Response): void => {
+        this.router.put("/", (req: Request, res: Response): void => {
             res.setHeader('Content-Type', 'application/json');
             res.status(200).json({message: "Api PUT gotten"});
-        })
+        });
 
         this.router.put("/user/edit/put",         (req: Request, res: Response) => new UserEditEndpoint().postRoute(req, res));
         this.router.put("/group/edit/put",        (req: Request, res: Response) => new GroupEditEndpoint().postRoute(req, res));
