@@ -149,7 +149,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     const { offsetState } = this.state
     const dates: string[] = [];
     getCurrentWeekDates(dates, offsetState);
-    this.setState({headerDates: dates})
+    this.setState({ headerDates: dates })
     console.log(offsetState)
     this.getData(offsetState);
   }
@@ -243,18 +243,18 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     return rows;
   }
 
-  private handleButtonClick = (increment: number) => {
+  private handleButtonClick = async (increment: number) => {
     const { offsetState } = this.state;
     const updatedOffset = offsetState + increment;
     this.setState({ offsetState: updatedOffset });
     const newDates: string[] = [];
-    getCurrentWeekDates(newDates, offsetState)
-    this.setState({headerDates: newDates});
-    this.getData(offsetState);
+    await getCurrentWeekDates(newDates, updatedOffset);
+    this.setState({ headerDates: newDates });
+    await this.getData(updatedOffset);
   }
 
   render() {
-    const { showAddModal, showDeleteRowModal, offsetState } = this.state;
+    const { showAddModal, showDeleteRowModal } = this.state;
 
     return (
       <Container fluid="lg">
@@ -262,19 +262,19 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
           {this.renderHeaderRow()}
           <tbody>{this.renderTaskRows()}</tbody>
         </Table>
-        <Button variant="primary" type="button" onClick={() => this.handleShowAddModal()}>Add Row</Button>
-        <></>
-        <ButtonGroup aria-label="Basic example">
-          <Button
-            onClick={() => { this.handleButtonClick(-7) }}
-            variant="primary"><FontAwesomeIcon icon={faArrowLeft} />
-          </Button>
-          <Button
-            onClick={() => { this.handleButtonClick(7) }}
-            variant="primary"><FontAwesomeIcon icon={faArrowRight} />
-          </Button>
-        </ButtonGroup>
-        <p>{offsetState}</p>
+        <Button variant="primary" type="button" onClick={() => this.handleShowAddModal()}>
+          Add Row
+        </Button>
+        <center>
+          <ButtonGroup aria-label="Basic example">
+            <Button onClick={() => this.handleButtonClick(-7)} variant="primary">
+              <FontAwesomeIcon icon={faArrowLeft} />
+            </Button>
+            <Button onClick={() => this.handleButtonClick(7)} variant="primary">
+              <FontAwesomeIcon icon={faArrowRight} />
+            </Button>
+          </ButtonGroup>
+        </center>
         <></>
         <Modal show={showAddModal} onHide={this.handleCloseAddModal}>
           <Modal.Header closeButton>
@@ -302,7 +302,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
             </Button>
           </Modal.Footer>
         </Modal>
-      </Container>
+      </Container >
     );
   }
 }
