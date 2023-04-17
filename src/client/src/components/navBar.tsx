@@ -118,7 +118,7 @@ class BaseNavBar extends Component<any>{
 
                                 { this.linkRender("/user-register", "Register time") }
 
-                                { userInfo.isManager ?
+                                { userInfo.isManager && !userInfo.isAdmin ?
                                         this.linkRender("/group/manager", "Group Manager")
                                     : ""
                                 }
