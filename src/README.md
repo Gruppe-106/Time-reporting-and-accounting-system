@@ -130,10 +130,11 @@ Optional:
 }
 ```
 </details>
+
 <details>
 <summary>Information</summary>
 
-## /api/project/information/get
+## /api/project/info/get
 ```
 Required:
     ids=number
@@ -208,6 +209,88 @@ Optional:
     {"id":5,"name":"Task B"},
     {"id":7,"name":"Task D"}
   ]
+}
+```
+</details>
+
+<details>
+<summary>Create</summary>
+
+## /api/task/creation/post
+### Body
+```
+export interface TaskData {
+    name      : string,
+    userId    : number[],
+    startDate : number,
+    endDate   : number,
+    timeType  : number
+}
+```
+### Structure Of Object Returned
+```
+    {
+        status: number,
+        data: {
+            success? : boolean, 
+            error?   : string, 
+            message? : string[], 
+            reason?  : string[]
+        }
+    }
+```
+### Example return:
+
+```json
+{
+  "success": true,
+  "data": {
+    "success": "true", 
+    "message": ["success"]
+  }
+}
+```
+</details>
+
+<details>
+<summary>Edit</summary>
+
+## /api/task/edit/put
+### Body
+```
+{
+    taskId     : number,
+    delete    ?: boolean,
+    name      ?: string,
+    startDate ?: number,
+    endDate   ?: number,
+    timeType  ?: number,
+    addUser   ?: number[],
+    removeUser?: number[],
+    projects  ?: number[]
+}
+```
+### Structure Of Object Returned
+```
+    {
+        status: number,
+        data: {
+            success? : boolean, 
+            error?   : string, 
+            message? : string[], 
+            reason?  : string[]
+        }
+    }
+```
+### Example return:
+
+```json
+{
+  "success": true,
+  "data": {
+    "success": "true", 
+    "message": ["success"]
+  }
 }
 ```
 </details>
@@ -372,6 +455,67 @@ Optional:
     "success": "true", 
     "message": ["success"]
   }
+}
+```
+</details>
+
+<details>
+<summary>Delete</summary>
+
+## /api/user/delete
+```
+Required:
+    user=number | number,number...
+```
+### Structure Of Object Returned
+
+```
+  {
+  status: number,
+  data: [
+        { error: "Failed to delete user" } | null
+    ]
+  }
+```
+### Example return:
+
+```json
+{
+  "success": true,
+  "data": [{ "error": "Failed to delete user"}]
+}
+```
+</details>
+
+# User Task Project
+<details>
+<summary>Get</summary>
+
+## /api/user/task/project/get
+```
+Required:
+    user=number
+```
+### Structure Of Object Returned
+
+```
+  {
+  status: number,
+  data:
+      {
+        projectName: string,
+        projectId: number,
+        taskName: string,
+        taskId: number
+      }[]
+  }
+```
+### Example return:
+
+```json
+{
+  "success": true,
+  "data": [{"taskName": "Task Y", "taskId": 2, "projectId": 2, "projectName": "Project Beta"}]
 }
 ```
 </details>
@@ -642,6 +786,7 @@ Required:
     user=number | number,number,...
 Optional:
     var=taskId,taskName,projectName,projectId,date,userId,time,approved,managerLogged
+    period=number,number
     Can be any and/or all
 ```
 ### Structure Of Object Returned
@@ -721,6 +866,41 @@ Optional:
 <details>
 <summary>Edit</summary>
 
+## /api/time/register/edit/put
+### Body
+```
+{
+    date          : number,
+    taskId        : number,
+    userId        : number,
+    time         ?: number,
+    approved     ?: boolean,
+    managerLogged?: boolean
+}
+```
+### Structure Of Object Returned
+```
+    {
+        status: number,
+        data: {
+            success? : boolean, 
+            error?   : string, 
+            message? : string[], 
+            reason?  : string[]
+        }
+    }
+```
+### Example return:
+
+```json
+{
+  "success": true,
+  "data": {
+    "success": "true", 
+    "message": ["success"]
+  }
+}
+```
 </details>
 
 # Login
