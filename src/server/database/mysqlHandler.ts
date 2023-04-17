@@ -1,6 +1,10 @@
 import * as mysql from "mysql";
 import {Connection, FieldInfo, MysqlError} from "mysql";
 import {MySQLConfig} from "../../app";
+import {wipeDatabase} from "./wipeDB";
+import fs from "fs";
+import path from "path";
+import {Server} from "../server";
 
 export interface Where {
     column: string,
@@ -22,10 +26,12 @@ class MysqlHandler {
     private logQueries: boolean = false;
     private static connectionConfig: object = undefined;
     private static connection: Connection   = undefined;
+    public readonly database: string = "timemanagerdatabase";
 
     constructor(connectionConfig?:MySQLConfig, mysqlOnConnectCallback?: () => void) {
         if (connectionConfig !== undefined) { MysqlHandler.connectionConfig = connectionConfig; }
         this.hasOrCreateConnection(mysqlOnConnectCallback);
+        this.databaseExists(this.database, true);
     }
 
     /**
@@ -75,6 +81,40 @@ class MysqlHandler {
             return console.log("[MySQL] Connection to database destroyed");
         }
         console.log("[MySQL] No connection to destroy")
+    }
+
+    public selectDatabase(database: string = this.database): void {
+        MysqlHandler.connection.changeUser({database: database});
+    }
+
+    /**
+     * Check if a database exists
+     * @param database String: name of the database
+     * @param createClean Boolean: Whether to create a clean database using the wipe SQL
+     */
+    public async databaseExists(database: string, createClean: boolean = false): Promise<boolean> {
+        return this.sendQuery(`SHOW DATABASES LIKE '${database}';`).then((value) => {
+            // If not and wipe argument weren't given recreate it
+            if (value.results.length === 0) {
+                console.log(`[MySQL] Database ${database} doesn't exist`);
+                if (createClean) {
+                    console.log(`[MySQL] Creating clean version`);
+                    wipeDatabase().then((success) => {
+                        if (success) {
+                            console.log(`[MySQL] Database ${database} couldn't be created`);
+                            return Promise.resolve(true);
+                        } else {
+                            console.log(`[MySQL] Database ${database} has been created`);
+                            return Promise.reject(false);
+                        }
+                    });
+                } else {
+                    return Promise.resolve(false);
+                }
+            } else {
+                return Promise.resolve(true);
+            }
+        });
     }
 
     /**
@@ -166,6 +206,32 @@ class MysqlHandler {
             return promise;
         }
         return {error: undefined, results: undefined, fields: undefined};
+    }
+
+    /**
+     * Reads an SQL file
+     * @param file String: path of file
+     * @private
+     */
+    private fsReadSQL(file: string): string {
+        return fs.readFileSync(path.join(__dirname, file), {encoding: "utf-8"})
+            .replace(/\$\{db\}/g, Server.mysql.database); // Replace db with actual db/schema name
+    }
+
+    /**
+     * Reads an SQL file and sends it as a query
+     * @param file String: path of file
+     * @constructor
+     */
+    public async SQLFileQuery(file: string): Promise<MySQLResponse> {
+        if (/.*\.SQL(?!.)/g.test(file)) {
+            let query: string = this.fsReadSQL(file);
+            return Server.mysql.sendQuery(query);
+        }
+        return {error: {
+            code: "404", errno: 404, fatal: true, name: "File not an SQL file", message: "File cannot be send, as it's not a MySQL file"},
+            results: null,
+            fields: null};
     }
 
     /**

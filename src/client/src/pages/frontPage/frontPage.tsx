@@ -73,7 +73,6 @@ class FrontPage extends Component<any, CustomTypes> {
 
     }
 
-
     async componentDidMount(): Promise<void> {
         this.handleLoader("Getting user info")
         const user: User = (await APICalls.getUser(userInfo.userId))[0]
