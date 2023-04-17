@@ -143,19 +143,15 @@ test("Testing project edit api", async () => {
 });
 
 test("Testing project information api", async () => {
-    apiHandler.get("/api/project/info/get?ids=1", {headers: headers}, (value) => {
+    apiHandler.get("/api/project/info/get?ids=5", {headers: headers}, (value) => {
         expect(value).toStrictEqual(
             {
                 status: 200,
                 data: [
-                    { taskId: 11, id: 1, firstName: 'Matt', lastName: 'Brown' },
-                    { taskId: 11, id: 2, firstName: 'Joe', lastName: 'Smith' },
-                    { taskId: 11, id: 3, firstName: 'Jane', lastName: 'Doe' },
-                    { taskId: 1, id: 5, firstName: 'Jill', lastName: 'Jones' },
-                    { taskId: 1, id: 6, firstName: 'John', lastName: 'Adams' },
-                    { taskId: 1, id: 7, firstName: 'Dave', lastName: 'Brown' },
-                    { taskId: 6, id: 8, firstName: 'Sarah', lastName: 'Doe' },
-                    { taskId: 6, id: 9, firstName: 'Alex', lastName: 'Johnson' }
+                    { taskId: 5, id: 8, firstName: 'Sarah', lastName: 'Doe' },
+                    { taskId: 5, id: 9, firstName: 'Alex', lastName: 'Johnson' },
+                    { taskId: 10, id: 1, firstName: 'Matt', lastName: 'Brown' },
+                    { taskId: 10, id: 2, firstName: 'Joe', lastName: 'Smith' }
                 ]
             }
         )
