@@ -75,7 +75,7 @@ class FrontPage extends Component<any, CustomTypes> {
 
     async componentDidMount(): Promise<void> {
         this.handleLoader("Getting user info")
-        const user: User = (await APICalls.getUser(userInfo.userId))
+        const user: User = (await APICalls.getUser(userInfo.userId)).data[0]
 
         this.handleLoader("Getting tasks")
         const tasks: Tasks[] = (await APICalls.getTasks(userInfo.userId)).data
