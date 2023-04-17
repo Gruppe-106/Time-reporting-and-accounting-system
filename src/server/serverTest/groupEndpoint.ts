@@ -55,28 +55,32 @@ describe("Group API", () => {
     });
     describe("POST API", () => {
         test("Fail case", () => {
-           apiHandler.post("/api/group/manager/post", {headers: headers}, (value) => {
-               expect(value["message"]).toMatch("Bad Request");
+           apiHandler.post("/api/group/creation/post", {headers: headers}, (value) => {
+               expect(value["status"]).toBe(404);
+               expect(value["data"]["success"]).toMatch("false");
+               expect(value["data"]["message"]).toMatch("Missing Body");
            });
         });
 
         test("Success case", () => {
-            apiHandler.post("/api/group/manager/post", {headers: headers, body: {managerId: 3}}, (value) => {
-                expect(value["success"]).toMatch("true");
+            apiHandler.post("/api/group/creation/post", {headers: headers, body: {managerId: 3}}, (value) => {
+                expect(value["data"]["success"]).toMatch("true");
             });
         });
     });
 
     describe("PUT API", () => {
         test("Fail case", () => {
-            apiHandler.post("/api/group/edit/put", {headers: headers}, (value) => {
-                expect(value["message"]).toMatch("Bad Request");
+            apiHandler.put("/api/group/edit/put", {headers: headers}, (value) => {
+                expect(value["status"]).toBe(404);
+                expect(value["data"]["success"]).toMatch("false");
+                expect(value["data"]["message"]).toMatch("Missing Body");
             });
         });
 
         test("Success case", () => {
-            apiHandler.post("/api/group/edit/put", {headers: headers, body: {managerId: 3, groupId: 2}}, (value) => {
-                expect(value["success"]).toMatch("true");
+            apiHandler.put("/api/group/edit/put", {headers: headers, body: [{managerId: 1, groupId: 3}]}, (value) => {
+                expect(value["data"]["success"]).toMatch("true");
             })
         });
     });

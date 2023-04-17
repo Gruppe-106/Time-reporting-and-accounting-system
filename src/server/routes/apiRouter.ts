@@ -53,6 +53,11 @@ export class ApiRouter extends BaseRouter {
         this.router.get("/role/user/get",        (req: Request, res: Response) => new UserRoleEndpoint().getRoute(req, res));
         this.router.get("/group/manager/get",    (req: Request, res: Response) => new ManagerGroupEndpoint().getRoute(req, res));
         this.router.get("/time/register/get",    (req: Request, res: Response) => new TaskTimeRegisterEndpoint().getRoute(req, res));
+
+        this.router.get("*", (req: Request, res: Response): void => {
+            res.setHeader('Content-Type', 'application/json');
+            res.status(200).json({message: "Bad Request", route: req.url});
+        });
     }
 
     /**
@@ -64,7 +69,7 @@ export class ApiRouter extends BaseRouter {
         this.router.post("/", (req: Request, res: Response): void => {
             res.setHeader('Content-Type', 'application/json');
             res.status(200).json({message: "Api POST gotten"});
-        })
+        });
 
         this.router.post("/login",                (req: Request, res: Response) => new LoginEndpoint().postRoute(req, res));
 
@@ -73,6 +78,11 @@ export class ApiRouter extends BaseRouter {
         this.router.post("/project/creation/post",(req: Request, res: Response) => new ProjectCreationEndpoint().postRoute(req, res));
         this.router.post("/task/creation/post",   (req: Request, res: Response) => new TaskCreationEndpoint().postRoute(req, res));
         this.router.post("/time/register/post",   (req: Request, res: Response) => new UserTimeRegisterEndpoint().postRoute(req, res));
+
+        this.router.post("*", (req: Request, res: Response): void => {
+            res.setHeader('Content-Type', 'application/json');
+            res.status(200).json({message: "Bad Request", route: req.url});
+        });
     }
 
     /**
@@ -91,6 +101,11 @@ export class ApiRouter extends BaseRouter {
         this.router.put("/project/edit/put",      (req: Request, res: Response) => new ProjectEditEndpoint().postRoute(req, res));
         this.router.put("/task/edit/put",         (req: Request, res: Response) => new TaskEditEndpoint().postRoute(req, res));
         this.router.put("/time/register/edit/put",(req: Request, res: Response) => new UserTimeRegisterEditEndpoint().postRoute(req, res));
+
+        this.router.put("*", (req: Request, res: Response): void => {
+            res.setHeader('Content-Type', 'application/json');
+            res.status(200).json({message: "Bad Request", route: req.url});
+        });
     }
 
     private deleteRoutes() {
@@ -100,6 +115,11 @@ export class ApiRouter extends BaseRouter {
         })
 
         this.router.delete("/user/remove", (req: Request, res: Response) => new UserDeleteEndpoint().getRoute(req, res));
+
+        this.router.delete("*", (req: Request, res: Response): void => {
+            res.setHeader('Content-Type', 'application/json');
+            res.status(200).json({message: "Bad Request", route: req.url});
+        });
     }
 
     /**

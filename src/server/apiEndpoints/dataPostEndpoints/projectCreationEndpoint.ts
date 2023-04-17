@@ -19,6 +19,11 @@ interface ProjectCreationData {
     task          ?: TaskData[]
 }
 
+function isProjectCreationData(obj: any): obj is ProjectCreationData {
+    return ("name" in obj && "startDate" in obj && "endDate" in obj && "projectLeader" in obj) &&
+        (obj.name && obj.startDate && obj.endDate && obj.projectLeader);
+}
+
 export async function addUsersToTask(users: number[], taskId: number): Promise<void> {
     let userTask: string[][] = [];
     for (const user of users) {
@@ -67,6 +72,9 @@ class ProjectCreationEndpoint extends PostEndpointBase {
 
     async submitData(req: Request, res: Response): Promise<string[]> {
         //Get data from the user creation form
+        if (!isProjectCreationData(req.body)) {
+            return ["Invalid data"];
+        }
         let project: ProjectCreationData = req.body;
 
         let projectResponse: MySQLResponse = await this.mySQL.insert("PROJECTS",
