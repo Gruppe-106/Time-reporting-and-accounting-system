@@ -26,13 +26,12 @@ export function getDayThisWeek(day: number = 0, weekOffset: number = 0) : number
     if (day < 0 || 6 < day) return -1;
     const today = new Date();
     const dayOfWeek = today.getDay();
-    const sunday = new Date(today.getFullYear(), today.getMonth(), today.getDate() - dayOfWeek + 1 + day + (weekOffset * 7));
-    return sunday.getTime();
+    return new Date(today.getFullYear(), today.getMonth(), today.getDate() - dayOfWeek + 1 + day + (weekOffset * 7)).getTime();
 }
 
-export function dateIsInThisWeek(date: number) : boolean {
+export function dateInThisWeek(date: number, weekOffset: number = 0) : boolean {
     const monThis : number = getDayThisWeek()
-    const monNext : number = getDayThisWeek(0, 1)
+    const monNext : number = getDayThisWeek(0, weekOffset + 1)
     return monThis <= date && date < monNext;
 }
 
