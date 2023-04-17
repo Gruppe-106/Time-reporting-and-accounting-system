@@ -23,7 +23,7 @@ class UserCreationEndpoint extends PostEndpointBase {
 
         // Input validate email address
         const emailValid:boolean = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(user.email);
-        if (emailValid) return Promise.resolve(["Email not valid"]);
+        if (!emailValid) return Promise.resolve(["Email not valid"]);
 
         // Get the group id the manager presides over
         let groupResponse: MySQLResponse = await this.mySQL.select("GROUPS_CONNECTOR", ["groupId"], {column: "managerId", equals: [user.manager.toString()]})

@@ -3,7 +3,7 @@ import {Request, Response} from "express";
 import {addUsersToTask, taskProjectConnector} from "../dataPostEndpoints/projectCreationEndpoint";
 import {MySQLResponse, UpdateSet} from "../../database/mysqlHandler";
 
-interface TaskEditData {
+export interface TaskEditData {
     taskId     : number,
     delete    ?: boolean,
     name      ?: string,

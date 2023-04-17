@@ -23,9 +23,8 @@ abstract class EndpointBase {
             let roles: boolean[] = authData.userRoles.map((value) => {
                 return value.roleId === this.requiredRole || value.roleId === 4
             });
-            console.log(roles, authData.userRoles);
             return roles.indexOf(true) !== -1;
-        } catch (e) { }
+        } catch (e) { console.log(e) }
         return false;
     }
 
@@ -41,7 +40,7 @@ abstract class EndpointBase {
      * @protected
      */
     protected badRequest(res: Response) {
-        res.sendStatus(400);
+        res.status(400).send(JSON.stringify({message: "Bad Request"}));
         res.end();
     }
 }

@@ -39,7 +39,6 @@ class ProjectInformationEndpoint extends GetEndpointBase {
             equals: taskIds
         })}) ut ${join}`);
         if (userTaskResponse.error !== null) throw new Error("[MySQL] Failed to retrieve data");
-        console.log(userTaskResponse.results);
 
         return userTaskResponse.results;
     }
