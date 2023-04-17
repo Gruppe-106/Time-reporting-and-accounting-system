@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { Container, Table, Form, InputGroup, Button, ButtonGroup, Modal } from "react-bootstrap";
-//import { Highlighter, Typeahead } from 'react-bootstrap-typeahead';
+import { Container, Table, Form, InputGroup, Button, ButtonGroup, Modal  } from "react-bootstrap";
+import { Highlighter, Typeahead } from 'react-bootstrap-typeahead';
 import BaseApiHandler from "../../../network/baseApiHandler";
 import { getCurrentWeekDates, dateStringFormatter, dateToNumber } from "../../../utility/timeConverter"
 import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons'
@@ -11,6 +11,11 @@ interface Api {
   data: TimeSheetData[]
 }
 
+interface AddModalApi {
+  status: number,
+  data: SearchData[]
+}
+
 // Loaded data from database, used in TimeSheetRow and TimeSheetPage
 interface TimeSheetData {
   projectName: string;
@@ -18,6 +23,13 @@ interface TimeSheetData {
   taskId: number;
   time: number;
   date: number;
+}
+
+interface SearchData {
+  taskId: number,
+  taskName: string,
+  projectId: number,
+  projectName: string,
 }
 
 interface TaskRowData {
@@ -49,6 +61,8 @@ interface TimeSheetProp {
 // Variable states in TimeSheetPage
 interface TimeSheetState {
   stateRowData: Map<number, TaskRowData>;
+  searchDataState: SearchData[]
+  selectedProject: SearchData
   offsetState: number;
   isUpdating: boolean;
   showAddModal: boolean;
@@ -74,6 +88,13 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     // Initialise states
     this.state = {
       stateRowData: new Map<number, TaskRowData>(),
+      searchDataState: [],
+      selectedProject: {
+        taskId: -1,
+        taskName: "",
+        projectId: -1,
+        projectName: "",
+      },
       offsetState: -28,
       isUpdating: false,
       showAddModal: false,
@@ -84,7 +105,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
       delRowTaskProject: {
         projectName: "",
         taskName: "",
-      }
+      },
     };
   }
 
@@ -93,9 +114,9 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
   };
   private handleShowDelModal = (rowId: number | undefined) => {
     const { stateRowData } = this.state
-    if(rowId) {
-      const taskRowData: TaskRowData | undefined = stateRowData.get(rowId); 
-      this.setState({delRowTaskProject: {projectName: taskRowData?.projectName, taskName: taskRowData?.taskName}})
+    if (rowId) {
+      const taskRowData: TaskRowData | undefined = stateRowData.get(rowId);
+      this.setState({ delRowTaskProject: { projectName: taskRowData?.projectName, taskName: taskRowData?.taskName } })
     }
     this.setState({ deleteId: rowId });
     this.setState({ showDeleteRowModal: true });
@@ -103,9 +124,9 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
   private handleDeleteRow = () => {
     const { stateRowData, deleteId } = this.state;
     if (deleteId) {
-      stateRowData.delete(deleteId); 
+      stateRowData.delete(deleteId);
     }
-    this.setState({ stateRowData }); 
+    this.setState({ stateRowData });
     this.handleCloseDelModal();
   }
   // ************************************************
@@ -116,9 +137,9 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     this.setState({ showAddModal: true })
   }
   private handleAddRow = () => {
-    const { stateRowData } = this.state
+    const { stateRowData, selectedProject } = this.state
 
-    stateRowData.set(-1, { projectName: "NewName", taskName: "NewName", taskId: -1, objectData: [{ date: 1679616000, time: 10 }] })
+    stateRowData.set(selectedProject.taskId, { projectName: selectedProject.projectName, taskName: selectedProject.taskName, taskId: selectedProject.taskId, objectData: [{ date: Date.now(), time: 0 }] })
 
     this.handleCloseAddModal();
   }
@@ -164,6 +185,19 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     getCurrentWeekDates(dates, offsetState);
     this.setState({ headerDates: dates })
     this.getData(offsetState);
+
+    const { userId } = this.props;
+    let apiHandler = new BaseApiHandler();
+    apiHandler.get(
+      `/api/user/task/project/get?user=${userId}&var=taskId,taskName,projectId,projectName`, {},
+      (value) => {
+        let json: AddModalApi = JSON.parse(JSON.stringify(value));
+        if (json.status === 200) {
+          this.setState({ searchDataState: json.data })
+          console.log(json.data)
+        }
+      }
+    );
   }
 
   private getTimeFromData(id: number, timeArr: number[]): number[] {
@@ -266,7 +300,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
   }
 
   render() {
-    const { showAddModal, showDeleteRowModal, deleteId, delRowTaskProject } = this.state;
+    const { showAddModal, showDeleteRowModal, deleteId, delRowTaskProject, searchDataState } = this.state;
 
     return (
       <Container fluid="lg">
@@ -292,6 +326,34 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
           <Modal.Header closeButton>
             <Modal.Title>Add Row?</Modal.Title>
           </Modal.Header>
+          <Modal.Body>
+            <p>Which task do you want to add?</p>
+            <Form.Group className="mb-3" controlId="formBasicAssignManager">
+              <Typeahead
+                id="findProject"
+                labelKey={(option: any) => `${option.projectName}  ${option.taskName}`}
+                options={searchDataState.filter((option: any) => !this.state.stateRowData.has(option.taskName))}
+                placeholder="Pick a project"
+                filterBy={(option: any, props: any): boolean => {
+                  const query: string = props.text.toLowerCase().trim();
+                  const name: string = option.projectName.toLowerCase() + option.taskName.toLowerCase();
+                  return name.includes(query);
+                }}
+                renderMenuItemChildren={(option: any, props: any) => (
+                  <>
+                    <Highlighter search={props.text}>
+                      {option.projectName + ", " + option.taskName}
+                    </Highlighter>
+                  </>
+                )}
+                onChange={(selected: any) => {
+                  // Set selectedProject state to the first selected option (if any)
+                  this.setState({ selectedProject: selected[0] || null });
+                }}
+                selected={this.state.selectedProject ? [this.state.selectedProject] : []}
+              />
+            </Form.Group>
+          </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={this.handleCloseAddModal}>Cancel</Button>
             <Button variant="primary" onClick={this.handleAddRow}>Add</Button>
