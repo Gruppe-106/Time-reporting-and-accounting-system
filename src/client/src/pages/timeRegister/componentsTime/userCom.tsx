@@ -8,94 +8,16 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 
 interface Api {
   status: number,
-  data: TimeSheetRowData[]
-}
-
-/*
-
-    * TODO: User timeSheet
-      * Only render table row if there is time for said table, otherwise be able to create a row for that task.
-      * (Need api for project name and task name connected to user).
-      * 
-      * 
-      * Submit button (Post data)
-
-*/
-
-// Empty prop to indicate that the component will not recive a prop.
-interface TableHeaderProp {
-  timeOffset: number,
-}
-
-interface TableHeaderState {
-  headerDates: string[];
-}
-
-/*
-
-    * Creating the table header
-
-*/
-class TableHeader extends React.Component<TableHeaderProp, TableHeaderState> {
-  constructor(props: TableHeaderProp) {
-    super(props);
-
-    const dates: string[] = [];
-
-    // Set the initial state
-    this.state = {
-      headerDates: getCurrentWeekDates(dates, this.props.timeOffset),
-    };
-  }
-
-  render() {
-    const today = new Date();
-    const stringToday = dateStringFormatter(dateToNumber(today));
-
-
-    return (
-      <thead>
-        <tr>
-          <th>Project Name</th>
-          <th>Task Name</th>
-          {/* Gets the dates, and maps each date with an index to a table header, creating 7 <th>, all dates in a week */}
-          {this.state.headerDates.map((date, index) => (
-            <th key={index} className={date === stringToday ? "bg-light" : ""}>{date}</th>
-          ))}
-          <th>Total Time</th>
-          <th>&#128465;</th> {/* Trashcan, HTML Entity: */}
-        </tr>
-      </thead>
-    );
-  }
+  data: TimeSheetData[]
 }
 
 // Loaded data from database, used in TimeSheetRow and TimeSheetPage
-interface TimeSheetRowData {
+interface TimeSheetData {
   projectName: string;
   taskName: string;
   taskId: number;
   time: number;
   date: number;
-}
-
-// The props given to TimeSheetRow
-interface TimeSheetRowProps {
-  rowData: Map<number, TaskRowData>;
-  onDelete: (rowId: number) => void;
-}
-
-// State of variables in TimeSheetRow
-interface TimeSheetRowState {
-  times: number[];
-  deleteRow: delRow
-  showDeleteRowModal: boolean;
-}
-
-type delRow = {
-  projectName: string | undefined,
-  taskName: string | undefined,
-  taskId: number | undefined,
 }
 
 interface TaskRowData {
@@ -110,161 +32,14 @@ interface TaskRowData {
 
 /*
 
-    * Creating a tablerow for the table body, takes in 2 props, data and onDelete
+    * TODO: User timeSheet
+      * Only render table row if there is time for said table, otherwise be able to create a row for that task.
+      * (Need api for project name and task name connected to user).
+      * 
+      * 
+      * Submit button (Post data)
 
 */
-class TimeSheetRow extends Component<TimeSheetRowProps, TimeSheetRowState> {
-  constructor(props: TimeSheetRowProps) {
-    super(props);
-
-    // Inilisie all states
-    this.state = {
-      times: [0, 0, 0, 0, 0, 0, 0],
-      deleteRow: {
-        projectName: "",
-        taskName: "",
-        taskId: -1
-      },
-      showDeleteRowModal: false,
-    };
-
-  }
-
-  /*
-      * Closes the modal 
-   */
-  private handleCloseModal = () => {
-    this.setState({ showDeleteRowModal: false });
-  };
-
-  /*
-      * Opens the modal
-   */
-  private handleShowDelModal = (taskToDel: delRow) => {
-    const { deleteRow } = this.state
-
-    deleteRow.taskId = taskToDel.taskId;
-
-    this.setState({ deleteRow: taskToDel })
-    this.setState({ showDeleteRowModal: true });
-  };
-
-
-  /*
-      * Calles the onDelete function/method, and then closes the modal 
-   */
-  private handleDeleteClick = () => {
-    const { onDelete } = this.props;
-    const { deleteRow } = this.state
-
-    if (deleteRow.taskId) onDelete(deleteRow.taskId);
-    this.handleCloseModal();
-  };
-
-  getTimeData(id: number, timeArr: number[], timeOffset: number = 0): number[] {
-    const { rowData } = this.props;
-
-    for (let j = 0; j < 7; j++) {
-      timeArr[j] = 0;
-    }
-
-    let dates: string[] = [];
-    getCurrentWeekDates(dates, timeOffset);
-
-    for (const key of Array.from(rowData.keys())) {
-      let data = rowData.get(key);
-      if (data && id === data.taskId) {
-        data.objectData.map((item) => {
-          for (let i = 0; i < dates.length; i++) {
-            const currentDate = dateStringFormatter(item.date);
-            const matchDate = dates[i];
-            if (currentDate === matchDate) {
-              timeArr[i] = item.time;
-            }
-          }
-          return true;
-        })
-      }
-    }
-    return timeArr;
-  }
-
-
-  renderTaskRows() {
-    const { rowData } = this.props;
-
-    let arr: number[] = [];
-
-    let rows: JSX.Element[] = [];
-
-    for (const key of Array.from(rowData.keys())) {
-      let data = rowData.get(key);
-      if (data) {
-        this.getTimeData(data.taskId, arr)
-        rows.push((
-          <tr>
-            <td>{data.projectName}</td>
-            <td>{data.taskName}</td>
-            {arr.map((num, index) => {
-              return (
-                <td key={index}>
-                  <InputGroup size="sm">
-                    <Form.Control type="number" placeholder="0" value={num} />
-                    <InputGroup.Text id={`basic-addon-${index}`}>:</InputGroup.Text>
-                    <Form.Select>
-                      <option value="0">0</option>
-                      <option value="15">15</option>
-                      <option value="30">30</option>
-                      <option value="45">45</option>
-                    </Form.Select>
-                  </InputGroup>
-                </td>
-              );
-            })}
-            <td>{arr.reduce((partialSum, a) => partialSum + a, 0)}</td>
-            <td><Button variant="danger" onClick={() => this.handleShowDelModal({ projectName: data?.projectName, taskName: data?.taskName, taskId: data?.taskId })}>-</Button></td>
-          </tr>
-        ))
-      }
-    }
-    return rows;
-  }
-  //<td>{data.taskId}</td>
-  //<Button variant="danger" size="sm" onClick={() => this.handleShowDelModal(data.taskId)}>Delete</Button>
-
-
-
-  render() {
-    const { showDeleteRowModal, deleteRow } = this.state;
-
-    return (
-      <Container>
-        <Table bordered size="sm" className="fixed-table ellipses">
-          <TableHeader timeOffset={-21} />
-          <tbody>{this.renderTaskRows()}</tbody>
-        </Table>
-        <></>
-        <Modal show={showDeleteRowModal} onHide={this.handleCloseModal}>
-          <Modal.Header closeButton>
-            <Modal.Title>Delete Row?</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <p>Are you sure you want to delete: {deleteRow.taskName}</p>
-            <p>{deleteRow.taskName}, in {deleteRow.projectName}</p>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={this.handleCloseModal}>
-              Cancel
-            </Button>
-            <Button variant="danger" onClick={() => this.handleDeleteClick()}> {/* This 2 is the row number (taskId) */}
-              Delete
-            </Button>
-          </Modal.Footer>
-        </Modal>
-      </Container>
-    );
-  }
-}
 
 // Props used in TimeSheetPage
 interface TimeSheetProp {
@@ -277,6 +52,10 @@ interface TimeSheetState {
   offsetState: number;
   isUpdating: boolean;
   showAddModal: boolean;
+  headerDates: string[];
+  times: number[];
+  showDeleteRowModal: boolean;
+  deleteId: number | undefined;
 }
 
 /*
@@ -291,13 +70,53 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     // Initialise states
     this.state = {
       stateRowData: new Map<number, TaskRowData>(),
-      offsetState: -21,
+      offsetState: -28,
       isUpdating: false,
       showAddModal: false,
+      headerDates: [],
+      times: [0, 0, 0, 0, 0, 0, 0],
+      showDeleteRowModal: false,
+      deleteId: -1,
     };
   }
 
-  getData(timeOffset: number = 0) {
+  private handleCloseDelModal = () => {
+    this.setState({ showDeleteRowModal: false });
+  };
+  private handleShowDelModal = (rowId: number | undefined) => {
+    this.setState({ deleteId: rowId });
+    this.setState({ showDeleteRowModal: true });
+  };
+  private handleDeleteRow = () => {
+    const { stateRowData, deleteId } = this.state;
+    if (deleteId) {
+      stateRowData.delete(deleteId); // Delete the row from rowData map based on rowId
+    }
+    this.setState({ stateRowData }); // Update the state to trigger re-render
+    this.handleCloseDelModal();
+  }
+  // ************************************************
+  private handleCloseAddModal = () => {
+    this.setState({ showAddModal: false })
+  }
+  private handleShowAddModal = () => {
+    this.setState({ showAddModal: true })
+  }
+  private handleAddRow = () => {
+    const { stateRowData } = this.state
+
+    stateRowData.set(-1, { projectName: "NewName", taskName: "NewName", taskId: -1, objectData: [{ date: 1679616000, time: 10 }] })
+
+    this.handleCloseAddModal();
+  }
+
+
+  /*
+  
+  ******* Get data function
+  
+  */
+  private getData(timeOffset: number = 0) {
     const { userId } = this.props;
     let timeSheetDate: string[] = []
     getCurrentWeekDates(timeSheetDate, timeOffset);
@@ -325,83 +144,162 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     );
   }
 
-  // apiHandler to get data from "database", the data is passed to the data array
+  // Called once when code is runned
   public componentDidMount() {
     const { offsetState } = this.state
+    const dates: string[] = [];
+    getCurrentWeekDates(dates, offsetState);
+    this.setState({headerDates: dates})
     console.log(offsetState)
     this.getData(offsetState);
   }
 
-  handleShowAddModal = () => {
-    this.setState({ showAddModal: true })
-  }
-  handleCloseModal = () => {
-    this.setState({ showAddModal: false })
-  }
-  handleAddModal = () => {
-    const { stateRowData } = this.state
+  private getTimeFromData(id: number, timeArr: number[]): number[] {
+    const { stateRowData, offsetState } = this.state;
 
-    stateRowData.set(-1, { projectName: "NewName", taskName: "NewName", taskId: -1, objectData: [{ date: 1679616000, time: 10 }] })
+    for (let j = 0; j < 7; j++) {
+      timeArr[j] = 0;
+    }
 
-    this.handleCloseModal();
-  }
-  handleDeleteRow = (rowId: number) => {
-    const { stateRowData } = this.state;
-    stateRowData.delete(rowId); // Delete the row from rowData map based on rowId
-    this.setState({ stateRowData }); // Update the state to trigger re-render
-  }
+    let dates: string[] = [];
+    getCurrentWeekDates(dates, offsetState);
 
-  handleButtonClick = (increment: boolean): Promise<void> => {
-    return new Promise((resolve) => {
-      this.setState({ isUpdating: true }, () => {
-        setTimeout(() => {
-          const { offsetState } = this.state;
-          const incrementValue = increment ? 7 : -7;
-          const updatedOffset = offsetState + incrementValue;
-          this.setState(
-            { offsetState: updatedOffset, isUpdating: false},
-            () => {
-              this.getData(offsetState);
-              console.log(offsetState);
-              resolve();
+    for (const key of Array.from(stateRowData.keys())) {
+      let data = stateRowData.get(key);
+      if (data && id === data.taskId) {
+        data.objectData.map((item) => {
+          for (let i = 0; i < dates.length; i++) {
+            const currentDate = dateStringFormatter(item.date);
+            const matchDate = dates[i];
+            if (currentDate === matchDate) {
+              timeArr[i] = item.time;
             }
-          );
-        }, 1000);
-      });
-    });
-  };
+          }
+          return true;
+        })
+      }
+    }
+    return timeArr;
+  }
+
+  renderHeaderRow() {
+    const { headerDates } = this.state
+
+    const today = new Date();
+    const stringToday = dateStringFormatter(dateToNumber(today));
+    return (
+      < thead >
+        <tr>
+          <th>Project Name</th>
+          <th>Task Name</th>
+          {/* Gets the dates, and maps each date with an index to a table header, creating 7 <th>, all dates in a week */}
+          {headerDates.map((date, index) => (
+            <th key={index} className={date === stringToday ? "bg-light" : ""}>{date}</th>
+          ))}
+          <th>Total Time</th>
+          <th>&#128465;</th> {/* Trashcan, HTML Entity: */}
+        </tr>
+      </thead >
+    )
+  }
+
+  renderTaskRows() {
+    const { stateRowData } = this.state;
+
+    let arr: number[] = [];
+
+    let rows: JSX.Element[] = [];
+
+    for (const key of Array.from(stateRowData.keys())) {
+      let data = stateRowData.get(key);
+      if (data) {
+        this.getTimeFromData(data.taskId, arr)
+        rows.push((
+          <tr>
+            <td>{data.projectName}</td>
+            <td>{data.taskName}</td>
+            {arr.map((num, index) => {
+              return (
+                <td key={index}>
+                  <InputGroup size="sm">
+                    <Form.Control type="number" placeholder="0" value={num} />
+                    <InputGroup.Text id={`basic-addon-${index}`}>:</InputGroup.Text>
+                    <Form.Select>
+                      <option value="0">0</option>
+                      <option value="15">15</option>
+                      <option value="30">30</option>
+                      <option value="45">45</option>
+                    </Form.Select>
+                  </InputGroup>
+                </td>
+              );
+            })}
+            <td>{arr.reduce((partialSum, a) => partialSum + a, 0)}</td>
+            <td><Button variant="danger" onClick={() => this.handleShowDelModal(data?.taskId)}>-</Button></td>
+          </tr>
+        ))
+      }
+    }
+    return rows;
+  }
+
+  private handleButtonClick = (increment: number) => {
+    const { offsetState } = this.state;
+    const updatedOffset = offsetState + increment;
+    this.setState({ offsetState: updatedOffset });
+    const newDates: string[] = [];
+    getCurrentWeekDates(newDates, offsetState)
+    this.setState({headerDates: newDates});
+    this.getData(offsetState);
+  }
 
   render() {
-    const { stateRowData, showAddModal, isUpdating, offsetState } = this.state;
+    const { showAddModal, showDeleteRowModal, offsetState } = this.state;
 
     return (
       <Container fluid="lg">
-        <TimeSheetRow rowData={stateRowData} onDelete={this.handleDeleteRow} />
+        <Table bordered size="sm" className="fixed-table ellipses">
+          {this.renderHeaderRow()}
+          <tbody>{this.renderTaskRows()}</tbody>
+        </Table>
         <Button variant="primary" type="button" onClick={() => this.handleShowAddModal()}>Add Row</Button>
         <></>
         <ButtonGroup aria-label="Basic example">
           <Button
-            onClick={() => {
-              if (!isUpdating) { this.handleButtonClick(false); }
-            }} disabled={isUpdating}
+            onClick={() => { this.handleButtonClick(-7) }}
             variant="primary"><FontAwesomeIcon icon={faArrowLeft} />
           </Button>
           <Button
-            onClick={() => {
-              if (!isUpdating) { this.handleButtonClick(true); }
-            }} disabled={isUpdating}
+            onClick={() => { this.handleButtonClick(7) }}
             variant="primary"><FontAwesomeIcon icon={faArrowRight} />
           </Button>
         </ButtonGroup>
         <p>{offsetState}</p>
         <></>
-        <Modal show={showAddModal} onHide={this.handleCloseModal}>
+        <Modal show={showAddModal} onHide={this.handleCloseAddModal}>
           <Modal.Header closeButton>
             <Modal.Title>Add Row?</Modal.Title>
           </Modal.Header>
           <Modal.Footer>
-            <Button variant="secondary" onClick={this.handleCloseModal}>Cancel</Button>
-            <Button variant="primary" onClick={this.handleAddModal}>Add</Button>
+            <Button variant="secondary" onClick={this.handleCloseAddModal}>Cancel</Button>
+            <Button variant="primary" onClick={this.handleAddRow}>Add</Button>
+          </Modal.Footer>
+        </Modal>
+        <></>
+        <Modal show={showDeleteRowModal} onHide={this.handleCloseDelModal}>
+          <Modal.Header closeButton>
+            <Modal.Title>Delete Row?</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <p>Are you sure you want to delete:</p>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={this.handleCloseDelModal}>
+              Cancel
+            </Button>
+            <Button variant="danger" onClick={this.handleDeleteRow}> {/* This 2 is the row number (taskId) */}
+              Delete
+            </Button>
           </Modal.Footer>
         </Modal>
       </Container>
@@ -410,19 +308,3 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
 }
 
 export default TimeSheetPage;
-
-
-/*handleGetWeekButton = (increment: boolean): Promise<void> => {
-  return new Promise((resolve) => {
-    this.setState({ isUpdating: true }, () => {
-      const { offsetState } = this.state;
-      const incrementValue = increment ? 7 : -7;
-      this.setState(
-        { offsetState: offsetState + incrementValue },
-        () => {
-          this.setState({ isUpdating: false }, resolve);
-        }
-      );
-    });
-  });
-} */
