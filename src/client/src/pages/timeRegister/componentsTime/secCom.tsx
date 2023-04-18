@@ -249,7 +249,7 @@ interface TimeSheetState {
     * Creating the full Timesheet page
 
 */
-class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
+class TimeSheetPage2 extends Component<TimeSheetProp, TimeSheetState> {
   constructor(props: TimeSheetProp) {
     super(props);
 
@@ -345,7 +345,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     const { stateRowData } = this.state;
   
     const dates: string[] = [];
-    getCurrentWeekDates(dates, - 19);
+    getCurrentWeekDates(dates, - 28);
   
     const projectNames: string[] = [];
     const taskNames: string[] = [];
@@ -440,4 +440,4 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
   }
 }
 
-export default TimeSheetPage;
+export default TimeSheetPage2;

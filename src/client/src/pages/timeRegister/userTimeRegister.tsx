@@ -8,7 +8,6 @@ import BaseNavBar from "../../components/navBar";
 import {Container} from "react-bootstrap";
 import TimeSheetPage from "./componentsTime/userCom";
 import UserTimeSheet from "./componentsTime/adminCom";
-
 import { userInfo } from '../../utility/router';
 
 class UserTimeRegister extends Component<any>{

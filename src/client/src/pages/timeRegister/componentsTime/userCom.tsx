@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Container, Table, Form, InputGroup, Button, ButtonGroup, Modal  } from "react-bootstrap";
+import { Container, Table, Form, InputGroup, Button, ButtonGroup, Modal } from "react-bootstrap";
 import { Highlighter, Typeahead } from 'react-bootstrap-typeahead';
 import BaseApiHandler from "../../../network/baseApiHandler";
 import { getCurrentWeekDates, dateStringFormatter, dateToNumber } from "../../../utility/timeConverter"
@@ -73,7 +73,7 @@ interface TimeSheetState {
   delRowTaskProject: {
     projectName: string | undefined,
     taskName: string | undefined,
-  }
+  },
 }
 
 /*
@@ -144,6 +144,42 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     this.handleCloseAddModal();
   }
 
+  private handleTimeChange(index: number, value: number, data: TaskRowData | undefined) {
+    const { stateRowData, offsetState } = this.state;
+
+    let dates: string[] = [];
+    getCurrentWeekDates(dates, offsetState);
+
+    for (const key of Array.from(stateRowData.keys())) {
+      let rowData = stateRowData.get(key);
+      if (data && rowData && data.taskId === rowData.taskId) {
+        let dateFound: boolean = false;
+        rowData.objectData.map((item) => {
+          if (item.date === Date.parse(dates[index])) {
+            if (value === 0 && rowData) {
+                rowData.objectData = rowData.objectData.filter(
+                  (objItem) => objItem.date !== item.date
+                );
+            } else {
+              item.time = Math.max(0, value); // Prevent value from going below 0
+            }
+            dateFound = true;
+          }
+          return item; // just to return something
+        });
+
+        if (!dateFound && value > 0) {
+          rowData.objectData.push({ date: Date.parse(dates[index]), time: Math.max(0, value) });
+        }
+
+        this.setState({ stateRowData });
+        break; // Break out of the map function if date matches or if a new object was pushed.
+      }
+    }
+  }
+
+
+
 
   /*
   
@@ -194,7 +230,6 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
         let json: AddModalApi = JSON.parse(JSON.stringify(value));
         if (json.status === 200) {
           this.setState({ searchDataState: json.data })
-          console.log(json.data)
         }
       }
     );
@@ -256,16 +291,10 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
 
     let rows: JSX.Element[] = [];
 
-    const handleTimeChange = (num: number, index: number) => {
-      arr[index] = num
-      // Perform any additional logic or state updates related to time change here
-    };
-
     for (const key of Array.from(stateRowData.keys())) {
       let data = stateRowData.get(key);
       if (data) {
         this.getTimeFromData(data.taskId, arr)
-        console.log(arr)
         rows.push((
           <tr>
             <td>{data.projectName}</td>
@@ -274,13 +303,13 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
               return (
                 <td key={index}>
                   <InputGroup size="sm">
-                    <Form.Control type="number" placeholder="0" value={num} onChange={(event) => handleTimeChange(parseInt(event.target.value), index)} />
+                    <Form.Control type="number" placeholder="0" value={arr[index]} onChange={(e) => this.handleTimeChange(index, parseInt(e.target.value), data)} />
                     <InputGroup.Text id={`basic-addon-${index}`}>:</InputGroup.Text>
-                    <Form.Select>
-                      <option value="0">0</option>
-                      <option value="15">15</option>
-                      <option value="30">30</option>
-                      <option value="45">45</option>
+                    <Form.Select >
+                      <option value={0}>0</option>
+                      <option value={15}>15</option>
+                      <option value={30}>30</option>
+                      <option value={45}>45</option>
                     </Form.Select>
                   </InputGroup>
                 </td>
