@@ -312,7 +312,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
               return (
                 <td key={index}>
                   <InputGroup size="sm">
-                    <Form.Control type="number" placeholder="0" value={Math.floor(arr[index] / 60)} onChange={(e) => this.handleTimeChange(index, parseInt(e.target.value), data)} />
+                    <Form.Control type="number" placeholder="0" value={arr[index]} onChange={(e) => this.handleTimeChange(index, parseInt(e.target.value), data)} />
                     <InputGroup.Text id={`basic-addon-${index}`}>:</InputGroup.Text>
                     <Form.Select
                       style={{ fontSize: '14px', border: '1px solid #ccc', borderRadius: '0 4px 4px 0', fontFamily: 'Helvetica', color: "#212529" }}
