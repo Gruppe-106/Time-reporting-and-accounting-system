@@ -3,24 +3,19 @@ import {headers} from "./testBaseConfig";
 
 const apiHandler = new BaseApiHandler("http://localhost:8080");
 
-// Check if all base api routes exists
-test("Testing GET base api", () => {
-    apiHandler.get("/api/", {headers: headers}, (value) => {
-        expect(value["message"]).toMatch("Api GET gotten");
-    })
-});
-test("Testing POST base api", () => {
-    apiHandler.post("/api/", {headers: headers}, (value) => {
-        expect(value["message"]).toMatch("Api POST gotten");
-    })
-});
-test("Testing PUT base api", () => {
-    apiHandler.put("/api/", {headers: headers}, (value) => {
-        expect(value["message"]).toMatch("Api PUT gotten");
-    })
-});
-test("Testing DELETE base api", () => {
-    apiHandler.delete("/api/", {headers: headers},(value) => {
-        expect(value["message"]).toMatch("Api DELETE gotten");
-    })
+describe("Testing base api routes", () => {
+  const testCases = [
+    { method: "get", message: "Api GET gotten" },
+    { method: "post", message: "Api POST gotten" },
+    { method: "put", message: "Api PUT gotten" },
+    { method: "delete", message: "Api DELETE gotten" },
+  ];
+
+  testCases.forEach(({ method, message }) => {
+    test(`Testing \${method.toUpperCase()} base api`, () => {
+      apiHandler[method]("/api/", { headers: headers }, (value: { [x: string]: any; }) => {
+        expect(value["message"]).toMatch(message);
+      });
+    });
+  });
 });
