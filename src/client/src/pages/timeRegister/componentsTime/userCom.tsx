@@ -178,6 +178,15 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     }
   }
 
+  private displayTimeTotal = (value: number): JSX.Element => {
+
+    const hours = Math.floor(value / 60);
+    const minutes = value % 60;
+
+    return (
+      <p>{hours}:{minutes}</p>
+    )
+  }
 
 
 
@@ -303,12 +312,13 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
               return (
                 <td key={index}>
                   <InputGroup size="sm">
-                    <Form.Control type="number" placeholder="0" value={arr[index]} onChange={(e) => this.handleTimeChange(index, parseInt(e.target.value), data)} />
+                    <Form.Control type="number" placeholder="0" value={Math.floor(arr[index] / 60)} onChange={(e) => this.handleTimeChange(index, parseInt(e.target.value), data)} />
                     <InputGroup.Text id={`basic-addon-${index}`}>:</InputGroup.Text>
                     <Form.Select
                       style={{ fontSize: '14px', border: '1px solid #ccc', borderRadius: '0 4px 4px 0', fontFamily: 'Helvetica', color: "#212529" }}
                       className="myFormSelect"
-                      bsPrefix="myFormSelect">
+                      bsPrefix="myFormSelect"
+                      defaultValue={arr[index] % 60}>
                       <option value={0}>0</option>
                       <option value={15}>15</option>
                       <option value={30}>30</option>
@@ -320,7 +330,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
                 </td>
               );
             })}
-            <td>{arr.reduce((partialSum, a) => partialSum + a, 0)}</td>
+            <td>{this.displayTimeTotal(arr.reduce((partialSum, a) => partialSum + a, 0))}</td>
             <td><Button variant="danger" onClick={() => this.handleShowDelModal(data?.taskId)}>-</Button></td>
           </tr>
         ))
