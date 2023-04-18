@@ -306,7 +306,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
                     <Form.Control type="number" placeholder="0" value={arr[index]} onChange={(e) => this.handleTimeChange(index, parseInt(e.target.value), data)} />
                     <InputGroup.Text id={`basic-addon-${index}`}>:</InputGroup.Text>
                     <Form.Select
-                      style={{fontSize: '14px', border: '1px solid #ccc', borderRadius: '0 4px 4px 0', fontFamily: 'Helvetica', color: "#212529"}}
+                      style={{ fontSize: '14px', border: '1px solid #ccc', borderRadius: '0 4px 4px 0', fontFamily: 'Helvetica', color: "#212529" }}
                       className="myFormSelect"
                       bsPrefix="myFormSelect">
                       <option value={0}>0</option>
