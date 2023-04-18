@@ -308,8 +308,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
                     <Form.Select
                       style={{fontSize: '14px', border: '1px solid #ccc', borderRadius: '0 4px 4px 0', fontFamily: 'Helvetica', color: "#212529"}}
                       className="myFormSelect"
-                      bsPrefix="myFormSelect"
-                    >
+                      bsPrefix="myFormSelect">
                       <option value={0}>0</option>
                       <option value={15}>15</option>
                       <option value={30}>30</option>
