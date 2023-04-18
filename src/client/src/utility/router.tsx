@@ -18,6 +18,7 @@ import UserTimeRegister from "../pages/timeRegister/userTimeRegister";
 import BaseApiHandler from "../network/baseApiHandler";
 import {Col, Row} from "react-bootstrap";
 import Spinner from "react-bootstrap/Spinner";
+import TaskCreator from "../pages/projectCreation/taskCreator";
 
 interface AuthApi {
     status: number,
@@ -85,6 +86,7 @@ class Router extends Component<any> {
                                 { userInfo.isManager ?  <Route path={"/data-export"} Component={DataExport}/> : ""}
                                 { userInfo.isProjectLeader ?  <Route path={"/project/create"} Component={ProjectCreator}/> : ""}
                                 { userInfo.isProjectLeader ? <Route path={"/project/manage"} Component={ProjectManager}/> : ""}
+                                { userInfo.isProjectLeader ? <Route path={"/project/create/task"} Component={TaskCreator}/> : ""}
                                 <Route path={"/project/menu"} Component={ProjectMenu}/>
                                 <Route path={"/project/viewer"} Component={ProjectViewer}/>
                                 { userInfo.isManager && !userInfo.isAdmin ?  <Route path={"/group/manager"} Component={GroupManager}/> : ""}
