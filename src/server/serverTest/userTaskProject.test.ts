@@ -13,6 +13,7 @@ describe("User Task Project API", () => {
 
         test("Success GET message", async () => {
             apiHandler.get("/api/user/task/project/get?user=6", {headers: headers}, (value) => {
+                expect(value["status"]).toBe(200);
                 expect(value).toStrictEqual({
                     status: 200,
                     data: [

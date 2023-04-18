@@ -20,7 +20,7 @@ class DataExport extends Component<any>{
                 <Container>
                     <Button onClick={() => {
                         let apiHandler = new BaseApiHandler();
-                        apiHandler.get("/api/group/manager/get?manager=2", {}, (value) => {
+                        apiHandler.get("/api/time/register/get?user=3,4,5", {}, (value) => {
                             console.log(value)
                         });
                     }

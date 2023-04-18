@@ -19,11 +19,3 @@ describe("Testing base api routes", () => {
     });
   });
 });
-
-require("./role.test")
-require("./groupEndpoint.test")
-require("./projectTaskEndpoint.test")
-require("./userTaskProject.test")
-require("./projectEndpoint.test")
-require("./taskEndpoint.test")
-require("./userEndpoint.test")

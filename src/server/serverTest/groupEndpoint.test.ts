@@ -13,9 +13,9 @@ describe("Group API", () => {
 
         test("Success GET message manager", async() => {
             await apiHandler.get("/api/group/manager/get?manager=2", {headers: headers}, (value) => {
-                expect(value["status"]).toEqual(400);
+                expect(value["status"]).toEqual(200);
                 expect(value).toStrictEqual({
-                    "status": 400,
+                    "status": 200,
                     "data":
                         [
                             {
@@ -32,6 +32,7 @@ describe("Group API", () => {
 
         test("Success GET message group", () => {
             apiHandler.get("/api/group/manager/get?group=2", {headers: headers}, (value) => {
+                expect(value["status"]).toEqual(200);
                 expect(value).toStrictEqual({
                     "status": 200,
                     "data": [{

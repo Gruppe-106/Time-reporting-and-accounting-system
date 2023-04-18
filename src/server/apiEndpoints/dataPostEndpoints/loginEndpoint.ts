@@ -12,11 +12,15 @@ class LoginEndpoint extends PostEndpointBase{
     requiredRole: number;
     
     async processRequest(req: Request, res: Response): Promise<{ status: number; data: object }> {
+        if(req.body.constructor === Object && Object.keys(req.body).length === 0) {
+            return {status: 404, data: {success: "false", message: "Missing Body"}};
+        }
         return {status: 200, data: await this.submitData(req, res)};
     }
 
     async submitData(req: Request, res: Response): Promise<string[]> {
         let data: LoginData = req.body;
+        if (data.email === undefined || data.password === undefined) return ["Password and/or email invalid"];
 
         // Try to get the auth table with the specified email
         let authResponse: MySQLResponse = await this.mySQL.select("AUTH", ["authKey", "authKeyEndDate", "password", "userId"], {column: "email", equals: [data.email]});
