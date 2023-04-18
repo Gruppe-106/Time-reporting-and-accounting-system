@@ -90,9 +90,9 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
       stateRowData: new Map<number, TaskRowData>(),
       searchDataState: [],
       selectedProject: {
-        taskId: -1,
+        taskId: Infinity,
         taskName: "",
-        projectId: -1,
+        projectId: Infinity,
         projectName: "",
       },
       offsetState: -28,
@@ -101,7 +101,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
       headerDates: [],
       times: [0, 0, 0, 0, 0, 0, 0],
       showDeleteRowModal: false,
-      deleteId: -1,
+      deleteId: Infinity,
       delRowTaskProject: {
         projectName: "",
         taskName: "",
@@ -157,9 +157,9 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
         rowData.objectData.map((item) => {
           if (item.date === Date.parse(dates[index])) {
             if (value === 0 && rowData) {
-                rowData.objectData = rowData.objectData.filter(
-                  (objItem) => objItem.date !== item.date
-                );
+              rowData.objectData = rowData.objectData.filter(
+                (objItem) => objItem.date !== item.date
+              );
             } else {
               item.time = Math.max(0, value); // Prevent value from going below 0
             }
@@ -305,12 +305,18 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
                   <InputGroup size="sm">
                     <Form.Control type="number" placeholder="0" value={arr[index]} onChange={(e) => this.handleTimeChange(index, parseInt(e.target.value), data)} />
                     <InputGroup.Text id={`basic-addon-${index}`}>:</InputGroup.Text>
-                    <Form.Select >
+                    <Form.Select
+                      style={{fontSize: '14px', border: '1px solid #ccc', borderRadius: '0 4px 4px 0', fontFamily: 'Helvetica', color: "#212529"}}
+                      className="myFormSelect"
+                      bsPrefix="myFormSelect"
+                    >
                       <option value={0}>0</option>
                       <option value={15}>15</option>
                       <option value={30}>30</option>
                       <option value={45}>45</option>
                     </Form.Select>
+
+
                   </InputGroup>
                 </td>
               );

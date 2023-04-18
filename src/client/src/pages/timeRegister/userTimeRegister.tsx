@@ -20,6 +20,7 @@ class UserTimeRegister extends Component<any>{
                 </Container>
                 <TimeSheetPage userId={userInfo.userId} /> 
                 {userInfo.isAdmin ? (<UserTimeSheet/>) : null} {/*Button to adminCom*/}
+                {console.log(userInfo)}
             </>
         );
     }
