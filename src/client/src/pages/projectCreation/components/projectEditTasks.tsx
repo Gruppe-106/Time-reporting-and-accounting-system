@@ -115,6 +115,10 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
   deleteTaskId: number = Infinity;
 
   componentDidMount() {
+    this.getInformation()
+  }
+
+  getInformation() {
     //First make an instance of the api handler, give it the auth key of the user once implemented
     let apiHandler = new BaseApiHandler();
     //Run the get or post function depending on need only neccesarry argument is the path aka what comes after the hostname
@@ -213,6 +217,7 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
       apiHandler.post(`/api/task/creation/post`, {body:post_data}, (value) =>{
         console.log(value);
       })
+      this.getInformation()
     }))
 
   };
@@ -238,6 +243,7 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
         })
         this.setState({formSubmitted: true})
         this.handleClose()
+        this.getInformation()
       }
   }
 
