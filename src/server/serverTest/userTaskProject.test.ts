@@ -18,6 +18,12 @@ describe("User Task Project API", () => {
                     status: 200,
                     data: [
                         {
+                            taskName: 'Task X',
+                            taskId: 1,
+                            projectId: 1,
+                            projectName: 'Project Alpha'
+                        },
+                        {
                             taskName: 'Task Z',
                             taskId: 3,
                             projectId: 3,

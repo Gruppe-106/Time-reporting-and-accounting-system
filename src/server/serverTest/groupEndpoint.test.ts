@@ -59,7 +59,6 @@ describe("Group API", () => {
     describe("POST API", () => {
         test("Fail case", () => {
             apiHandler.post("/api/group/creation/post", { headers: headers }, (value) => {
-                console.log(value["data"]["success"])
                 expect(value["status"]).toBe(404);
                 expect(value["data"]["success"]).toMatch("false");
                 expect(value["data"]["message"]).toMatch("Missing Body");
@@ -68,7 +67,8 @@ describe("Group API", () => {
 
         test("Success case", () => {
             apiHandler.post("/api/group/creation/post", { headers: headers, body: { managerId: 3 } }, (value) => {
-                expect(value["data"]["success"]).toMatch("false");
+                expect(value["data"]["success"]).toMatch("true");
+                expect(value["status"]).toBe(200);
             });
         });
     });

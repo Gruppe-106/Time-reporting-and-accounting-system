@@ -29,7 +29,7 @@ describe("User API", () => {
                     "data": [
                         {id: 1, email: 'matt@example.com', firstName: 'Matt', lastName: 'Brown', groupId: 2},
                         {id: 3, email: 'jane@example.com', firstName: 'Jane', lastName: 'Doe', groupId: 4},
-                        {id: 5, email: 'jill@example.com', firstName: 'Jill', lastName: 'Jones', groupId: 3}
+                        {id: 5, email: 'jill@example.com', firstName: 'Jill', lastName: 'Jones', groupId: 1}
                     ]
                 });
             });

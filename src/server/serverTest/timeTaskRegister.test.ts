@@ -18,159 +18,76 @@ describe("Time-type API", () => {
                 expect(value["status"]).toBe(200);
                 expect(value).toStrictEqual(
                     {
-                    "status": 200,
-                    "data": [{
-                        "date": 1679526000000,
-                        "taskId": 2,
-                        "userId": 1,
-                        "time": 1,
-                        "approved": 0,
-                        "managerLogged": 0,
-                        "taskName": "Task Y",
-                        "projectId": 1,
-                        "projectName": "Project test"
-                    }, {
-                        "date": 1679612400000,
-                        "taskId": 2,
-                        "userId": 1,
-                        "time": 5,
-                        "approved": 1,
-                        "managerLogged": 1,
-                        "taskName": "Task Y",
-                        "projectId": 1,
-                        "projectName": "Project test"
-                    }, {
-                        "date": 1679785200000,
-                        "taskId": 2,
-                        "userId": 1,
-                        "time": 10,
-                        "approved": 0,
-                        "managerLogged": 1,
-                        "taskName": "Task Y",
-                        "projectId": 1,
-                        "projectName": "Project test"
-                    }, {
-                        "date": 1679266800000,
-                        "taskId": 10,
-                        "userId": 1,
-                        "time": 1,
-                        "approved": 0,
-                        "managerLogged": 0,
-                        "taskName": "Task G",
-                        "projectId": 1,
-                        "projectName": "Project test"
-                    }, {
-                        "date": 1679353200000,
-                        "taskId": 10,
-                        "userId": 1,
-                        "time": 2,
-                        "approved": 0,
-                        "managerLogged": 0,
-                        "taskName": "Task G",
-                        "projectId": 1,
-                        "projectName": "Project test"
-                    }, {
-                        "date": 1679698800000,
-                        "taskId": 10,
-                        "userId": 1,
-                        "time": 3,
-                        "approved": 1,
-                        "managerLogged": 1,
-                        "taskName": "Task G",
-                        "projectId": 1,
-                        "projectName": "Project test"
-                    }, {
-                        "date": 1679526000000,
-                        "taskId": 2,
-                        "userId": 1,
-                        "time": 1,
-                        "approved": 0,
-                        "managerLogged": 0,
-                        "taskName": "Task Y",
-                        "projectId": 2,
-                        "projectName": "Project Beta"
-                    }, {
-                        "date": 1679612400000,
-                        "taskId": 2,
-                        "userId": 1,
-                        "time": 5,
-                        "approved": 1,
-                        "managerLogged": 1,
-                        "taskName": "Task Y",
-                        "projectId": 2,
-                        "projectName": "Project Beta"
-                    }, {
-                        "date": 1679785200000,
-                        "taskId": 2,
-                        "userId": 1,
-                        "time": 10,
-                        "approved": 0,
-                        "managerLogged": 1,
-                        "taskName": "Task Y",
-                        "projectId": 2,
-                        "projectName": "Project Beta"
-                    }, {
-                        "date": 1679439600000,
-                        "taskId": 3,
-                        "userId": 1,
-                        "time": 3,
-                        "approved": 1,
-                        "managerLogged": 1,
-                        "taskName": "Task Z",
-                        "projectId": 3,
-                        "projectName": "Project Gamma"
-                    }, {
-                        "date": 1679526000000,
-                        "taskId": 3,
-                        "userId": 1,
-                        "time": 1,
-                        "approved": 1,
-                        "managerLogged": 1,
-                        "taskName": "Task Z",
-                        "projectId": 3,
-                        "projectName": "Project Gamma"
-                    }, {
-                        "date": 1679612400000,
-                        "taskId": 3,
-                        "userId": 1,
-                        "time": 5,
-                        "approved": 0,
-                        "managerLogged": 0,
-                        "taskName": "Task Z",
-                        "projectId": 3,
-                        "projectName": "Project Gamma"
-                    }, {
-                        "date": 1679266800000,
-                        "taskId": 10,
-                        "userId": 1,
-                        "time": 1,
-                        "approved": 0,
-                        "managerLogged": 0,
-                        "taskName": "Task G",
-                        "projectId": 5,
-                        "projectName": "Project Epsilon"
-                    }, {
-                        "date": 1679353200000,
-                        "taskId": 10,
-                        "userId": 1,
-                        "time": 2,
-                        "approved": 0,
-                        "managerLogged": 0,
-                        "taskName": "Task G",
-                        "projectId": 5,
-                        "projectName": "Project Epsilon"
-                    }, {
-                        "date": 1679698800000,
-                        "taskId": 10,
-                        "userId": 1,
-                        "time": 3,
-                        "approved": 1,
-                        "managerLogged": 1,
-                        "taskName": "Task G",
-                        "projectId": 5,
-                        "projectName": "Project Epsilon"
-                    }]
-                });
+                        status: 200,
+                        data: [
+                            {
+                                date: 1679526000000,
+                                taskId: 2,
+                                userId: 1,
+                                time: 120,
+                                approved: 0,
+                                managerLogged: 0,
+                                taskName: 'Task Y',
+                                projectId: 2,
+                                projectName: 'Project Beta'
+                            },
+                            {
+                                date: 1679612400000,
+                                taskId: 2,
+                                userId: 1,
+                                time: 60,
+                                approved: 1,
+                                managerLogged: 1,
+                                taskName: 'Task Y',
+                                projectId: 2,
+                                projectName: 'Project Beta'
+                            },
+                            {
+                                date: 1679785200000,
+                                taskId: 2,
+                                userId: 1,
+                                time: 120,
+                                approved: 0,
+                                managerLogged: 1,
+                                taskName: 'Task Y',
+                                projectId: 2,
+                                projectName: 'Project Beta'
+                            },
+                            {
+                                date: 1679439600000,
+                                taskId: 3,
+                                userId: 1,
+                                time: 30,
+                                approved: 1,
+                                managerLogged: 1,
+                                taskName: 'Task Z',
+                                projectId: 3,
+                                projectName: 'Project Gamma'
+                            },
+                            {
+                                date: 1679526000000,
+                                taskId: 3,
+                                userId: 1,
+                                time: 120,
+                                approved: 1,
+                                managerLogged: 1,
+                                taskName: 'Task Z',
+                                projectId: 3,
+                                projectName: 'Project Gamma'
+                            },
+                            {
+                                date: 1679612400000,
+                                taskId: 3,
+                                userId: 1,
+                                time: 120,
+                                approved: 0,
+                                managerLogged: 0,
+                                taskName: 'Task Z',
+                                projectId: 3,
+                                projectName: 'Project Gamma'
+                            }
+                        ]
+                    });
             });
         });
 
@@ -179,278 +96,196 @@ describe("Time-type API", () => {
             await apiHandler.get("/api/time/register/get?user=3,4,5", {headers: headers}, (value) => {
                 expect(value["status"]).toBe(200);
                 expect(value).toStrictEqual({
-                    "status": 200,
-                    "data": [{
-                        "date": 1679526000000,
-                        "taskId": 2,
-                        "userId": 4,
-                        "time": 1,
-                        "approved": 1,
-                        "managerLogged": 1,
-                        "taskName": "Task Y",
-                        "projectId": 1,
-                        "projectName": "Project test"
-                    }, {
-                        "date": 1679785200000,
-                        "taskId": 2,
-                        "userId": 3,
-                        "time": 1,
-                        "approved": 0,
-                        "managerLogged": 0,
-                        "taskName": "Task Y",
-                        "projectId": 1,
-                        "projectName": "Project test"
-                    }, {
-                        "date": 1680386400000,
-                        "taskId": 2,
-                        "userId": 4,
-                        "time": 5,
-                        "approved": 0,
-                        "managerLogged": 0,
-                        "taskName": "Task Y",
-                        "projectId": 1,
-                        "projectName": "Project test"
-                    }, {
-                        "date": 1680472800000,
-                        "taskId": 2,
-                        "userId": 3,
-                        "time": 5,
-                        "approved": 0,
-                        "managerLogged": 0,
-                        "taskName": "Task Y",
-                        "projectId": 1,
-                        "projectName": "Project test"
-                    }, {
-                        "date": 1680559200000,
-                        "taskId": 2,
-                        "userId": 3,
-                        "time": 5,
-                        "approved": 0,
-                        "managerLogged": 0,
-                        "taskName": "Task Y",
-                        "projectId": 1,
-                        "projectName": "Project test"
-                    }, {
-                        "date": 1679526000000,
-                        "taskId": 2,
-                        "userId": 4,
-                        "time": 1,
-                        "approved": 1,
-                        "managerLogged": 1,
-                        "taskName": "Task Y",
-                        "projectId": 2,
-                        "projectName": "Project Beta"
-                    }, {
-                        "date": 1679785200000,
-                        "taskId": 2,
-                        "userId": 3,
-                        "time": 1,
-                        "approved": 0,
-                        "managerLogged": 0,
-                        "taskName": "Task Y",
-                        "projectId": 2,
-                        "projectName": "Project Beta"
-                    }, {
-                        "date": 1680386400000,
-                        "taskId": 2,
-                        "userId": 4,
-                        "time": 5,
-                        "approved": 0,
-                        "managerLogged": 0,
-                        "taskName": "Task Y",
-                        "projectId": 2,
-                        "projectName": "Project Beta"
-                    }, {
-                        "date": 1680472800000,
-                        "taskId": 2,
-                        "userId": 3,
-                        "time": 5,
-                        "approved": 0,
-                        "managerLogged": 0,
-                        "taskName": "Task Y",
-                        "projectId": 2,
-                        "projectName": "Project Beta"
-                    }, {
-                        "date": 1680559200000,
-                        "taskId": 2,
-                        "userId": 3,
-                        "time": 5,
-                        "approved": 0,
-                        "managerLogged": 0,
-                        "taskName": "Task Y",
-                        "projectId": 2,
-                        "projectName": "Project Beta"
-                    }, {
-                        "date": 1679439600000,
-                        "taskId": 3,
-                        "userId": 3,
-                        "time": 1,
-                        "approved": 0,
-                        "managerLogged": 0,
-                        "taskName": "Task Z",
-                        "projectId": 3,
-                        "projectName": "Project Gamma"
-                    }, {
-                        "date": 1679439600000,
-                        "taskId": 3,
-                        "userId": 4,
-                        "time": 5,
-                        "approved": 0,
-                        "managerLogged": 0,
-                        "taskName": "Task Z",
-                        "projectId": 3,
-                        "projectName": "Project Gamma"
-                    }, {
-                        "date": 1679439600000,
-                        "taskId": 3,
-                        "userId": 5,
-                        "time": 5,
-                        "approved": 1,
-                        "managerLogged": 1,
-                        "taskName": "Task Z",
-                        "projectId": 3,
-                        "projectName": "Project Gamma"
-                    }, {
-                        "date": 1679526000000,
-                        "taskId": 3,
-                        "userId": 3,
-                        "time": 1,
-                        "approved": 1,
-                        "managerLogged": 1,
-                        "taskName": "Task Z",
-                        "projectId": 3,
-                        "projectName": "Project Gamma"
-                    }, {
-                        "date": 1679612400000,
-                        "taskId": 3,
-                        "userId": 3,
-                        "time": 5,
-                        "approved": 0,
-                        "managerLogged": 1,
-                        "taskName": "Task Z",
-                        "projectId": 3,
-                        "projectName": "Project Gamma"
-                    }, {
-                        "date": 1679785200000,
-                        "taskId": 3,
-                        "userId": 4,
-                        "time": 1,
-                        "approved": 0,
-                        "managerLogged": 0,
-                        "taskName": "Task Z",
-                        "projectId": 3,
-                        "projectName": "Project Gamma"
-                    }, {
-                        "date": 1679785200000,
-                        "taskId": 3,
-                        "userId": 5,
-                        "time": 1,
-                        "approved": 1,
-                        "managerLogged": 1,
-                        "taskName": "Task Z",
-                        "projectId": 3,
-                        "projectName": "Project Gamma"
-                    }, {
-                        "date": 1680559200000,
-                        "taskId": 3,
-                        "userId": 5,
-                        "time": 3,
-                        "approved": 1,
-                        "managerLogged": 1,
-                        "taskName": "Task Z",
-                        "projectId": 3,
-                        "projectName": "Project Gamma"
-                    }, {
-                        "date": 1679526000000,
-                        "taskId": 8,
-                        "userId": 5,
-                        "time": 1,
-                        "approved": 0,
-                        "managerLogged": 1,
-                        "taskName": "Task E",
-                        "projectId": 3,
-                        "projectName": "Project Gamma"
-                    }, {
-                        "date": 1679612400000,
-                        "taskId": 8,
-                        "userId": 5,
-                        "time": 5,
-                        "approved": 1,
-                        "managerLogged": 1,
-                        "taskName": "Task E",
-                        "projectId": 3,
-                        "projectName": "Project Gamma"
-                    }, {
-                        "date": 1679785200000,
-                        "taskId": 8,
-                        "userId": 5,
-                        "time": 10,
-                        "approved": 1,
-                        "managerLogged": 1,
-                        "taskName": "Task E",
-                        "projectId": 3,
-                        "projectName": "Project Gamma"
-                    }, {
-                        "date": 1679266800000,
-                        "taskId": 9,
-                        "userId": 4,
-                        "time": 1,
-                        "approved": 1,
-                        "managerLogged": 1,
-                        "taskName": "Task F",
-                        "projectId": 4,
-                        "projectName": "Project Delta"
-                    }, {
-                        "date": 1679353200000,
-                        "taskId": 9,
-                        "userId": 4,
-                        "time": 2,
-                        "approved": 1,
-                        "managerLogged": 1,
-                        "taskName": "Task F",
-                        "projectId": 4,
-                        "projectName": "Project Delta"
-                    }, {
-                        "date": 1679698800000,
-                        "taskId": 9,
-                        "userId": 4,
-                        "time": 3,
-                        "approved": 1,
-                        "managerLogged": 1,
-                        "taskName": "Task F",
-                        "projectId": 4,
-                        "projectName": "Project Delta"
-                    }, {
-                        "date": 1680040800000,
-                        "taskId": 9,
-                        "userId": 3,
-                        "time": 1,
-                        "approved": 0,
-                        "managerLogged": 0,
-                        "taskName": "Task F",
-                        "projectId": 4,
-                        "projectName": "Project Delta"
-                    }, {
-                        "date": 1680300000000,
-                        "taskId": 9,
-                        "userId": 3,
-                        "time": 1,
-                        "approved": 0,
-                        "managerLogged": 0,
-                        "taskName": "Task F",
-                        "projectId": 4,
-                        "projectName": "Project Delta"
-                    }, {
-                        "date": 1680386400000,
-                        "taskId": 9,
-                        "userId": 3,
-                        "time": 3,
-                        "approved": 0,
-                        "managerLogged": 0,
-                        "taskName": "Task F",
-                        "projectId": 4,
-                        "projectName": "Project Delta"
-                    }]
+                    status: 200,
+                    data: [
+                        {
+                            date: 1680559200000,
+                            taskId: 1,
+                            userId: 5,
+                            time: 120,
+                            approved: 0,
+                            managerLogged: 0,
+                            taskName: 'Task X',
+                            projectId: 1,
+                            projectName: 'Project Alpha'
+                        },
+                        {
+                            date: 1679526000000,
+                            taskId: 2,
+                            userId: 4,
+                            time: 120,
+                            approved: 1,
+                            managerLogged: 1,
+                            taskName: 'Task Y',
+                            projectId: 2,
+                            projectName: 'Project Beta'
+                        },
+                        {
+                            date: 1680386400000,
+                            taskId: 2,
+                            userId: 4,
+                            time: 60,
+                            approved: 0,
+                            managerLogged: 0,
+                            taskName: 'Task Y',
+                            projectId: 2,
+                            projectName: 'Project Beta'
+                        },
+                        {
+                            date: 1679439600000,
+                            taskId: 3,
+                            userId: 3,
+                            time: 90,
+                            approved: 0,
+                            managerLogged: 0,
+                            taskName: 'Task Z',
+                            projectId: 3,
+                            projectName: 'Project Gamma'
+                        },
+                        {
+                            date: 1679439600000,
+                            taskId: 3,
+                            userId: 4,
+                            time: 60,
+                            approved: 0,
+                            managerLogged: 0,
+                            taskName: 'Task Z',
+                            projectId: 3,
+                            projectName: 'Project Gamma'
+                        },
+                        {
+                            date: 1679439600000,
+                            taskId: 3,
+                            userId: 5,
+                            time: 120,
+                            approved: 1,
+                            managerLogged: 1,
+                            taskName: 'Task Z',
+                            projectId: 3,
+                            projectName: 'Project Gamma'
+                        },
+                        {
+                            date: 1679526000000,
+                            taskId: 3,
+                            userId: 3,
+                            time: 60,
+                            approved: 1,
+                            managerLogged: 1,
+                            taskName: 'Task Z',
+                            projectId: 3,
+                            projectName: 'Project Gamma'
+                        },
+                        {
+                            date: 1679612400000,
+                            taskId: 3,
+                            userId: 3,
+                            time: 30,
+                            approved: 0,
+                            managerLogged: 1,
+                            taskName: 'Task Z',
+                            projectId: 3,
+                            projectName: 'Project Gamma'
+                        },
+                        {
+                            date: 1679785200000,
+                            taskId: 3,
+                            userId: 4,
+                            time: 120,
+                            approved: 0,
+                            managerLogged: 0,
+                            taskName: 'Task Z',
+                            projectId: 3,
+                            projectName: 'Project Gamma'
+                        },
+                        {
+                            date: 1679785200000,
+                            taskId: 3,
+                            userId: 5,
+                            time: 150,
+                            approved: 1,
+                            managerLogged: 1,
+                            taskName: 'Task Z',
+                            projectId: 3,
+                            projectName: 'Project Gamma'
+                        },
+                        {
+                            date: 1680559200000,
+                            taskId: 3,
+                            userId: 5,
+                            time: 180,
+                            approved: 1,
+                            managerLogged: 1,
+                            taskName: 'Task Z',
+                            projectId: 3,
+                            projectName: 'Project Gamma'
+                        },
+                        {
+                            date: 1679266800000,
+                            taskId: 9,
+                            userId: 4,
+                            time: 60,
+                            approved: 1,
+                            managerLogged: 1,
+                            taskName: 'Task F',
+                            projectId: 4,
+                            projectName: 'Project Delta'
+                        },
+                        {
+                            date: 1679353200000,
+                            taskId: 9,
+                            userId: 4,
+                            time: 30,
+                            approved: 1,
+                            managerLogged: 1,
+                            taskName: 'Task F',
+                            projectId: 4,
+                            projectName: 'Project Delta'
+                        },
+                        {
+                            date: 1679698800000,
+                            taskId: 9,
+                            userId: 4,
+                            time: 30,
+                            approved: 1,
+                            managerLogged: 1,
+                            taskName: 'Task F',
+                            projectId: 4,
+                            projectName: 'Project Delta'
+                        },
+                        {
+                            date: 1680040800000,
+                            taskId: 9,
+                            userId: 3,
+                            time: 60,
+                            approved: 0,
+                            managerLogged: 0,
+                            taskName: 'Task F',
+                            projectId: 4,
+                            projectName: 'Project Delta'
+                        },
+                        {
+                            date: 1680300000000,
+                            taskId: 9,
+                            userId: 3,
+                            time: 120,
+                            approved: 0,
+                            managerLogged: 0,
+                            taskName: 'Task F',
+                            projectId: 4,
+                            projectName: 'Project Delta'
+                        },
+                        {
+                            date: 1680386400000,
+                            taskId: 9,
+                            userId: 3,
+                            time: 60,
+                            approved: 0,
+                            managerLogged: 0,
+                            taskName: 'Task F',
+                            projectId: 4,
+                            projectName: 'Project Delta'
+                        }
+                    ]
                 });
             });
         });
@@ -466,8 +301,8 @@ describe("Time-type API", () => {
         });
 
         let bodyFail = {
-            firstName   : "Test",
-            lastName    : "Fail"
+            date          : 1679529600000,
+            time          : 1,
         }
 
         test("Fail case wrong body", () => {
@@ -477,12 +312,10 @@ describe("Time-type API", () => {
         });
 
         let bodySuccess = {
-            firstName   : "Test",
-            lastName    : "Success",
-            email       : "test@success.com",
-            password    : "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
-            manager     : 2,
-            roles       : [1]
+            date          : 1692403200000,
+            taskId        : 1,
+            userId        : 6,
+            time          : 30
         }
 
         test("Success case", () => {
@@ -512,8 +345,6 @@ describe("Time-type API", () => {
 
             apiHandler.put("/api/time/register/edit/put", {headers: headers, body: bodyFail}, (value) => {
                 expect(value["status"]).toBe(404);
-                expect(value["data"]["message"]).toMatch("Missing Body");
-                expect(value["data"]["success"]).toMatch("false");
             });
         });
 

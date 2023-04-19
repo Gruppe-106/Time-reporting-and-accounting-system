@@ -30,9 +30,8 @@ describe("Login API", () => {
             }
 
             apiHandler.post("/api/login", {body: bodySuccess}, (value) => {
-                console.log(value);
-                expect(value["data"]["message"][0]).toMatch("success");
-                expect(parseInt(value["data"]["message"][2])).toBeGreaterThan(Date.now());
+                expect(value["data"][0]).toMatch("success");
+                expect(parseInt(value["data"][2])).toBeGreaterThan(Date.now());
             })
         });
     });

@@ -17,6 +17,8 @@ class UserTimeRegisterEndpoint extends PostEndpointBase {
     async submitData(req: Request, res: Response): Promise<string[]> {
         let timeRegisterData: UserTimeRegisterData = req.body;
 
+        if (timeRegisterData.userId === undefined || timeRegisterData.taskId === undefined || timeRegisterData.date === undefined) return ["Missing data"];
+
         let timeRegisterUpdateSet: UpdateSet[] = [];
         if (timeRegisterData.time)          timeRegisterUpdateSet.push({column: "time", value: timeRegisterData.time.toString()});
         if (timeRegisterData.approved)      timeRegisterUpdateSet.push({column: "approved", value: timeRegisterData.approved ? "1" : "0"});
