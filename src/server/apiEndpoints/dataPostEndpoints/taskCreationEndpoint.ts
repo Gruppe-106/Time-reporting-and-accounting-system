@@ -1,7 +1,6 @@
 import PostEndpointBase from "../postEndpointBase";
 import {Request, Response} from "express";
 import {addTaskToProject} from "./projectCreationEndpoint";
-import taskEditEndpoint from "../dataPutEndpoints/taskEditEndpoint";
 
 export interface TaskData {
     name      : string,
@@ -11,7 +10,7 @@ export interface TaskData {
     timeType  : number
 }
 
-interface TaskCreationData {
+export interface TaskCreationData {
     projectId: number,
     task: TaskData
 }
@@ -22,6 +21,7 @@ class TaskCreationEndpoint extends PostEndpointBase {
     async submitData(req: Request, res: Response): Promise<string[]> {
         let tasksData: TaskCreationData = req.body;
         if (tasksData.task) await addTaskToProject.call(this, [tasksData.task], tasksData.projectId);
+        else throw new Error("Task data not given");
 
         return Promise.resolve(["success"]);
     }

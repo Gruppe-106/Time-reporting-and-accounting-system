@@ -37,7 +37,7 @@ class UserEndpoint extends  GetEndpointBase {
 
         this.processRequest(req, requestedValues, primaryKey, requestKeys).then((data) => {
             res.setHeader('Content-Type', 'application/json');
-            res.status(data.status).json(data.data);
+            res.status(data.status).json({status: 200, data: data.data});
         })
     };
 }

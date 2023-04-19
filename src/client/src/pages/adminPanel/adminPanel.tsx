@@ -147,7 +147,8 @@ class AdminPanel extends Component<any, CustomTypes> {
         this.handleLoader("Getting users")
 
         const dbManagers: Manager[] = (await APICalls.getAllManagerGroups()).data
-        const dbUsers: User[] = await APICalls.getAllUsers()
+        const dbUsers: User[] =( await APICalls.getAllUsers()).data
+        console.log(dbUsers)
         const groups: number[] = []
         dbUsers.forEach((ele: User) => groups.push(ele.groupId))
         dbUsers.forEach((ele: User) => {
@@ -590,7 +591,7 @@ class AdminPanel extends Component<any, CustomTypes> {
 
         this.handleLoader("Updating users")
 
-        const dbUsers: User[] = await APICalls.getAllUsers()
+        const dbUsers: User[] = (await APICalls.getAllUsers()).data
         const groups: number[] = []
         dbUsers.forEach((ele: User) => groups.push(ele.groupId))
         dbUsers.forEach((ele: User) => {

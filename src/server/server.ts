@@ -52,6 +52,7 @@ export class Server {
             output: process.stdout
         });
 
+        // Only for local host usage, to stop the server
         inquirer.on("line", input => {
             if (input === "stop" || input.match(/^q(uit)?$/i)) {
                 inquirer.question('[Server] Are you sure you want to exit? (y/n)> ', (answer) => {
@@ -60,6 +61,7 @@ export class Server {
             }
         });
 
+        // On the linux server PM2 automatically calls this function when told to stop the server
         inquirer.on("close", function() {
             server.stop();
             Server.mysql.destroyConnection();
