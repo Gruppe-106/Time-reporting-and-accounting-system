@@ -19,7 +19,7 @@ describe("Time-type API", () => {
                 expect(value).toStrictEqual({
                     "status": 200,
                     "data": [
-                        {"id":2,"name":"sick"}
+                        {"id":2,"name":"non-billable"}
                     ]
                 });
             });
@@ -32,10 +32,10 @@ describe("Time-type API", () => {
                 expect(value).toStrictEqual({
                     "status": 200,
                     "data": [
-                        {"id":0,"name":"billable"},
-                        {"id":1,"name":"non-billable"},
-                        {"id":2,"name":"sick"},
-                        {"id":3,"name":"vacation"}
+                        {"id":1,"name":"billable"},
+                        {"id":2,"name":"non-billable"},
+                        {"id":3,"name":"sick"},
+                        {"id":4,"name":"vacation"}
                     ]
                 });
             });

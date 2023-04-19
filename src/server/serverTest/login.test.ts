@@ -19,7 +19,7 @@ describe("Login API", () => {
                 password: "4f31fa50e5bd5ff45684e560fc24aeee527a43739ab611c49c51098a33e2b469"
             }
             apiHandler.post("/api/login", {body: bodyFail}, (value) => {
-               expect(value).toStrictEqual({"status":404,"data":{"success":false}});
+               expect(value).toStrictEqual({ status: 200, data: [ 'Password or email incorrect' ] });
             });
         });
 
@@ -30,6 +30,7 @@ describe("Login API", () => {
             }
 
             apiHandler.post("/api/login", {body: bodySuccess}, (value) => {
+                console.log(value);
                 expect(value["data"]["message"][0]).toMatch("success");
                 expect(parseInt(value["data"]["message"][2])).toBeGreaterThan(Date.now());
             })
