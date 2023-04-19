@@ -148,7 +148,6 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     const { stateRowData, offsetState } = this.state;
 
     let newValue = parseInt(value);
-
     if(isNaN(newValue)) newValue = 0
 
     let dates: string[] = [];
@@ -159,6 +158,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
       if (data && rowData && data.taskId === rowData.taskId) {
         let dateFound: boolean = false;
         rowData.objectData.map((item) => {
+          let minutes = item.time % 60
           if (item.date === Date.parse(dates[index])) {
             if (newValue === 0 && rowData) {
               rowData.objectData = rowData.objectData.filter(
@@ -166,9 +166,9 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
               );
             } else {
               if(newValue < item.time /60){
-                item.time = newValue * 60;
+                item.time = newValue * 60 + (minutes);
               } else {
-                item.time = newValue * 60;
+                item.time = newValue * 60 + (minutes);
               }
             }
             dateFound = true;
@@ -184,6 +184,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
         break; // Break out of the map function if date matches or if a new object was pushed.
       }
     }
+    console.log(stateRowData)
   }
 
   private displayTimeTotal = (value: number): JSX.Element => {
@@ -321,7 +322,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
               return (
                 <td key={index}>
                   <InputGroup size="sm">
-                    <Form.Control type="number" placeholder="0" value={arr[index]/ 60} onChange={(e) => this.handleTimeChange(index, e.target.value, data)} />
+                    <Form.Control type="number" placeholder="0" value={Math.floor(arr[index]/ 60)} onChange={(e) => this.handleTimeChange(index, e.target.value, data)} />
                     <InputGroup.Text id={`basic-addon-${index}`}>:</InputGroup.Text>
                     <Form.Select
                       style={{ fontSize: '14px', border: '1px solid #ccc', borderRadius: '0 4px 4px 0', fontFamily: 'Helvetica', color: "#212529" }}
