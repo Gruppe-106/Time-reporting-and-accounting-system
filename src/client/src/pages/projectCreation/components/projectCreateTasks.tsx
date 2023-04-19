@@ -28,13 +28,14 @@ interface TaskCreateData {
 }
 
 interface Api{
-
-    id?: number,
-    email?: string,
-    firstName?: string,
-    lastName?: string,
-    group?: number
-
+    status:number
+    data : {
+        id?: number,
+        email?: string,
+        firstName?: string,
+        lastName?: string,
+        groupId?: number
+    }
 }
 
 interface TaskCreateState {
@@ -68,7 +69,7 @@ class TaskCreateRow extends Component<TaskCreateRowProps> {
             email: "",
             firstName: "",
             lastName: "",
-            group: -1
+            groupId: -1
         } ]
     }
 
@@ -80,7 +81,7 @@ class TaskCreateRow extends Component<TaskCreateRowProps> {
         apiHandler.get(`/api/user/get?ids=*`,{}, (value) => {
             console.log(value)
             //Then convert the string to the expected object(eg. )
-            let json:Api[] = JSON.parse(JSON.stringify(value))
+            let json:Api = JSON.parse(JSON.stringify(value))
             //Then update states or variables or whatever you want with the information
             this.setState({tableRows: json})
             console.log(json)
@@ -104,10 +105,7 @@ class TaskCreateRow extends Component<TaskCreateRowProps> {
                             placeholder="John Doe"
                             id="member"
                         />
-                        {this.state.tableRows.map(row => (
-                        <option>{row.firstName} {row.lastName}</option>
-                        ))}
-
+                        <option>bruh</option>
                     </Form.Select>
                 </InputGroup></td>
                 <td><InputGroup size="sm">

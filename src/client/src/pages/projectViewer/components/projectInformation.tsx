@@ -16,6 +16,11 @@ interface Api{
         name?: string,
         startDate?: string,
         endDate?: string
+        projectLeader?:{
+        id: number
+        lastName: string
+        firstName: string
+    }
     }[]
 }
 
@@ -30,7 +35,7 @@ interface ProjectInformationProp {
 
 class ProjectInformation extends Component<ProjectInformationProp> {
     state = {
-        pageInformation: {id: -1, superProjectId: -1, name: "", startDate: "", endDate: ""}
+        pageInformation: {id: -1, superProjectId: -1, name: "", startDate: "", endDate: "", projectLeader: {id: -1, lastName: "", firstName: ""}}
     }
 
     constructor(props:ProjectInformationProp) {
@@ -88,7 +93,7 @@ class ProjectInformation extends Component<ProjectInformationProp> {
                                         <th>Parent Project: {this.state.pageInformation.superProjectId}</th>
                                     </tr>
                                     <tr>
-                                        <th>Project Manager: no one</th>
+                                        <th>Project Leader: {this.state.pageInformation.projectLeader.firstName} {this.state.pageInformation.projectLeader.lastName} - ID: {this.state.pageInformation.projectLeader.id}</th>
                                     </tr>
                                     </thead>
                                 </Table>

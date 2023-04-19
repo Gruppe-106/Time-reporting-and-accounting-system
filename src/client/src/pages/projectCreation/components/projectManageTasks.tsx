@@ -1,10 +1,8 @@
 import {Form, InputGroup, Table} from "react-bootstrap";
 import React, {Component} from "react";
 import BaseApiHandler from "../../../network/baseApiHandler";
-/*
-NEED TO ADD SO IT SHOWS BY GROUP AND NOT JUST EVERYONE.
-NUMBER FOR THE GROUP SHOULD CORRESPOND TO THE ID OF THE PROJECT AND PROJECT PAGE
- */
+
+
 interface Api{
     status:number,
     data:{
@@ -16,19 +14,19 @@ interface Api{
     }[]
 }
 
-export interface ProjectTableTaskRow{
-    id:number
-    name?:string
-    startDate?:number
-    endDate?:number
-    timeType?:number
+interface TaskProjectApi{
+    status: number;
+    data: {
+        taskId?: number,
+        taskName?: string,
+        projectId?: number,
+        projectName?: string
+    }[]
 }
-/*
+
 const queryString = window.location.search;
 const params = new URLSearchParams(queryString);
 const id = parseInt(params.get("id") as string);
-THIS IS TO BE USED IN THE FUTURE
- */
 
 class ProjectManageTask extends Component<any> {
     constructor(props: any) {
@@ -43,14 +41,20 @@ class ProjectManageTask extends Component<any> {
     }
     state = {
         tableRows: [ {
-            id: -1,
             name: "",
+            id: -1,
             startDate: -1,
             endDate: -1,
             timeType: -1,
             isFocused: false,
             isEndFocused: false
         } ],
+        task:[{
+            taskId: -1,
+            taskName: "",
+            projectId: -1,
+            projectName: ""
+        }]
     }
     handleFocus(){
         this.setState({isFocused: true});
@@ -69,16 +73,26 @@ class ProjectManageTask extends Component<any> {
 
     componentDidMount() {
         //First make an instance of the api handler, give it the auth key of the user once implemented
-        let apiHandler = new BaseApiHandler("test");
+        let apiHandler = new BaseApiHandler();
         //Run the get or post function depending on need only neccesarry argument is the path aka what comes after the hostname
         //Callbacks can be used to tell what to do with the data once it's been retrieved
-        apiHandler.get(`/api/task/get?ids=*`,{}, (value) => {
+        apiHandler.get(`/api/task/project/get?project=${id}`,{}, (value) => {
             console.log(value)
             //Then convert the string to the expected object(eg. )
-            let json:Api = JSON.parse(JSON.stringify(value))
+            let json:TaskProjectApi = JSON.parse(JSON.stringify(value))
             //Then update states or variables or whatever you want with the information
-            this.setState({tableRows: json.data})
+            this.setState({task: json.data})
             console.log(json.data)
+            let id = []
+            for (const task of json.data) {
+                id.push(task.taskId)
+            }
+            apiHandler.get(`/api/task/get?ids=${id}`, {}, (tasks) => {
+                console.log(tasks)
+                let json:Api = JSON.parse(JSON.stringify(tasks))
+                this.setState({tableRows: json.data})
+                console.log(json.data)
+            })
         })
     }
 
@@ -94,7 +108,8 @@ class ProjectManageTask extends Component<any> {
                 <td><InputGroup size="sm">
                     <Form.Control
                         type="number"
-                        placeholder={row.id.toString()}
+                        min="0"
+                        placeholder={row.id.toString() ?? ''}
                         id="id"
                     />
                 </InputGroup></td>
@@ -134,7 +149,8 @@ class ProjectManageTask extends Component<any> {
                 <td><InputGroup size="sm">
                     <Form.Control
                         type="number"
-                        placeholder={row.timeType.toString()}
+                        min="0"
+                        placeholder={row.timeType.toString() ?? ''}
                         id="timeType"
                     />
                 </InputGroup></td>
