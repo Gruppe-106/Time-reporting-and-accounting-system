@@ -1,7 +1,6 @@
-
 import React, {Component} from "react";
 import BaseNavBar from "../../components/navBar";
-import {Button, Col, Container} from "react-bootstrap";
+import {Button, Container} from "react-bootstrap";
 import {ProjectTableRow} from "../projectViewer/components/projectTable";
 import Row from "react-bootstrap/Row";
 import CreateTaskTable from "./components/projectEditTasks";
@@ -9,10 +8,6 @@ import CreateTaskTable from "./components/projectEditTasks";
 interface  ProjectMenuState{
     projects: ProjectTableRow[];
 }
-
-const queryString = window.location.search;
-const params = new URLSearchParams(queryString);
-const id = parseInt(params.get("id") as string);
 
 class TaskCreator extends Component<any, ProjectMenuState>{
 

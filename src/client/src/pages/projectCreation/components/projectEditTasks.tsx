@@ -1,5 +1,5 @@
-import React, {Component, useState} from "react";
-import {Table, Button, Form, InputGroup, Row, Col, Container, TabContainer, Tab} from "react-bootstrap";
+import React, {Component} from "react";
+import {Table, Button, Form, InputGroup, Row, Col, Container, Tab} from "react-bootstrap";
 import BaseApiHandler from "../../../network/baseApiHandler";
 import Nav from "react-bootstrap/Nav";
 import {userInfo} from "../../../utility/router";
@@ -11,15 +11,6 @@ interface TableRow {
   endDate: string;
   timeType: string;
   userId: string;
-}
-
-interface ProjectInformationProp {
-  id:number
-  superProjectId?:number
-  name?:string
-  startDate?:string
-  endDate?:string
-
 }
 
 interface DynamicTableState {

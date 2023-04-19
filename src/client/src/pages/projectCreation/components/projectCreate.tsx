@@ -1,10 +1,8 @@
-import React, {Component, useState} from "react";
+import React, {Component} from "react";
 import Col from 'react-bootstrap/Col';
-import Nav from 'react-bootstrap/Nav';
 import Row from 'react-bootstrap/Row';
-import Tab from 'react-bootstrap/Tab';
 import Modal from 'react-bootstrap/Modal'
-import {Alert, Button, Container, Form, InputGroup, Table} from "react-bootstrap";
+import {Alert, Button, Form} from "react-bootstrap";
 import BaseApiHandler from "../../../network/baseApiHandler";
 import {Highlighter, Typeahead} from "react-bootstrap-typeahead";
 
