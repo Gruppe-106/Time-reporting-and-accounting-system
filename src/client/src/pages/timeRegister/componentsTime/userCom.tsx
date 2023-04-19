@@ -144,42 +144,10 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     this.handleCloseAddModal();
   }
 
-  private handleTimeChange(index: number, value: number, data: TaskRowData | undefined) {
+  private handleTimeChange(index: number, value: string, data: TaskRowData | undefined) {
     const { stateRowData, offsetState } = this.state;
-
-    let dates: string[] = [];
-    getCurrentWeekDates(dates, offsetState);
-
-    for (const key of Array.from(stateRowData.keys())) {
-      let rowData = stateRowData.get(key);
-      if (data && rowData && data.taskId === rowData.taskId) {
-        let dateFound: boolean = false;
-        rowData.objectData.map((item) => {
-          if (item.date === Date.parse(dates[index])) {
-            if (value === 0 && rowData) {
-              rowData.objectData = rowData.objectData.filter(
-                (objItem) => objItem.date !== item.date
-              );
-            } else {
-              if(value < item.time){
-                item.time = Math.max(0, item.time - 60); // Prevent value from going below 0
-              } else {
-                item.time = item.time + 60; 
-              }
-            }
-            dateFound = true;
-          }
-          return item; // just to return something
-        });
-
-        if (!dateFound && value > 0) {
-          rowData.objectData.push({ date: Date.parse(dates[index]), time: Math.max(0, 60) });
-        }
-
-        this.setState({ stateRowData });
-        break; // Break out of the map function if date matches or if a new object was pushed.
-      }
-    }
+    console.log(value)
+    
   }
 
   private displayTimeTotal = (value: number): JSX.Element => {
@@ -317,7 +285,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
               return (
                 <td key={index}>
                   <InputGroup size="sm">
-                    <Form.Control type="number" placeholder="0" value={arr[index]} onChange={(e) => this.handleTimeChange(index, parseInt(e.target.value), data)} />
+                    <Form.Control type="text" placeholder="0" value={arr[index]/ 60} onChange={(e) => this.handleTimeChange(index, e.target.value, data)} />
                     <InputGroup.Text id={`basic-addon-${index}`}>:</InputGroup.Text>
                     <Form.Select
                       style={{ fontSize: '14px', border: '1px solid #ccc', borderRadius: '0 4px 4px 0', fontFamily: 'Helvetica', color: "#212529" }}
