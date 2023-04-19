@@ -7,7 +7,6 @@ import Modal from 'react-bootstrap/Modal'
 import {Alert, Button, Container, Form, InputGroup, Table} from "react-bootstrap";
 import BaseApiHandler from "../../../network/baseApiHandler";
 import {Highlighter, Typeahead} from "react-bootstrap-typeahead";
-import ProjectCreateTask from "./projectCreateTasks";
 
 interface Api{
     status:number,
@@ -184,21 +183,10 @@ class ProjectCreate extends Component<ProjectCreateProp> {
     private informationRender():JSX.Element {
 
         return (
-            <Tab.Container id="left-tabs-example" defaultActiveKey="first">
                 <Row>
                     <Col sm={2}>
-                        <Nav variant="pills" className="flex-column">
-                            <Nav.Item>
-                                <Nav.Link eventKey="first">Project Information</Nav.Link>
-                            </Nav.Item>
-                            <Nav.Item>
-                                <Nav.Link eventKey="second">Tasks</Nav.Link>
-                            </Nav.Item>
-                        </Nav>
                     </Col>
                     <Col sm={9}>
-                        <Tab.Content>
-                            <Tab.Pane eventKey="first">
                                 <h1>Create a project</h1>
                                 <Form>
                                     <Row>
@@ -313,15 +301,8 @@ class ProjectCreate extends Component<ProjectCreateProp> {
                                         Your project has been successfully created, it can now be viewed under the <a href="/project/menu">project menu</a>
                                     </p>
                                 </Alert>) : ""}
-                            </Tab.Pane>
-                            <Tab.Pane eventKey="second">
-                                <h3>Task list</h3>
-                                <ProjectCreateTask></ProjectCreateTask>
-                            </Tab.Pane>
-                        </Tab.Content>
                     </Col>
                 </Row>
-            </Tab.Container>
         )
     }
 
