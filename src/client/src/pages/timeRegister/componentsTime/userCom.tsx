@@ -161,7 +161,11 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
                 (objItem) => objItem.date !== item.date
               );
             } else {
-              item.time = Math.max(0, value); // Prevent value from going below 0
+              if(value < item.time){
+                item.time = Math.max(0, item.time - 60); // Prevent value from going below 0
+              } else {
+                item.time = item.time + 60; 
+              }
             }
             dateFound = true;
           }
@@ -169,7 +173,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
         });
 
         if (!dateFound && value > 0) {
-          rowData.objectData.push({ date: Date.parse(dates[index]), time: Math.max(0, value) });
+          rowData.objectData.push({ date: Date.parse(dates[index]), time: Math.max(0, 60) });
         }
 
         this.setState({ stateRowData });
@@ -269,6 +273,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
         })
       }
     }
+    console.log()
     return timeArr;
   }
 
@@ -324,8 +329,6 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
                       <option value={30}>30</option>
                       <option value={45}>45</option>
                     </Form.Select>
-
-
                   </InputGroup>
                 </td>
               );
