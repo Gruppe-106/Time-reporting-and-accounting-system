@@ -146,7 +146,11 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
 
   private handleTimeChange(index: number, value: string, data: TaskRowData | undefined) {
     const { stateRowData, offsetState } = this.state;
+
     let newValue = parseInt(value);
+
+    if(isNaN(newValue)) newValue = 0
+
     let dates: string[] = [];
     getCurrentWeekDates(dates, offsetState);
 
@@ -162,14 +166,10 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
               );
             } else {
               if(newValue < item.time /60){
-                item.time = item.time - 60
-                console.log(item.time)
+                item.time = newValue * 60;
               } else {
-                item.time = item.time + 60; 
-                console.log(item.time)
-
+                item.time = newValue * 60;
               }
-             
             }
             dateFound = true;
           }
@@ -177,7 +177,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
         });
 
         if (!dateFound && newValue > 0) {
-          rowData.objectData.push({ date: Date.parse(dates[index]), time: Math.max(0, 60) });
+          rowData.objectData.push({ date: Date.parse(dates[index]), time: Math.max(0, newValue * 60) });
         }
 
         this.setState({ stateRowData });
