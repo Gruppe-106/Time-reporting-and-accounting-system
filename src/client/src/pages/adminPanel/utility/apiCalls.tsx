@@ -12,13 +12,13 @@ export default class APICalls {
      * @param id If of the user
      * @returns A user object if found
      */
-    public static getUser(id: number): Promise<{
+    public static getUser(id: number): Promise<{status:number, data:{
         email: string,
         firstName: string,
         lastName: string,
         id: number,
         groupId: number
-    }[]> {
+    }[]}> {
         return fetch(`/api/user/get?ids=${id}`, {
             method: 'GET',
             headers: {
