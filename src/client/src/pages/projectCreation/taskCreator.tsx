@@ -4,7 +4,7 @@ import BaseNavBar from "../../components/navBar";
 import {Button, Col, Container} from "react-bootstrap";
 import {ProjectTableRow} from "../projectViewer/components/projectTable";
 import Row from "react-bootstrap/Row";
-import CreateTaskTable from "./components/projectCreateTasksTest";
+import CreateTaskTable from "./components/projectEditTasks";
 
 interface  ProjectMenuState{
     projects: ProjectTableRow[];
