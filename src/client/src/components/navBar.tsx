@@ -112,8 +112,7 @@ class BaseNavBar extends Component<any>{
                             <Nav className="me-auto">
                                 { userInfo.isProjectLeader ? this.dropDownRender("Project", [
                                     {href:"/project/create", title:"Create Project"},
-                                    {href:"/project/menu"  , title:"Project Menu"},
-                                    {href:"/project/create/task", title: "Create Task"}
+                                    {href:"/project/menu"  , title:"Project Menu"}
                                 ]) : this.linkRender("/project/menu", "Project Menu")
                                 }
 
