@@ -29,7 +29,7 @@ class TaskCreator extends Component<any, ProjectMenuState>{
             <>
                 <BaseNavBar/>
                 <Container>
-                    <h1>Task Creator</h1>
+                    <h1>Task Editor</h1>
                     <Button href="/project/menu" variant="outline-secondary">Back</Button>{''}
                 </Container>
 
