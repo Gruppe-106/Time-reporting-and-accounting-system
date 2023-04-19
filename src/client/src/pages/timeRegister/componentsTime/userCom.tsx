@@ -147,8 +147,10 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
   private handleTimeChange(index: number, value: string, data: TaskRowData | undefined) {
     const { stateRowData, offsetState } = this.state;
 
-    let newValue = parseInt(value);
-    if (isNaN(newValue)) newValue = 0
+    let newValue: number = parseInt(value);
+    if (isNaN(newValue)) {
+      newValue = 0
+    }
 
     let dates: string[] = [];
     getCurrentWeekDates(dates, offsetState);
