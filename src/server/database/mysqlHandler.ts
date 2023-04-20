@@ -1,37 +1,45 @@
-import * as mysql from "mysql";
-import {Connection, FieldInfo, MysqlError} from "mysql";
-import {MySQLConfig} from "../../app";
+import * as mysql from "mysql2";
+import {Connection, Field, QueryError} from "mysql2";
 import {wipeDatabase} from "./wipeDB";
-import fs from "fs";
-import path from "path";
-import {Server} from "../server";
+import * as fs from "fs";
+import * as path from "path";
+import {mysqlHandler} from "../../app";
+
+export interface MySQLConfig {
+    host     : string,
+    user     : string,
+    password : string,
+    database : string
+}
 
 export interface Where {
-    column: string,
-    equals: string[]
+    column : string,
+    equals : string[]
 }
 
 export interface UpdateSet {
-    column: string,
-    value: string
+    column : string,
+    value  : string
 }
 
 export interface MySQLResponse {
-    error: MysqlError | null,
-    results: any,
-    fields: FieldInfo[]
+    error   : QueryError | null,
+    results : any | null,
+    fields  : Field[] | null
 }
 
 class MysqlHandler {
     private logQueries: boolean = false;
-    private static connectionConfig: object = undefined;
-    private static connection: Connection   = undefined;
-    public readonly database: string = "timemanagerdatabase";
+    private static connectionConfig: MySQLConfig;
+    private static connection: Connection;
+    public static readonly database: string = "timemanagerdatabase";
 
-    constructor(connectionConfig?:MySQLConfig, mysqlOnConnectCallback?: () => void) {
+    constructor(connectionConfig: MySQLConfig, mysqlOnConnectCallback: () => void) {
         if (connectionConfig !== undefined) { MysqlHandler.connectionConfig = connectionConfig; }
-        this.hasOrCreateConnection(mysqlOnConnectCallback);
-        this.databaseExists(this.database, true);
+        this.hasOrCreateConnection();
+        this.databaseExists(MysqlHandler.database, process.argv.indexOf("wipe") !== -1).then(() => {
+            mysqlOnConnectCallback();
+        });
     }
 
     /**
@@ -45,17 +53,16 @@ class MysqlHandler {
      * @return Boolean: Returns whether a MySQL connection is present or not
      * @private
      */
-    private createConnection(mysqlOnConnectCallback?: () => void): boolean {
+    private createConnection(): boolean {
         if (MysqlHandler.connectionConfig !== undefined) {
             MysqlHandler.connection = mysql.createConnection(MysqlHandler.connectionConfig);
 
-            MysqlHandler.connection.connect((e: MysqlError) => {
+            MysqlHandler.connection.connect((e: QueryError | null) => {
                 if (e) {
                     console.log("[MySQL] failed to connect to database. Error: ", e.stack);
                     return false;
                 }
                 console.log(`[MySQL] Connected to database with id: ${MysqlHandler.connection.threadId}`);
-                mysqlOnConnectCallback();
                 return true;
             });
         }
@@ -65,9 +72,9 @@ class MysqlHandler {
     /** Checks if connection is present, if not try to create one
      * @return Boolean: Returns true if connection is present otherwise false
      */
-    public hasOrCreateConnection(mysqlOnConnectCallback?: () => void): boolean {
+    public hasOrCreateConnection(): boolean {
         if (!this.hasConnection()) {
-            return this.createConnection(mysqlOnConnectCallback);
+            return this.createConnection();
         }
         return true;
     }
@@ -83,7 +90,7 @@ class MysqlHandler {
         console.log("[MySQL] No connection to destroy")
     }
 
-    public selectDatabase(database: string = this.database): void {
+    public selectDatabase(database: string = MysqlHandler.database): void {
         MysqlHandler.connection.changeUser({database: database});
     }
 
@@ -93,27 +100,23 @@ class MysqlHandler {
      * @param createClean Boolean: Whether to create a clean database using the wipe SQL
      */
     public async databaseExists(database: string, createClean: boolean = false): Promise<boolean> {
-        return this.sendQuery(`SHOW DATABASES LIKE '${database}';`).then((value) => {
-            // If not and wipe argument weren't given recreate it
-            if (value.results.length === 0) {
-                console.log(`[MySQL] Database ${database} doesn't exist`);
-                if (createClean) {
+        return new Promise<boolean>((resolve) => {
+            this.sendQuery(`SHOW DATABASES LIKE '${database}';`).then(async (value) => {
+                // If not and wipe argument weren't given recreate it
+                if (value.results.length === 0 || createClean) {
+                    if (value.results.length === 0) console.log(`[MySQL] Database ${database} doesn't exist`);
                     console.log(`[MySQL] Creating clean version`);
-                    wipeDatabase().then((success) => {
-                        if (success) {
-                            console.log(`[MySQL] Database ${database} couldn't be created`);
-                            return Promise.resolve(true);
-                        } else {
-                            console.log(`[MySQL] Database ${database} has been created`);
-                            return Promise.reject(false);
-                        }
-                    });
-                } else {
-                    return Promise.resolve(false);
+                    let success = await wipeDatabase();
+                    if (success) {
+                        console.log(`[MySQL] Database ${database} has been created`);
+                        return resolve(true);
+                    } else {
+                        console.log(`[MySQL] Database ${database} couldn't be created`);
+                        return resolve(false);
+                    }
                 }
-            } else {
-                return Promise.resolve(true);
-            }
+                return resolve(true);
+            });
         });
     }
 
@@ -146,7 +149,7 @@ class MysqlHandler {
         let string: string = "";
         for (let i = 0; i < list.length; i++) {
             if (i !== 0) string += ","
-            if (list[i] !== undefined) string += `'${list[i].replace(/\'/g, '"')}'`;
+            string += `'${list[i].replace(/\'/g, '"')}'`;
         }
         return string;
     }
@@ -191,7 +194,7 @@ class MysqlHandler {
     public async sendQuery(sqlQuery: string): Promise<MySQLResponse>{
         if (this.hasOrCreateConnection()) {
             let promise:Promise<MySQLResponse> = new Promise<MySQLResponse>((resolve) =>  {
-                MysqlHandler.connection.query({ sql: sqlQuery, timeout: 30000 }, (error: MysqlError | null, results: any, fields: FieldInfo[]) => {
+                MysqlHandler.connection.query({ sql: sqlQuery, timeout: 30000 }, (error: QueryError | null, results: any, fields: Field[]) => {
                     if (error !== null) {
                         console.log("[MySQL] Error retrieving data: ", error);
                     }
@@ -205,17 +208,18 @@ class MysqlHandler {
             if (this.logQueries) console.log("[MySQL] Retrieving data from DB, query: ", sqlQuery);
             return promise;
         }
-        return {error: undefined, results: undefined, fields: undefined};
+        return {error: null, results: null, fields: null};
     }
 
     /**
      * Reads an SQL file
      * @param file String: path of file
+     * @param database String: name of database to replace with in file
      * @private
      */
-    private fsReadSQL(file: string): string {
+    private fsReadSQL(file: string, database: string = MysqlHandler.database): string {
         return fs.readFileSync(path.join(__dirname, file), {encoding: "utf-8"})
-            .replace(/\$\{db\}/g, Server.mysql.database); // Replace db with actual db/schema name
+            .replace(/\$\{db\}/g, database); // Replace db with actual db/schema name
     }
 
     /**
@@ -226,10 +230,10 @@ class MysqlHandler {
     public async SQLFileQuery(file: string): Promise<MySQLResponse> {
         if (/.*\.SQL(?!.)/g.test(file)) {
             let query: string = this.fsReadSQL(file);
-            return Server.mysql.sendQuery(query);
+            return mysqlHandler.sendQuery(query);
         }
         return {error: {
-            code: "404", errno: 404, fatal: true, name: "File not an SQL file", message: "File cannot be send, as it's not a MySQL file"},
+                code: "404", errno: 404, fatal: true, name: "File not an SQL file", message: "File cannot be send, as it's not a MySQL file"},
             results: null,
             fields: null};
     }
