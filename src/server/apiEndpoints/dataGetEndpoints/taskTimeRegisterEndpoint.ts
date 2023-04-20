@@ -66,14 +66,16 @@ class TaskTimeRegisterEndpoint extends  GetEndpointBase {
 
     public getRoute(req:Request, res:Response, primaryKey:string = "userId", requestKeysName:string = "user") {
         let requestKeys: string[] = this.urlParamsConversion(req.query[requestKeysName], false, true, res);
-        if (requestKeys === undefined) { return this.badRequest(res); }
+        if (requestKeys === undefined) { return this.badRequest(res, req); }
 
         let requestedValues:string[] = this.urlParamsConversion(req.query.var);
         let period: string[] = this.urlParamsConversion(req.query.period);
 
         this.processRequest(req, requestedValues, primaryKey, requestKeys, period).then((data) => {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(data.status).json(data);
+            if (!res.writableEnded) {
+                res.setHeader('Content-Type', 'application/json');
+                res.status(data.status).json(data);
+            }
         })
     };
 }

@@ -19,8 +19,12 @@ interface ProjectCreationData {
     task          ?: TaskData[]
 }
 
+function isProjectCreationData(obj: any): obj is ProjectCreationData {
+    return ("name" in obj && "startDate" in obj && "endDate" in obj && "projectLeader" in obj) &&
+        (obj.name && obj.startDate && obj.endDate && obj.projectLeader);
+}
+
 export async function addUsersToTask(users: number[], taskId: number): Promise<void> {
-    console.log(users);
     let userTask: string[][] = [];
     for (const user of users) {
         userTask.push([user.toString(), taskId.toString()]);
@@ -46,7 +50,6 @@ export async function addTaskToProject(taskData: TaskData[], projectId?: number)
             [task.name, this.mySQL.dateFormatter(task.startDate), this.mySQL.dateFormatter(task.endDate), task.timeType.toString()]);
         if (taskResponse.error !== null) throw new Error("[MySQL] Failed insert data");
         let taskId: number = taskResponse.results.insertId;
-        console.log(taskId);
         if(projectId !== undefined) await taskProjectConnector.call(this, taskId, projectId);
         await addUsersToTask.call(this, task.userId, taskId);
     }
@@ -69,6 +72,9 @@ class ProjectCreationEndpoint extends PostEndpointBase {
 
     async submitData(req: Request, res: Response): Promise<string[]> {
         //Get data from the user creation form
+        if (!isProjectCreationData(req.body)) {
+            return ["Invalid data"];
+        }
         let project: ProjectCreationData = req.body;
 
         let projectResponse: MySQLResponse = await this.mySQL.insert("PROJECTS",

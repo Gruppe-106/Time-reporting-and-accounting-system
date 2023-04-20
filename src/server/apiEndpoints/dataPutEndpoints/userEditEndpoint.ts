@@ -20,6 +20,10 @@ class UserEditEndpoint extends PostEndpointBase {
         //Get data from the user creation form
         let user: UserEditData = req.body;
 
+        if (user.userId === undefined) {
+            return ["Missing user id"];
+        }
+
         let userUpdateSet: UpdateSet[] = [];
         let authUpdateSet: UpdateSet[] = [];
 

@@ -48,6 +48,8 @@ class ProjectEditEndpoint extends PostEndpointBase {
         //Get data from the user creation form
         let projectData: ProjectEditData = req.body;
 
+        if (projectData.projectId === undefined) return ["Missing project id"];
+
         // Create the update set and append any the requester wishes to change
         let projectUpdateSet: UpdateSet[] = [];
         if (projectData.superProjectId) projectUpdateSet.push({column: "superProjectId", value: projectData.superProjectId.toString()})

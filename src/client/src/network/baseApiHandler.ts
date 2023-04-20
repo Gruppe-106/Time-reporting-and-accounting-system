@@ -116,11 +116,19 @@ class BaseApiHandler {
             body: body
         })
             //Create task/promise for converting response to json
-            .then((response) => { return response.json(); })
+            .then((response) => {
+                return response.text();
+            })
             //Check the created json
             .then((value) => {
                 //console.log(value)
-                if (value) { return JSON.parse(JSON.stringify(value)); }
+                if (value) {
+                    if (value.includes("<!DOCTYPE html>")) {
+                        console.log(value);
+                        return JSON.parse(`{"error" : "${value.toString()}"}`)
+                    }
+                    return JSON.parse(value);
+                }
                 //Throw an error if the response could not be converted to json
                 else { throw new Error("Value is void"); }
             })
