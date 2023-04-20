@@ -3,6 +3,7 @@ import BaseNavBar from "../../components/navBar";
 import {Container} from "react-bootstrap";
 import BaseApiHandler from "../../network/baseApiHandler";
 import { Button } from "react-bootstrap";
+import { getCurrentMonthInterval } from "../../utility/timeConverter";
 
 //  This component will work like this:
 // 
@@ -164,6 +165,7 @@ class DataExport extends Component<any>{
                     let varList = [lastName, userData.firstName, userData.id, projectName, projectData.projectId, taskName, taskData.taskId, taskData.totalHours];
                     allText += `\n"${varList.join(`"${delimiter}"`)}"`; // For all tasks we need to create a new line in the csv containing all info. 
                     // Joins the elements the same way the header works.
+                    console.log(`\n"${varList.join(`"${delimiter}"`)}"`);
                 }
             }
         }
@@ -318,11 +320,12 @@ class DataExport extends Component<any>{
     }
 
     /**
-     * Retrieves all timesheets for all users in the given data structure.
+     * Retrieves all timesheets for all users in the given data structure, in a given period.
      * @param convertedData - the data structure containing user data
+     * @param period - the period in milliseconds, [start, end].
      * @returns a promise that resolves to the timesheet data
      */
-    private async getAllTimesheets(convertedData: AllData): Promise<RecTimesheetData> {
+    private async getAllTimesheets(convertedData: AllData, period: [number, number]): Promise<RecTimesheetData> {
         // Get an array of all user IDs in the data structure
         let userIds: number[] = this.getAllUserIDs(convertedData)
         // Construct the URL for the API request using the user IDs
@@ -335,6 +338,9 @@ class DataExport extends Component<any>{
                 url += `,${element}`
             }
         }
+
+        // Set the period in which we want time registrations.
+        url += `&period=${period[0]},${period[1]}`;
 
         // Create a promise that resolves to the timesheet data
         let promise: Promise<RecTimesheetData> = new Promise((res) => {
@@ -379,12 +385,14 @@ class DataExport extends Component<any>{
      * populates the data structure with the timesheet data, downloads the CSV file, and logs the data structure.
      */
     private async getAllData() {
+
+        let [monthStart, monthEnd]: [number, number] = getCurrentMonthInterval()
         // Get the user data and convert it to the correct format
         let rawUserDataReceived: RecUserData = await this.getAllUsers();
         let convertedData: AllData = this.convertRawUserData(rawUserDataReceived);
 
         // Get the timesheet data and populate the data structure with it
-        let rawTimesheetDataReceived: RecTimesheetData = await this.getAllTimesheets(convertedData);
+        let rawTimesheetDataReceived: RecTimesheetData = await this.getAllTimesheets(convertedData, [monthStart, monthEnd]);
         this.populateWithTimesheetData(convertedData, rawTimesheetDataReceived);
 
         // Download the CSV file
@@ -401,6 +409,12 @@ class DataExport extends Component<any>{
         for (let i = 0; i < rawTimesheetDataReceived.data.length; i++) {
             // Get the timesheet
             const timesheet: RecTimesheetModel = rawTimesheetDataReceived.data[i];
+
+            //DeMorgans law! Kachow!
+            if (!timesheet.approved || !timesheet.managerLogged) {
+                continue;
+            }
+
             // Find the user tuple in the converted data that matches the user ID of the timesheet
             let userTupleMaybe: [string, UserData] | null = this.findEmployeeById(timesheet.userId, convertedData.data);
             // If the user tuple is null, throw an error
@@ -425,6 +439,7 @@ class DataExport extends Component<any>{
         // If no project was found, insert the project at the specified index
         if (project === null) {
             this.insertProjectAtIndex(userTuple[1].projects, timesheet, indexToInsert);
+            this.updateProjectData(userTuple[1].projects[indexToInsert][1], timesheet);
         } 
         // If the project was found, update the project data
         else {
@@ -444,22 +459,7 @@ class DataExport extends Component<any>{
         const projectData: ProjectData = {
             projectId: timesheet.projectId,
             projectName: timesheet.projectName,
-            tasks: [
-                [
-                    timesheet.taskName,
-                    {
-                        taskName: timesheet.taskName,
-                        taskId: timesheet.taskId,
-                        totalHours: timesheet.time,
-                        registrations: [
-                            {
-                                date: timesheet.date,
-                                time: timesheet.time
-                            }
-                        ]
-                    }
-                ]
-            ]
+            tasks: []
         };
         // Insert the new project into the projects array at the specified index
         projects.splice(indexToInsert, 0, [
@@ -555,7 +555,7 @@ class DataExport extends Component<any>{
         const newTask: TaskData = {
             taskId: timesheet.taskId,
             taskName: timesheet.taskName,
-            totalHours: 0,
+            totalHours: timesheet.time,
             registrations: [{
                 date: timesheet.date,
                 time: timesheet.time
