@@ -18,9 +18,8 @@ class UserTimeRegister extends Component<any>{
                 <Container fluid="lg">
                     <h1>User Time Register:</h1>
                 </Container>
-                <TimeSheetPage userId={userInfo.userId} /> 
+                <TimeSheetPage key={1} userId={userInfo.userId} /> 
                 {userInfo.isAdmin ? (<UserTimeSheet/>) : null} {/*Button to adminCom*/}
-                {console.log(userInfo)}
             </>
         );
     }

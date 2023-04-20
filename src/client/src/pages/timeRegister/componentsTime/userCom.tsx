@@ -186,8 +186,8 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
         break; // Break out of the map function if date matches or if a new object was pushed.
       }
     }
-    console.log(stateRowData)
   }
+
   private handleTimeSelectChange(index: number, value: string, data: TaskRowData | undefined) {
     const { stateRowData, offsetState } = this.state;
 
@@ -223,7 +223,16 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
         break; // Break out of the map function if date matches or if a new object was pushed.
       }
     }
-    console.log(stateRowData)
+  }
+
+  private handleButtonClick = async (increment: number) => {
+    const { offsetState } = this.state;
+    const updatedOffset = offsetState + increment;
+    this.setState({ offsetState: updatedOffset });
+    const newDates: string[] = [];
+    await getCurrentWeekDates(newDates, updatedOffset);
+    this.setState({ headerDates: newDates });
+    await this.getData(updatedOffset);
   }
 
   private displayTimeTotal = (value: number): JSX.Element => {
@@ -354,7 +363,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
       if (data) {
         this.getTimeFromData(data.taskId, arr)
         rows.push((
-          <tr>
+          <tr key={data.taskId} >
             <td>{data.projectName}</td>
             <td>{data.taskName}</td>
             {arr.map((num, index) => {
@@ -387,14 +396,9 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     return rows;
   }
 
-  private handleButtonClick = async (increment: number) => {
-    const { offsetState } = this.state;
-    const updatedOffset = offsetState + increment;
-    this.setState({ offsetState: updatedOffset });
-    const newDates: string[] = [];
-    await getCurrentWeekDates(newDates, updatedOffset);
-    this.setState({ headerDates: newDates });
-    await this.getData(updatedOffset);
+  private handleSubmitButton() {
+    const { stateRowData } = this.state
+    console.log(stateRowData)
   }
 
   render() {
@@ -406,9 +410,8 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
           {this.renderHeaderRow()}
           <tbody>{this.renderTaskRows()}</tbody>
         </Table>
-        <Button variant="primary" type="button" onClick={() => this.handleShowAddModal()}>
-          Add Row
-        </Button>
+        <Button variant="primary" type="button" onClick={() => this.handleShowAddModal()}>Add Row</Button>
+        <Button variant="primary" type="button" style={{ float: "right" }} onClick={() => this.handleSubmitButton()} >Submit</Button>
         <center>
           <ButtonGroup aria-label="Basic example">
             <Button onClick={() => this.handleButtonClick(-7)} variant="primary">
