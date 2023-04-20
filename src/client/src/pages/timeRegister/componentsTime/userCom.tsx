@@ -61,6 +61,7 @@ interface TimeSheetProp {
 // Variable states in TimeSheetPage
 interface TimeSheetState {
   stateRowData: Map<number, TaskRowData>;
+  prevRowSubmitData: TimeSheetData[];
   searchDataState: SearchData[]
   selectedProject: SearchData
   offsetState: number;
@@ -88,6 +89,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     // Initialise states
     this.state = {
       stateRowData: new Map<number, TaskRowData>(),
+      prevRowSubmitData: [],
       searchDataState: [],
       selectedProject: {
         taskId: Infinity,
@@ -258,7 +260,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     getCurrentWeekDates(timeSheetDate, timeOffset);
     let apiHandler = new BaseApiHandler();
     apiHandler.get(
-      `/api/time/register/get?user=${userId}&period=${Date.parse(timeSheetDate[0])},${Date.parse(timeSheetDate[6])}&var=taskName,taskId,projectName,time,date`, {},
+      `/api/time/register/get?user=${userId}&period=${Date.parse(timeSheetDate[0])},${Date.parse(timeSheetDate[6])}&var=taskName,taskId,time,date`, {},
       (value) => {
         let json: Api = JSON.parse(JSON.stringify(value));
         let taskData: Map<number, TaskRowData> = new Map<number, TaskRowData>();
@@ -276,6 +278,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
           }
           this.setState({ stateRowData: taskData })
         }
+        this.setState({ prevRowSubmitData: json.data })
       }
     );
   }
@@ -342,10 +345,10 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
           <th>Task Name</th>
           {/* Gets the dates, and maps each date with an index to a table header, creating 7 <th>, all dates in a week */}
           {headerDates.map((date, index) => (
-            <th key={index} style={{textAlign: "center", verticalAlign: "buttom"}} className={date === stringToday ? "bg-light" : ""}>{date}</th>
+            <th key={index} style={{ textAlign: "center", verticalAlign: "buttom" }} className={date === stringToday ? "bg-light" : ""}>{date}</th>
           ))}
           <th>Total Time</th>
-          <th style={{textAlign: "center"}}>&#128465;</th>{/* Trashcan, HTML Entity: */}
+          <th style={{ textAlign: "center" }}>&#128465;</th>{/* Trashcan, HTML Entity: */}
         </tr>
       </thead>
     )
@@ -368,7 +371,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
             <td>{data.taskName}</td>
             {arr.map((num, index) => {
               return (
-                <td key={index} style={{textAlign: "center", verticalAlign: "middle"}}>
+                <td key={index} style={{ textAlign: "center", verticalAlign: "middle" }}>
                   <InputGroup size="sm">
                     <Form.Control type="number" placeholder="0" value={Math.floor(arr[index] / 60)} onChange={(e) => this.handleTimeChange(index, e.target.value, data)} />
                     <InputGroup.Text id={`basic-addon-${index}`}>:</InputGroup.Text>
@@ -397,9 +400,40 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
   }
 
   private handleSubmitButton() {
-    const { stateRowData } = this.state
+    const { stateRowData, prevRowSubmitData } = this.state
+    // TimeSheetData
+    //Convert every objectData array in stateRowData to an TimeSheetData item in an array: someVariable TimeSheetData[]
+    let dataToUpdate: TimeSheetData[] = [];
+    for (const key of Array.from(stateRowData.keys())) {
+      let data = stateRowData.get(key);
+      if (data) {
+        data.objectData.map((item) => {
+          let dataToUpdate2: TimeSheetData = {
+            projectName: data?.projectName ?? "",
+            taskName: data?.taskName ?? "",
+            taskId: data?.taskId ?? Infinity,
+            time: item.time, 
+            date: item.date,
+          }
+          dataToUpdate.push(dataToUpdate2);
+          return true
+        });
+      }
+    }
+    // check if previous data is the same
+
+  
+    // check if previous data is the same
+    // if it is then do nothing (Console.log("no data changed"))
+    //else if check if a task has the same data as the previous data, and then update that data
+    // else create and post the new data
+    console.log("All data:")
+    console.log(dataToUpdate)
+    console.log(prevRowSubmitData);
     console.log(stateRowData)
+    //console.log(prevRowSubmitData.filter(data => data.taskName === "Task Y"));
   }
+  
 
   render() {
     const { showAddModal, showDeleteRowModal, deleteId, delRowTaskProject, searchDataState } = this.state;
