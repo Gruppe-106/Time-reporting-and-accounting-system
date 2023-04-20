@@ -11,6 +11,7 @@ class GroupCreationEndpoint extends PostEndpointBase {
 
     async submitData(req: Request, res: Response): Promise<string[]> {
         let creationData: GroupCreationData = req.body;
+        if (creationData.managerId === undefined) return ["Missing manger id"];
 
         let userRoleResponse: MySQLResponse = await  this.mySQL.select("USERS_ROLES_CONNECTOR", ["roleId"], [
             {column: "userId", equals: [creationData.managerId.toString()]},

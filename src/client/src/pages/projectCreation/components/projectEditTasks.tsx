@@ -198,11 +198,14 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
       let userId = [parseInt(row.userId)]
 
       let post_data = {
-        name: taskName,
-        userId: userId,
-        startDate: startDate,
-        endDate: endDate,
-        timeType: timeType
+        projectId: id,
+        task: {
+          name: taskName,
+          userId: userId,
+          startDate: startDate,
+          endDate: endDate,
+          timeType: timeType
+        }
       }
       let apiHandler = new BaseApiHandler();
       apiHandler.post(`/api/task/creation/post`, {body:post_data}, (value) =>{
@@ -223,7 +226,7 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
         console.log("test")
         const post_data = {
           taskId: this.deleteTaskId,
-          delete: true
+          delete: id
         }
         console.log(post_data)
         let apiHandler = new BaseApiHandler();
