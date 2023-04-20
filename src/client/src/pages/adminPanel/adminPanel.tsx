@@ -19,7 +19,7 @@ import LoadingOverlay from 'react-loading-overlay-ts';
 import React, { Component } from "react";
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faTrash } from '@fortawesome/free-solid-svg-icons'
+import { faTrash, faHand } from '@fortawesome/free-solid-svg-icons'
 import { Highlighter, Typeahead } from 'react-bootstrap-typeahead';
 
 
@@ -376,7 +376,8 @@ class AdminPanel extends Component<any, CustomTypes> {
                         />
                     </Form.Group>
                 </Form></td>
-                <td style={{ textAlign: 'center', verticalAlign: 'middle' }}><FontAwesomeIcon style={{ cursor: "pointer" }} onClick={() => this.handleDeleteShow(user)} icon={faTrash} /> </td>
+                {this.state.dbManagers.findIndex((ele: Manager) => ele.managerId === user.id) === -1 ? <td style={{ textAlign: 'center', verticalAlign: 'middle' }}><FontAwesomeIcon style={{ cursor: "pointer" }} onClick={() => this.handleDeleteShow(user)} icon={faTrash} /> </td> :
+                    <td style={{ textAlign: 'center', verticalAlign: 'middle' }}><FontAwesomeIcon icon={faHand} /> </td>}
             </tr>
         );
     }
