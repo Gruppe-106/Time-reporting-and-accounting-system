@@ -19,6 +19,7 @@ interface AddModalApi {
 // Loaded data from database, used in TimeSheetRow and TimeSheetPage
 interface TimeSheetData {
   projectName?: string;
+  userId?: number,
   taskName: string;
   taskId: number;
   time: number;
@@ -405,6 +406,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
 
   private handleSubmitButton() {
     const { stateRowData, prevRowSubmitData } = this.state
+    const { userId } = this.props
     // TimeSheetData
     //Convert every objectData array in stateRowData to an TimeSheetData item in an array: someVariable TimeSheetData[]
     let dataToUpdate: TimeSheetData[] = [];
@@ -429,17 +431,21 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     // if it is then do nothing (Console.log("no data changed"))
     dataToUpdate.map((item) => {
       delete item.projectName;
+      item.userId = userId;
       let foundItem = false;
       for (let i = 0; i < prevRowSubmitData.length; i++) {
         if (item.taskId === prevRowSubmitData[i].taskId &&
           item.date === prevRowSubmitData[i].date &&
           item.time === prevRowSubmitData[i].time) {
-          i++
           console.log("Previos data:");
           foundItem = true;
         } else if (item.taskId === prevRowSubmitData[i].taskId &&
           item.date === prevRowSubmitData[i].date) { // Should put data
-          console.log("Updated data:");
+          console.log("Update data:"); 
+          let apiHandler = new BaseApiHandler();
+          apiHandler.put(`/api/time/register/edit/put`, {body:item}, (value) =>{
+              console.log(value);
+          })
           foundItem = true;
         }
       }
@@ -448,6 +454,11 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
       }
       return true;
     });
+    if (dataToUpdate.length < prevRowSubmitData.length) {
+      const deletedItems = prevRowSubmitData.filter((item) => !dataToUpdate.some((d) => d.taskId === item.taskId && d.date === item.date && d.time === item.time));
+      console.log("data to delete:", deletedItems);
+    }
+    // Needs to find deleted items better
   }
 
 
