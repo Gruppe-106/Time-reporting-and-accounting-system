@@ -13,7 +13,6 @@ class UserTaskProjectEndpoint extends getEndpointBase{
         query += ` CROSS JOIN PROJECTS p ON p.id=tpc.projectId`;
         let response: MySQLResponse = await this.mySQL.sendQuery(query);
         if (response.error !== null) throw new Error("Failed to load data");
-        console.log(response.results);
         return Promise.resolve(response.results);
     }
 
