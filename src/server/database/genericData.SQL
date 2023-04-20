@@ -104,10 +104,6 @@ INSERT IGNORE INTO USERS_ROLES_CONNECTOR
 VALUES
     (2, 4);
 
-UPDATE GROUPS_CONNECTOR
-SET managerId=4
-WHERE groupId=1;
-
 # ------------ Normal-users ------------
 INSERT IGNORE INTO USERS
 (email,firstName,lastName,groupId)
@@ -144,7 +140,7 @@ VALUES
 
 # --------------- Admin ---------------
 # Update the default admin to different values
-UPDATE USERS
+    UPDATE USERS
 SET email='matt@example.com',firstName='Matt',lastName='Brown',groupId=2
 WHERE id=1;
 
@@ -163,6 +159,7 @@ INSERT IGNORE INTO GROUPS_CONNECTOR
 (managerId, groupId)
 values
     (10, 4); # Sam Smith user 10
+
 
 # --------------- Auth ---------------
 INSERT IGNORE INTO  AUTH
