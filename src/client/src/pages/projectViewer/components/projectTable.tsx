@@ -56,7 +56,8 @@ class ProjectTable extends Component<any> {
                 <td>{row.name ?? ''}</td>
                 <td>{row.startDate ? new Date(row.startDate).toLocaleDateString() : ''}</td>
                 <td>{row.endDate ? new Date(row.endDate).toLocaleDateString() : ''}</td>
-                {userInfo.isProjectLeader ? (<Button href={`/project/manage?id=${row.id}`} variant="outline-primary">Edit</Button>): null }
+                {userInfo.isProjectLeader ? (<td><Button href={`/project/manage?id=${row.id}`} variant="primary" className="p-2">Edit</Button></td>): null }
+                {userInfo.isProjectLeader ? (<td><Button href={`/project/create/task?id=${row.id}`} variant="primary" className="p-2">Edit task</Button></td>): null }
             </tr>
         ))
     }
