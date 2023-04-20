@@ -139,7 +139,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
   private handleAddRow = () => {
     const { stateRowData, selectedProject } = this.state
 
-    stateRowData.set(selectedProject.taskId, { projectName: selectedProject.projectName, taskName: selectedProject.taskName, taskId: selectedProject.taskId, objectData: [{ date: Date.now(), time: 0 }] })
+    stateRowData.set(selectedProject.taskId, { projectName: selectedProject.projectName, taskName: selectedProject.taskName, taskId: selectedProject.taskId, objectData: [] })
 
     this.handleCloseAddModal();
   }
@@ -342,10 +342,10 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
           <th>Task Name</th>
           {/* Gets the dates, and maps each date with an index to a table header, creating 7 <th>, all dates in a week */}
           {headerDates.map((date, index) => (
-            <th key={index} className={date === stringToday ? "bg-light" : ""}>{date}</th>
+            <th key={index} style={{textAlign: "center", verticalAlign: "buttom"}} className={date === stringToday ? "bg-light" : ""}>{date}</th>
           ))}
           <th>Total Time</th>
-          <th>&#128465;</th>{/* Trashcan, HTML Entity: */}
+          <th style={{textAlign: "center"}}>&#128465;</th>{/* Trashcan, HTML Entity: */}
         </tr>
       </thead>
     )
@@ -368,7 +368,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
             <td>{data.taskName}</td>
             {arr.map((num, index) => {
               return (
-                <td key={index}>
+                <td key={index} style={{textAlign: "center", verticalAlign: "middle"}}>
                   <InputGroup size="sm">
                     <Form.Control type="number" placeholder="0" value={Math.floor(arr[index] / 60)} onChange={(e) => this.handleTimeChange(index, e.target.value, data)} />
                     <InputGroup.Text id={`basic-addon-${index}`}>:</InputGroup.Text>
