@@ -336,7 +336,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     const today = new Date();
     const stringToday = dateStringFormatter(dateToNumber(today));
     return (
-      < thead >
+      <thead>
         <tr>
           <th>Project Name</th>
           <th>Task Name</th>
@@ -345,9 +345,9 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
             <th key={index} className={date === stringToday ? "bg-light" : ""}>{date}</th>
           ))}
           <th>Total Time</th>
-          <th>&#128465;</th> {/* Trashcan, HTML Entity: */}
+          <th>&#128465;</th>{/* Trashcan, HTML Entity: */}
         </tr>
-      </thead >
+      </thead>
     )
   }
 
