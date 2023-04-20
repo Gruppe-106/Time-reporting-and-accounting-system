@@ -28,7 +28,7 @@ class TaskCreator extends Component<any, ProjectMenuState>{
                 </Container>
 
                 <Container>
-                        <CreateTaskTable initialRows={[]}></CreateTaskTable>
+                    <CreateTaskTable initialRows={[]}></CreateTaskTable>
                 </Container>
 
             </>

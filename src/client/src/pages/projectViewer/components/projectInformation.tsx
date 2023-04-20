@@ -49,12 +49,10 @@ class ProjectInformation extends Component<ProjectInformationProp> {
         //Run the get or post function depending on need only neccesarry argument is the path aka what comes after the hostname
         //Callbacks can be used to tell what to do with the data once it's been retrieved
         apiHandler.get(`/api/project/get?ids=${this.state.pageInformation.id}`, {},(value) => {
-            console.log(value)
             //Then convert the string to the expected object(eg. )
             let json:Api = JSON.parse(JSON.stringify(value))
             //Then update states or variables or whatever you want with the information
             this.setState({pageInformation: json.data[0]})
-            console.log(json.data)
         })
     }
 

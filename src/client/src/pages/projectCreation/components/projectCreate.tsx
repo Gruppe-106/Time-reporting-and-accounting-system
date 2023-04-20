@@ -66,20 +66,16 @@ class ProjectCreate extends Component<ProjectCreateProp> {
         //Run the get or post function depending on need only neccesarry argument is the path aka what comes after the hostname
         //Callbacks can be used to tell what to do with the data once it's been retrieved
         apiHandler.get(`/api/project/get?ids=*`, {},(value) => {
-            console.log(value)
             //Then convert the string to the expected object(eg. )
             let json:Api = JSON.parse(JSON.stringify(value))
             //Then update states or variables or whatever you want with the information
             this.setState({pageInformation: json.data})
-            console.log(json.data)
         })
         apiHandler.get(`/api/role/user/get?role=3`, {},(value) => {
-            console.log(value)
             //Then convert the string to the expected object(eg. )
             let json:ProjectLeaders = JSON.parse(JSON.stringify(value))
             //Then update states or variables or whatever you want with the information
             this.setState({projectLeaders: json.data})
-            console.log(json.data)
         })
     }
 
@@ -112,7 +108,7 @@ class ProjectCreate extends Component<ProjectCreateProp> {
         let maxDate: Date = new Date("3000-01-01")
         let minDate: Date = new Date("1970-01-01")
 
-         if (!(minDate > endDate || endDate > maxDate || startDate > endDate)){
+        if (!(minDate > endDate || endDate > maxDate || startDate > endDate)){
             this.setState({invalidEndDate : false})
         }
         else {
@@ -169,9 +165,7 @@ class ProjectCreate extends Component<ProjectCreateProp> {
         }
 
         let apiHandler = new BaseApiHandler();
-        apiHandler.post(`/api/project/creation/post`, {body:post_data}, (value) =>{
-            console.log(value);
-
+        apiHandler.post(`/api/project/creation/post`, {body:post_data}, () =>{
 
         })
         this.setState({formSubmitted: true})
@@ -181,126 +175,126 @@ class ProjectCreate extends Component<ProjectCreateProp> {
     private informationRender():JSX.Element {
 
         return (
-                <Row>
-                    <Col sm={2}>
-                    </Col>
-                    <Col sm={9}>
-                                <h1>Create a project</h1>
-                                <Form>
-                                    <Row>
-                                        <Col>
-                                            <Form.Group className="mb-3" controlId="formBasicProjectName" onChange={() => {this.handleValidity.call(this)}}>
-                                                <Form.Label>Project Name*</Form.Label>
-                                                <Form.Control type="text" placeholder="Project Name" maxLength={49} />
-                                            </Form.Group>
-                                        </Col>
-                                        <Col>
-                                            <Form.Group className="mb-3" controlId="formBasicParent">
-                                                <Form.Label>Assign Parent Project (optional)</Form.Label>
-                                                <Typeahead
-                                                    id="chooseParent"
-                                                    labelKey="name"
-                                                    options={
-                                                        this.state.pageInformation.map(row =>({id: row.id, name: row.name}))
-                                                    }
-                                                    placeholder="Choose Parent Project..."
-                                                    onChange={(value) => this.HandleParent.call(this, value)}
-                                                    filterBy={(option: any, props: any): boolean => {
-                                                        const query: string = props.text.toLowerCase().trim();
-                                                        const name: string = option.name.toLowerCase();
-                                                        const id: string = option.id.toString();
-                                                        return name.includes(query) || id.includes(query);
-                                                    }}
-                                                    renderMenuItemChildren={(option: any, props: any) => (
-                                                        <>
-                                                            <Highlighter search={props.text}>
-                                                                {option.name}
-                                                            </Highlighter>
-                                                            <div>
-                                                                <small>Project ID: {option.id}</small>
-                                                            </div>
-                                                        </>
-                                                    )}
-                                                />
-                                            </Form.Group>
-                                        </Col>
-                                    </Row>
-                                    <Row>
-                                        <Col>
-                                            <Form.Group className="mb-3" controlId="formBasicStartDate" onChange={() => {this.handleValidity.call(this); this.handleStartDate.call(this)}}>
-                                                <Form.Label>Start Date*</Form.Label>
-                                                <Form.Control type="date" placeholder="1/20/1970" min="1970-01-01" max="3000-01-01" isInvalid={this.state.invalidStartDate}/>
-                                                <Form.Control.Feedback type="invalid">
-                                                    {<p><b>Date is invalid</b></p>}
-                                                </Form.Control.Feedback>
-                                            </Form.Group>
-                                        </Col>
-                                        <Col>
-                                            <Form.Group className="mb-3" controlId="formBasicEndDate" onChange={() => {this.handleValidity.call(this); this.handleEndDate.call(this)}}>
-                                                <Form.Label>End Date*</Form.Label>
-                                                <Form.Control type="date" placeholder="1/20/1970" min="1970-01-01" max="3000-01-01" isInvalid={this.state.invalidEndDate} />
-                                                <Form.Control.Feedback type="invalid">
-                                                    {<p><b>Date is invalid</b></p>}
-                                                </Form.Control.Feedback>
-                                            </Form.Group>
-                                        </Col>
-                                    </Row>
+            <Row>
+                <Col sm={2}>
+                </Col>
+                <Col sm={9}>
+                    <h1>Create a project</h1>
+                    <Form>
+                        <Row>
+                            <Col>
+                                <Form.Group className="mb-3" controlId="formBasicProjectName" onChange={() => {this.handleValidity.call(this)}}>
+                                    <Form.Label>Project Name*</Form.Label>
+                                    <Form.Control type="text" placeholder="Project Name" maxLength={49} />
+                                </Form.Group>
+                            </Col>
+                            <Col>
+                                <Form.Group className="mb-3" controlId="formBasicParent">
+                                    <Form.Label>Assign Parent Project (optional)</Form.Label>
+                                    <Typeahead
+                                        id="chooseParent"
+                                        labelKey="name"
+                                        options={
+                                            this.state.pageInformation.map(row =>({id: row.id, name: row.name}))
+                                        }
+                                        placeholder="Choose Parent Project..."
+                                        onChange={(value) => this.HandleParent.call(this, value)}
+                                        filterBy={(option: any, props: any): boolean => {
+                                            const query: string = props.text.toLowerCase().trim();
+                                            const name: string = option.name.toLowerCase();
+                                            const id: string = option.id.toString();
+                                            return name.includes(query) || id.includes(query);
+                                        }}
+                                        renderMenuItemChildren={(option: any, props: any) => (
+                                            <>
+                                                <Highlighter search={props.text}>
+                                                    {option.name}
+                                                </Highlighter>
+                                                <div>
+                                                    <small>Project ID: {option.id}</small>
+                                                </div>
+                                            </>
+                                        )}
+                                    />
+                                </Form.Group>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col>
+                                <Form.Group className="mb-3" controlId="formBasicStartDate" onChange={() => {this.handleValidity.call(this); this.handleStartDate.call(this)}}>
+                                    <Form.Label>Start Date*</Form.Label>
+                                    <Form.Control type="date" placeholder="1/20/1970" min="1970-01-01" max="3000-01-01" isInvalid={this.state.invalidStartDate}/>
+                                    <Form.Control.Feedback type="invalid">
+                                        {<p><b>Date is invalid</b></p>}
+                                    </Form.Control.Feedback>
+                                </Form.Group>
+                            </Col>
+                            <Col>
+                                <Form.Group className="mb-3" controlId="formBasicEndDate" onChange={() => {this.handleValidity.call(this); this.handleEndDate.call(this)}}>
+                                    <Form.Label>End Date*</Form.Label>
+                                    <Form.Control type="date" placeholder="1/20/1970" min="1970-01-01" max="3000-01-01" isInvalid={this.state.invalidEndDate} />
+                                    <Form.Control.Feedback type="invalid">
+                                        {<p><b>Date is invalid</b></p>}
+                                    </Form.Control.Feedback>
+                                </Form.Group>
+                            </Col>
+                        </Row>
 
-                                    <Form.Group className="mb-3" controlId="formBasicManager">
-                                        <Form.Label>Assign Project Leader*</Form.Label>
-                                        <Typeahead
-                                            id="chooseLeader"
-                                            labelKey="name"
-                                            options={
-                                            this.state.projectLeaders.map(row =>({id: row.userId, name: row.firstName + " " + row.lastName}))
-                                            }
-                                            placeholder="Choose Team Leader..."
-                                            onMenuToggle={() => {this.handleValidity.call(this)}}
-                                            onChange={(value) => {this.HandleManager.call(this, value);
-                                                this.handleValidity.call(this)}}
-                                            filterBy={(option: any, props: any): boolean => {
-                                                const query: string = props.text.toLowerCase().trim();
-                                                const name: string = option.name.toLowerCase();
-                                                const id: string = option.id.toString();
-                                                return name.includes(query) ||  id.includes(query);
-                                            }}
-                                            renderMenuItemChildren={(option: any, props: any) => (
-                                                <>
-                                                    <Highlighter search={props.text}>
-                                                        {option.name}
-                                                    </Highlighter>
-                                                    <div>
-                                                        <small>Manager id: {option.id}</small>
-                                                    </div>
-                                                </>
-                                            )}
-                                        />
-                                    </Form.Group>
-                                    <center>
-                                    <Button variant="success" id="submitbutton" onClick={this.handleShow} size="lg">Submit project</Button>
-                                        </center>
-                                    <Modal show={this.state.show} onHide={this.handleClose}>
-                                        <Modal.Header closeButton>
-                                            <Modal.Title>Confirm project</Modal.Title>
-                                        </Modal.Header>
-                                        <Modal.Body>Check that you have filled out all required fields correctly *</Modal.Body>
-                                        <Modal.Body>Are you sure you want to create this project?</Modal.Body>
-                                        <Modal.Footer>
-                                            <Button variant="secondary" onClick={this.handleClose}>
-                                                Close
-                                            </Button>
-                                        <Button variant="success" type="submit" id="submitbutton" onClick={this.handleFormSubmit}>Create Project</Button>
-                                        </Modal.Footer>
-                                    </Modal>
-                                </Form>
-                                {this.state.formSubmitted ? (<Alert variant="success" id="alert">
-                                    <Alert.Heading>Project created!</Alert.Heading>
-                                    <p>
-                                        Your project has been successfully created, it can now be viewed under the <a href="/project/menu">project menu</a>
-                                    </p>
-                                </Alert>) : ""}
-                    </Col>
-                </Row>
+                        <Form.Group className="mb-3" controlId="formBasicManager">
+                            <Form.Label>Assign Project Leader*</Form.Label>
+                            <Typeahead
+                                id="chooseLeader"
+                                labelKey="name"
+                                options={
+                                    this.state.projectLeaders.map(row =>({id: row.userId, name: row.firstName + " " + row.lastName}))
+                                }
+                                placeholder="Choose Team Leader..."
+                                onMenuToggle={() => {this.handleValidity.call(this)}}
+                                onChange={(value) => {this.HandleManager.call(this, value);
+                                    this.handleValidity.call(this)}}
+                                filterBy={(option: any, props: any): boolean => {
+                                    const query: string = props.text.toLowerCase().trim();
+                                    const name: string = option.name.toLowerCase();
+                                    const id: string = option.id.toString();
+                                    return name.includes(query) ||  id.includes(query);
+                                }}
+                                renderMenuItemChildren={(option: any, props: any) => (
+                                    <>
+                                        <Highlighter search={props.text}>
+                                            {option.name}
+                                        </Highlighter>
+                                        <div>
+                                            <small>Manager id: {option.id}</small>
+                                        </div>
+                                    </>
+                                )}
+                            />
+                        </Form.Group>
+                        <center>
+                            <Button variant="success" id="submitbutton" onClick={this.handleShow} size="lg">Submit project</Button>
+                        </center>
+                        <Modal show={this.state.show} onHide={this.handleClose}>
+                            <Modal.Header closeButton>
+                                <Modal.Title>Confirm project</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>Check that you have filled out all required fields correctly *</Modal.Body>
+                            <Modal.Body>Are you sure you want to create this project?</Modal.Body>
+                            <Modal.Footer>
+                                <Button variant="secondary" onClick={this.handleClose}>
+                                    Close
+                                </Button>
+                                <Button variant="success" type="submit" id="submitbutton" onClick={this.handleFormSubmit}>Create Project</Button>
+                            </Modal.Footer>
+                        </Modal>
+                    </Form>
+                    {this.state.formSubmitted ? (<Alert variant="success" id="alert">
+                        <Alert.Heading>Project created!</Alert.Heading>
+                        <p>
+                            Your project has been successfully created, it can now be viewed under the <a href="/project/menu">project menu</a>
+                        </p>
+                    </Alert>) : ""}
+                </Col>
+            </Row>
         )
     }
 
