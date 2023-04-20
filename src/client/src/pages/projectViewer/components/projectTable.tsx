@@ -16,7 +16,7 @@ interface Api{
 
 export interface ProjectTableRow{
     id:number
-    superProject?:number
+    superProjectId?:number
     name?:string
     startDate?:any
     endDate?:any
@@ -26,7 +26,7 @@ class ProjectTable extends Component<any> {
     state = {
         tableRows: [ {
             id: -1,
-            superProject: "",
+            superProjectId: "",
             name: "",
             startDate: "",
             endDate: ""
@@ -52,11 +52,12 @@ class ProjectTable extends Component<any> {
         return this.state.tableRows.map(row => (
             <tr key={row.id}>
                 <td> <a href={`/project/viewer?id=${row.id}`}>{row.id}</a> </td>
-                <td>{row.superProject ?? ''}</td>
+                <td>{row.superProjectId ?? ''}</td>
                 <td>{row.name ?? ''}</td>
                 <td>{row.startDate ? new Date(row.startDate).toLocaleDateString() : ''}</td>
                 <td>{row.endDate ? new Date(row.endDate).toLocaleDateString() : ''}</td>
-                {userInfo.isProjectLeader ? (<Button href={`/project/manage?id=${row.id}`} variant="outline-primary">Edit</Button>): null }
+                {userInfo.isProjectLeader ? (<td><Button href={`/project/manage?id=${row.id}`} variant="primary" className="p-2">Edit</Button></td>): null }
+                {userInfo.isProjectLeader ? (<td><Button href={`/project/create/task?id=${row.id}`} variant="primary" className="p-2">Edit task</Button></td>): null }
             </tr>
         ))
     }
