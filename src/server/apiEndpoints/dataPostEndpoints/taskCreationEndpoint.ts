@@ -21,7 +21,7 @@ class TaskCreationEndpoint extends PostEndpointBase {
     async submitData(req: Request, res: Response): Promise<string[]> {
         let tasksData: TaskCreationData = req.body;
         if (tasksData.task) await addTaskToProject.call(this, [tasksData.task], tasksData.projectId);
-        else throw new Error("Task data not given");
+        else return ["Task data not given"];
 
         return Promise.resolve(["success"]);
     }

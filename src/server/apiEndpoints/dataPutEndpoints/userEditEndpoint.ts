@@ -24,6 +24,8 @@ class UserEditEndpoint extends PostEndpointBase {
             return ["Missing user id"];
         }
 
+        if (user.userId === undefined) return ["Missing user id"];
+
         let userUpdateSet: UpdateSet[] = [];
         let authUpdateSet: UpdateSet[] = [];
 

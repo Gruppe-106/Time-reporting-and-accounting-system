@@ -30,7 +30,6 @@ class TaskTimeRegisterEndpoint extends  GetEndpointBase {
         if (data !== undefined && data.length > 1) {
             period = ` AND (date BETWEEN '${this.mySQL.dateFormatter(parseInt(data[0]))}' AND '${this.mySQL.dateFormatter(parseInt(data[1]))}')`;
         }
-
         let allColumns: boolean = requestValues.indexOf("*") !== -1;
 
         //Find all columns to find in the database
@@ -44,7 +43,7 @@ class TaskTimeRegisterEndpoint extends  GetEndpointBase {
             select.push("t.name as taskName");
             join += " CROSS JOIN TASKS t ON t.id=ttr.taskId";
         }
-        if (requestValues.indexOf("projectName") !== -1 || requestValues.indexOf("projectId") || allColumns) {
+        if (requestValues.indexOf("projectName") !== -1 || requestValues.indexOf("projectId") !== -1|| allColumns) {
             join += " CROSS JOIN TASKS_PROJECTS_CONNECTOR tp ON ttr.taskId=tp.taskId CROSS JOIN PROJECTS p ON tp.projectId=p.id";
             if (requestValues.indexOf("projectId")   || allColumns) select.push("p.id as projectId");
             if (requestValues.indexOf("projectName") || allColumns) select.push("p.name as projectName");

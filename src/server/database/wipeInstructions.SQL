@@ -82,6 +82,7 @@ CREATE TABLE USERS_TASKS_TIME_REGISTER
         ON DELETE CASCADE,
     FOREIGN KEY (taskId)
         REFERENCES TASKS (id)
+        ON DELETE RESTRICT
 );
 # Ensures the rows are unique so no duplicate date - taskId - userId exists
 ALTER TABLE USERS_TASKS_TIME_REGISTER
@@ -162,11 +163,12 @@ ALTER TABLE USERS
 
 CREATE TABLE TASKS_PROJECTS_CONNECTOR
 (
-    taskId    INT UNSIGNED NOT NULL,
+    taskId    INT UNSIGNED NOT NULL UNIQUE,
     projectId INT UNSIGNED NOT NULL,
     PRIMARY KEY (taskId, projectId),
     FOREIGN KEY (taskId)
-        REFERENCES TASKS (id),
+        REFERENCES TASKS (id)
+            ON DELETE CASCADE,
     FOREIGN KEY (projectId)
         REFERENCES PROJECTS (id)
 );
@@ -196,4 +198,5 @@ CREATE TABLE USERS_TASKS_CONNECTOR
         ON DELETE CASCADE,
     FOREIGN KEY (taskId)
         REFERENCES TASKS (id)
+        ON DELETE CASCADE
 );
