@@ -289,12 +289,12 @@ class TimesheetTable extends Component<any, TimesheetPropTypes> {
                                                 {pt.days[day].time > 0?(
                                                     <>{pt.days[day].managerLogged?(
                                                         <>
-                                                            <span className='row px-3'>{pt.days[day].time} Hours</span>
+                                                            <span className='row px-3'>Hours: {Math.floor(pt.days[day].time / 60)}:{pt.days[day].time % 60 === 0? "00" : pt.days[day].time % 60}</span>
                                                             <span className='row px-3'><Button className='m-1 disabled' variant="success" onClick={() => this.acceptTimesheet(true, pt, day)}><FontAwesomeIcon icon={faCheck} /></Button> <Button className='m-1 disabled' variant="danger" onClick={() => this.acceptTimesheet(false, pt, day)}><FontAwesomeIcon icon={faX} /></Button></span>
                                                         </>
                                                     ):(
                                                         <>
-                                                            <span className='row px-3'>{pt.days[day].time} Hours</span>
+                                                            <span className='row px-3'>Hours: {Math.floor(pt.days[day].time / 60)}:{pt.days[day].time % 60 === 0? "00" : pt.days[day].time % 60}</span>
                                                             <span className='row px-3'><Button className='m-1' variant="success" onClick={() => this.acceptTimesheet(true, pt, day)}><FontAwesomeIcon icon={faCheck} /></Button> <Button className='m-1' variant="danger" onClick={() => this.acceptTimesheet(false, pt, day)}><FontAwesomeIcon icon={faX} /></Button></span>
                                                         </>
                                                     )}</>
