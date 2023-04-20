@@ -288,7 +288,7 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
         }
       }
       let apiHandler = new BaseApiHandler();
-      apiHandler.post(`/api/task/creation/post`, {body:post_data}, (value) =>{
+      apiHandler.post(`/api/task/creation/post`, {body:post_data}, () =>{
         this.getInformation()
       })
       this.setState({formSubmitted: true})
@@ -315,7 +315,7 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
         delete: id
       }
       let apiHandler = new BaseApiHandler();
-      apiHandler.put(`/api/task/edit/put`, {body:post_data}, (value) =>{
+      apiHandler.put(`/api/task/edit/put`, {body:post_data}, () =>{
         this.getInformation()
       })
 
