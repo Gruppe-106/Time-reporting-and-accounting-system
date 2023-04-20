@@ -147,7 +147,7 @@ class AdminPanel extends Component<any, CustomTypes> {
         this.handleLoader("Getting users")
 
         const dbManagers: Manager[] = (await APICalls.getAllManagerGroups()).data
-        const dbUsers: User[] =( await APICalls.getAllUsers()).data
+        const dbUsers: User[] = (await APICalls.getAllUsers()).data
         console.log(dbUsers)
         const groups: number[] = []
         dbUsers.forEach((ele: User) => groups.push(ele.groupId))
@@ -266,7 +266,7 @@ class AdminPanel extends Component<any, CustomTypes> {
         * @param {User} user - The User object to render a row for.
         * @returns {JSX.Element | undefined} - A JSX Element for the row, or undefined if user has no manager.
    */
-    private renderEditingRow(user: User): JSX.Element | undefined { 
+    private renderEditingRow(user: User): JSX.Element | undefined {
 
 
         return (
@@ -515,14 +515,34 @@ class AdminPanel extends Component<any, CustomTypes> {
      *
      * @param user The user to be deleted.
      */
-    private handleDelete(user: User): void {
-        console.log(user);
+    private async handleDelete(user: User): Promise<void> {
+        const test = await fetch(`/api/user/remove?user=${user.id}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then((response: Response) => {
+                if (response.status === 400) {
+                    throw new Error("Status 400 bad request")
+                } else if (response.status === 200) {
+                    return response.json()
+                } else {
+                    throw new Error(`Unexpected response status: ${response.status}`)
+                }
+            })
+            .catch(error => {
+                throw new Error(error.Code);
+            });
+
+        console.log(test)
     }
 
     /**
      * Toggles the editing state of the component.
      */
     private handleEditing(): void {
+
         this.setState({
             editing: !this.state.editing
         });
