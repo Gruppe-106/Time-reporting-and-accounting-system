@@ -198,11 +198,14 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
       let userId = [parseInt(row.userId)]
 
       let post_data = {
-        name: taskName,
-        userId: userId,
-        startDate: startDate,
-        endDate: endDate,
-        timeType: timeType
+        projectId: id,
+        task: {
+          name: taskName,
+          userId: userId,
+          startDate: startDate,
+          endDate: endDate,
+          timeType: timeType
+        }
       }
       let apiHandler = new BaseApiHandler();
       apiHandler.post(`/api/task/creation/post`, {body:post_data}, (value) =>{

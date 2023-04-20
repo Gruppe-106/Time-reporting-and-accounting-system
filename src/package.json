@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "npx ts-node app.ts",
+    "start:dev": "nodemon --watch \"src/**\" --ext \"ts,json\" --ignore \"src/**/*.spec.ts\" --exec \"npx ts-node app.ts\"",
     "build": "npx tsc",
     "test": "jest",
     "update-node": "npm install && cd client && npm install"

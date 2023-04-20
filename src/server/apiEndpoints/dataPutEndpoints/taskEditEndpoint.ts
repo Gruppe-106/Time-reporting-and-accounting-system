@@ -41,7 +41,12 @@ class TaskEditEndpoint extends PostEndpointBase {
         let message: string[] = ["success"];
         //Get data from the user creation form
         let taskData: TaskEditData = req.body;
-
+        if (taskData.taskId === undefined) return ["Missing task id"];
+        if (taskData.delete === true) {
+            let response: MySQLResponse = await this.mySQL.remove("TASKS", [{column: "id", equals: [taskData.taskId.toString()]}]);
+            if (response.error === null) return ["success"];
+            return [`Failed to delete ${taskData.taskId}`];
+        }
         // Create the update set and append any the requester wishes to change
         let taskUpdateSet: UpdateSet[] = [];
         if (taskData.name) taskUpdateSet.push({column: "name", value: taskData.name});
