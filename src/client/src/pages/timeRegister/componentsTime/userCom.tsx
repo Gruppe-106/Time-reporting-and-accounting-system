@@ -336,6 +336,9 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
   renderHeaderRow() {
     const { headerDates } = this.state
 
+    let i: number = 0;
+
+    const weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
     const today = new Date();
     const stringToday = dateStringFormatter(dateToNumber(today));
     return (
@@ -343,10 +346,11 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
         <tr>
           <th>Project Name</th>
           <th>Task Name</th>
-          {/* Gets the dates, and maps each date with an index to a table header, creating 7 <th>, all dates in a week */}
-          {headerDates.map((date, index) => (
-            <th key={index} style={{ textAlign: "center", verticalAlign: "buttom" }} className={date === stringToday ? "bg-light" : ""}>{date}</th>
-          ))}
+          {headerDates.map((date, index) => {
+            const weekday = weekdays[i];
+            i = i + 1;
+            return (<th key={index} style={{ textAlign: "center", verticalAlign: "buttom" }} className={date === stringToday ? "bg-light" : ""}><div style={{ lineHeight: "1em" }}>{weekday}</div><div style={{ lineHeight: "1em" }}>{date}</div></th>)
+          })}
           <th>Total Time</th>
           <th style={{ textAlign: "center" }}>&#128465;</th>{/* Trashcan, HTML Entity: */}
         </tr>
@@ -433,19 +437,21 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
           console.log("Previos data:");
           foundItem = true;
         } else if (item.taskId === prevRowSubmitData[i].taskId &&
-          item.date === prevRowSubmitData[i].date) {
+          item.date === prevRowSubmitData[i].date) { // Should put data
           console.log("Updated data:");
           foundItem = true;
         }
       }
-      if (!foundItem) {
+      if (!foundItem) {  // else create and post the new data
         console.log("New data:");
+        console.log(item)
       }
       return true;
     });
 
 
-    // else create and post the new data
+
+
     console.log("All data:")
     console.log(dataToUpdate)
     console.log(prevRowSubmitData);
