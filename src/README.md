@@ -830,12 +830,10 @@ Optional:
 ### Body
 ```
 {
-    firstName   : string,
-    lastName    : string,
-    email       : string,
-    password    : string,
-    manager     : number,
-    roles       : number[]
+    date   : number,
+    taskId : number,
+    userId : number,
+    time   : number,
 }
 ```
 ### Structure Of Object Returned

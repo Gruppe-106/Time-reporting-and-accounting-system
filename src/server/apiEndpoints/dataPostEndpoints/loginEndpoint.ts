@@ -17,11 +17,11 @@ class LoginEndpoint extends PostEndpointBase{
 
     async submitData(req: Request, res: Response): Promise<string[]> {
         let data: LoginData = req.body;
-
+        if (data.password === undefined || data.email === undefined) return ["Missing password or email"];
         // Try to get the auth table with the specified email
         let authResponse: MySQLResponse = await this.mySQL.select("AUTH", ["authKey", "authKeyEndDate", "password", "userId"], {column: "email", equals: [data.email]});
         if (authResponse.error !== null) throw new Error("[MySQL] Failed to retrieve data");
-
+        if (authResponse.results[0] === undefined || authResponse.results[0].password === undefined) return ["Password or email incorrect"];
         // Check if the password match
         if (data.password === authResponse.results[0].password) {
             // If auth key is still valid return it, this is so login on other devices doesn't lose their auth token

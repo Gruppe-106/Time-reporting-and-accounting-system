@@ -1,6 +1,5 @@
 import {ParsedQs} from "qs";
 import {Request, Response} from "express";
-import {Where} from "../database/mysqlHandler";
 import EndpointBase from "./endpointBase";
 
 abstract class GetEndpointBase extends EndpointBase{
@@ -14,7 +13,7 @@ abstract class GetEndpointBase extends EndpointBase{
      * @param data String[]?: Additional data needed for sending query
      * @return Promise object[] : containing the information to send to client
      */
-    abstract getData(requestValues: string[], primaryKey: string, keyEqual?: string[], data?:string[]):Promise<object[]>;
+    abstract getData(requestValues: string[], primaryKey: string, keyEqual?: string[], data?:string[]): Promise<object[]>;
 
     public async processRequest(req: Request, requestValues: string[], primaryKey:string, keyEqual?:string[], data?:string[]):Promise<{status:number, data: object[]}> {
         try {
@@ -37,27 +36,30 @@ abstract class GetEndpointBase extends EndpointBase{
         }
     }
 
-    protected urlParamsConversion(params:string | string[] | ParsedQs | ParsedQs[], allowAll:boolean = true, throwOnMissing:boolean = false, res?:Response):string[] {
+    protected urlParamsConversion(params:string | string[] | ParsedQs | ParsedQs[], allowAll:boolean = true, throwOnMissing:boolean = false, res?:Response, req?: Request): string[] {
         let paramsList:string[];
         if (typeof params === "string" ) {
             paramsList = params.split(",");
         } else if (allowAll) {
             paramsList = ["*"];
         } else if (throwOnMissing) {
-            this.badRequest(res);
+            this.badRequest(res, req);
         }
         return paramsList;
     }
 
-    public getRoute(req:Request, res:Response, primaryKey:string = "id", requestKeysName:string = "ids") {
-        let requestKeys: string[] = this.urlParamsConversion(req.query[requestKeysName], false, true, res);
-        if (requestKeys === undefined) { return this.badRequest(res); }
+    public getRoute(req:Request, res:Response, primaryKey:string = "id", requestKeysName:string = "ids"): void {
+        let requestKeys: string[] = this.urlParamsConversion(req.query[requestKeysName], false, true, res, req);
+        if (requestKeys === undefined) { return this.badRequest(res, req); }
 
         let requestedValues:string[] = this.urlParamsConversion(req.query.var);
 
         this.processRequest(req, requestedValues, primaryKey, requestKeys).then((data) => {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(data.status).json(data);
+            if (!res.writableEnded) {
+                res.setHeader('Content-Type', 'application/json');
+                res.status(data.status).json(data);
+                res.end();
+            }
         })
     };
 }

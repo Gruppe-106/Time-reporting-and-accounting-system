@@ -146,7 +146,7 @@ class MysqlHandler {
         let string: string = "";
         for (let i = 0; i < list.length; i++) {
             if (i !== 0) string += ","
-            string += `'${list[i].replace(/\'/g, '"')}'`;
+            if (list[i] !== undefined) string += `'${list[i].replace(/\'/g, '"')}'`;
         }
         return string;
     }
