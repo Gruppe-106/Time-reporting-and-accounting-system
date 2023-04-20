@@ -21,7 +21,7 @@ import forge from 'node-forge';
 //Custom import
 import BaseApiHandler from "../../network/baseApiHandler";
 import Utility from './utility/userCreation/userCreation'
-import APICalls from "./utility/userCreation/apiCalls";
+import APICalls from "./utility/apiCalls";
 
 interface Manager {
     managerId: number,

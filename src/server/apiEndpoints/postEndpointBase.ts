@@ -19,6 +19,10 @@ abstract class PostEndpointBase extends EndpointBase{
      */
     public async processRequest(req:Request, res:Response):Promise<{status:number, data: object}> {
         try {
+            // Check if the body is empty
+            if(req.body.constructor === Object && Object.keys(req.body).length === 0) {
+                return {status: 404, data: {success: "false", message: "Missing Body"}};
+            }
             // First check if user is authorised
             if (await this.ensureAuth(req)) {
                 // Try to submit data to DB
@@ -32,7 +36,7 @@ abstract class PostEndpointBase extends EndpointBase{
             }
             // Tell requester they aren't authorised
             return {status: 401, data: {error: "Not authorized"}};
-        } catch (e) {
+        } catch (e: unknown) {
             console.error(e);
             return {status: 404, data: {error: "Failed to submit data"}};
         }
@@ -46,8 +50,10 @@ abstract class PostEndpointBase extends EndpointBase{
     public postRoute(req: Request, res: Response): void {
         // Calls the process request of the endpoint and send back the result to the requester
         this.processRequest(req, res).then((data) => {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(data.status).json(data);
+            if (!res.writableEnded) {
+                res.setHeader('Content-Type', 'application/json');
+                res.status(data.status).json(data);
+            }
         })
     };
 }

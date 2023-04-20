@@ -1,6 +1,4 @@
-/*
-    Show a list of projects a user is related to
- */
+
 import React, {Component} from "react";
 import BaseNavBar from "../../components/navBar";
 import {Button, Container} from "react-bootstrap";
