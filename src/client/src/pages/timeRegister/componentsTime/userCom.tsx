@@ -18,7 +18,7 @@ interface AddModalApi {
 
 // Loaded data from database, used in TimeSheetRow and TimeSheetPage
 interface TimeSheetData {
-  projectName: string;
+  projectName?: string;
   taskName: string;
   taskId: number;
   time: number;
@@ -273,7 +273,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
                 taskData.set(task.taskId, data);
               }
             } else {
-              taskData.set(task.taskId, { projectName: task.projectName, taskName: task.taskName, taskId: task.taskId, objectData: [{ date: task.date, time: task.time }] })
+              taskData.set(task.taskId, { projectName: task.projectName ?? "", taskName: task.taskName, taskId: task.taskId, objectData: [{ date: task.date, time: task.time }] })
             }
           }
           this.setState({ stateRowData: taskData })
@@ -409,11 +409,11 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
       if (data) {
         data.objectData.map((item) => {
           let dataToUpdate2: TimeSheetData = {
-            projectName: data?.projectName ?? "",
-            taskName: data?.taskName ?? "",
-            taskId: data?.taskId ?? Infinity,
-            time: item.time, 
             date: item.date,
+            taskId: data?.taskId ?? Infinity,
+            time: item.time,
+            taskName: data?.taskName ?? "",
+            projectName: data?.projectName ?? "",
           }
           dataToUpdate.push(dataToUpdate2);
           return true
@@ -421,11 +421,30 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
       }
     }
     // check if previous data is the same
-
-  
-    // check if previous data is the same
     // if it is then do nothing (Console.log("no data changed"))
-    //else if check if a task has the same data as the previous data, and then update that data
+    dataToUpdate.map((item) => {
+      delete item.projectName;
+      let foundItem = false;
+      for (let i = 0; i < prevRowSubmitData.length; i++) {
+        if (item.taskId === prevRowSubmitData[i].taskId &&
+          item.date === prevRowSubmitData[i].date &&
+          item.time === prevRowSubmitData[i].time) {
+          i++;
+          console.log("Previos data:");
+          foundItem = true;
+        } else if (item.taskId === prevRowSubmitData[i].taskId &&
+          item.date === prevRowSubmitData[i].date) {
+          console.log("Updated data:");
+          foundItem = true;
+        }
+      }
+      if (!foundItem) {
+        console.log("New data:");
+      }
+      return true;
+    });
+
+
     // else create and post the new data
     console.log("All data:")
     console.log(dataToUpdate)
@@ -433,7 +452,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     console.log(stateRowData)
     //console.log(prevRowSubmitData.filter(data => data.taskName === "Task Y"));
   }
-  
+
 
   render() {
     const { showAddModal, showDeleteRowModal, deleteId, delRowTaskProject, searchDataState } = this.state;
