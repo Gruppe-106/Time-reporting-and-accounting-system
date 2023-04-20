@@ -353,33 +353,3 @@ VALUES
         ('2023-03-24',6 ,10,150 ,0,0),
         ('2023-03-23',6 ,10,150 ,1,1),
         ('2023-03-24',6 ,10,150 ,1,1);
-
-# -----------------------------------------------
-# -------------- For test purposes --------------
-# -----------------------------------------------
-
-# User task test
-INSERT IGNORE INTO PROJECTS
-(superProjectId, name, startDate, endDate)
-VALUES
-    (0,'Project User Task','2023-03-20','2023-04-26'); # 7
-
-INSERT IGNORE INTO TASKS
-(name, startDate, endDate, timeType)
-VALUES
-    ('Task User Task','2023-03-20','2023-04-26',2); # 13
-
-INSERT IGNORE INTO TASKS_PROJECTS_CONNECTOR
-(taskId, projectId)
-VALUES
-    (13,7);
-
-INSERT IGNORE INTO USERS
-(email,firstName,lastName,groupId)
-VALUES
-    ('peter@example.com','Peter','Johnson', 3); # Alex Johnson user 11
-
-INSERT IGNORE INTO USERS_TASKS_CONNECTOR
-    (userId,taskId)
-    VALUES
-        (11,13);
