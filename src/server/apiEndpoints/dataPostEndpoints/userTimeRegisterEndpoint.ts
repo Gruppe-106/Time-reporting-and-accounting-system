@@ -20,11 +20,13 @@ class UserTimeRegisterEndpoint extends PostEndpointBase {
     async submitData(req: Request, res: Response): Promise<string[]> {
         let timeRegisterData: UserTimeRegisterData = req.body;
 
+        if (timeRegisterData.userId === undefined || timeRegisterData.taskId === undefined || timeRegisterData.date === undefined) return ["Missing data"];
+
         // First check if the time register already exists in the DB
         let timeRegisterGetResponse: MySQLResponse = await this.mySQL.select("USERS_TASKS_TIME_REGISTER", ["approved", "managerLogged"], [
             {column: "userId", equals: [timeRegisterData.userId.toString()]},
             {column: "taskId", equals: [timeRegisterData.taskId.toString()]},
-            {column: "date",   equals: [timeRegisterData.date.toString()]}
+            {column: "date",   equals: [this.mySQL.dateFormatter(timeRegisterData.date)]}
         ])
         let timeRegisterGetResult: TimeRegisterGetData[] = timeRegisterGetResponse.results;
 

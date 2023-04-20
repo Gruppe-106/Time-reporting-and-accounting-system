@@ -4,9 +4,9 @@
  */
 
 import React, {Component} from "react";
-import ReactDOM from "react-dom/client";
 import BaseNavBar from "../../components/navBar";
-import {Container} from "react-bootstrap";
+import {Button, Container} from "react-bootstrap";
+import BaseApiHandler from "../../network/baseApiHandler";
 
 class DataExport extends Component<any>{
     constructor(props:any) {
@@ -18,6 +18,13 @@ class DataExport extends Component<any>{
             <>
                 <BaseNavBar/>
                 <Container>
+                    <Button onClick={() => {
+                        let apiHandler = new BaseApiHandler();
+                        apiHandler.get("/api/time/register/get?user=3,4,5", {}, (value) => {
+                            console.log(value)
+                        });
+                    }
+                    }></Button>
                     <h1>DataExport</h1>
                 </Container>
             </>

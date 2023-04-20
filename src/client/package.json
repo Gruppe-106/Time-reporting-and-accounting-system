@@ -54,8 +54,9 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://10.92.1.237:8080",
+  "proxy": "http://localhost:8080",
   "devDependencies": {
-    "@types/jest": "^29.5.0"
+    "@types/jest": "^29.5.1",
+    "@types/mocha": "^10.0.1"
   }
 }
