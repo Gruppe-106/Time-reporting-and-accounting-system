@@ -51,13 +51,13 @@ export default class APICalls {
     }
 
 
-    public static getAllUsers(): Promise<{
+    public static getAllUsers(): Promise<{status:number,data:{
         id: number;
         email: string;
         firstName: string;
         lastName: string;
         groupId: number;
-    }[]> {
+    }[]}> {
 
         return fetch(`/api/user/get?ids=*`, {
             method: 'GET',

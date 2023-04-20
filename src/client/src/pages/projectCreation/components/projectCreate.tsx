@@ -1,13 +1,10 @@
 import React, {Component} from "react";
 import Col from 'react-bootstrap/Col';
-import Nav from 'react-bootstrap/Nav';
 import Row from 'react-bootstrap/Row';
-import Tab from 'react-bootstrap/Tab';
 import Modal from 'react-bootstrap/Modal'
 import {Alert, Button, Form} from "react-bootstrap";
 import BaseApiHandler from "../../../network/baseApiHandler";
 import {Highlighter, Typeahead} from "react-bootstrap-typeahead";
-import ProjectCreateTask from "./projectCreateTasks";
 
 interface Api{
     status:number,
@@ -20,6 +17,17 @@ interface Api{
     }[]
 }
 
+interface ProjectLeaders{
+    status: number,
+    data: {
+        userId?: number
+        firstName?: string
+        lastName?: string
+        roleId?: number
+        roleName?: string
+    }[]
+}
+
 interface ProjectCreateProp {
     id:number
     superProject?:number
@@ -29,12 +37,14 @@ interface ProjectCreateProp {
     assignedToManager?: { managerId: number, managerName: string }
 }
 
+
 class ProjectCreate extends Component<ProjectCreateProp> {
     // @ts-ignore
     state = {
         assignedToManager: {"id": Infinity, "name": "" },
         selectedParentProject: {"id": Infinity, "name": ""},
         pageInformation: [{id: -1, superProject: -1, name: "", startDate: "", endDate: ""}],
+        projectLeaders: [{userId: -1, firstName: "", lastName: ""}],
         tasks: [],
         show: false,
         formSubmitted: false,
@@ -61,6 +71,14 @@ class ProjectCreate extends Component<ProjectCreateProp> {
             let json:Api = JSON.parse(JSON.stringify(value))
             //Then update states or variables or whatever you want with the information
             this.setState({pageInformation: json.data})
+            console.log(json.data)
+        })
+        apiHandler.get(`/api/role/user/get?role=3`, {},(value) => {
+            console.log(value)
+            //Then convert the string to the expected object(eg. )
+            let json:ProjectLeaders = JSON.parse(JSON.stringify(value))
+            //Then update states or variables or whatever you want with the information
+            this.setState({projectLeaders: json.data})
             console.log(json.data)
         })
     }
@@ -162,24 +180,11 @@ class ProjectCreate extends Component<ProjectCreateProp> {
 
     private informationRender():JSX.Element {
 
-        // @ts-ignore
-        // @ts-ignore
         return (
-            <Tab.Container id="left-tabs-example" defaultActiveKey="first">
                 <Row>
                     <Col sm={2}>
-                        <Nav variant="pills" className="flex-column">
-                            <Nav.Item>
-                                <Nav.Link eventKey="first">Project Information</Nav.Link>
-                            </Nav.Item>
-                            <Nav.Item>
-                                <Nav.Link eventKey="second">Tasks</Nav.Link>
-                            </Nav.Item>
-                        </Nav>
                     </Col>
                     <Col sm={9}>
-                        <Tab.Content>
-                            <Tab.Pane eventKey="first">
                                 <h1>Create a project</h1>
                                 <Form>
                                     <Row>
@@ -242,16 +247,13 @@ class ProjectCreate extends Component<ProjectCreateProp> {
                                     </Row>
 
                                     <Form.Group className="mb-3" controlId="formBasicManager">
-                                        <Form.Label>Assign Team Leader*</Form.Label>
+                                        <Form.Label>Assign Project Leader*</Form.Label>
                                         <Typeahead
                                             id="chooseLeader"
                                             labelKey="name"
-                                            options={[
-                                                { id: 1, name: "Andreas Monster addict" },
-                                                { id: 2, name: "Mads the OG Mads" },
-                                                { id: 3, name: "Mikkel the mikkelman" },
-                                                { id: 4, name: "Alexander 👌" }
-                                            ]}
+                                            options={
+                                            this.state.projectLeaders.map(row =>({id: row.userId, name: row.firstName + " " + row.lastName}))
+                                            }
                                             placeholder="Choose Team Leader..."
                                             onMenuToggle={() => {this.handleValidity.call(this)}}
                                             onChange={(value) => {this.HandleManager.call(this, value);
@@ -260,7 +262,7 @@ class ProjectCreate extends Component<ProjectCreateProp> {
                                                 const query: string = props.text.toLowerCase().trim();
                                                 const name: string = option.name.toLowerCase();
                                                 const id: string = option.id.toString();
-                                                return name.includes(query) || id.includes(query);
+                                                return name.includes(query) ||  id.includes(query);
                                             }}
                                             renderMenuItemChildren={(option: any, props: any) => (
                                                 <>
@@ -274,7 +276,9 @@ class ProjectCreate extends Component<ProjectCreateProp> {
                                             )}
                                         />
                                     </Form.Group>
-                                    <Button variant="success" id="submitbutton" onClick={this.handleShow}>Submit project</Button>
+                                    <center>
+                                    <Button variant="success" id="submitbutton" onClick={this.handleShow} size="lg">Submit project</Button>
+                                        </center>
                                     <Modal show={this.state.show} onHide={this.handleClose}>
                                         <Modal.Header closeButton>
                                             <Modal.Title>Confirm project</Modal.Title>
@@ -295,15 +299,8 @@ class ProjectCreate extends Component<ProjectCreateProp> {
                                         Your project has been successfully created, it can now be viewed under the <a href="/project/menu">project menu</a>
                                     </p>
                                 </Alert>) : ""}
-                            </Tab.Pane>
-                            <Tab.Pane eventKey="second">
-                                <h3>Task list</h3>
-                                <ProjectCreateTask/>
-                            </Tab.Pane>
-                        </Tab.Content>
                     </Col>
                 </Row>
-            </Tab.Container>
         )
     }
 
@@ -315,5 +312,4 @@ class ProjectCreate extends Component<ProjectCreateProp> {
         )
     }
 }
-
 export default ProjectCreate;
