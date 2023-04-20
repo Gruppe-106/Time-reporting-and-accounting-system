@@ -1,9 +1,4 @@
-## TO DO FOR PROJECT CREATION
-* ADD VALIDATION FOR USER INPUT WHEN CREATING A PROJECT/EDITING PROJECT
+## Optional
 * Tasks in project information needs to have a member column that shows assigned members
-* Members list in project information needs to have assigned task ids
-* Add correct members to project rather than showing every user.
-* Edit project
-* Send tasks along with create project info
-* Confirmation for create project
-* Redirect to Project receipt?
+* Create a new page for tasks only where you can choose a project and add tasks
+* List of time types when creating tasks
