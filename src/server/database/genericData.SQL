@@ -128,16 +128,14 @@ VALUES
 INSERT IGNORE INTO USERS
 (email,firstName,lastName,groupId)
 VALUES
-    ('sam@example.com','Sam','Smith',1),     # Sam Smith    user 8
-    ('sarah@example.com','Sarah','Doe',2),   # Sarah Doe    user 9
-    ('alex@example.com','Alex','Johnson',3); # Alex Johnson user 10
+    ('sarah@example.com','Sarah','Doe',2),   # Sarah Doe    user 8
+    ('alex@example.com','Alex','Johnson',3); # Alex Johnson user 9
 
 INSERT IGNORE INTO USERS_ROLES_CONNECTOR
 (roleId,userID)
 VALUES
-    (3,8),  # Sam Smith    user 8
-    (3,9),  # Sarah Doe    user 9
-    (3,10); # Alex Johnson user 10
+    (3,9),  # Sarah Doe    user 8
+    (3,10); # Alex Johnson user 9
 
 INSERT IGNORE INTO PROJECTS_MANAGER_CONNECTOR
 (userId, projectId)
@@ -149,6 +147,22 @@ VALUES
 UPDATE USERS
 SET email='matt@example.com',firstName='Matt',lastName='Brown',groupId=2
 WHERE id=1;
+
+# Tom Jones user 4
+INSERT IGNORE INTO USERS
+(email,firstName,lastName,groupId)
+VALUES
+    ('sam@example.com','Sam','Smith',2); # Sam Smith user 10
+
+INSERT IGNORE INTO USERS_ROLES_CONNECTOR
+(roleId,userID)
+VALUES
+    (2, 10);
+
+INSERT IGNORE INTO GROUPS_CONNECTOR
+(managerId, groupId)
+values
+    (10, 4); # Sam Smith user 10
 
 # --------------- Auth ---------------
 INSERT IGNORE INTO  AUTH
@@ -339,3 +353,33 @@ VALUES
         ('2023-03-24',6 ,10,150 ,0,0),
         ('2023-03-23',6 ,10,150 ,1,1),
         ('2023-03-24',6 ,10,150 ,1,1);
+
+# -----------------------------------------------
+# -------------- For test purposes --------------
+# -----------------------------------------------
+
+# User task test
+INSERT IGNORE INTO PROJECTS
+(superProjectId, name, startDate, endDate)
+VALUES
+    (0,'Project User Task','2023-03-20','2023-04-26'); # 7
+
+INSERT IGNORE INTO TASKS
+(name, startDate, endDate, timeType)
+VALUES
+    ('Task User Task','2023-03-20','2023-04-26',2); # 13
+
+INSERT IGNORE INTO TASKS_PROJECTS_CONNECTOR
+(taskId, projectId)
+VALUES
+    (13,7);
+
+INSERT IGNORE INTO USERS
+(email,firstName,lastName,groupId)
+VALUES
+    ('peter@example.com','Peter','Johnson', 3); # Alex Johnson user 11
+
+INSERT IGNORE INTO USERS_TASKS_CONNECTOR
+    (userId,taskId)
+    VALUES
+        (11,13);

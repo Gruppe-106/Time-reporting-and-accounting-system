@@ -12,7 +12,7 @@ describe("User Task Project API", () => {
         });
 
         test("Success GET message", async () => {
-            apiHandler.get("/api/user/task/project/get?user=6", {headers: headers}, (value) => {
+            apiHandler.get("/api/user/task/project/get?user=11", {headers: headers}, (value) => {
                 expect(value["status"]).toBe(200);
                 expect(value).toStrictEqual({
                     status: 200,
@@ -24,16 +24,10 @@ describe("User Task Project API", () => {
                             projectName: 'Project Alpha'
                         },
                         {
-                            taskName: 'Task Z',
-                            taskId: 3,
-                            projectId: 3,
-                            projectName: 'Project Gamma'
-                        },
-                        {
-                            taskName: 'Task E',
-                            taskId: 8,
-                            projectId: 3,
-                            projectName: 'Project Gamma'
+                            taskName: 'Task User Task',
+                            taskId: 13,
+                            projectId: 7,
+                            projectName: 'Project User Task'
                         }
                     ]
                 });

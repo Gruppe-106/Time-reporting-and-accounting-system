@@ -174,6 +174,17 @@ describe("Project API", () => {
                 )
             });
         })
+test("Testing project information api", async () => {
+    apiHandler.get("/api/project/info/get?ids=7", {headers: headers}, (value) => {
+        expect(value).toStrictEqual(
+            {
+                status: 200,
+                data: [
+                    { taskId: 13, id: 11, firstName: 'Peter', lastName: 'Johnson' }
+                ]
+            }
+        )
+    });
 
         test("Fail case", () => {
             apiHandler.get("/api/project/info/get", {headers: headers}, (value) => {
