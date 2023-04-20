@@ -265,10 +265,10 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
           foundItem = true;
         } else if (item.taskId === prevRowSubmitData[i].taskId &&
           item.date === prevRowSubmitData[i].date) { // Should put data
-          console.log("Update data:"); 
+          console.log("Update data:");
           let apiHandler = new BaseApiHandler();
-          apiHandler.put(`/api/time/register/edit/put`, {body:item}, (value) =>{
-              console.log(value);
+          apiHandler.put(`/api/time/register/edit/put`, { body: item }, (value) => {
+            console.log(value);
           })
           foundItem = true;
         }
@@ -277,8 +277,8 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
         delete item.taskName
         console.log("New data:");
         let apiHandler = new BaseApiHandler();
-        apiHandler.post(`/api/time/register/post`, {body:item}, (value) =>{
-            console.log(value);
+        apiHandler.post(`/api/time/register/post`, { body: item }, (value) => {
+          console.log(value);
         })
 
       }
@@ -423,45 +423,51 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
   }
 
   renderTaskRows() {
-    const { stateRowData } = this.state;
+    const { stateRowData, searchDataState } = this.state;
 
     let arr: number[] = [];
-
     let rows: JSX.Element[] = [];
+
+    console.log(searchDataState)
 
     for (const key of Array.from(stateRowData.keys())) {
       let data = stateRowData.get(key);
       if (data) {
-        this.getTimeFromData(data.taskId, arr)
-        rows.push((
-          <tr key={data.taskId} >
-            <td>{data.projectName}</td>
-            <td>{data.taskName}</td>
-            {arr.map((num, index) => {
-              return (
-                <td key={index} style={{ textAlign: "center", verticalAlign: "middle" }}>
-                  <InputGroup size="sm">
-                    <Form.Control type="number" placeholder="0" value={Math.floor(arr[index] / 60)} onChange={(e) => this.handleTimeChange(index, e.target.value, data)} />
-                    <InputGroup.Text id={`basic-addon-${index}`}>:</InputGroup.Text>
-                    <Form.Select
-                      style={{ fontSize: '14px', border: '1px solid #ccc', borderRadius: '0 4px 4px 0', fontFamily: 'Helvetica', color: "#212529" }}
-                      className="myFormSelect"
-                      bsPrefix="myFormSelect"
-                      defaultValue={arr[index] % 60}
-                      onChange={(e) => this.handleTimeSelectChange(index, e.target.value, data)}>
-                      <option value={0}>0</option>
-                      <option value={15}>15</option>
-                      <option value={30}>30</option>
-                      <option value={45}>45</option>
-                    </Form.Select>
-                  </InputGroup>
-                </td>
-              );
-            })}
-            <td>{this.displayTimeTotal(arr.reduce((partialSum, a) => partialSum + a, 0))}</td>
-            <td><Button variant="danger" onClick={() => this.handleShowDelModal(data?.taskId)}>-</Button></td>
-          </tr>
-        ))
+        for (let i = 0; i < searchDataState.length; i++) {
+          if (data.taskId === searchDataState[i].taskId) {
+            let taskProjectName: string = searchDataState[i].projectName
+            this.getTimeFromData(data.taskId, arr)
+            rows.push((
+              <tr key={data.taskId} >
+                <td>{taskProjectName}</td>
+                <td>{data.taskName}</td>
+                {arr.map((num, index) => {
+                  return (
+                    <td key={index} style={{ textAlign: "center", verticalAlign: "middle" }}>
+                      <InputGroup size="sm">
+                        <Form.Control type="number" placeholder="0" value={Math.floor(arr[index] / 60)} onChange={(e) => this.handleTimeChange(index, e.target.value, data)} />
+                        <InputGroup.Text id={`basic-addon-${index}`}>:</InputGroup.Text>
+                        <Form.Select
+                          style={{ fontSize: '14px', border: '1px solid #ccc', borderRadius: '0 4px 4px 0', fontFamily: 'Helvetica', color: "#212529" }}
+                          className="myFormSelect"
+                          bsPrefix="myFormSelect"
+                          defaultValue={arr[index] % 60}
+                          onChange={(e) => this.handleTimeSelectChange(index, e.target.value, data)}>
+                          <option value={0}>0</option>
+                          <option value={15}>15</option>
+                          <option value={30}>30</option>
+                          <option value={45}>45</option>
+                        </Form.Select>
+                      </InputGroup>
+                    </td>
+                  );
+                })}
+                <td>{this.displayTimeTotal(arr.reduce((partialSum, a) => partialSum + a, 0))}</td>
+                <td><Button variant="danger" onClick={() => this.handleShowDelModal(data?.taskId)}>-</Button></td>
+              </tr>
+            ))
+          }
+        }
       }
     }
     return rows;
