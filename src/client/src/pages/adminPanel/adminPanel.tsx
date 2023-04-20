@@ -151,6 +151,9 @@ class AdminPanel extends Component<any, CustomTypes> {
 
     }
 
+    /**
+     * Runs after all components have mounted
+    */
     async componentDidMount(): Promise<void> {
         this.handleLoader("Getting users")
 
@@ -185,6 +188,12 @@ class AdminPanel extends Component<any, CustomTypes> {
         console.log(dbManagers)
     }
 
+
+    /**
+     * Runs whenever a state updates
+     * @param prevProps The previous props
+     * @param prevState The previous state
+    */
     componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<CustomTypes>): void {
         if (this.state.selectedUsersId.length > 1 && this.state.buttonText !== "Bulk edit") {
             this.setState({ buttonText: "Bulk edit" });
@@ -626,10 +635,8 @@ class AdminPanel extends Component<any, CustomTypes> {
     }
 
     /**
-  * Deletes a user.
-  *
-  * @param user The user to be deleted.
-  */
+     * Deletes a user.
+    */
     private async handleDelete(): Promise<void> {
 
 
@@ -700,6 +707,10 @@ class AdminPanel extends Component<any, CustomTypes> {
 
 
     }
+
+    /**
+     * Handles the closing of the deletion modal
+    */
     private async handleDeleteClose(): Promise<void> {
         this.setState({
             showDelete: false,
@@ -709,6 +720,9 @@ class AdminPanel extends Component<any, CustomTypes> {
     }
 
 
+    /**
+     * Handles the opening of the deletion modal
+    */
     private async handleDeleteShow(user: User): Promise<void> {
         let hasShown: boolean = false;
 
@@ -723,8 +737,6 @@ class AdminPanel extends Component<any, CustomTypes> {
         }
 
     }
-
-
 
 
     /**
@@ -742,7 +754,7 @@ class AdminPanel extends Component<any, CustomTypes> {
         }[] = []
 
 
- 
+
 
         for (const user of this.state.selectedUsers) {
             console.log(user.id)
@@ -757,7 +769,7 @@ class AdminPanel extends Component<any, CustomTypes> {
         }
 
 
-       
+
 
         this.handleLoader("Posting changes")
         const responses = await Promise.all(userData.map(ele => apiHandler.put("/api/user/edit/put", { body: ele })))
