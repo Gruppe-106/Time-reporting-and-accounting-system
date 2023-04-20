@@ -20,7 +20,7 @@ interface AddModalApi {
 interface TimeSheetData {
   projectName?: string;
   userId?: number,
-  taskName: string;
+  taskName?: string;
   taskId: number;
   time: number;
   date: number;
@@ -228,6 +228,69 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     }
   }
 
+  private handleSubmitButton() {
+    const { stateRowData, prevRowSubmitData } = this.state
+    const { userId } = this.props
+    // TimeSheetData
+    //Convert every objectData array in stateRowData to an TimeSheetData item in an array: someVariable TimeSheetData[]
+    let dataToUpdate: TimeSheetData[] = [];
+    for (const key of Array.from(stateRowData.keys())) {
+      let data = stateRowData.get(key);
+      if (data) {
+        data.objectData.map((item) => {
+          let dataToUpdate2: TimeSheetData = {
+            date: item.date,
+            taskId: data?.taskId ?? Infinity,
+            time: item.time,
+            taskName: data?.taskName ?? "",
+            projectName: data?.projectName ?? "",
+          }
+          dataToUpdate.push(dataToUpdate2);
+          return true
+        });
+      }
+    }
+    console.log("Breakpoint ---------------")
+    // check if previous data is the same
+    // if it is then do nothing (Console.log("no data changed"))
+    dataToUpdate.map((item) => {
+      delete item.projectName;
+      item.userId = userId;
+      let foundItem = false;
+      for (let i = 0; i < prevRowSubmitData.length; i++) {
+        if (item.taskId === prevRowSubmitData[i].taskId &&
+          item.date === prevRowSubmitData[i].date &&
+          item.time === prevRowSubmitData[i].time) {
+          console.log("Previos data:");
+          foundItem = true;
+        } else if (item.taskId === prevRowSubmitData[i].taskId &&
+          item.date === prevRowSubmitData[i].date) { // Should put data
+          console.log("Update data:"); 
+          let apiHandler = new BaseApiHandler();
+          apiHandler.put(`/api/time/register/edit/put`, {body:item}, (value) =>{
+              console.log(value);
+          })
+          foundItem = true;
+        }
+      }
+      if (!foundItem) {  // else create and post the new data
+        delete item.taskName
+        console.log("New data:");
+        let apiHandler = new BaseApiHandler();
+        apiHandler.post(`/api/time/register/post`, {body:item}, (value) =>{
+            console.log(value);
+        })
+
+      }
+      return true;
+    });
+    if (dataToUpdate.length < prevRowSubmitData.length) {
+      const deletedItems = prevRowSubmitData.filter((item) => !dataToUpdate.some((d) => d.taskId === item.taskId && d.date === item.date && d.time === item.time));
+      console.log("data to delete:", deletedItems);
+    }
+    // Needs to find deleted items better
+  }
+
   private handleButtonClick = async (increment: number) => {
     const { offsetState } = this.state;
     const updatedOffset = offsetState + increment;
@@ -274,7 +337,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
                 taskData.set(task.taskId, data);
               }
             } else {
-              taskData.set(task.taskId, { projectName: task.projectName ?? "", taskName: task.taskName, taskId: task.taskId, objectData: [{ date: task.date, time: task.time }] })
+              taskData.set(task.taskId, { projectName: task.projectName ?? "", taskName: task.taskName ?? "", taskId: task.taskId, objectData: [{ date: task.date, time: task.time }] })
             }
           }
           this.setState({ stateRowData: taskData })
@@ -403,64 +466,6 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     }
     return rows;
   }
-
-  private handleSubmitButton() {
-    const { stateRowData, prevRowSubmitData } = this.state
-    const { userId } = this.props
-    // TimeSheetData
-    //Convert every objectData array in stateRowData to an TimeSheetData item in an array: someVariable TimeSheetData[]
-    let dataToUpdate: TimeSheetData[] = [];
-    for (const key of Array.from(stateRowData.keys())) {
-      let data = stateRowData.get(key);
-      if (data) {
-        data.objectData.map((item) => {
-          let dataToUpdate2: TimeSheetData = {
-            date: item.date,
-            taskId: data?.taskId ?? Infinity,
-            time: item.time,
-            taskName: data?.taskName ?? "",
-            projectName: data?.projectName ?? "",
-          }
-          dataToUpdate.push(dataToUpdate2);
-          return true
-        });
-      }
-    }
-    console.log("Breakpoint ---------------")
-    // check if previous data is the same
-    // if it is then do nothing (Console.log("no data changed"))
-    dataToUpdate.map((item) => {
-      delete item.projectName;
-      item.userId = userId;
-      let foundItem = false;
-      for (let i = 0; i < prevRowSubmitData.length; i++) {
-        if (item.taskId === prevRowSubmitData[i].taskId &&
-          item.date === prevRowSubmitData[i].date &&
-          item.time === prevRowSubmitData[i].time) {
-          console.log("Previos data:");
-          foundItem = true;
-        } else if (item.taskId === prevRowSubmitData[i].taskId &&
-          item.date === prevRowSubmitData[i].date) { // Should put data
-          console.log("Update data:"); 
-          let apiHandler = new BaseApiHandler();
-          apiHandler.put(`/api/time/register/edit/put`, {body:item}, (value) =>{
-              console.log(value);
-          })
-          foundItem = true;
-        }
-      }
-      if (!foundItem) {  // else create and post the new data
-        console.log("New data:");
-      }
-      return true;
-    });
-    if (dataToUpdate.length < prevRowSubmitData.length) {
-      const deletedItems = prevRowSubmitData.filter((item) => !dataToUpdate.some((d) => d.taskId === item.taskId && d.date === item.date && d.time === item.time));
-      console.log("data to delete:", deletedItems);
-    }
-    // Needs to find deleted items better
-  }
-
 
   render() {
     const { showAddModal, showDeleteRowModal, deleteId, delRowTaskProject, searchDataState } = this.state;
