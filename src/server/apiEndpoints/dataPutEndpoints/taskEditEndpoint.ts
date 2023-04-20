@@ -5,7 +5,7 @@ import {MySQLResponse, UpdateSet} from "../../database/mysqlHandler";
 
 export interface TaskEditData {
     taskId     : number,
-    delete    ?: boolean,
+    delete    ?: number,
     name      ?: string,
     startDate ?: number,
     endDate   ?: number,
@@ -42,8 +42,8 @@ class TaskEditEndpoint extends PostEndpointBase {
         //Get data from the user creation form
         let taskData: TaskEditData = req.body;
         if (taskData.taskId === undefined) return ["Missing task id"];
-        if (taskData.delete === true) {
-            let response: MySQLResponse = await this.mySQL.remove("TASKS", [{column: "id", equals: [taskData.taskId.toString()]}]);
+        if (taskData.delete > 0) {
+            let response: MySQLResponse = await this.mySQL.remove("TASKS_PROJECTS_CONNECTOR", [{column: "taskId", equals: [taskData.taskId.toString()]},{column: "projectId", equals: [taskData.delete.toString()]}]);
             if (response.error === null) return ["success"];
             return [`Failed to delete ${taskData.taskId}`];
         }

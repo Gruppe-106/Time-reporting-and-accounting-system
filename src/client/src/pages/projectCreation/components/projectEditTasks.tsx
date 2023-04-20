@@ -226,7 +226,7 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
         console.log("test")
         const post_data = {
           taskId: this.deleteTaskId,
-          delete: true
+          delete: id
         }
         console.log(post_data)
         let apiHandler = new BaseApiHandler();

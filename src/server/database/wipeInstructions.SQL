@@ -82,6 +82,7 @@ CREATE TABLE USERS_TASKS_TIME_REGISTER
         ON DELETE CASCADE,
     FOREIGN KEY (taskId)
         REFERENCES TASKS (id)
+        ON DELETE RESTRICT
 );
 # Ensures the rows are unique so no duplicate date - taskId - userId exists
 ALTER TABLE USERS_TASKS_TIME_REGISTER
