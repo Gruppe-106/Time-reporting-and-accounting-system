@@ -31,6 +31,7 @@ interface SearchData {
   taskName: string,
   projectId: number,
   projectName: string,
+  isRendered?: boolean
 }
 
 interface TaskRowData {
@@ -428,14 +429,13 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     let arr: number[] = [];
     let rows: JSX.Element[] = [];
 
-    console.log(searchDataState)
-
     for (const key of Array.from(stateRowData.keys())) {
       let data = stateRowData.get(key);
       if (data) {
         for (let i = 0; i < searchDataState.length; i++) {
           if (data.taskId === searchDataState[i].taskId) {
             let taskProjectName: string = searchDataState[i].projectName
+            searchDataState[i].isRendered = true
             this.getTimeFromData(data.taskId, arr)
             rows.push((
               <tr key={data.taskId} >
@@ -466,7 +466,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
                 <td><Button variant="danger" onClick={() => this.handleShowDelModal(data?.taskId)}>-</Button></td>
               </tr>
             ))
-          }
+          } else { searchDataState[i].isRendered = false }
         }
       }
     }
@@ -505,7 +505,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
               <Typeahead
                 id="findProject"
                 labelKey={(option: any) => `${option.projectName}  ${option.taskName}`}
-                options={searchDataState.filter((option: any) => !this.state.stateRowData.has(option.taskName))}
+                options={searchDataState.filter((option: any) => option.isRendered === false)}
                 placeholder="Pick a project"
                 filterBy={(option: any, props: any): boolean => {
                   const query: string = props.text.toLowerCase().trim();
