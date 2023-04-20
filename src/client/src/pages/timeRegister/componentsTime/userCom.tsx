@@ -424,6 +424,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
         });
       }
     }
+    console.log("Breakpoint ---------------")
     // check if previous data is the same
     // if it is then do nothing (Console.log("no data changed"))
     dataToUpdate.map((item) => {
@@ -433,7 +434,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
         if (item.taskId === prevRowSubmitData[i].taskId &&
           item.date === prevRowSubmitData[i].date &&
           item.time === prevRowSubmitData[i].time) {
-          i++;
+          i++
           console.log("Previos data:");
           foundItem = true;
         } else if (item.taskId === prevRowSubmitData[i].taskId &&
@@ -444,19 +445,9 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
       }
       if (!foundItem) {  // else create and post the new data
         console.log("New data:");
-        console.log(item)
       }
       return true;
     });
-
-
-
-
-    console.log("All data:")
-    console.log(dataToUpdate)
-    console.log(prevRowSubmitData);
-    console.log(stateRowData)
-    //console.log(prevRowSubmitData.filter(data => data.taskName === "Task Y"));
   }
 
 
