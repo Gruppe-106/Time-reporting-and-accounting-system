@@ -16,6 +16,8 @@ export interface TimeSheetData {
     taskId: number;
     time: number;
     date: number;
+    approved: boolean,
+    managerLogged: boolean
 }
 
 export interface SearchData {
@@ -30,6 +32,8 @@ export interface TaskRowData {
     projectName: string;
     taskName: string;
     taskId: number;
+    approved?: boolean,
+    managerLogged?: boolean
     objectData: {
         time: number;
         date: number;
@@ -52,7 +56,6 @@ export interface TimeSheetState {
     isUpdating: boolean;
     showAddRowModal: boolean;
     showDeleteRowModal: boolean;
-    showSubmitModal: boolean;
     headerDates: string[];
     times: number[];
     deleteId: number | undefined,

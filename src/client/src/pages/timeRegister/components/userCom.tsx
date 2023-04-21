@@ -43,7 +43,6 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
       offsetState: -28,
       isUpdating: false,
       showAddRowModal: false,
-      showSubmitModal: false,
       headerDates: [],
       times: [0, 0, 0, 0, 0, 0, 0],
       showDeleteRowModal: false,
@@ -88,14 +87,6 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     stateRowData.set(selectedProject.taskId, { projectName: selectedProject.projectName, taskName: selectedProject.taskName, taskId: selectedProject.taskId, objectData: [] })
 
     this.handleCloseAddModal();
-  }
-  private handleShowSubmit = () => {
-    const { prevRowSubmitData } = this.state
-    console.log(prevRowSubmitData)
-    this.setState({ showSubmitModal: true })
-  }
-  private handleCloseSubmit = () => {
-    this.setState({ showSubmitModal: false })
   }
 
   private handleTimeChange(index: number, value: string, data: TaskRowData | undefined) {
@@ -193,6 +184,8 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
             time: item.time,
             taskName: data?.taskName ?? "",
             projectName: data?.projectName ?? "",
+            approved: data?.approved ?? true,
+            managerLogged: data?.managerLogged ?? false
           }
           dataToUpdate.push(dataToUpdate2);
           return true
@@ -212,6 +205,8 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
         } else if (item.taskId === prevRowSubmitData[i].taskId &&
           item.date === prevRowSubmitData[i].date) { // Should put data
           //console.log("Update data:");
+          item.managerLogged = false
+          console.log(item)
           let apiHandler = new BaseApiHandler();
           apiHandler.put(`/api/time/register/edit/put`, { body: item }, (value) => {
             console.log(value);
@@ -221,6 +216,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
       }
       if (!foundItem) {  // else create and post the new data
         delete item.taskName
+        item.managerLogged = false
         //console.log("New data:");
         let apiHandler = new BaseApiHandler();
         apiHandler.post(`/api/time/register/post`, { body: item }, (value) => {
@@ -237,6 +233,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     for (let k = 0; k < deletedItem.length; k++) { // should be able to delete, but for now updates time
       deletedItem[k].time = 60 // Should be 0
       deletedItem[k].userId = userId
+      deletedItem[k].managerLogged = false
       //console.log("Deleted data:")
       let apiHandler = new BaseApiHandler();
       apiHandler.put(`/api/time/register/edit/put`, { body: deletedItem[k] }, (value) => {
@@ -244,7 +241,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
       })
     }
     this.setState({ deletedItems: deletedItem })
-    this.setState({ showSubmitModal: false })
+    console.log(prevRowSubmitData)
   }
 
 
@@ -294,7 +291,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
                 taskData.set(task.taskId, data);
               }
             } else {
-              taskData.set(task.taskId, { projectName: task.projectName ?? "", taskName: task.taskName ?? "", taskId: task.taskId, objectData: [{ date: task.date, time: task.time }] })
+              taskData.set(task.taskId, { projectName: task.projectName ?? "", taskName: task.taskName ?? "", taskId: task.taskId, approved: task.approved, managerLogged: task.managerLogged, objectData: [{ date: task.date, time: task.time }] })
             }
           }
           this.setState({ stateRowData: taskData })
@@ -430,7 +427,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
   }
 
   render() {
-    const { showAddRowModal, showDeleteRowModal, showSubmitModal, deleteId, delRowTaskProject, searchDataState, deletedItems } = this.state;
+    const { showAddRowModal, showDeleteRowModal, deleteId, delRowTaskProject, searchDataState, deletedItems } = this.state;
 
     return (
       <Container fluid="lg">
@@ -439,7 +436,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
           <tbody>{this.renderTaskRows()}</tbody>
         </Table>
         <Button variant="primary" type="button" onClick={() => this.handleShowAddModal()}>Add Row</Button>
-        <Button variant="primary" type="button" style={{ float: "right" }} onClick={() => this.handleShowSubmit()} >Submit</Button>
+        <Button variant="primary" type="button" style={{ float: "right" }} onClick={() => this.handleSubmitButton()} >Submit</Button>
         <center>
           <ButtonGroup aria-label="Basic example">
             <Button onClick={() => this.handleButtonClick(-7)} variant="primary">
@@ -507,30 +504,6 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
             </Button>
             <Button variant="danger" onClick={this.handleDeleteRow}> {/* This 2 is the row number (taskId) */}
               Delete
-            </Button>
-          </Modal.Footer>
-        </Modal>
-        <></>
-        <Modal show={showSubmitModal} onHide={this.handleCloseSubmit}>
-          <Modal.Header closeButton>
-            <Modal.Title>Delete Row?</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <p>Are you sure you want to submit:</p>
-            <p>Are you sure u want to delete:</p>
-            {deletedItems.map((item, index) => {
-              return <p key={index}>{item.taskName}, at {item.date}</p>
-            })}
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={this.handleCloseSubmit}>
-              Cancel
-            </Button>
-            <Button variant="primary" onClick={this.handleCloseSubmit}>
-              Testers
-            </Button>
-            <Button variant="success" onClick={() => this.handleSubmitButton()}>
-              Submit
             </Button>
           </Modal.Footer>
         </Modal>
