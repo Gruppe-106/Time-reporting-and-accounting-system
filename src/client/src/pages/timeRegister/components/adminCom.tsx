@@ -1,11 +1,7 @@
 import React, { Component } from 'react';
 import { Container, Form } from "react-bootstrap";
 import TimeSheetPage from "./userCom";
-
-// State of UserTimeSheet
-interface UserState {
-  userId: number;
-}
+import { UserState } from "./interfaces"
 
 class UserTimeSheet extends Component<{}, UserState> {
   constructor(props: {}) {

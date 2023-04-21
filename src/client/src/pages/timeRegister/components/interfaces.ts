@@ -61,3 +61,8 @@ export interface TimeSheetState {
         taskName: string | undefined,
     },
 }
+
+// State of UserTimeSheet
+export interface UserState {
+  userId: number;
+}
