@@ -62,7 +62,7 @@ class ProjectManageTask extends Component<any> {
     handleBlur(){
         this.setState({isFocused: false});
     }
-     handleEndFocus(){
+    handleEndFocus(){
         this.setState({isEndFocused: true});
     }
 
@@ -77,21 +77,17 @@ class ProjectManageTask extends Component<any> {
         //Run the get or post function depending on need only neccesarry argument is the path aka what comes after the hostname
         //Callbacks can be used to tell what to do with the data once it's been retrieved
         apiHandler.get(`/api/task/project/get?project=${id}`,{}, (value) => {
-            console.log(value)
             //Then convert the string to the expected object(eg. )
             let json:TaskProjectApi = JSON.parse(JSON.stringify(value))
             //Then update states or variables or whatever you want with the information
             this.setState({task: json.data})
-            console.log(json.data)
             let id = []
             for (const task of json.data) {
                 id.push(task.taskId)
             }
             apiHandler.get(`/api/task/get?ids=${id}`, {}, (tasks) => {
-                console.log(tasks)
                 let json:Api = JSON.parse(JSON.stringify(tasks))
                 this.setState({tableRows: json.data})
-                console.log(json.data)
             })
         })
     }

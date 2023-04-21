@@ -82,28 +82,22 @@ class ProjectManageInformation extends Component<ProjectInformationProp> {
         //Run the get or post function depending on need only neccesarry argument is the path aka what comes after the hostname
         //Callbacks can be used to tell what to do with the data once it's been retrieved
         apiHandler.get(`/api/project/get?ids=${this.state.pageInformation.id}`, {},(value) => {
-            console.log(value)
             //Then convert the string to the expected object(eg. )
             let json:Api = JSON.parse(JSON.stringify(value))
             //Then update states or variables or whatever you want with the information
             this.setState({pageInformation: json.data[0]})
-            console.log(json.data)
         })
         apiHandler.get(`/api/project/get?ids=*`, {},(value) => {
-            console.log(value)
             //Then convert the string to the expected object(eg. )
             let json:SuperProjects = JSON.parse(JSON.stringify(value))
             //Then update states or variables or whatever you want with the information
             this.setState({parentProjects: json.data})
-            console.log(json.data)
         })
         apiHandler.get(`/api/role/user/get?role=3`, {},(value) => {
-            console.log(value)
             //Then convert the string to the expected object(eg. )
             let json:ProjectLeaders = JSON.parse(JSON.stringify(value))
             //Then update states or variables or whatever you want with the information
             this.setState({projectLeaders: json.data})
-            console.log(json.data)
         })
     }
 
@@ -135,7 +129,7 @@ class ProjectManageInformation extends Component<ProjectInformationProp> {
         let maxDate: Date = new Date("3000-01-01")
         let minDate: Date = new Date("1970-01-01")
 
-         if (!(minDate > endDate || endDate > maxDate || startDate > endDate)){
+        if (!(minDate > endDate || endDate > maxDate || startDate > endDate)){
             this.setState({invalidEndDate : false})
         }
         else {
@@ -191,8 +185,7 @@ class ProjectManageInformation extends Component<ProjectInformationProp> {
         }
 
         let apiHandler = new BaseApiHandler();
-        apiHandler.put(`/api/project/edit/put`, {body:post_data}, (value) =>{
-            console.log(value);
+        apiHandler.put(`/api/project/edit/put`, {body:post_data}, () =>{
 
 
         })
@@ -287,7 +280,7 @@ class ProjectManageInformation extends Component<ProjectInformationProp> {
                                             id="chooseLeader"
                                             labelKey="name"
                                             options={
-                                            this.state.projectLeaders.map(row =>({id: row.userId, name: row.firstName + " " + row.lastName}))
+                                                this.state.projectLeaders.map(row =>({id: row.userId, name: row.firstName + " " + row.lastName}))
                                             }
                                             placeholder={this.state.pageInformation.projectLeader.firstName + " " + this.state.pageInformation.projectLeader.lastName}
                                             onMenuToggle={() => {this.handleValidity.call(this)}}
@@ -312,8 +305,8 @@ class ProjectManageInformation extends Component<ProjectInformationProp> {
                                         />
                                     </Form.Group>
                                     <center>
-                                    <Button variant="success" id="submitbutton" onClick={this.handleShow} size="lg">Submit changes</Button>
-                                        </center>
+                                        <Button variant="success" id="submitbutton" onClick={this.handleShow} size="lg">Submit changes</Button>
+                                    </center>
                                     <Modal show={this.state.show} onHide={this.handleClose}>
                                         <Modal.Header closeButton>
                                             <Modal.Title>Confirm changes</Modal.Title>
@@ -323,7 +316,7 @@ class ProjectManageInformation extends Component<ProjectInformationProp> {
                                             <Button variant="secondary" onClick={this.handleClose}>
                                                 Close
                                             </Button>
-                                        <Button variant="success" type="submit" id="submitbutton" onClick={this.handleFormSubmit}>Confirm changes</Button>
+                                            <Button variant="success" type="submit" id="submitbutton" onClick={this.handleFormSubmit}>Confirm changes</Button>
                                         </Modal.Footer>
                                     </Modal>
                                 </Form>
