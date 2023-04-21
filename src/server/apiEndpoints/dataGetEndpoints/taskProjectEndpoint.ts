@@ -54,20 +54,22 @@ class TaskProjectEndpoint extends GetEndpointBase {
             //If not try projects
             requestKeys = this.urlParamsConversion(req.query.project, false, true, res);
             //If not return and send bad request
-            if (requestKeys === undefined) { return this.badRequest(res); }
+            if (requestKeys === undefined) { return this.badRequest(res, req); }
             primaryKey  = "projectId";
         }
 
         //Not allowed to get all, so remove that from the list
         requestKeys = requestKeys.filter((value:string) => { if (value !== "*") return value});
-        if (requestKeys.length === 0) { return this.badRequest(res); }
+        if (requestKeys.length === 0) { return this.badRequest(res, req); }
 
         //Get vars if any otherwise it will get all
         let requestedValues:string[] = this.urlParamsConversion(req.query.var);
 
         this.processRequest(req, requestedValues, primaryKey, requestKeys).then((data) => {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(data.status).json(data);
+            if (!res.writableEnded) {
+                res.setHeader('Content-Type', 'application/json');
+                res.status(data.status).json(data);
+            }
         })
     }
 }

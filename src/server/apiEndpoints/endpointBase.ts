@@ -37,11 +37,15 @@ abstract class EndpointBase {
     /**
      * Sends bad request back to the request and ends connection
      * @param res Response: response object of the api request
+     * @param req Request: Request object of the api request
      * @protected
      */
-    protected badRequest(res: Response) {
-        res.status(400).send(JSON.stringify({message: "Bad Request"}));
-        res.end();
+    protected badRequest(res: Response, req: Request) {
+        if (!res.writableEnded) {
+            if (req !== undefined) req.pause();
+            res.status(400);
+            res.end(JSON.stringify({message: "Bad Request"}));
+        }
     }
 }
 
