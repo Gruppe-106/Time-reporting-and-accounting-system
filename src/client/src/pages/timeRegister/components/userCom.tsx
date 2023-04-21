@@ -247,6 +247,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     this.setState({ showSubmitModal: false })
   }
 
+
   private handleButtonClick = async (increment: number) => {
     const { offsetState } = this.state;
     const updatedOffset = offsetState + increment;
