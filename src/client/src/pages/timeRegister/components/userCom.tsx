@@ -5,44 +5,8 @@ import BaseApiHandler from "../../../network/baseApiHandler";
 import { getCurrentWeekDates, dateStringFormatter, dateToNumber } from "../../../utility/timeConverter"
 import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-
-interface Api {
-  status: number,
-  data: TimeSheetData[]
-}
-
-interface AddModalApi {
-  status: number,
-  data: SearchData[]
-}
-
-// Loaded data from database, used in TimeSheetRow and TimeSheetPage
-interface TimeSheetData {
-  projectName?: string;
-  userId?: number,
-  taskName?: string;
-  taskId: number;
-  time: number;
-  date: number;
-}
-
-interface SearchData {
-  taskId: number,
-  taskName: string,
-  projectId: number,
-  projectName: string,
-  isRendered?: boolean
-}
-
-interface TaskRowData {
-  projectName: string;
-  taskName: string;
-  taskId: number;
-  objectData: {
-    time: number;
-    date: number;
-  }[]
-}
+//All interfaces for user component
+import { Api, AddModalApi, TaskRowData, TimeSheetData, TimeSheetProp, TimeSheetState } from "./interfaces"
 
 /*
 
@@ -54,32 +18,6 @@ interface TaskRowData {
       * Submit button (Post data)
 
 */
-
-// Props used in TimeSheetPage
-interface TimeSheetProp {
-  userId: number;
-}
-
-// Variable states in TimeSheetPage
-interface TimeSheetState {
-  stateRowData: Map<number, TaskRowData>;
-  prevRowSubmitData: TimeSheetData[];
-  deletedItems: TimeSheetData[];
-  searchDataState: SearchData[]
-  selectedProject: SearchData
-  offsetState: number;
-  isUpdating: boolean;
-  showAddRowModal: boolean;
-  showDeleteRowModal: boolean;
-  showSubmitModal: boolean;
-  headerDates: string[];
-  times: number[];
-  deleteId: number | undefined,
-  delRowTaskProject: {
-    projectName: string | undefined,
-    taskName: string | undefined,
-  },
-}
 
 /*
 
@@ -512,9 +450,9 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
           </ButtonGroup>
         </center>
         <p>Delete task at date:</p>
-            {deletedItems.map((item) => {
-              return <p>{item.taskName}, at {dateStringFormatter(item.date)}</p>
-            })}
+        {deletedItems.map((item, index) => {
+          return <p key={index}>{item.taskName}, at {dateStringFormatter(item.date)}</p>
+        })}
         <></>
         <Modal show={showAddRowModal} onHide={this.handleCloseAddModal}>
           <Modal.Header closeButton>
@@ -579,8 +517,8 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
           <Modal.Body>
             <p>Are you sure you want to submit:</p>
             <p>Are you sure u want to delete:</p>
-            {deletedItems.map((item) => {
-              return <p>{item.taskName}, at {item.date}</p>
+            {deletedItems.map((item, index) => {
+              return <p key={index}>{item.taskName}, at {item.date}</p>
             })}
           </Modal.Body>
           <Modal.Footer>
