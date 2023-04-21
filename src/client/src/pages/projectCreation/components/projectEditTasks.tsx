@@ -4,6 +4,7 @@ import BaseApiHandler from "../../../network/baseApiHandler";
 import Nav from "react-bootstrap/Nav";
 import {userInfo} from "../../../utility/router";
 import Modal from "react-bootstrap/Modal";
+import {Highlighter, Typeahead} from "react-bootstrap-typeahead";
 
 interface TableRow {
   taskName: string;
@@ -18,11 +19,15 @@ interface DynamicTableState {
   formData: TableRow;
   task: TaskProjectApi;
   member: MemberApi;
+  users: UserApi;
+  timeTypes: TimeApi;
   formSubmitted?: boolean;
   showDelete?: boolean
   showAdd?: boolean
   invalidStartDate: boolean,
-  invalidEndDate: boolean
+  invalidEndDate: boolean,
+  assignedToUser?: { id: number, name: string},
+  buttonDisabled?: boolean
 }
 
 interface DynamicTableProps {
@@ -45,6 +50,25 @@ interface MemberApi{
   status: number,
   data: {
     userId?: number
+  }[]
+}
+
+interface UserApi{
+  status: number,
+  data: {
+    id?: number,
+    email?: string,
+    firstName?: string,
+    lastName?: string,
+    group?: number
+  }[]
+}
+
+interface TimeApi{
+  status: number,
+  data: {
+    id?: number,
+    name?: string
   }[]
 }
 
@@ -77,7 +101,7 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
         taskName: "",
         startDate: "",
         endDate: "",
-        timeType: "",
+        timeType: "1",
         userId: ""
       },
       task: {
@@ -104,7 +128,26 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
       formSubmitted: false,
       showAdd: false,
       invalidStartDate: false,
-      invalidEndDate: false
+      invalidEndDate: false,
+      assignedToUser: {id: 1, name: ''},
+      buttonDisabled: true,
+      users: {
+        status: -1,
+        data: [{
+          id: -1,
+          email: '',
+          firstName: '',
+          lastName: '',
+          group: -1
+        }]
+      },
+      timeTypes: {
+        status: -1,
+        data: [{
+          id: -1,
+          name: ''
+        }]
+      }
     };
     this.handleAddClose = this.handleAddClose.bind(this)
     this.handleAddShow = this.handleAddShow.bind(this)
@@ -143,10 +186,28 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
         //Then update states or variables or whatever you want with the information
         this.setState({member: member})
       })
+      apiHandler.get(`/api/user/get?ids=*`,{}, (value) => {
+        //Then convert the string to the expected object(eg. )
+        let user:UserApi = JSON.parse(JSON.stringify(value))
+        //Then update states or variables or whatever you want with the information
+        this.setState({users: user})
+      })
+      apiHandler.get(`/api/timetype/get?ids=*`,{}, (value) => {
+        //Then convert the string to the expected object(eg. )
+        let timeType:TimeApi = JSON.parse(JSON.stringify(value))
+        //Then update states or variables or whatever you want with the information
+        this.setState({timeTypes: timeType})
+      })
     })
   }
 
   handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    this.setState({
+      formData: { ...this.state.formData, [event.target.name]: event.target.value },
+    });
+  };
+
+  handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     this.setState({
       formData: { ...this.state.formData, [event.target.name]: event.target.value },
     });
@@ -170,8 +231,22 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
     })
   }
   private handleAddShow(){
+    if (this.state.buttonDisabled === false){
+      this.setState({
+        showAdd: true
+      })
+    }
+  }
+
+  private handleButtonDisable() {
     this.setState({
-      showAdd: true
+      buttonDisabled: true
+    })
+  }
+
+  private handleButtonEnable() {
+    this.setState({
+      buttonDisabled: false
     })
   }
 
@@ -182,28 +257,56 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
     const startDate = new Date((document.getElementById("formStartDate") as HTMLInputElement).value)
     const endDate = new Date((document.getElementById("formEndDate") as HTMLInputElement).value)
     const timeType = (document.getElementById("formTimeType") as HTMLInputElement).value
-    const userId = (document.getElementById("formUserID") as HTMLInputElement).value
+    const user = this.state.assignedToUser
 
-    if ((/^\s/g.test(taskName) || taskName === '' || !/\d/g.test(startDate.toString()) || !/\d/g.test(endDate.toString()) || this.state.invalidStartDate || this.state.invalidEndDate || /\D/g.test(timeType) || /\D/g.test(userId) || timeType === '' || userId === '') || this.state.rows.length < 0){
+    if ((/^\s/g.test(taskName) || taskName === '' || !/\d/g.test(startDate.toString()) || !/\d/g.test(endDate.toString())
+            || this.state.invalidStartDate || this.state.invalidEndDate || /\D/g.test(timeType) || timeType === ''
+            || user?.name === '' || user?.id == null || /\d/g.test(user.name) || /\D/g.test(user.id.toString()))
+        || this.state.rows.length < 0){
       addButton?.setAttribute('disabled', '')
     }
     else {
       addButton?.removeAttribute('disabled')
     }
-
+    button?.setAttribute('disabled', '')
     if (this.state.rows.length > 0) {
       for (let i = 1; this.state.rows.length >= i; i++) {
-        if (/^\s/g.test(this.state.rows[i - 1].taskName) || this.state.rows[i - 1].taskName === '' || !/\d/g.test(this.state.rows[i - 1].startDate.toString()) || !/\d/g.test(this.state.rows[i - 1].endDate.toString()) || this.state.invalidStartDate || this.state.invalidEndDate || /\D/g.test(this.state.rows[i - 1].timeType) || /\D/g.test(this.state.rows[i - 1].userId) || this.state.rows[i - 1].timeType === '' || this.state.rows[i - 1].userId === '' || this.state.rows.length < 0) {
+
+        if ((/^\s/g.test(this.state.rows[i - 1].taskName) || this.state.rows[i - 1].taskName === ''
+            || !/\d/g.test(this.state.rows[i - 1].startDate.toString()) || !/\d/g.test(this.state.rows[i - 1].endDate.toString())
+            || this.state.invalidStartDate || this.state.invalidEndDate || /\D/g.test(this.state.rows[i - 1].timeType)
+            || /\D/g.test(this.state.rows[i - 1].userId)) || this.state.rows.length < 0) {
+
           button?.setAttribute('disabled', '')
-        } else {
+        }
+        else {
           button?.removeAttribute('disabled')
         }
       }
     }
+  }
 
+   private handleButtonValidity() {
+    const button = document.getElementById("submitbutton") as HTMLInputElement | null;
 
+    button?.setAttribute('disabled', '')
+    if (this.state.rows.length > 0) {
+      for (let i = 1; this.state.rows.length >= i; i++) {
 
+        if ((/^\s/g.test(this.state.rows[i - 1].taskName) || this.state.rows[i - 1].taskName === ''
+            || !/\d/g.test(this.state.rows[i - 1].startDate.toString()) || !/\d/g.test(this.state.rows[i - 1].endDate.toString())
+            || this.state.invalidStartDate || this.state.invalidEndDate || /\D/g.test(this.state.rows[i - 1].timeType)
+            || /\D/g.test(this.state.rows[i - 1].userId)) || this.state.rows.length < 0) {
 
+          button?.setAttribute('disabled', '')
+          this.handleButtonDisable()
+        }
+        else {
+          button?.removeAttribute('disabled')
+          this.handleButtonEnable()
+        }
+      }
+    }
   }
 
   private handleEndDate(){
@@ -243,9 +346,10 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
         taskName: "",
         startDate: "",
         endDate: "",
-        timeType: "",
+        timeType: "1",
         userId: ""
       },
+      assignedToUser: {id: -1, name: ""},
     });
     if (this.props.onRowsUpdate) {
       this.props.onRowsUpdate(newRows);
@@ -267,6 +371,18 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
       this.handleValidity()
     }, 200)
   };
+
+  private HandleManager(user: any): void {
+    this.setState({
+      assignedToUser: user[0] ? user[0] : null,
+      formData: {
+        taskName: this.state.formData.taskName,
+        startDate: this.state.formData.startDate,
+        endDate: this.state.formData.endDate,
+        timeType: this.state.formData.timeType,
+        userId: user[0]?.id}
+    })
+  }
 
   handlePostData = () => {
     // eslint-disable-next-line array-callback-return
@@ -299,10 +415,16 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
           taskName: "",
           startDate: "",
           endDate: "",
-          timeType: "",
+          timeType: "1",
           userId: ""
-        },})
+        },
+        assignedToUser: {id: 1, name: ''}
+      },)
     }))
+    setTimeout (()=> {
+        this.setState({formSubmitted: false})
+
+      },4000)
   };
 
   handleDeleteData = (event: any) => {
@@ -319,9 +441,12 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
       apiHandler.put(`/api/task/edit/put`, {body:post_data}, () =>{
         this.getInformation()
       })
-
       this.setState({formSubmitted: true})
       this.handleDeleteClose()
+      setTimeout (()=> {
+        this.setState({formSubmitted: false})
+
+      },4000)
     }
   }
 
@@ -376,6 +501,7 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
                       <Form onSubmit={this.handleSubmit}>
                         <InputGroup>
                           <Form.Group controlId="formTaskName" onChange={this.handleValidity}>
+                            <Form.Label>Task Name:</Form.Label>
                             <Form.Control
                                 type="text"
                                 placeholder="Task Name"
@@ -386,6 +512,7 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
                             />
                           </Form.Group>
                           <Form.Group controlId="formStartDate" onChange={() =>{this.handleValidity.call(this); this.handleStartDate.call(this)}}>
+                            <Form.Label>Start Date:</Form.Label>
                             <Form.Control
                                 type="date"
                                 placeholder="Start Date"
@@ -395,13 +522,13 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
                                 value={formData.startDate}
                                 onChange={this.handleChange}
                                 isInvalid={this.state.invalidStartDate}
-
                             />
                             <Form.Control.Feedback type="invalid">
                               {<p><b>Date is invalid</b></p>}
                             </Form.Control.Feedback>
                           </Form.Group>
                           <Form.Group controlId="formEndDate" onChange={() => {this.handleValidity.call(this); this.handleEndDate.call(this)}}>
+                            <Form.Label>End Date:</Form.Label>
                             <Form.Control
                                 type="date"
                                 placeholder="End Date"
@@ -417,28 +544,58 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
                             </Form.Control.Feedback>
                           </Form.Group>
                           <Form.Group controlId="formTimeType" onChange={this.handleValidity}>
-                            <Form.Control
-                                type="number"
+                            <Form.Label>Time Type:</Form.Label>
+                            <Form.Select
                                 placeholder="Time Type"
                                 name="timeType"
                                 value={formData.timeType}
-                                min="1"
-                                max="4"
-                                onChange={this.handleChange}
-                            />
+                                onChange={this.handleSelectChange}
+                                onBlur={this.handleSelectChange}
+                                onInput={this.handleSelectChange}
+                                onSelect={this.handleSelectChange}
+                            >
+                              {this.state.timeTypes.data.map((row) => {
+                                return (<option value={row.id?.toString()}>{row.id}: {row.name}</option>)
+                              })}
+                            </Form.Select>
                           </Form.Group>
                           <Form.Group controlId="formUserID" onChange={this.handleValidity}>
-                            <Form.Control
-                                type="number"
-                                placeholder="User ID"
-                                name="userId"
-                                value={formData.userId}
-                                onChange={this.handleChange}
+                            <Form.Label>User:</Form.Label>
+                            <Typeahead
+                                id="chooseUser"
+                                labelKey="name"
+                                placeholder="Choose User..."
+                                options={
+                                  this.state.users.data.map(row =>({id: row.id, name: row.firstName + " " + row.lastName}))
+                                }
+                                onMenuToggle={() => {this.handleValidity.call(this)}}
+                                onChange={(value) => {this.HandleManager.call(this, value);
+                                  this.handleValidity.call(this);}}
+                                filterBy={(option: any, props: any): boolean => {
+                                  const query: string = props.text.toLowerCase().trim();
+                                  const name: string = option.name.toLowerCase();
+                                  const id: string = option.id.toString();
+                                  return name.includes(query) ||  id.includes(query);
+                                }}
+                                renderMenuItemChildren={(option: any, props: any) => (
+                                    <>
+                                      <Highlighter search={props.text}>
+                                        {option.name}
+                                      </Highlighter>
+                                      <div>
+                                        <small>User id: {option.id}</small>
+                                      </div>
+                                    </>
+                                )}
                             />
                           </Form.Group>
-                          <Button variant="primary" type="submit" id="addButton" disabled>
-                            Add
-                          </Button>
+                          <Row>
+                            <Col>
+                              <Button variant="primary" type="submit" id="addButton" disabled className="p-4">
+                                Add
+                              </Button>
+                            </Col>
+                          </Row>
                         </InputGroup>
                       </Form>
                     </Container>
@@ -503,7 +660,7 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
                       </Modal>
                     </Container>
                     <center>
-                      <Button variant="success" id="submitbutton" onClick={this.handleAddShow} className="px-5" disabled>Submit task(s)</Button>
+                      <Button variant="success" id="submitbutton" onClick={() =>{this.handleAddShow.call(this); this.handleButtonValidity()}} className="px-5">Submit task(s)</Button>
                     </center>
                     {this.state.formSubmitted ? (<Alert variant="success" id="alert">
                       <Alert.Heading>Task(s) added</Alert.Heading>
