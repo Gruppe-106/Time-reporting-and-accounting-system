@@ -1,8 +1,8 @@
 import {MySQLResponse} from "./mysqlHandler";
-import {Server} from "../server";
+import {mysqlHandler} from "../../app";
 
 export async function wipeDatabase() : Promise<boolean> {
-    let response: MySQLResponse = await Server.mysql.SQLFileQuery("wipeInstructions.SQL");
+    let response: MySQLResponse = await mysqlHandler.SQLFileQuery("wipeInstructions.SQL");
     if (response.error === null) {
         console.log("[MySQL] Successfully wiped database");
         return true;
@@ -12,7 +12,7 @@ export async function wipeDatabase() : Promise<boolean> {
 }
 
 export async function insertGeneric() : Promise<boolean> {
-    let response: MySQLResponse = await Server.mysql.SQLFileQuery("genericData.SQL");
+    let response: MySQLResponse = await mysqlHandler.SQLFileQuery("genericData.SQL");
     if (response.error === null) {
         console.log("[MySQL] Successfully inserted generic data into database");
         return true;

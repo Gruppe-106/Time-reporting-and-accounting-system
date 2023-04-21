@@ -1,10 +1,10 @@
-import {Server} from "../server";
 import {Request, Response} from "express";
 import AuthEndpoint, {AuthData} from "./dataGetEndpoints/authEndpoint";
 import {Where} from "../database/mysqlHandler";
+import {mysqlHandler} from "../../app";
 
 abstract class EndpointBase {
-    protected readonly mySQL = Server.mysql;
+    protected readonly mySQL = mysqlHandler;
     abstract requiredRole: number;
 
     /**
@@ -37,11 +37,15 @@ abstract class EndpointBase {
     /**
      * Sends bad request back to the request and ends connection
      * @param res Response: response object of the api request
+     * @param req Request: Request object of the api request
      * @protected
      */
-    protected badRequest(res: Response) {
-        res.status(400).send(JSON.stringify({message: "Bad Request"}));
-        res.end();
+    protected badRequest(res: Response, req: Request) {
+        if (!res.writableEnded) {
+            if (req !== undefined) req.pause();
+            res.status(400);
+            res.end(JSON.stringify({message: "Bad Request"}));
+        }
     }
 }
 

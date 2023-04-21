@@ -279,6 +279,7 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
 
       let post_data = {
         projectId: id,
+
         task : {
           name: taskName,
           userId: userId,

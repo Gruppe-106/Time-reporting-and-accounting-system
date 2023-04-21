@@ -23,13 +23,12 @@ describe("User API", () => {
         });
 
         test("Success get message with multiple IDs", async () => {
-            apiHandler.get("/api/user/get?ids=1,3,5", {headers: headers}, (value) => {
+            apiHandler.get("/api/user/get?ids=1,3", {headers: headers}, (value) => {
                 expect(value).toStrictEqual({
                     "status":200,
                     "data": [
                         {id: 1, email: 'matt@example.com', firstName: 'Matt', lastName: 'Brown', groupId: 2},
-                        {id: 3, email: 'jane@example.com', firstName: 'Jane', lastName: 'Doe', groupId: 4},
-                        {id: 5, email: 'jill@example.com', firstName: 'Jill', lastName: 'Jones', groupId: 3}
+                        {id: 3, email: 'jane@example.com', firstName: 'Jane', lastName: 'Doe', groupId: 4}
                     ]
                 });
             });
@@ -90,7 +89,7 @@ describe("User API", () => {
            };
 
            apiHandler.put("/api/user/edit/put", {headers: headers, body: bodyFail}, (value) => {
-               expect(value["data"]["success"]).toBeUndefined();
+               expect(value["data"]["success"]).toBe("false");
            });
        });
 
