@@ -1,10 +1,10 @@
-import {Server} from "../server";
 import {Request, Response} from "express";
 import AuthEndpoint, {AuthData} from "./dataGetEndpoints/authEndpoint";
 import {Where} from "../database/mysqlHandler";
+import {mysqlHandler} from "../../app";
 
 abstract class EndpointBase {
-    protected readonly mySQL = Server.mysql;
+    protected readonly mySQL = mysqlHandler;
     abstract requiredRole: number;
 
     /**
