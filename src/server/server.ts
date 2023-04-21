@@ -1,28 +1,29 @@
 import {Express} from "express";
 import {MainRouter} from "./mainRouter";
-import * as http from "http";
-import readline from "readline";
-import MysqlHandler from "./database/mysqlHandler";
-import {MySQLConfig} from "../app";
+import * as readline from "readline";
+import {mysqlHandler} from "../app";
+import * as https from "https";
+import * as fs from "fs";
+import * as path from "path";
+
+// Load in the SSL credentials for HTTPS
+const privateKey : string = fs.readFileSync(path.join(__dirname, "/SSL/selfsigned.key"), 'utf8');
+const certificate: string = fs.readFileSync(path.join(__dirname, "/SSL/selfsigned.crt"), 'utf8');
+
+const credentials: {key: string, cert: string} = {key: privateKey, cert: certificate};
 
 export class Server {
     private app: Express;
     private router: MainRouter
-    //Need SSL cert for https server
-    //private server: https.Server;
-    public static server: http.Server;
-    public static mysql: MysqlHandler;
+    public static server: https.Server;
 
-    constructor(app: Express, mySQLConnectionConfig: MySQLConfig, port: number, mysqlOnConnectCallback?: () => void) {
+    constructor(app: Express) {
         this.app = app;
         this.router = new MainRouter();
         app.use('/', this.router.routes());
+        Server.server = https.createServer(credentials, app);
 
-        Server.server = http.createServer(app);
-        Server.mysql = new MysqlHandler(mySQLConnectionConfig, mysqlOnConnectCallback);
-        this.start(port);
-
-        this.commandLineInterface(this);
+        this.commandLineInterface();
     }
 
     /**
@@ -30,7 +31,7 @@ export class Server {
      * @param port Number: port to listen to
      */
     public start(port: number): void {
-        Server.server.listen(port, () => console.log(`[Server] Server listening on port ${port}, http://localhost:${port}`));
+        Server.server.listen(port, () => console.log(`[Server] Server listening on port ${port}, https://localhost:${port}`));
     }
 
     /**
@@ -42,18 +43,28 @@ export class Server {
     }
 
     /**
+     * Kills the server and the main mysql connection
+     */
+    public kill(): void {
+        this.stop();
+        mysqlHandler.destroyConnection();
+        console.log("[Process] Everything shutdown, ending process");
+        process.exit(0);
+    }
+
+    /**
      * Start the command line interface
      * @param server Server: server to interact with
      * @private
      */
-    private commandLineInterface(server: Server) {
+    private commandLineInterface(server: Server = this): void {
         const inquirer = readline.createInterface({
             input: process.stdin,
             output: process.stdout
         });
 
-        // Only for local host usage, to stop the server
-        inquirer.on("line", input => {
+        // Only for use in ide usage, to stop the server
+        inquirer.on("line", (input) => {
             if (input === "stop" || input.match(/^q(uit)?$/i)) {
                 inquirer.question('[Server] Are you sure you want to exit? (y/n)> ', (answer) => {
                     if (answer.match(/^y(es)?$/i)) inquirer.close();
@@ -63,10 +74,7 @@ export class Server {
 
         // On the linux server PM2 automatically calls this function when told to stop the server
         inquirer.on("close", function() {
-            server.stop();
-            Server.mysql.destroyConnection();
-            console.log("[Process] Everything shutdown, ending process");
-            process.exit(0);
+            server.kill();
         });
     }
 }
