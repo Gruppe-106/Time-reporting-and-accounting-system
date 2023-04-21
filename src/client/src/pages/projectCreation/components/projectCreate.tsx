@@ -60,48 +60,61 @@ class ProjectCreate extends Component<ProjectCreateProp> {
         this.handleFormSubmit = this.handleFormSubmit.bind(this)
     }
 
+    /**
+     * Gets project leader information from database and information about every
+     * project which will be used for parent project assigning
+     */
     componentDidMount() {
-        //First make an instance of the api handler, give it the auth key of the user once implemented
         let apiHandler = new BaseApiHandler();
-        //Run the get or post function depending on need only neccesarry argument is the path aka what comes after the hostname
-        //Callbacks can be used to tell what to do with the data once it's been retrieved
         apiHandler.get(`/api/project/get?ids=*`, {},(value) => {
-            //Then convert the string to the expected object(eg. )
             let json:Api = JSON.parse(JSON.stringify(value))
-            //Then update states or variables or whatever you want with the information
             this.setState({pageInformation: json.data})
         })
         apiHandler.get(`/api/role/user/get?role=3`, {},(value) => {
-            //Then convert the string to the expected object(eg. )
             let json:ProjectLeaders = JSON.parse(JSON.stringify(value))
-            //Then update states or variables or whatever you want with the information
             this.setState({projectLeaders: json.data})
         })
     }
 
+    /**
+     * Handles the modal closing
+     */
     private handleClose(){
         this.setState({
             show: false
         });
     }
 
+    /**
+     * Handles the modal showing
+     */
     private handleShow(){
         this.setState({
             show: true
         })
     }
 
+    /**
+     * Handles the currently assigned manager
+     */
     private HandleManager(manager: any): void {
         this.setState({
             assignedToManager: manager[0] ? manager[0] : null
         })
     }
+
+    /**
+     * Handles the currently select parent project
+     */
     private HandleParent(selected: any): void {
         this.setState({
             selectedParentProject: selected[0] ? selected[0] : null
         });
     }
 
+    /**
+     * Handles the endDate, this is used for validating if the endDate is valid
+     */
     private handleEndDate(){
         const startDate = new Date((document.getElementById("formBasicStartDate") as HTMLInputElement).value)
         const endDate = new Date((document.getElementById("formBasicEndDate") as HTMLInputElement).value)
@@ -116,6 +129,9 @@ class ProjectCreate extends Component<ProjectCreateProp> {
         }
     }
 
+    /**
+     * Handles the endDate, this is used for validating if the endDate is valid
+     */
     private handleStartDate(){
         const startDate = new Date((document.getElementById("formBasicStartDate") as HTMLInputElement).value)
         const endDate = new Date((document.getElementById("formBasicEndDate") as HTMLInputElement).value)
@@ -130,6 +146,10 @@ class ProjectCreate extends Component<ProjectCreateProp> {
         }
     }
 
+    /**
+     * Handles the validity of the input form.
+     * This disables the button if the form is not correctly inputted
+     */
     private handleValidity() {
         const button = document.getElementById("submitbutton") as HTMLInputElement | null;
         const projectName = (document.getElementById("formBasicProjectName") as HTMLInputElement).value
@@ -145,6 +165,10 @@ class ProjectCreate extends Component<ProjectCreateProp> {
         }
     }
 
+    /**
+     * This handles the formSubmit.
+     * Submits the data to the database
+     */
     handleFormSubmit = () =>{
         //event.preventDefault();
         const projectName = (document.getElementById("formBasicProjectName") as HTMLInputElement).value
@@ -171,6 +195,10 @@ class ProjectCreate extends Component<ProjectCreateProp> {
         this.handleClose()
     }
 
+    /**
+     * Renders the project manage information page.
+     * Uses a Form and typeahead to get input.
+     */
     private informationRender():JSX.Element {
         return (
             <Row>
@@ -296,6 +324,9 @@ class ProjectCreate extends Component<ProjectCreateProp> {
         )
     }
 
+    /**
+     * Renders the html elements
+     */
     render() {
         return(
             <div>

@@ -16,6 +16,9 @@ class ProjectViewer extends Component<any>{
 
     }
 
+    /**
+     * Renders the project viewer using the ProjectInformation component
+     */
     render() {
         return (
             <>
