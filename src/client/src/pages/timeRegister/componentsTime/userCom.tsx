@@ -64,14 +64,16 @@ interface TimeSheetProp {
 interface TimeSheetState {
   stateRowData: Map<number, TaskRowData>;
   prevRowSubmitData: TimeSheetData[];
+  deletedItems: TimeSheetData[];
   searchDataState: SearchData[]
   selectedProject: SearchData
   offsetState: number;
   isUpdating: boolean;
-  showAddModal: boolean;
+  showAddRowModal: boolean;
+  showDeleteRowModal: boolean;
+  showSubmitModal: boolean;
   headerDates: string[];
   times: number[];
-  showDeleteRowModal: boolean;
   deleteId: number | undefined,
   delRowTaskProject: {
     projectName: string | undefined,
@@ -93,6 +95,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
       stateRowData: new Map<number, TaskRowData>(),
       prevRowSubmitData: [],
       searchDataState: [],
+      deletedItems: [],
       selectedProject: {
         taskId: Infinity,
         taskName: "",
@@ -101,7 +104,8 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
       },
       offsetState: -28,
       isUpdating: false,
-      showAddModal: false,
+      showAddRowModal: false,
+      showSubmitModal: false,
       headerDates: [],
       times: [0, 0, 0, 0, 0, 0, 0],
       showDeleteRowModal: false,
@@ -135,10 +139,10 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
   }
   // ************************************************
   private handleCloseAddModal = () => {
-    this.setState({ showAddModal: false })
+    this.setState({ showAddRowModal: false })
   }
   private handleShowAddModal = () => {
-    this.setState({ showAddModal: true })
+    this.setState({ showAddRowModal: true })
   }
   private handleAddRow = () => {
     const { stateRowData, selectedProject } = this.state
@@ -146,6 +150,14 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     stateRowData.set(selectedProject.taskId, { projectName: selectedProject.projectName, taskName: selectedProject.taskName, taskId: selectedProject.taskId, objectData: [] })
 
     this.handleCloseAddModal();
+  }
+  private handleShowSubmit = () => {
+    const { prevRowSubmitData } = this.state
+    console.log(prevRowSubmitData)
+    this.setState({ showSubmitModal: true })
+  }
+  private handleCloseSubmit = () => {
+    this.setState({ showSubmitModal: false })
   }
 
   private handleTimeChange(index: number, value: string, data: TaskRowData | undefined) {
@@ -276,7 +288,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
         apiHandler.post(`/api/time/register/post`, { body: item }, (value) => {
           console.log(value);
         })
-      } 
+      }
       return true;
     });
     let deletedItem = prevRowSubmitData.filter(delItem =>
@@ -293,6 +305,8 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
         console.log(value);
       })
     }
+    this.setState({ deletedItems: deletedItem })
+    this.setState({ showSubmitModal: false })
   }
 
   private handleButtonClick = async (increment: number) => {
@@ -328,7 +342,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     getCurrentWeekDates(timeSheetDate, timeOffset);
     let apiHandler = new BaseApiHandler();
     apiHandler.get(
-      `/api/time/register/get?user=${userId}&period=${Date.parse(timeSheetDate[0])},${Date.parse(timeSheetDate[6])}&var=taskName,taskId,time,date`, {},
+      `/api/time/register/get?user=${userId}&period=${Date.parse(timeSheetDate[0])},${Date.parse(timeSheetDate[6])}&var=taskName,taskId,time,date,approved,managerLogged`, {},
       (value) => {
         let json: Api = JSON.parse(JSON.stringify(value));
         let taskData: Map<number, TaskRowData> = new Map<number, TaskRowData>();
@@ -477,7 +491,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
   }
 
   render() {
-    const { showAddModal, showDeleteRowModal, deleteId, delRowTaskProject, searchDataState } = this.state;
+    const { showAddRowModal, showDeleteRowModal, showSubmitModal, deleteId, delRowTaskProject, searchDataState, deletedItems } = this.state;
 
     return (
       <Container fluid="lg">
@@ -486,7 +500,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
           <tbody>{this.renderTaskRows()}</tbody>
         </Table>
         <Button variant="primary" type="button" onClick={() => this.handleShowAddModal()}>Add Row</Button>
-        <Button variant="primary" type="button" style={{ float: "right" }} onClick={() => this.handleSubmitButton()} >Submit</Button>
+        <Button variant="primary" type="button" style={{ float: "right" }} onClick={() => this.handleShowSubmit()} >Submit</Button>
         <center>
           <ButtonGroup aria-label="Basic example">
             <Button onClick={() => this.handleButtonClick(-7)} variant="primary">
@@ -497,8 +511,12 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
             </Button>
           </ButtonGroup>
         </center>
+        <p>Delete task at date:</p>
+            {deletedItems.map((item) => {
+              return <p>{item.taskName}, at {dateStringFormatter(item.date)}</p>
+            })}
         <></>
-        <Modal show={showAddModal} onHide={this.handleCloseAddModal}>
+        <Modal show={showAddRowModal} onHide={this.handleCloseAddModal}>
           <Modal.Header closeButton>
             <Modal.Title>Add Row?</Modal.Title>
           </Modal.Header>
@@ -550,6 +568,30 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
             </Button>
             <Button variant="danger" onClick={this.handleDeleteRow}> {/* This 2 is the row number (taskId) */}
               Delete
+            </Button>
+          </Modal.Footer>
+        </Modal>
+        <></>
+        <Modal show={showSubmitModal} onHide={this.handleCloseSubmit}>
+          <Modal.Header closeButton>
+            <Modal.Title>Delete Row?</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <p>Are you sure you want to submit:</p>
+            <p>Are you sure u want to delete:</p>
+            {deletedItems.map((item) => {
+              return <p>{item.taskName}, at {item.date}</p>
+            })}
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={this.handleCloseSubmit}>
+              Cancel
+            </Button>
+            <Button variant="primary" onClick={this.handleCloseSubmit}>
+              Testers
+            </Button>
+            <Button variant="success" onClick={() => this.handleSubmitButton()}>
+              Submit
             </Button>
           </Modal.Footer>
         </Modal>
