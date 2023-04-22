@@ -42,34 +42,29 @@ class AuthEndpoint {
             throw new Error("[Auth] No auth cookie provided");
         }
 
+        let query: string = `SELECT authKey,authKeyEndDate,userId FROM AUTH WHERE authKey='${authKey}' AND authKeyEndDate >= NOW()`;
         // Retrieve authentication data from database
-        let authResponse: MySQLResponse = await mysqlHandler.select("AUTH", ["authKey", "authKeyEndDate", "userId"], {column: "authKey", equals: [authKey]});
+        let authResponse: MySQLResponse = await mysqlHandler.sendQuery(query);
         // Throw error if data retrieval fails
         if (authResponse.error !== null) {
             throw new Error("[MySQL] Failed to retrieve data");
         }
 
-        // Get authentication data from response
-        let auth: AuthApi = authResponse.results[0];
         // Throw error if auth key is invalid
-        if (authKey !== auth.authKey) {
+        if (authResponse.results.length === 0) {
             throw new Error("[Auth] Failed to authenticate token is either missing or expired");
         }
 
-        // Throw error if auth key is expired
-        if (Date.now() >= mysqlHandler.dateToNumber(new Date(auth.authKeyEndDate))) {
-            throw new Error("[Auth] Failed to authenticate token is either missing or expired");
-        }
+        // Get authentication data from response
+        let auth: AuthApi = authResponse.results[0];
 
         // Retrieve user roles from database
         let roleResponse: MySQLResponse = await mysqlHandler.select("USERS_ROLES_CONNECTOR", ["roleId"], {column: "userId", equals: [auth.userId.toString()]});
-        let roles: RoleApi[];
+
         // If roles are retrieved successfully, set roles to the results, otherwise set roles to an array with a single invalid role
-        if (roleResponse.error === null) {
+        let roles: RoleApi[] = [{roleId: -1}];
+        if (roleResponse.error === null)
             roles = roleResponse.results;
-        } else {
-            roles = [{roleId: -1}];
-        }
 
         // Return authentication data
         return {success: true, userId: auth.userId, userRoles: roles};
