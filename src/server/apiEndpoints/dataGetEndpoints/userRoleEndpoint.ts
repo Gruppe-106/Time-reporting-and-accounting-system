@@ -1,78 +1,52 @@
-import GetEndpointBase, { PrimaryKeyType } from "../getEndpointBase";
+import GetEndpointBase, {PrimaryKeyType} from "../getEndpointBase";
 import {MySQLResponse} from "../../database/mysqlHandler";
-import {Request, Response} from "express";
+import MysqlStringBuilder from "../../database/mysqlStringBuilder";
+import MysqlQueryBuilder, {MySQLJoinTypes} from "../../database/mysqlStringBuilder";
 
 /**
  * Endpoint for .../api/role/user/get
  */
 class UserRoleEndpoint extends GetEndpointBase {
-    urlPrimaryKey: PrimaryKeyType[];
+    urlPrimaryKey: PrimaryKeyType[] = [
+        {urlKey: "user", mysqlKey: "userId", throwOnMissing: false, allowAll: false},
+        {urlKey: "role", mysqlKey: "roleId", throwOnMissing: true,  allowAll: false}
+    ];
     requiredRole: number = 1;
 
-    allowedColumns: string[] = [
-        "userId",
-        "firstName",
-        "lastName",
-        "roleId",
-        "roleName",
-        "*"
-    ];
-
-    async getData(requestValues: string[], primaryKey: string, keyEqual?: string[], data?: string[]): Promise<object[]> {
-        let select: string[] = [];
-        let join: string = "";
-
+    async getData(requestValues: string[], primaryKey: string, keyEqual?: string[]): Promise<object[]> {
         let allColumns: boolean = requestValues.indexOf("*") !== -1;
-        let userJoinAdded: boolean = false;
-        //Find all columns to find in the database
-        if (requestValues.indexOf("userId")    !== -1 || allColumns) select.push("ur.userId");
-        if (requestValues.indexOf("roleId") !== -1 || allColumns) select.push("ur.roleId");
+
+        // Check if a where condition is needed
+        let where: [key: string, equals: string[]] = undefined;
+        if (keyEqual !== undefined && allColumns)
+            where = [primaryKey, keyEqual];
+
+        let mysqlBuilder: MysqlStringBuilder = new MysqlQueryBuilder()
+            .from("USERS_ROLES_CONNECTOR", where, undefined, "ur");
+
+        // Add all columns to find in the database
+        if (requestValues.indexOf("userId") !== -1 || allColumns) mysqlBuilder.addColumnsToGet(["ur.userId"]);
+        if (requestValues.indexOf("roleId") !== -1 || allColumns) mysqlBuilder.addColumnsToGet(["ur.roleId"]);
         // The 2 columns below has to be retrieved from a different table, so add a join statement to query
         if (requestValues.indexOf("firstName")  !== -1 || allColumns) {
-            select.push("u.firstName");
-            join += " CROSS JOIN USERS u ON u.id=ur.userId";
-            userJoinAdded = true;
+            mysqlBuilder.join(MySQLJoinTypes.CROSS, "USERS", ["u.id", "ur.userId"], "u");
+            mysqlBuilder.addColumnsToGet(["u.firstName"]);
         }
         if (requestValues.indexOf("lastName")  !== -1 || allColumns) {
-            select.push("u.lastName");
-            if (!userJoinAdded) join += " CROSS JOIN USERS u ON u.id=ur.userId";
+            mysqlBuilder.join(MySQLJoinTypes.CROSS, "USERS", ["u.id", "ur.userId"], "u");
+            mysqlBuilder.addColumnsToGet(["u.lastName"]);
         }
         if (requestValues.indexOf("roleName") !== -1 || allColumns) {
-            select.push("r.name");
-            join += " CROSS JOIN ROLES r ON r.id=ur.roleId";
+            mysqlBuilder.join(MySQLJoinTypes.CROSS, "ROLES", ["r.id", "ur.roleId"], "r");
+            mysqlBuilder.addColumnsToGet(["r.name"]);
         }
 
         //Query the data for all group that satisfies conditions
-        let query: string = `SELECT ${select} FROM (SELECT * FROM USERS_ROLES_CONNECTOR ${this.mySQL.createWhereString(this.createWhere(primaryKey, keyEqual))}) ur ${join}`;
-        let response:MySQLResponse = await this.mySQL.sendQuery(query);
+        let response:MySQLResponse = await this.mySQL.sendQuery(mysqlBuilder.build());
         //Check if there was an error and throw if so
         if (response.error !== null) throw new Error("[MySQL] Failed to retrieve data");
 
         return response.results;
-    }
-
-    getRoute(req: Request, res: Response) {
-        //Check if tasks where specified
-        let primaryKey:string = "userId";
-        let requestKeys: string[] = this.urlParamsConversion(req.query.user, false);
-
-        if (requestKeys === undefined) {
-            //If not try projects
-            requestKeys = this.urlParamsConversion(req.query.role, false, true, res);
-            //If not return and send bad request
-            if (requestKeys === undefined) { return this.badRequest(res, req); }
-            primaryKey  = "roleId";
-        }
-
-        //Get vars if any otherwise it will get all
-        let requestedValues:string[] = this.urlParamsConversion(req.query.var);
-
-        this.processRequest(req, requestedValues, primaryKey, requestKeys).then((data) => {
-            if (!res.writableEnded) {
-                res.setHeader('Content-Type', 'application/json');
-                res.status(data.status).json(data);
-            }
-        })
     }
 }
 

@@ -63,7 +63,7 @@ export class Server {
             output: process.stdout
         });
 
-        // Only for use in ide usage, to stop the server
+        // Only for use in ide to stop the server
         inquirer.on("line", (input) => {
             if (input === "stop" || input.match(/^q(uit)?$/i)) {
                 inquirer.question('[Server] Are you sure you want to exit? (y/n)> ', (answer) => {

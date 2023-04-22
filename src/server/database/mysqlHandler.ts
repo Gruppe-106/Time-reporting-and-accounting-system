@@ -127,7 +127,7 @@ class MysqlHandler {
      * @private
      */
     public createWhereString(where?:Where): string {
-        return where !== undefined ? "WHERE " + where.column + " in ('" + where.equals.toString().replace(/(?<![\)']),'|(?<![\)']),(?![\('])|',(?![\('])/g, "','") + "')" : "";
+        return where !== undefined ? "WHERE " + where.column + " IN ('" + where.equals.toString().replace(/(?<![\)']),'|(?<![\)']),(?![\('])|',(?![\('])/g, "','") + "')" : "";
     }
 
     /**

@@ -37,38 +37,47 @@ class MysqlQueryBuilder {
         return this;
     }
 
-    /**
+/**
      * Set the FROM clause of the query
      * @param table - The name of the table to select from
      * @param condition - An optional array containing a key-value pair to filter the results by
+     * @param where - An optional where string to append to
      * @param tableIdentifier - An optional identifier for the table
      * @returns The current instance of the MysqlQueryBuilder
+     * @description Remember to add table identifier e.g. userId from table USERS u should be u.userId
      */
-    from(table: string, condition?: [key: string, equals: string[]], tableIdentifier?: string): MysqlQueryBuilder {
-        this.query.from = `FROM (SELECT * FROM ${table} ${this.where(condition)}) ${tableIdentifier}`;
+    from(table: string, condition?: [key: string, equals: string[]], where?: string, tableIdentifier?: string): MysqlQueryBuilder {
+        if (where !== undefined)
+            this.query.from = `FROM (SELECT * FROM ${table} ${where}) ${tableIdentifier}`;
+        else
+            this.query.from = `FROM (SELECT * FROM ${table} ${this.where(condition)}) ${tableIdentifier}`;
         return this;
     }
+
 
     /**
      * Generate a WHERE clause for the query
      * @param condition - An optional array containing a key-value pair to filter the results by
+     * @param currentWhere - An optional where string to append to
      * @returns A string representing the WHERE clause of the query
+     * @description Remember to add table identifier e.g. userId from table USERS u should be u.userId
      */
-    where(condition?: [key: string, equals: string[]]): string {
-        if (condition === undefined) return "";
+    where(condition?: [key: string, equals: string[]], currentWhere?: string): string {
+        if (condition === undefined || condition[1].indexOf("*") !== -1) return "";
+        if (currentWhere !== undefined) return currentWhere + ` AND ${condition[0]} IN (${condition[1]})`
         return `WHERE ${condition[0]} IN (${condition[1]})`;
     }
 
     /**
-     * Add a table name to a column name if it doesn't already have one
-     * @param columnOrTable - A string representing a column name or table name
-     * @returns A string representing the column name with a table name prefix if necessary
+     * Generate a WHERE clause for the query
+     * @param betweenDates - An optional array containing a key-value pair to filter the results by date range
+     * @param currentWhere - An optional where string to append to
+     * @returns A string representing the WHERE clause of the query
      */
-    addTableName(columnOrTable: string): string {
-        if (columnOrTable.includes('.')) {
-            return columnOrTable;
-        }
-        return `table${this.query.from.length}.${columnOrTable}`;
+    whereDates(betweenDates?: [key: string, start: string, end: string], currentWhere?: string): string {
+        if (betweenDates === undefined) return "";
+        if (currentWhere !== undefined) return currentWhere + ` AND ${betweenDates[0]} BETWEEN '${betweenDates[1]}' AND '${betweenDates[2]}'`;
+        return `WHERE ${betweenDates[0]} BETWEEN '${betweenDates[1]}' AND '${betweenDates[2]}'`;
     }
 
     /**
@@ -92,15 +101,13 @@ class MysqlQueryBuilder {
         return this;
     }
 
-
     /**
      * Add a GROUP BY clause to the query
      * @param columns - A string or array of strings representing the columns to group by
      * @returns The current instance of the MysqlQueryBuilder
      */
-    groupBy(columns: string | string[]): MysqlQueryBuilder {
-        const uniqueColumns: string[] = Array.isArray(columns) ? columns.map(column => this.addTableName(column)) : [this.addTableName(columns)];
-        this.query.groupBy.push(`GROUP BY ${uniqueColumns.join(', ')}`);
+    groupBy(columns: string): MysqlQueryBuilder {
+        this.query.groupBy.push(`GROUP BY ${columns}`);
         return this;
     }
 

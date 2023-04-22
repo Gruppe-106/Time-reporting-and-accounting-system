@@ -10,8 +10,9 @@ export interface PrimaryKeyType {
 }
 
 abstract class GetEndpointBase extends EndpointBase{
-    abstract allowedColumns: string[];
-    abstract urlPrimaryKey: PrimaryKeyType[];
+    public allowedColumns: string[];
+    public urlPrimaryKey: PrimaryKeyType[];
+    public dataKey: PrimaryKeyType;
 
     /**
      * Gets data from DB and convert to client format
@@ -56,7 +57,6 @@ abstract class GetEndpointBase extends EndpointBase{
                 if (this.allowedColumns.indexOf(value) !== -1) return value;
             })
         }
-        return this.allowedColumns;
     }
 
     /**
@@ -84,13 +84,22 @@ abstract class GetEndpointBase extends EndpointBase{
      * Search for primary keys in the url based on urlPrimaryKey list in class
      * @param req The request object
      * @param res The response object
+     * @param keyData PrimaryKeyType[]: Data to use to match against url
+     * @param defaultOnUndefined Whether to use ids, id if keyData is undefined
      * @return [key, values] or undefined: A tuple containing the mysql key and list of values gotten
      * @protected
      */
-    protected findPrimaryKeys(res: Response, req: Request): [string, string[]] {
-        for (const urlPrimaryKeyElement of this.urlPrimaryKey) {
-            let param: string[] = this.urlParamsConversion(req.query[urlPrimaryKeyElement.urlKey], urlPrimaryKeyElement.allowAll, urlPrimaryKeyElement.throwOnMissing, res, req)
-            if (param !== undefined) return [urlPrimaryKeyElement.mysqlKey, param]
+    protected findPrimaryKeys(res: Response, req: Request, keyData: PrimaryKeyType[], defaultOnUndefined: boolean = true): [string, string[]] {
+        if (keyData === undefined || keyData[0] === undefined) {
+            if (defaultOnUndefined) {
+                let param: string[] = this.urlParamsConversion(req.query.ids, true, true, res, req)
+                if (param !== undefined) return ["id", param]
+            }
+        } else {
+            for (const urlPrimaryKeyElement of keyData) {
+                let param: string[] = this.urlParamsConversion(req.query[urlPrimaryKeyElement.urlKey], urlPrimaryKeyElement.allowAll, urlPrimaryKeyElement.throwOnMissing, res, req)
+                if (param !== undefined) return [urlPrimaryKeyElement.mysqlKey, param]
+            }
         }
         return undefined;
     }
@@ -99,16 +108,15 @@ abstract class GetEndpointBase extends EndpointBase{
      * @brief Gets the route and returns the data to the client
      * @param req The request object
      * @param res The response object
-     * @param primaryKey The primary key to look for
-     * @param requestKeysName The name of the request keys
      */
     public getRoute(req:Request, res:Response): void {
-        let [primaryKey, requestKeys] = this.findPrimaryKeys(res, req);
-        if (primaryKey === undefined || requestKeys === undefined) return;
+        let [primaryKey, requestKeys] = this.findPrimaryKeys(res, req, this.urlPrimaryKey);
+        if (primaryKey === undefined || requestKeys === undefined) return this.badRequest(res, req);
         //Get vars if any otherwise it will get all
-        let requestedValues:string[] = this.urlParamsConversion(req.query.var);
+        let requestedValues: string[] = this.urlParamsConversion(req.query.var);
+        let data: [string, string[]] = this.findPrimaryKeys(res, req, [this.dataKey], false);
 
-        this.processRequest(req, requestedValues, primaryKey, requestKeys).then((data) => {
+        this.processRequest(req, requestedValues, primaryKey, requestKeys, data === undefined ? undefined : data[1]).then((data) => {
             if (!res.writableEnded) {
                 if (data.data === undefined) return this.badRequest(res, req);
                 res.setHeader('Content-Type', 'application/json');

@@ -1,4 +1,4 @@
-import GetEndpointBase, { PrimaryKeyType } from "../getEndpointBase";
+import GetEndpointBase from "../getEndpointBase";
 import {MySQLResponse} from "../../database/mysqlHandler";
 
 /**
@@ -31,7 +31,6 @@ interface ProjectLeaderData {
  * Endpoint for .../api/project/get
  */
 class ProjectEndpoint extends GetEndpointBase {
-    urlPrimaryKey: PrimaryKeyType[];
     requiredRole: number = 1;
 
     allowedColumns: string[] = [
@@ -56,28 +55,24 @@ class ProjectEndpoint extends GetEndpointBase {
         let getAll: boolean = requestValues.indexOf("*") !== -1;
         
         // If projectLeader is requested, add id to requestValues
-        if (requestValues.indexOf("id") === -1 && (requestValues.indexOf("projectLeader") !== -1 || getAll)) {
-            requestValues.push("id");
+        if (!getAll && requestValues.indexOf("projectLeader") !== -1) {
+            if (requestValues.indexOf("id") === -1) requestValues.push("id");
         }
         
         // Retrieve project data from database
         let response: MySQLResponse = await this.mySQL.select("PROJECTS", this.createColumns(requestValues), this.createWhere(primaryKey, keyEqual));
-
-        // Throw error if there was an error
-        if (response.error !== null) {
-            throw new Error("[MySQL] Failed to retrieve data");
-        }
+        if (response.error !== null) throw new Error("[MySQL] Failed to retrieve data");
 
         // Retrieve project leader data if requested
         let projectLeaderData: ProjectLeaderData[] = [];
         if (requestValues.indexOf("projectLeader") !== -1 || getAll) {
-            let leaderResponse: MySQLResponse = await this.mySQL.sendQuery(`SELECT pm.projectId,pm.userId as id,u.lastName,u.firstName FROM 
+            let leaderResponse: MySQLResponse = await this.mySQL.sendQuery(
+                `SELECT pm.projectId,pm.userId as id,u.lastName,u.firstName FROM 
                 (SELECT * FROM PROJECTS_MANAGER_CONNECTOR ${this.mySQL.createWhereString({column: "projectId", equals: keyEqual})}) pm 
                 CROSS JOIN USERS u ON pm.userId=u.id`
             );
-            if (leaderResponse.error === null) {
-                projectLeaderData = leaderResponse.results;
-            }
+
+            if (leaderResponse.error === null) projectLeaderData = leaderResponse.results;
         }
 
         // Convert dates to number format

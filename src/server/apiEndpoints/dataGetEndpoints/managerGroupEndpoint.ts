@@ -38,9 +38,6 @@ class ManagerGroupEndpoint extends GetEndpointBase {
         {urlKey: "group", mysqlKey: "groupId", allowAll: false, throwOnMissing: true}
     ];
     requiredRole: number = 1;
-    //Not used, but required by base class
-    allowedColumns: string[];
-
 
     /**
      * Retrieves data for manager group and optionally all employees in group
@@ -62,7 +59,7 @@ class ManagerGroupEndpoint extends GetEndpointBase {
         if (response.error !== null) throw new Error("[MySQL] Failed to retrieve data");
         let results: ManagerGroupReturnType[] = response.results;
 
-        if (results.length === 0) return;
+        if (results.length === 0) return [{error: "Failed to get data, couldn't find group"}];
 
         //Ensure the data sent to client has the correct layout
         let finalResult: ManagerGroupReturnType[] = results.map(result => ({
@@ -97,7 +94,7 @@ class ManagerGroupEndpoint extends GetEndpointBase {
 
         // Create a MySQL query builder
         let mysqlBuilder: MysqlQueryBuilder = new MysqlQueryBuilder()
-            .from("GROUPS_CONNECTOR", where, "g")
+            .from("GROUPS_CONNECTOR", where, undefined, "g")
             .addColumnsToGet(["g.groupId"]);
 
         // Add columns to retrieve from GROUPS_CONNECTOR table
