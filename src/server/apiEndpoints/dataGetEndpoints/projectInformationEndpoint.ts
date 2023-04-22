@@ -1,4 +1,4 @@
-import GetEndpointBase from "../getEndpointBase";
+import GetEndpointBase, { PrimaryKeyType } from "../getEndpointBase";
 import {MySQLResponse} from "../../database/mysqlHandler";
 
 interface ProjectTaskResponse {
@@ -10,6 +10,7 @@ interface ProjectTaskResponse {
  * Endpoint for .../api/task/user/get
  */
 class ProjectInformationEndpoint extends GetEndpointBase {
+    urlPrimaryKey: PrimaryKeyType[];
     allowedColumns: string[] = [
         "taskId",
         "userId",

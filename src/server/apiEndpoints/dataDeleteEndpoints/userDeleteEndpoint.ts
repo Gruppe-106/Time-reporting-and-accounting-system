@@ -1,8 +1,9 @@
-import GetEndpointBase from "../getEndpointBase";
+import GetEndpointBase, { PrimaryKeyType } from "../getEndpointBase";
 import {Request, Response} from "express";
 import {MySQLResponse} from "../../database/mysqlHandler";
 
 class UserDeleteEndpoint extends GetEndpointBase {
+    urlPrimaryKey: PrimaryKeyType[];
     allowedColumns: string[];
     requiredRole: number = 4;
 

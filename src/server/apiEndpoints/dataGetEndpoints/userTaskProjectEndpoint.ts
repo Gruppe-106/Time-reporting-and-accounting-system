@@ -1,8 +1,9 @@
-import getEndpointBase from "../getEndpointBase";
+import getEndpointBase, { PrimaryKeyType } from "../getEndpointBase";
 import {Request, Response} from "express";
 import {MySQLResponse} from "../../database/mysqlHandler";
 
-class UserTaskProjectEndpoint extends getEndpointBase{
+class UserTaskProjectEndpoint extends getEndpointBase {
+    urlPrimaryKey: PrimaryKeyType[];
     allowedColumns: string[];
     requiredRole: number = 1;
 

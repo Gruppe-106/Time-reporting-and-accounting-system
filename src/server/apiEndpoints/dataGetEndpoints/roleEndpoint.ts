@@ -1,4 +1,4 @@
-import GetEndpointBase from "../getEndpointBase";
+import GetEndpointBase, {PrimaryKeyType} from "../getEndpointBase";
 import {MySQLResponse} from "../../database/mysqlHandler";
 
 /**
@@ -6,6 +6,7 @@ import {MySQLResponse} from "../../database/mysqlHandler";
  */
 class RoleEndpoint extends  GetEndpointBase {
     requiredRole: number = 1;
+    urlPrimaryKey: PrimaryKeyType[];
 
     allowedColumns: string[] = [
         "id",
@@ -21,6 +22,7 @@ class RoleEndpoint extends  GetEndpointBase {
 
         return response.results;
     }
+
 }
 
 export default RoleEndpoint;

@@ -1,11 +1,12 @@
-import GetEndpointBase from "../getEndpointBase";
+import GetEndpointBase, { PrimaryKeyType } from "../getEndpointBase";
 import {MySQLResponse} from "../../database/mysqlHandler";
 import {Request, Response} from "express";
 
 /**
  * Endpoint for .../api/role/get
  */
-class UserEndpoint extends  GetEndpointBase {
+class UserEndpoint extends GetEndpointBase {
+    urlPrimaryKey: PrimaryKeyType[];
     requiredRole: number = 1;
 
     allowedColumns: string[] = [

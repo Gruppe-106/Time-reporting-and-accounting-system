@@ -1,11 +1,12 @@
-import GetEndpointBase from "../getEndpointBase";
+import GetEndpointBase, { PrimaryKeyType } from "../getEndpointBase";
 import {MySQLResponse} from "../../database/mysqlHandler";
 import {Request, Response} from "express";
 
 /**
  * Endpoint for .../api/time/register/get
  */
-class TaskTimeRegisterEndpoint extends  GetEndpointBase {
+class TaskTimeRegisterEndpoint extends GetEndpointBase {
+    urlPrimaryKey: PrimaryKeyType[];
     requiredRole: number = 1;
 
     allowedColumns: string[] = [

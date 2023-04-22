@@ -1,11 +1,12 @@
-import GetEndpointBase from "../getEndpointBase";
+import GetEndpointBase, { PrimaryKeyType } from "../getEndpointBase";
 import {MySQLResponse} from "../../database/mysqlHandler";
 import {Request, Response} from "express";
 
 /**
  * Endpoint for .../api/task/user/get
  */
-class UserTaskEndpoint extends  GetEndpointBase {
+class UserTaskEndpoint extends GetEndpointBase {
+    urlPrimaryKey: PrimaryKeyType[];
     allowedColumns: string[] = [
         "taskId",
         "userId",
