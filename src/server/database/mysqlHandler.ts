@@ -2,7 +2,6 @@ import * as mysql from "mysql2";
 import {Connection, Field, QueryError} from "mysql2";
 import {wipeDatabase} from "./wipeDB";
 import * as fs from "fs";
-import * as path from "path";
 import {mysqlHandler} from "../../app";
 
 export interface MySQLConfig {
@@ -213,23 +212,24 @@ class MysqlHandler {
 
     /**
      * Reads an SQL file
-     * @param file String: path of file
+     * @param path String: path of file
      * @param database String: name of database to replace with in file
      * @private
      */
-    private fsReadSQL(file: string, database: string = MysqlHandler.database): string {
-        return fs.readFileSync(path.join(__dirname, file), {encoding: "utf-8"})
+    private fsReadSQL(path: string, database: string = MysqlHandler.database): string {
+        return fs.readFileSync(path, {encoding: "utf-8"})
             .replace(/\$\{db\}/g, database); // Replace db with actual db/schema name
     }
 
     /**
      * Reads an SQL file and sends it as a query
-     * @param file String: path of file
+     * @param path String: path of file
+     * @param database String: name of database to replace with in file
      * @constructor
      */
-    public async SQLFileQuery(file: string): Promise<MySQLResponse> {
-        if (/.*\.SQL(?!.)/g.test(file)) {
-            let query: string = this.fsReadSQL(file);
+    public async SQLFileQuery(path: string, database: string = MysqlHandler.database): Promise<MySQLResponse> {
+        if (/.*\.SQL(?!.)/g.test(path)) {
+            let query: string = this.fsReadSQL(path, database);
             return mysqlHandler.sendQuery(query);
         }
         return {error: {

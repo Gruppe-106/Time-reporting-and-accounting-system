@@ -92,7 +92,7 @@ abstract class GetEndpointBase extends EndpointBase{
     protected findPrimaryKeys(res: Response, req: Request, keyData: PrimaryKeyType[], defaultOnUndefined: boolean = true): [string, string[]] {
         if (keyData === undefined || keyData[0] === undefined) {
             if (defaultOnUndefined) {
-                let param: string[] = this.urlParamsConversion(req.query.ids, true, true, res, req)
+                let param: string[] = this.urlParamsConversion(req.query.ids, false, true, res, req)
                 if (param !== undefined) return ["id", param]
             }
         } else {

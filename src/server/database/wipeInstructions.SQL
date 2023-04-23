@@ -43,6 +43,15 @@ CREATE TABLE TIMETYPES
     PRIMARY KEY (id)
 );
 
+# Add all time-types
+INSERT IGNORE INTO TIMETYPES
+(name)
+VALUES
+    ('billable'),
+    ('non-billable'),
+    ('sick'),
+    ('vacation');
+
 CREATE TABLE TASKS
 (
     id        INT UNSIGNED NOT NULL AUTO_INCREMENT UNIQUE,
@@ -157,7 +166,7 @@ INSERT IGNORE INTO GROUPS_CONNECTOR
 ALTER TABLE USERS
     ADD CONSTRAINT USERS_GROUPS_CONNECTOR_ibfk_1
         FOREIGN KEY (groupId)
-            REFERENCES GROUPS_CONNECTOR (managerId)
+            REFERENCES GROUPS_CONNECTOR (groupId)
             ON DELETE RESTRICT
             ON UPDATE CASCADE;
 

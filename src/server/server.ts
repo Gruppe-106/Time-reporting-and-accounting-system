@@ -5,6 +5,7 @@ import {mysqlHandler} from "../app";
 import * as https from "https";
 import * as fs from "fs";
 import * as path from "path";
+import * as http from "http";
 
 // Load in the SSL credentials for HTTPS
 const privateKey : string = fs.readFileSync(path.join(__dirname, "/SSL/selfsigned.key"), 'utf8');
@@ -15,13 +16,18 @@ const credentials: {key: string, cert: string} = {key: privateKey, cert: certifi
 export class Server {
     private app: Express;
     private router: MainRouter
-    public static server: https.Server;
+    public static server: https.Server | http.Server;
 
     constructor(app: Express) {
         this.app = app;
         this.router = new MainRouter();
         app.use('/', this.router.routes());
-        Server.server = https.createServer(credentials, app);
+
+        // If server is in test mode, start the server on http instead of https
+        if (process.argv.indexOf("test") !== -1)
+            Server.server = http.createServer(app);
+        else
+            Server.server = https.createServer(credentials, app);
 
         this.commandLineInterface();
     }

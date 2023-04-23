@@ -1,5 +1,5 @@
-import BaseApiHandler from "../../client/src/network/baseApiHandler";
-import {headers} from "./testBaseConfig";
+import BaseApiHandler from "../../../client/src/network/baseApiHandler";
+import {headers} from "../testBaseConfig";
 
 const apiHandler= new BaseApiHandler("http://localhost:8080");
 
