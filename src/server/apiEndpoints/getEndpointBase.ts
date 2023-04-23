@@ -101,7 +101,7 @@ abstract class GetEndpointBase extends EndpointBase{
                 if (param !== undefined) return [urlPrimaryKeyElement.mysqlKey, param]
             }
         }
-        return undefined;
+        return [undefined, undefined];
     }
 
     /**
