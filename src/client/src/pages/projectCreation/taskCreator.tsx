@@ -18,6 +18,9 @@ class TaskCreator extends Component<any, ProjectMenuState>{
         };
     }
 
+    /**
+     * Renders the task editor page using CreateTaskTable component
+     */
     render() {
         return (
             <>
