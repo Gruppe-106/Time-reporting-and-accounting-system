@@ -120,31 +120,34 @@ class ManagerGroupEndpoint extends GetEndpointBase {
      * @returns An array of objects containing manager group data with employees added
      */
     private async getEmployeeData(finalResult: ManagerGroupReturnType[]) {
-        //Find all group ids to find employees for
+        //Find all group ids to find employees for & create a list mapped to group id as key
         let groupIds: number[] = [];
+        let groupResult:[key: number, data: ManagerGroupReturnType][] = [];
         for (const result of finalResult) {
             groupIds.push(result.groupId);
+            groupResult.push([result.groupId, result]);
         }
+
         //Send query to get all employees with a group id found above
         let employeeQuery: string = `SELECT * from USERS WHERE groupId IN (${groupIds}) ORDER BY groupId`;
         let employeeResponse: MySQLResponse = await this.mySQL.sendQuery(employeeQuery);
         if (employeeResponse.error !== null) throw new Error("[MySQL] Failed to retrieve data");
+
         //Loop through all employees and add them to the correct group
         let employeeResult: UserDataType[] = employeeResponse.results;
-        let mainIndex = 0;
         for (const user of employeeResult) {
-            if (user.groupId === undefined) continue
-            //Get the correct index for the specific user, as the list of users & group is sorted by groupId it's fine to just increment until correct
-            for (; finalResult[mainIndex].groupId !== user.groupId; mainIndex++) ;
-            //Add the employee to the group
-            finalResult[mainIndex].employees.push({
+            groupResult[user.groupId][1].employees.push({
                 id: user.id,
                 firstName: user.firstName,
                 lastName: user.lastName,
                 email: user.email
-            })
+            });
         }
-        return finalResult;
+
+        // Return the result without the group id as key
+        return groupResult.map(value => {
+            return value[1];
+        });
     }
 
 }
