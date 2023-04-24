@@ -530,9 +530,14 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     return rows;
   }
 
+  /**
+   * Renders buttons based on the adminPicked prop.
+   * @returns The Add Row and Submit buttons if adminPicked is null, otherwise nothing is rendered.
+   */
   renderButton() {
     const { adminPicked } = this.props
 
+    // If adminPicked is false, render the Add Row and Submit buttons
     if (!adminPicked) {
       return (
         <div>
