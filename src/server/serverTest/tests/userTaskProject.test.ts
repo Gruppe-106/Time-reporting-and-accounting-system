@@ -19,16 +19,16 @@ describe("User Task Project API", () => {
                     status: 200,
                     data: [
                         {
-                            taskName: 'Task X',
-                            taskId: 1,
-                            projectId: 1,
-                            projectName: 'Project Alpha'
+                            taskName: 'Task Put Task 1',
+                            taskId: 5,
+                            projectId: 7,
+                            projectName: 'Project Task Put 1'
                         },
                         {
-                            taskName: 'Task User Task',
-                            taskId: 13,
-                            projectId: 7,
-                            projectName: 'Project User Task'
+                            taskName: 'Task Put Task 2',
+                            taskId: 6,
+                            projectId: 8,
+                            projectName: 'Project Task Put 2'
                         }
                     ]
                 });

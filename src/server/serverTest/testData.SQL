@@ -247,6 +247,12 @@ VALUES
     ('Task Put Task 1','2023-03-20','2023-04-26',1), # Id 5
     ('Task Put Task 2','2023-03-20','2023-04-26',1); # Id 6
 
+INSERT IGNORE INTO USERS_TASKS_CONNECTOR
+(userId,taskId)
+VALUES
+    (16,5),
+    (16,6);
+
 INSERT IGNORE INTO PROJECTS
 (superProjectId, name, startDate, endDate)
 VALUES
