@@ -2,7 +2,6 @@ import React, {Component} from "react";
 import BaseNavBar from "../../components/navBar";
 import {Button, Container} from "react-bootstrap";
 import {ProjectTableRow} from "../projectViewer/components/projectTable";
-import Row from "react-bootstrap/Row";
 import CreateTaskTable from "./components/projectEditTasks";
 
 interface  ProjectMenuState{
@@ -19,6 +18,9 @@ class TaskCreator extends Component<any, ProjectMenuState>{
         };
     }
 
+    /**
+     * Renders the task editor page using CreateTaskTable component
+     */
     render() {
         return (
             <>
@@ -29,9 +31,7 @@ class TaskCreator extends Component<any, ProjectMenuState>{
                 </Container>
 
                 <Container>
-                    <Row>
-                        <CreateTaskTable initialRows={[]}></CreateTaskTable>
-                    </Row>
+                    <CreateTaskTable initialRows={[]}></CreateTaskTable>
                 </Container>
 
             </>

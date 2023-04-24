@@ -13,6 +13,7 @@ interface Api{
     }[]
 }
 
+//Finds the search query which will be used to get information about relevant information
 const queryString = window.location.search;
 const params = new URLSearchParams(queryString);
 const id = parseInt(params.get("id") as string);
@@ -27,22 +28,22 @@ class ProjectMemberTable extends Component<any> {
         } ]
     }
 
+    /**
+     * Gets project info and stores it in json file.
+     * Sets the json file as the state of tableRows which will be used to show the members on the project
+     */
     componentDidMount() {
-        //First make an instance of the api handler, give it the auth key of the user once implemented
         let apiHandler = new BaseApiHandler();
-        //Run the get or post function depending on need only neccesarry argument is the path aka what comes after the hostname
-        //Callbacks can be used to tell what to do with the data once it's been retrieved
         apiHandler.get(`/api/project/info/get?ids=${id}`,{}, (value) => {
-            console.log(value)
-            //Then convert the string to the expected object(eg. )
             let json:Api = JSON.parse(JSON.stringify(value))
-            //Then update states or variables or whatever you want with the information
             this.setState({tableRows: json.data})
-            console.log(json)
         })
     }
 
-
+    /**
+     * Maps the information gotten from project info to a table.
+     * returns table data with the information stored
+     */
     private tableRender():JSX.Element[] {
         return this.state.tableRows.map(row => (
             <tr key={row.id}>
@@ -54,6 +55,10 @@ class ProjectMemberTable extends Component<any> {
         ))
     }
 
+    /**
+     * renders a table with table rows.
+     * calls the tableRender() which has the info of the table
+     */
     render() {
         return(
             <Table bordered hover>

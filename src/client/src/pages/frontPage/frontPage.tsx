@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import BaseNavBar from "../../components/navBar";
-import { Button, Container, Table } from "react-bootstrap";
-import BaseApiHandler from "../../network/baseApiHandler";
+import { Container, Table } from "react-bootstrap";
 import LoadingOverlay from 'react-loading-overlay-ts';
 import { userInfo } from "../../utility/router";
 import APICalls from "../adminPanel/utility/apiCalls";
@@ -115,6 +114,11 @@ class FrontPage extends Component<any, CustomTypes> {
         }
     }
 
+    /**
+     * Renders the rows of the task table
+     * @param task The task object
+     * @returns an JSX element or undefined
+     */
     private renderRow(task: Tasks): JSX.Element | undefined {
 
         return (
@@ -145,7 +149,7 @@ class FrontPage extends Component<any, CustomTypes> {
                 >
                     <BaseNavBar />
 
-                    <Container style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%, -50%)"}} >
+                    <Container style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }} >
                         <div style={{ justifyContent: "center", display: "flex" }}>
                             <h1>Welcome {this.state.user.firstName + " " + this.state.user.lastName}</h1>
 
@@ -172,11 +176,11 @@ class FrontPage extends Component<any, CustomTypes> {
                                 </tr>
                             </thead>
                             <tbody>
-                                {this.state.tasks.filter((task:Tasks) =>
+                                {this.state.tasks.filter((task: Tasks) =>
                                     task.taskId.toString().trim().toLowerCase().includes(this.state.searchQuery.trim()) ||
                                     task.taskName.toLowerCase().trim().includes(this.state.searchQuery.trim()) ||
                                     task.projectId.toString().trim().toLowerCase().includes(this.state.searchQuery.trim()) ||
-                                    task.projectName.toString().trim().toLowerCase().includes(this.state.searchQuery.trim()) 
+                                    task.projectName.toString().trim().toLowerCase().includes(this.state.searchQuery.trim())
 
                                 ).map((user) => this.renderRow(user))}
                             </tbody>

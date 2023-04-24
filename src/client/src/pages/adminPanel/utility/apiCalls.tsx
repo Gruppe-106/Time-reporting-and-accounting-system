@@ -7,7 +7,18 @@
 export default class APICalls {
 
 
-    public static getUser(id: number) {
+    /**
+     * Gets a single user from the server
+     * @param id If of the user
+     * @returns A user object if found
+     */
+    public static getUser(id: number): Promise<{status:number, data:{
+        email: string,
+        firstName: string,
+        lastName: string,
+        id: number,
+        groupId: number
+    }[]}> {
         return fetch(`/api/user/get?ids=${id}`, {
             method: 'GET',
             headers: {
@@ -28,7 +39,19 @@ export default class APICalls {
             });
     }
 
-    public static getTasks(id: number) {
+    /**
+     * Gets the tasks of a specific user
+     * @param id The id of the user
+     * @returns The tasks and corrosponding projects if any
+     */
+    public static getTasks(id: number): Promise<{
+        status: number, data: {
+            projectId: number,
+            projectName: string,
+            taskId: number,
+            taskName: string
+        }[]
+    }> {
 
         return fetch(`/api/user/task/project/get?user=${id}`, {
             method: 'GET',
@@ -136,7 +159,19 @@ export default class APICalls {
 
     }
 
-    public static getAllManagerGroups() {
+
+    /**
+     * Gets all manager groups
+     * @returns the manager groups object
+     */
+    public static getAllManagerGroups(): Promise<{
+        status: number, data: {
+            managerId: number,
+            firstName: string,
+            lastName: string,
+            groupId: number
+        }[]
+    }> {
 
         return fetch("/api/group/manager/get?manager=*", {
             method: 'GET',

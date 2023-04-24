@@ -1,4 +1,3 @@
-
 import React, {Component} from "react";
 import BaseNavBar from "../../components/navBar";
 import {Button, Container} from "react-bootstrap";
@@ -23,6 +22,9 @@ class ProjectMenu extends Component<any, ProjectMenuState>{
         };
     }
 
+    /**
+     * Renders the project manager page using the ProjectManageInformation component
+     */
     render() {
         return (
             <>
