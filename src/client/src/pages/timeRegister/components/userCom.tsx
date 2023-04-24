@@ -8,6 +8,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 //All interfaces for user component
 import { Api, AddModalApi, TaskRowData, TimeSheetData, TimeSheetProp, TimeSheetState } from "./interfaces"
 
+type NumberWithBoolean = [number, boolean];
+
 /*
 
     * TODO: User timeSheet
@@ -146,7 +148,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
 
         // If the date was not found and the new value is greater than zero, push a new objectData to the row
         if (!dateFound && newValue > 0) {
-          rowData.objectData.push({ date: Date.parse(dates[index]), time: Math.max(0, newValue * 60) });
+          rowData.objectData.push({ date: Date.parse(dates[index]), time: Math.max(0, newValue * 60), approved: false, managerLogged: false});
         }
 
         this.setState({ stateRowData });
@@ -196,7 +198,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
 
         // If the date was not found and the new value is greater than zero, push a new objectData to the row
         if (!dateFound && newValue > 0) {
-          rowData.objectData.push({ date: Date.parse(dates[index]), time: Math.max(0, newValue) });
+          rowData.objectData.push({ date: Date.parse(dates[index]), time: Math.max(0, newValue), approved: false, managerLogged: false });
         }
 
         this.setState({ stateRowData });
@@ -223,8 +225,8 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
             time: item.time,
             taskName: data?.taskName ?? "",
             projectName: data?.projectName ?? "",
-            approved: data?.approved ?? true,
-            managerLogged: data?.managerLogged ?? false
+            approved: item.approved,
+            managerLogged: item.managerLogged
           }
           dataToUpdate.push(dataToUpdate2);
           return true
@@ -346,12 +348,12 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
               // If the task data is already in the Map, update the objectData array.
               let data = taskData.get(task.taskId);
               if (data) {
-                data?.objectData.push({ date: task.date, time: task.time });
+                data?.objectData.push({ date: task.date, time: task.time, approved: task.approved, managerLogged: task.managerLogged });
                 taskData.set(task.taskId, data);
               }
             } else {
               // If the task data is not in the Map, add it with a new objectData array.
-              taskData.set(task.taskId, { projectName: task.projectName ?? "", taskName: task.taskName ?? "", taskId: task.taskId, approved: task.approved, managerLogged: task.managerLogged, objectData: [{ date: task.date, time: task.time }] })
+              taskData.set(task.taskId, { projectName: task.projectName ?? "", taskName: task.taskName ?? "", taskId: task.taskId, objectData: [{ date: task.date, time: task.time, approved: task.approved, managerLogged: task.managerLogged }] })
             }
           }
           this.setState({ stateRowData: taskData })
@@ -395,12 +397,12 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
    * @param timeArr An array to store the time data for each day of the week
    * @returns An array of time data for each day of the week
    */
-  private getTimeFromData(id: number, timeArr: number[]): number[] {
+  private getTimeFromData(id: number, timeArr: NumberWithBoolean[]): NumberWithBoolean[] {
     const { stateRowData, offsetState } = this.state;
 
     // Initialize the time array with 0s for each day of the week
     for (let j = 0; j < 7; j++) {
-      timeArr[j] = 0;
+      timeArr.push([0, false]);
     }
 
     // Get the current week's dates
@@ -419,7 +421,8 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
             const matchDate = dates[i];
             if (currentDate === matchDate) {
               // If the date matches, set the time for that day in the time array
-              timeArr[i] = item.time;
+              timeArr[i][0] = item.time;
+              timeArr[i][1] = item.approved
             }
           }
           return true;
@@ -475,13 +478,13 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     const { stateRowData, searchDataState } = this.state;
 
     // Initialize an array for storing the task time data for each day
-    let arr: number[] = [];
     let rows: JSX.Element[] = [];
 
     // Loop through each task in stateRowData and check if it matches any task in searchDataState
     for (const key of Array.from(stateRowData.keys())) {
       let data = stateRowData.get(key);
       if (data) {
+        let arr: NumberWithBoolean[] = [];
         for (let i = 0; i < searchDataState.length; i++) {
           // If there is a match, get the task name and project name, mark the task as rendered,
           // and get the task time data for each day
@@ -498,13 +501,14 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
                   return (
                     <td key={index} style={{ textAlign: "center", verticalAlign: "middle" }}>
                       <InputGroup size="sm">
-                        <Form.Control type="number" placeholder="0" value={Math.floor(arr[index] / 60)} onChange={(e) => this.handleTimeChange(index, e.target.value, data)} />
+                        <Form.Control disabled={arr[index][1]} type="number" placeholder="0" value={Math.floor(arr[index][0] / 60)} onChange={(e) => this.handleTimeChange(index, e.target.value, data)} />
                         <InputGroup.Text id={`basic-addon-${index}`}>:</InputGroup.Text>
                         <Form.Select
-                          style={{ fontSize: '14px', border: '1px solid #ccc', borderRadius: '0 4px 4px 0', fontFamily: 'Helvetica', color: "#212529" }}
+                          style={{ fontSize: '14px', border: '1px solid #ccc', borderRadius: '0 4px 4px 0', fontFamily: 'Helvetica', color: "#212529", backgroundColor: arr[index][1] ? '#e9ecef' : '#fff' }}
                           className="myFormSelect"
                           bsPrefix="myFormSelect"
-                          defaultValue={arr[index] % 60}
+                          defaultValue={arr[index][0] % 60}
+                          disabled={arr[index][1]} 
                           onChange={(e) => this.handleTimeSelectChange(index, e.target.value, data)}>
                           <option value={0}>0</option>
                           <option value={15}>15</option>
@@ -515,7 +519,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
                     </td>
                   );
                 })}
-                <td>{this.displayTimeTotal(arr.reduce((partialSum, a) => partialSum + a, 0))}</td>
+                <td>{this.displayTimeTotal(arr.reduce((partialSum, [num]) => {return partialSum + num}, 0))}</td>
                 <td><Button variant="danger" onClick={() => this.handleShowDelModal(data?.taskId)}>-</Button></td>
               </tr>
             ))

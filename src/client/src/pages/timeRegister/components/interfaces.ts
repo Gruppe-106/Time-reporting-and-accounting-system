@@ -32,11 +32,11 @@ export interface TaskRowData {
     projectName: string;
     taskName: string;
     taskId: number;
-    approved?: boolean,
-    managerLogged?: boolean
     objectData: {
         time: number;
         date: number;
+        approved: boolean,
+        managerLogged: boolean
     }[]
 }
 
