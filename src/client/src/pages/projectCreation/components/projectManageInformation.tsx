@@ -1,12 +1,10 @@
 import React, {Component} from "react";
 import Col from 'react-bootstrap/Col';
-import Nav from 'react-bootstrap/Nav';
 import Row from 'react-bootstrap/Row';
 import Tab from 'react-bootstrap/Tab';
 import {Alert, Button, Container, Form} from "react-bootstrap";
 import BaseApiHandler from "../../../network/baseApiHandler";
 import {Highlighter, Typeahead} from "react-bootstrap-typeahead";
-import ProjectManageTask from "./projectManageTasks";
 import Modal from "react-bootstrap/Modal";
 
 interface Api{
@@ -76,66 +74,71 @@ class ProjectManageInformation extends Component<ProjectInformationProp> {
         this.handleFormSubmit = this.handleFormSubmit.bind(this)
     }
 
+    /**
+     * Gets information about project, super projects and project leaders
+     */
     componentDidMount() {
-        //First make an instance of the api handler, give it the auth key of the user once implemented
         let apiHandler = new BaseApiHandler();
-        //Run the get or post function depending on need only neccesarry argument is the path aka what comes after the hostname
-        //Callbacks can be used to tell what to do with the data once it's been retrieved
         apiHandler.get(`/api/project/get?ids=${this.state.pageInformation.id}`, {},(value) => {
-            console.log(value)
-            //Then convert the string to the expected object(eg. )
             let json:Api = JSON.parse(JSON.stringify(value))
-            //Then update states or variables or whatever you want with the information
             this.setState({pageInformation: json.data[0]})
-            console.log(json.data)
         })
         apiHandler.get(`/api/project/get?ids=*`, {},(value) => {
-            console.log(value)
-            //Then convert the string to the expected object(eg. )
             let json:SuperProjects = JSON.parse(JSON.stringify(value))
-            //Then update states or variables or whatever you want with the information
             this.setState({parentProjects: json.data})
-            console.log(json.data)
         })
         apiHandler.get(`/api/role/user/get?role=3`, {},(value) => {
-            console.log(value)
-            //Then convert the string to the expected object(eg. )
             let json:ProjectLeaders = JSON.parse(JSON.stringify(value))
-            //Then update states or variables or whatever you want with the information
             this.setState({projectLeaders: json.data})
-            console.log(json.data)
         })
     }
 
+    /**
+     * Handles the current assigned manager
+     */
     private HandleManager(manager: any): void {
         this.setState({
             assignedToManager: manager[0]
         })
     }
+
+    /**
+     * Handles the modal close
+     */
     private handleClose(){
         this.setState({
             show: false
         });
     }
 
+    /**
+     * Handles the modal show
+     */
     private handleShow(){
         this.setState({
             show: true
         })
     }
+
+    /**
+     * Handles the current assigned parent project
+     */
     private HandleParent(selected: any): void {
         this.setState({
             selectedParentProject: selected[0] ? selected[0] : null
         });
     }
 
+    /**
+     * Handles the endDate, this is used for validating if the endDate is valid
+     */
     private handleEndDate(){
         const startDate = new Date((document.getElementById("formBasicStartDate") as HTMLInputElement).value)
         const endDate = new Date((document.getElementById("formBasicEndDate") as HTMLInputElement).value)
         let maxDate: Date = new Date("3000-01-01")
         let minDate: Date = new Date("1970-01-01")
 
-         if (!(minDate > endDate || endDate > maxDate || startDate > endDate)){
+        if (!(minDate > endDate || endDate > maxDate || startDate > endDate)){
             this.setState({invalidEndDate : false})
         }
         else {
@@ -143,6 +146,9 @@ class ProjectManageInformation extends Component<ProjectInformationProp> {
         }
     }
 
+    /**
+     * Handles the startDate, this is used for validating if the startDate is valid
+     */
     private handleStartDate(){
         const startDate = new Date((document.getElementById("formBasicStartDate") as HTMLInputElement).value)
         const endDate = new Date((document.getElementById("formBasicEndDate") as HTMLInputElement).value)
@@ -157,6 +163,10 @@ class ProjectManageInformation extends Component<ProjectInformationProp> {
         }
     }
 
+    /**
+     * Handles the validity of the input form.
+     * This disables the button if the form is not correctly inputted
+     */
     private handleValidity() {
         const button = document.getElementById("submitbutton") as HTMLInputElement | null;
         const projectName = (document.getElementById("formBasicProjectName") as HTMLInputElement).value
@@ -169,6 +179,10 @@ class ProjectManageInformation extends Component<ProjectInformationProp> {
         }
     }
 
+    /**
+     * This handles the formSubmit.
+     * Submits the data to the database
+     */
     handleFormSubmit = () =>{
         const projectName = (document.getElementById("formBasicProjectName") as HTMLInputElement).value !== null ? (document.getElementById("formBasicProjectName") as HTMLInputElement).value : undefined
         const parentProject = this.state.selectedParentProject.id !== null ? this.state.selectedParentProject.id : undefined
@@ -191,31 +205,23 @@ class ProjectManageInformation extends Component<ProjectInformationProp> {
         }
 
         let apiHandler = new BaseApiHandler();
-        apiHandler.put(`/api/project/edit/put`, {body:post_data}, (value) =>{
-            console.log(value);
-
-
+        apiHandler.put(`/api/project/edit/put`, {body:post_data}, () =>{
         })
         this.setState({formSubmitted: true})
         this.handleClose()
     }
 
 
-
+    /**
+     * Renders the project manage information page.
+     * Uses a Form and typeahead to get input.
+     */
     private informationRender():JSX.Element {
         return (
             <Tab.Container id="left-tabs-example" defaultActiveKey="first">
 
                 <Row>
                     <Col sm={2}>
-                        <Nav variant="pills" className="flex-column">
-                            <Nav.Item>
-                                <Nav.Link eventKey="first">Project Information</Nav.Link>
-                            </Nav.Item>
-                            <Nav.Item>
-                                <Nav.Link eventKey="second">Tasks</Nav.Link>
-                            </Nav.Item>
-                        </Nav>
                     </Col>
                     <Col sm={9}>
                         <Tab.Content>
@@ -287,7 +293,7 @@ class ProjectManageInformation extends Component<ProjectInformationProp> {
                                             id="chooseLeader"
                                             labelKey="name"
                                             options={
-                                            this.state.projectLeaders.map(row =>({id: row.userId, name: row.firstName + " " + row.lastName}))
+                                                this.state.projectLeaders.map(row =>({id: row.userId, name: row.firstName + " " + row.lastName}))
                                             }
                                             placeholder={this.state.pageInformation.projectLeader.firstName + " " + this.state.pageInformation.projectLeader.lastName}
                                             onMenuToggle={() => {this.handleValidity.call(this)}}
@@ -312,8 +318,8 @@ class ProjectManageInformation extends Component<ProjectInformationProp> {
                                         />
                                     </Form.Group>
                                     <center>
-                                    <Button variant="success" id="submitbutton" onClick={this.handleShow} size="lg">Submit changes</Button>
-                                        </center>
+                                        <Button variant="success" id="submitbutton" onClick={this.handleShow} size="lg">Submit changes</Button>
+                                    </center>
                                     <Modal show={this.state.show} onHide={this.handleClose}>
                                         <Modal.Header closeButton>
                                             <Modal.Title>Confirm changes</Modal.Title>
@@ -323,7 +329,7 @@ class ProjectManageInformation extends Component<ProjectInformationProp> {
                                             <Button variant="secondary" onClick={this.handleClose}>
                                                 Close
                                             </Button>
-                                        <Button variant="success" type="submit" id="submitbutton" onClick={this.handleFormSubmit}>Confirm changes</Button>
+                                            <Button variant="success" type="submit" id="submitbutton" onClick={this.handleFormSubmit}>Confirm changes</Button>
                                         </Modal.Footer>
                                     </Modal>
                                 </Form>
@@ -334,10 +340,6 @@ class ProjectManageInformation extends Component<ProjectInformationProp> {
                                     </p>
                                 </Alert>) : ""}
                             </Tab.Pane>
-                            <Tab.Pane eventKey="second">
-                                <h3>Task list</h3>
-                                <ProjectManageTask/>
-                            </Tab.Pane>
                         </Tab.Content>
                     </Col>
                 </Row>
@@ -347,6 +349,9 @@ class ProjectManageInformation extends Component<ProjectInformationProp> {
         )
     }
 
+    /**
+     * Renders the elements
+     */
     render() {
         return(
             <div>

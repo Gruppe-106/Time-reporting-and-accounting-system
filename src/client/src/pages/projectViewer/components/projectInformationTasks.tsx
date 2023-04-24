@@ -23,6 +23,7 @@ interface TaskProjectApi{
     }[]
 }
 
+//Finds the search query which will be used to get information about relevant information
 const queryString = window.location.search;
 const params = new URLSearchParams(queryString);
 const id = parseInt(params.get("id") as string);
@@ -44,32 +45,31 @@ class ProjectTaskTable extends Component<any> {
         }]
     }
 
-
+    /**
+     * Gets project information and stores in json file
+     * it will then push task id's into an array.
+     * This array is then used to get information about the tasks in a new state.
+     */
     componentDidMount() {
-        //First make an instance of the api handler, give it the auth key of the user once implemented
         let apiHandler = new BaseApiHandler();
-        //Run the get or post function depending on need only neccesarry argument is the path aka what comes after the hostname
-        //Callbacks can be used to tell what to do with the data once it's been retrieved
         apiHandler.get(`/api/task/project/get?project=${id}`,{}, (value) => {
-            console.log(value)
-            //Then convert the string to the expected object(eg. )
             let json:TaskProjectApi = JSON.parse(JSON.stringify(value))
-            //Then update states or variables or whatever you want with the information
             this.setState({task: json.data})
-            console.log(json)
             let id = []
             for (const task of json.data) {
                 id.push(task.taskId)
             }
             apiHandler.get(`/api/task/get?ids=${id}`, {}, (tasks) => {
-                console.log(tasks)
                 let json:Api = JSON.parse(JSON.stringify(tasks))
                 this.setState({tableRows: json.data})
-                console.log(json.data)
             })
         })
-        }
+    }
 
+    /**
+     * Maps the information gotten to table data
+     * returns these elements to be used in a table.
+     */
     private tableRender():JSX.Element[] {
         return this.state.tableRows.map(row => (
             <tr key={row.id}>
@@ -82,6 +82,10 @@ class ProjectTaskTable extends Component<any> {
         ))
     }
 
+    /**
+     * renders a table with table rows.
+     * Calls tableRender to input information
+     */
     render() {
         return(
             <Table bordered hover>

@@ -1,6 +1,3 @@
-/*
-    Show a list of projects a user is related to
- */
 import React, {Component} from "react";
 import BaseNavBar from "../../components/navBar";
 import {Container} from "react-bootstrap";
@@ -20,6 +17,9 @@ class ProjectMenu extends Component<any, ProjectMenuState>{
         };
     }
 
+    /**
+     * Renders the project menu component
+     */
     render() {
         return (
             <>

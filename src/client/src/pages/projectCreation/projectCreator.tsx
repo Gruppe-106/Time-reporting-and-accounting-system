@@ -1,6 +1,3 @@
-/*
-    Show a list of projects a user is related to
- */
 import React, {Component} from "react";
 import BaseNavBar from "../../components/navBar";
 import {Button, Col, Container} from "react-bootstrap";
@@ -8,24 +5,28 @@ import {ProjectTableRow} from "../projectViewer/components/projectTable";
 import ProjectCreate from "./components/projectCreate";
 import Row from "react-bootstrap/Row";
 
-interface  ProjectMenuState{
+interface ProjectMenuState {
     projects: ProjectTableRow[];
 }
 
+//Gets search query, to use id to get correct page
 const queryString = window.location.search;
 const params = new URLSearchParams(queryString);
 const id = parseInt(params.get("id") as string);
 
-class ProjectCreator extends Component<any, ProjectMenuState>{
+class ProjectCreator extends Component<any, ProjectMenuState> {
 
-    constructor(props:any) {
+    constructor(props: any) {
         super(props);
 
-        this.state ={
+        this.state = {
             projects: []
         };
     }
 
+    /**
+     * Renders the project creator page using the ProjectCreate component
+     */
     render() {
         return (
             <>

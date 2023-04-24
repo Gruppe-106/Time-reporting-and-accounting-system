@@ -43,22 +43,22 @@ class ProjectInformation extends Component<ProjectInformationProp> {
         this.state.pageInformation.id = props.id;
     }
 
-    componentDidMount() {
-        //First make an instance of the api handler, give it the auth key of the user once implemented
+    /**
+     * Creates new apiHandler
+     * gets project information and stores it in a json file
+     * sets the state of pageInformation to the data of the json file
+     */
+    componentDidMount():void {
         let apiHandler = new BaseApiHandler();
-        //Run the get or post function depending on need only neccesarry argument is the path aka what comes after the hostname
-        //Callbacks can be used to tell what to do with the data once it's been retrieved
         apiHandler.get(`/api/project/get?ids=${this.state.pageInformation.id}`, {},(value) => {
-            console.log(value)
-            //Then convert the string to the expected object(eg. )
             let json:Api = JSON.parse(JSON.stringify(value))
-            //Then update states or variables or whatever you want with the information
             this.setState({pageInformation: json.data[0]})
-            console.log(json.data)
         })
     }
 
-
+    /**
+     * returns HTML a Tab Container containing pages of Project Information, Members and tasks
+     */
     private informationRender():JSX.Element {
         return (
             <Tab.Container id="left-tabs-example" defaultActiveKey="first">
@@ -113,6 +113,9 @@ class ProjectInformation extends Component<ProjectInformationProp> {
         )
     }
 
+    /**
+     * renders the HTML elements
+     */
     render() {
         return(
             <div>
