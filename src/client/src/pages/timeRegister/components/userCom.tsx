@@ -243,11 +243,11 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
         if (item.taskId === prevRowSubmitData[i].taskId &&
           item.date === prevRowSubmitData[i].date &&
           item.time === prevRowSubmitData[i].time) {
-          console.log("Previos data:");
+          console.log("No data submitted, for:" + item.date + "" + item.taskId);
           foundItem = true;
         } else if (item.taskId === prevRowSubmitData[i].taskId &&
           item.date === prevRowSubmitData[i].date) { // Should put data
-          console.log("Update data:");
+          console.log("Updated data for:" + item.date + "" + item.taskId);
           item.managerLogged = false
           console.log(item)
           let apiHandler = new BaseApiHandler();
@@ -262,7 +262,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
       if (!foundItem) {
         delete item.taskName
         item.managerLogged = false
-        console.log("New data:");
+        console.log("Added new data for:" + item.date + "" + item.taskId);
         let apiHandler = new BaseApiHandler();
         apiHandler.post(`/api/time/register/post`, { body: item }, (value) => {
           console.log(value);
@@ -280,7 +280,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
       deletedItem[k].time = 60 // Should be 0
       deletedItem[k].userId = userId
       deletedItem[k].managerLogged = false
-      console.log("Deleted data:")
+      console.log("Deleted data");
       let apiHandler = new BaseApiHandler();
       apiHandler.put(`/api/time/register/edit/put`, { body: deletedItem[k] }, (value) => {
         console.log(value);

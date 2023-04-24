@@ -43,13 +43,12 @@ class UserTimeSheet extends Component<{}, UserState> {
    * @returns The TimeSheetPage component if a user is selected, otherwise nothing is rendered.
    */
   private renderTimeSheet() {
-    const { userId, dataOfUser } = this.state;
+    const { userId } = this.state;
     const selectedUser = userId;
 
     if (selectedUser > 0) {
       return <TimeSheetPage key={selectedUser} userId={selectedUser} adminPicked={true} />;
     }
-    console.log(dataOfUser)
   }
 
   render() {
