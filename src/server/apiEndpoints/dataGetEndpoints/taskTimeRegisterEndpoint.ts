@@ -8,7 +8,7 @@ import MysqlQueryBuilder, {MySQLJoinTypes} from "../../database/mysqlStringBuild
  */
 class TaskTimeRegisterEndpoint extends GetEndpointBase {
     urlPrimaryKey: PrimaryKeyType[] = [
-        { urlKey: "user", mysqlKey: "userId", throwOnMissing: true, allowAll: true }
+        { urlKey: "user", mysqlKey: "userId", throwOnMissing: true, allowAll: false }
     ];
     dataKey: PrimaryKeyType = {
         urlKey: "period", mysqlKey: "", throwOnMissing: false
@@ -33,7 +33,7 @@ class TaskTimeRegisterEndpoint extends GetEndpointBase {
 
         // Check if a where condition is needed
         let where: string = undefined;
-        if (keyEqual !== undefined && allColumns)
+        if (keyEqual !== undefined)
             where = mysqlBuilder.where([primaryKey, keyEqual]);
 
         // If a specific period is specified, add that to where string

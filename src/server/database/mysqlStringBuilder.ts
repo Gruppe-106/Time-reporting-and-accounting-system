@@ -64,8 +64,11 @@ class MysqlQueryBuilder {
      */
     where(condition?: [key: string, equals: string[]], currentWhere?: string): string {
         if (condition === undefined || condition[1].indexOf("*") !== -1) return "";
-        if (currentWhere !== undefined) return currentWhere + ` AND ${condition[0]} IN (${condition[1]})`
-        return `WHERE ${condition[0]} IN (${condition[1]})`;
+        let values: string[] = condition[1].map(value => {return `'${value}'`;});
+        let conditionString:string = `${condition[0]} IN (${values})`;
+        if (values.length === 1) conditionString = ` ${condition[0]}=${values}`
+        if (currentWhere !== undefined) return currentWhere + " AND " + conditionString
+        return `WHERE ` + conditionString;
     }
 
     /**
@@ -75,7 +78,7 @@ class MysqlQueryBuilder {
      * @returns A string representing the WHERE clause of the query
      */
     whereDates(betweenDates?: [key: string, start: string, end: string], currentWhere?: string): string {
-        if (betweenDates === undefined) return "";
+        if (betweenDates === undefined) return currentWhere;
         if (currentWhere !== undefined) return currentWhere + ` AND ${betweenDates[0]} BETWEEN '${betweenDates[1]}' AND '${betweenDates[2]}'`;
         return `WHERE ${betweenDates[0]} BETWEEN '${betweenDates[1]}' AND '${betweenDates[2]}'`;
     }

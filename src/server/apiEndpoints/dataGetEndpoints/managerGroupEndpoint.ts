@@ -60,7 +60,6 @@ class ManagerGroupEndpoint extends GetEndpointBase {
         let results: ManagerGroupReturnType[] = response.results;
 
         if (results.length === 0) return [{error: "Failed to get data, couldn't find group"}];
-
         //Ensure the data sent to client has the correct layout
         let finalResult: ManagerGroupReturnType[] = results.map(result => ({
             managerId: result.managerId,
@@ -95,19 +94,19 @@ class ManagerGroupEndpoint extends GetEndpointBase {
         // Create a MySQL query builder
         let mysqlBuilder: MysqlQueryBuilder = new MysqlQueryBuilder()
             .from("GROUPS_CONNECTOR", where, undefined, "g")
-            .addColumnsToGet(["g.groupId"]);
+            .addColumnsToGet(["g.groupId as groupId"]);
 
         // Add columns to retrieve from GROUPS_CONNECTOR table
-        if (requestValues.indexOf("managerId") !== -1 || allColumns) mysqlBuilder.addColumnsToGet(["g.managerId"]);
+        if (requestValues.indexOf("managerId") !== -1 || allColumns) mysqlBuilder.addColumnsToGet(["g.managerId as managerId"]);
 
         // Add columns to retrieve from USERS table
         if (requestValues.indexOf("firstName") !== -1 || allColumns) {
             mysqlBuilder.join(MySQLJoinTypes.CROSS, "USERS", ["u.id", "g.managerId"], "u")
-                .addColumnsToGet(["u.firstName"]);
+                .addColumnsToGet(["u.firstName as firstName"]);
         }
         if (requestValues.indexOf("lastName") !== -1 || allColumns) {
             mysqlBuilder.join(MySQLJoinTypes.CROSS, "USERS", ["u.id", "g.managerId"], "u")
-                .addColumnsToGet(["u.lastName"]);
+                .addColumnsToGet(["u.lastName as lastName"]);
         }
 
         // Return the MySQL query string
@@ -122,17 +121,19 @@ class ManagerGroupEndpoint extends GetEndpointBase {
      */
     private async getEmployeeData(finalResult: ManagerGroupReturnType[]) {
         //Find all group ids to find employees for
-        let groupId: number[] = finalResult.map(result => result.groupId);
-
+        let groupIds: number[] = [];
+        for (const result of finalResult) {
+            groupIds.push(result.groupId);
+        }
         //Send query to get all employees with a group id found above
-        let employeeQuery: string = `SELECT id,firstName,lastName,email,groupId from USERS WHERE groupId IN (${groupId}) ORDER BY groupId`;
+        let employeeQuery: string = `SELECT * from USERS WHERE groupId IN (${groupIds}) ORDER BY groupId`;
         let employeeResponse: MySQLResponse = await this.mySQL.sendQuery(employeeQuery);
         if (employeeResponse.error !== null) throw new Error("[MySQL] Failed to retrieve data");
-
         //Loop through all employees and add them to the correct group
         let employeeResult: UserDataType[] = employeeResponse.results;
         let mainIndex = 0;
         for (const user of employeeResult) {
+            if (user.groupId === undefined) continue
             //Get the correct index for the specific user, as the list of users & group is sorted by groupId it's fine to just increment until correct
             for (; finalResult[mainIndex].groupId !== user.groupId; mainIndex++) ;
             //Add the employee to the group

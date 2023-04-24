@@ -18,6 +18,15 @@ class TaskEndpoint extends  GetEndpointBase {
         "timeTypeName"
     ];
 
+    // List of columns in the base table and what key should be request for getting columns
+    private baseColumns: {request: string, column: string}[] = [
+        { request: "id",             column: "t.id as id" },
+        { request: "name",           column: "t.name as name" },
+        { request: "startDate",      column: "t.startDate as startDate" },
+        { request: "endDate",        column: "t.endDate as endDate" },
+        { request: "timeType",       column: "t.timeType as timeType" }
+    ]
+
     /**
      * Gets data from DB and convert to client format
      * @param requestValues String[]: the values to request from the DB also known as columns
@@ -44,18 +53,17 @@ class TaskEndpoint extends  GetEndpointBase {
                 .addColumnsToGet(["tt.name"]);
         }
 
-        // Add requested columns to MySQL query
-        if (allColumns) {
-            requestValues = this.allowedColumns;
-        }
-        mysqlBuilder.addColumnsToGet(requestValues.filter((value) => {if (value !== "timeTypeName") return `t.${value}`}));
+        //Find all columns to find in the database
+        this.baseColumns.forEach((value) => {
+            if (requestValues.indexOf(value.request) !== -1 || allColumns) mysqlBuilder.addColumnsToGet([value.column]);
+        });
     
         // Send MySQL query and convert dates to number format
         let response:MySQLResponse = await this.mySQL.sendQuery(mysqlBuilder.build());
         if (response.error !== null) throw new Error("[MySQL] Failed to retrieve data");
-        for (const result of response.results) {
-            if (result.startDate) result.startDate = this.mySQL.dateToNumber(result.startDate);
-            if (result.endDate)   result.endDate   = this.mySQL.dateToNumber(result.endDate);
+        for (let i = 0; i < response.results.length; i++) {
+            if (response.results[i].startDate !== undefined) response.results[i].startDate = this.mySQL.dateToNumber(response.results[i].startDate);
+            if (response.results[i].endDate !== undefined)   response.results[i].endDate   = this.mySQL.dateToNumber(response.results[i].endDate);
         }
 
         return response.results;

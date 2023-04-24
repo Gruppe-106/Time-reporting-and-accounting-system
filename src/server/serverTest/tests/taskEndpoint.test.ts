@@ -1,8 +1,9 @@
 import BaseApiHandler from "../../../client/src/network/baseApiHandler";
-import {headers} from "../testBaseConfig";
+import {getConfig} from "../testBaseConfig";
 import {TaskCreationData} from "../../apiEndpoints/dataPostEndpoints/taskCreationEndpoint";
 
-const apiHandler = new BaseApiHandler("http://localhost:8080");
+const apiHandler: BaseApiHandler = new BaseApiHandler("http://localhost:8080");
+let headers: Record<string, string> = getConfig();
 
 describe("Task API", () => {
     describe("Task GET API", () => {
@@ -15,22 +16,39 @@ describe("Task API", () => {
         test("Success get message with single ID", async () => {
             apiHandler.get("/api/task/get?ids=1", {headers: headers}, (value) => {
                 expect(value).toStrictEqual({
-                    "status":200,
-                    "data": [
-                        {"name":"Task X","id":1,"startDate":1679266800000,"endDate":1682460000000,"timeType":1}
+                    status: 200,
+                    data: [
+                        {
+                            name: 'Project Info Task',
+                            id: 1,
+                            startDate: 1679266800000,
+                            endDate: 1682460000000,
+                            timeType: 1
+                        }
                     ]
                 });
             });
         });
 
         test("Success get message with multiple IDs", async () => {
-            apiHandler.get("/api/task/get?ids=1,3,5", {headers: headers}, (value) => {
+            apiHandler.get("/api/task/get?ids=1,2", {headers: headers}, (value) => {
                 expect(value).toStrictEqual({
-                    "status":200,
-                    "data": [
-                        {"name":"Task X","id":1,"startDate":1679266800000,"endDate":1682460000000,"timeType":1},
-                        {"name":"Task Z","id":3,"startDate":1679266800000,"endDate":1682460000000,"timeType":1},
-                        {"name":"Task B","id":5,"startDate":1679526000000,"endDate":1685052000000,"timeType":1}
+                    status: 200,
+                    data: [
+                        {
+                            name: 'Project Info Task',
+                            id: 1,
+                            startDate: 1679266800000,
+                            endDate: 1682460000000,
+                            timeType: 1
+                        },
+                        {
+                            name: 'Task Get Task',
+                            id: 2,
+                            startDate: 1679266800000,
+                            endDate: 1682460000000,
+                            timeType: 1
+                        }
                     ]
                 });
             });
@@ -40,16 +58,15 @@ describe("Task API", () => {
     describe("Task Creation API", () => {
         test("Success case", async () => {
             let bodySuccess: TaskCreationData = {
-                projectId: 2,
+                projectId: 4,
                 task: {
-                    name: "Task test",
-                    userId: [1, 2, 3],
+                    name: "Task test Post",
+                    userId: [8],
                     startDate: 1679266800000,
                     endDate: 1682460000000,
                     timeType: 1
                 }
             }
-
             apiHandler.post("/api/task/creation/post", {headers: headers, body: bodySuccess}, (value) => {
                 expect(value["data"]["success"]).toMatch("true");
             });

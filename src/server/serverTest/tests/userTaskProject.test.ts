@@ -1,7 +1,8 @@
 import BaseApiHandler from "../../../client/src/network/baseApiHandler";
-import {headers} from "../testBaseConfig";
+import {getConfig} from "../testBaseConfig";
 
-const apiHandler = new BaseApiHandler("http://localhost:8080");
+const apiHandler: BaseApiHandler = new BaseApiHandler("http://localhost:8080");
+let headers: Record<string, string> = getConfig();
 
 describe("User Task Project API", () => {
     describe("GET API", () => {
@@ -12,7 +13,7 @@ describe("User Task Project API", () => {
         });
 
         test("Success GET message", async () => {
-            apiHandler.get("/api/user/task/project/get?user=11", {headers: headers}, (value) => {
+            apiHandler.get("/api/user/task/project/get?user=16", {headers: headers}, (value) => {
                 expect(value["status"]).toBe(200);
                 expect(value).toStrictEqual({
                     status: 200,

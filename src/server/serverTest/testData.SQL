@@ -107,3 +107,154 @@ INSERT IGNORE INTO TASKS_PROJECTS_CONNECTOR
 VALUES
     (1,3),
     (1,3);
+
+# ----------------------------------------
+# ---------------- Task ------------------
+# ----------------------------------------
+
+# %%%%%%%%%%%%%%%%% Get %%%%%%%%%%%%%%%%%%
+INSERT IGNORE INTO TASKS
+(name, startDate, endDate, timeType)
+VALUES
+    ('Task Get Task','2023-03-20','2023-04-26',1); # Id 2
+
+# %%%%%%%%%%%%%%%%% Post %%%%%%%%%%%%%%%%%%
+INSERT IGNORE INTO PROJECTS
+(superProjectId, name, startDate, endDate)
+VALUES
+    (0,'Project Task Post','2023-03-20','2023-04-22');   # Id 4
+
+INSERT INTO USERS
+(email,firstName,lastName,groupId)
+VALUES
+    ('groupposttask@example.com','Task','Post', 1); # Id 8
+
+# ----------------------------------------
+# ---------- Time task register ----------
+# ----------------------------------------
+
+# %%%%%%%%%%%%%%%%% Get %%%%%%%%%%%%%%%%%%
+INSERT IGNORE INTO TASKS
+(name, startDate, endDate, timeType)
+VALUES
+    ('Task Get Task','2023-03-20','2023-04-26',1); # Id 3
+
+INSERT IGNORE INTO PROJECTS
+(superProjectId, name, startDate, endDate)
+VALUES
+    (0,'Project Task Post','2023-03-20','2023-04-22');   # Id 5
+
+INSERT IGNORE INTO TASKS_PROJECTS_CONNECTOR
+(taskId, projectId)
+VALUES
+    (3,5);
+
+INSERT INTO USERS
+(email,firstName,lastName,groupId)
+VALUES
+    ('timeregisterget@example.com','Task','Register', 1); # Id 9
+
+INSERT IGNORE INTO USERS_TASKS_CONNECTOR
+(userId,taskId)
+VALUES
+    (9,3);
+
+INSERT IGNORE INTO USERS_TASKS_TIME_REGISTER
+(date,taskId,userId,time,approved,managerLogged)
+VALUES
+    ('2023-01-01',3,9,30,0,0),
+    ('2023-12-01',3,9,60,0,0);
+
+# %%%%%%%%%%%%%%%%% Put %%%%%%%%%%%%%%%%%%
+
+INSERT IGNORE INTO TASKS
+(name, startDate, endDate, timeType)
+VALUES
+    ('Task Put Task','2023-03-20','2023-04-26',1); # Id 4
+
+INSERT IGNORE INTO PROJECTS
+(superProjectId, name, startDate, endDate)
+VALUES
+    (0,'Project Task Put','2023-03-20','2023-04-22'); # Id 6
+
+INSERT IGNORE INTO TASKS_PROJECTS_CONNECTOR
+(taskId, projectId)
+VALUES
+    (4,6);
+
+INSERT INTO USERS
+(email,firstName,lastName,groupId)
+VALUES
+    ('timeregisterput@example.com','Task','RegisterPut', 1); # Id 10
+
+INSERT IGNORE INTO USERS_TASKS_CONNECTOR
+(userId,taskId)
+VALUES
+    (10,4);
+
+INSERT IGNORE INTO USERS_TASKS_TIME_REGISTER
+(date,taskId,userId,time,approved,managerLogged)
+VALUES
+    ('2023-01-01',4,10,30,0,0);
+
+# ----------------------------------------
+# ---------- Time task register ----------
+# ----------------------------------------
+
+# %%%%%%%%%%%%%%%%% Get %%%%%%%%%%%%%%%%%%
+INSERT INTO USERS
+(email,firstName,lastName,groupId)
+VALUES
+    ('userget1@example.com','User','Get1', 1), # Id 11
+    ('userget2@example.com','User','Get2', 1); # Id 12
+
+# %%%%%%%%%%%%%%%%% Put %%%%%%%%%%%%%%%%%%
+INSERT INTO USERS
+(email,firstName,lastName,groupId)
+VALUES
+    ('userput@example.com','User','Put', 1); # Id 13
+
+# ----------------------------------------
+# ----------------- Role -----------------
+# ----------------------------------------
+
+# %%%%%%%%%%%%%%%%% Get %%%%%%%%%%%%%%%%%%
+INSERT INTO USERS
+(email,firstName,lastName,groupId)
+VALUES
+    ('roleget1@example.com','User','Role1', 1), # Id 14
+    ('roleget2@example.com','User','Role2', 1); # Id 15
+
+INSERT INTO USERS_ROLES_CONNECTOR
+(roleId,userID)
+VALUES
+    (3, 14),
+    (3, 15);
+
+# ----------------------------------------
+# ---------- User Task Project -----------
+# ----------------------------------------
+
+# %%%%%%%%%%%%%%%%% Get %%%%%%%%%%%%%%%%%%
+INSERT INTO USERS
+(email,firstName,lastName,groupId)
+VALUES
+    ('usertaskproject@example.com','User','TaskProject', 1); # Id 16
+
+INSERT IGNORE INTO TASKS
+(name, startDate, endDate, timeType)
+VALUES
+    ('Task Put Task 1','2023-03-20','2023-04-26',1), # Id 5
+    ('Task Put Task 2','2023-03-20','2023-04-26',1); # Id 6
+
+INSERT IGNORE INTO PROJECTS
+(superProjectId, name, startDate, endDate)
+VALUES
+    (0,'Project Task Put 1','2023-03-20','2023-04-22'), # Id 7
+    (0,'Project Task Put 2','2023-03-20','2023-04-22'); # Id 8
+
+INSERT IGNORE INTO TASKS_PROJECTS_CONNECTOR
+(taskId, projectId)
+VALUES
+    (5,7),
+    (6,8);
