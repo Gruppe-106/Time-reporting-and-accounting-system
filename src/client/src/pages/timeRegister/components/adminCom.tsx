@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { Container, Form } from "react-bootstrap";
 import TimeSheetPage from "./userCom";
-import { UserState } from "./interfaces"
+import BaseApiHandler from "../../../network/baseApiHandler";
+import { UserState, UserAPI } from "./interfaces"
 
 class UserTimeSheet extends Component<{}, UserState> {
   constructor(props: {}) {
@@ -9,6 +10,7 @@ class UserTimeSheet extends Component<{}, UserState> {
 
     this.state = {
       userId: 0,
+      dataOfUser: []
     };
   }
 
@@ -17,30 +19,44 @@ class UserTimeSheet extends Component<{}, UserState> {
     this.setState({ userId: newId });
   }
 
+
+  componentDidMount() {
+    let apiHandler = new BaseApiHandler();
+    apiHandler.get(
+      `/api/user/get?ids=*&var=id,firstName,lastName`, {},
+      (value) => {
+        let json: UserAPI = JSON.parse(JSON.stringify(value));
+        if (json.status === 200) {
+          this.setState({ dataOfUser: json.data })
+        }
+      }
+    );
+  }
+
+
+
+
   private renderTimeSheet() {
-    const { userId } = this.state;
+    const { userId, dataOfUser } = this.state;
     const selectedUser = userId;
 
     if (selectedUser > 0) {
-      return <TimeSheetPage key={selectedUser} userId={selectedUser} />;
+      return <TimeSheetPage key={selectedUser} userId={selectedUser} adminPicked={true} />;
     }
+    console.log(dataOfUser)
   }
 
   render() {
+    const { dataOfUser } = this.state;
     return (
       <Container fluid="sm">
         <Form.Select onChange={(e) => this.handleSelectChange(e.target.value)}>
-          <option>Select user</option>
-          <option value={1}>One</option>
-          <option value={2}>Two</option>
-          <option value={3}>Three</option>
-          <option value={4}>Four</option>
-          <option value={5}>Five</option>
-          <option value={6}>Six</option>
-          <option value={7}>Seven</option>
-          <option value={8}>Eight</option>
-          <option value={9}>Nine</option>
-          <option value={10}>Ten</option>
+        <option key={0}>Select user</option>
+          {dataOfUser.map((item) => {
+            return (
+              <option key={item.id} value={item.id}>{item.firstName} {item.lastName}, {item.id}</option>
+            );
+          })}
         </Form.Select>
         {this.renderTimeSheet()}
       </Container>

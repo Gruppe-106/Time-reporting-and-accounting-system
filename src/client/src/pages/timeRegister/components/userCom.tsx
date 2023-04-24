@@ -148,7 +148,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
 
         // If the date was not found and the new value is greater than zero, push a new objectData to the row
         if (!dateFound && newValue > 0) {
-          rowData.objectData.push({ date: Date.parse(dates[index]), time: Math.max(0, newValue * 60), approved: false, managerLogged: false});
+          rowData.objectData.push({ date: Date.parse(dates[index]), time: Math.max(0, newValue * 60), approved: false, managerLogged: false });
         }
 
         this.setState({ stateRowData });
@@ -508,7 +508,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
                           className="myFormSelect"
                           bsPrefix="myFormSelect"
                           defaultValue={arr[index][0] % 60}
-                          disabled={arr[index][1]} 
+                          disabled={arr[index][1]}
                           onChange={(e) => this.handleTimeSelectChange(index, e.target.value, data)}>
                           <option value={0}>0</option>
                           <option value={15}>15</option>
@@ -519,7 +519,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
                     </td>
                   );
                 })}
-                <td>{this.displayTimeTotal(arr.reduce((partialSum, [num]) => {return partialSum + num}, 0))}</td>
+                <td>{this.displayTimeTotal(arr.reduce((partialSum, [num]) => { return partialSum + num }, 0))}</td>
                 <td><Button variant="danger" onClick={() => this.handleShowDelModal(data?.taskId)}>-</Button></td>
               </tr>
             ))
@@ -528,6 +528,19 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
       }
     }
     return rows;
+  }
+
+  renderButton() {
+    const { adminPicked } = this.props
+
+    if (!adminPicked) {
+      return (
+        <div>
+          <Button variant="primary" type="button" onClick={() => this.handleShowAddModal()}>Add Row</Button>
+          <Button variant="primary" type="button" style={{ float: "right" }} onClick={() => this.handleSubmitButton()} >Submit</Button>
+        </div>
+      );
+    }
   }
 
   render() {
@@ -539,8 +552,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
           {this.renderHeaderRow()}
           <tbody>{this.renderTaskRows()}</tbody>
         </Table>
-        <Button variant="primary" type="button" onClick={() => this.handleShowAddModal()}>Add Row</Button>
-        <Button variant="primary" type="button" style={{ float: "right" }} onClick={() => this.handleSubmitButton()} >Submit</Button>
+        {this.renderButton()}
         <center>
           <ButtonGroup aria-label="Basic example">
             <Button onClick={() => this.handleButtonClick(-7)} variant="primary">
@@ -551,7 +563,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
             </Button>
           </ButtonGroup>
         </center>
-        <p>Delete task at date:</p>
+        {this.props.adminPicked === true ? null : <p>Delete task at date:</p>}
         {deletedItems.map((item, index) => {
           return <p key={index}>{item.taskName}, at {dateStringFormatter(item.date)}</p>
         })}
