@@ -11,11 +11,7 @@ import { Api, AddModalApi, TaskRowData, TimeSheetData, TimeSheetProp, TimeSheetS
 /*
 
     * TODO: User timeSheet
-      * Only render table row if there is time for said table, otherwise be able to create a row for that task.
-      * (Need api for project name and task name connected to user).
-      * 
-      * 
-      * Submit button (Post data)
+    * 
 
 */
 
@@ -40,7 +36,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
         projectId: Infinity,
         projectName: "",
       },
-      offsetState: -28,
+      offsetState: 0,
       isUpdating: false,
       showAddRowModal: false,
       headerDates: [],
@@ -54,9 +50,16 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     };
   }
 
+  /*
+    * Button handlers
+  */
   private handleCloseDelModal = () => {
     this.setState({ showDeleteRowModal: false });
   };
+  /**
+   * Takes the taskId from the row, which is the key in the stateRowData Map, and setState from delRowTaskProject
+   * @param rowId 
+   */
   private handleShowDelModal = (rowId: number | undefined) => {
     const { stateRowData } = this.state
     if (rowId) {
@@ -66,6 +69,9 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     this.setState({ deleteId: rowId });
     this.setState({ showDeleteRowModal: true });
   };
+  /**
+   * Deletes the row depended on the the rowId, set in handleShowDelModal()
+   */
   private handleDeleteRow = () => {
     const { stateRowData, deleteId } = this.state;
     if (deleteId) {
@@ -74,13 +80,15 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     this.setState({ stateRowData });
     this.handleCloseDelModal();
   }
-  // ************************************************
   private handleCloseAddModal = () => {
     this.setState({ showAddRowModal: false })
   }
   private handleShowAddModal = () => {
     this.setState({ showAddRowModal: true })
   }
+  /**
+   * Adds a project withput any time data
+   */
   private handleAddRow = () => {
     const { stateRowData, selectedProject } = this.state
 
@@ -89,29 +97,42 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     this.handleCloseAddModal();
   }
 
+  /**
+   * Changes the time value for a specific task row data at a given date index in the TimeSheet.
+   * @param index - The index of the date for which the time value needs to be changed.
+   * @param value - The new time value to be set.
+   * @param data - The task row data object to which the time value belongs.
+   */
   private handleTimeChange(index: number, value: string, data: TaskRowData | undefined) {
     const { stateRowData, offsetState } = this.state;
 
+    // Changes the value to a number and checks if number is under 0
     let newValue: number = parseInt(value);
     if (isNaN(newValue)) {
       newValue = 0
     }
 
+    // gets dates for a week
     let dates: string[] = [];
     getCurrentWeekDates(dates, offsetState);
 
+    // Loop through each task in stateRowData data
     for (const key of Array.from(stateRowData.keys())) {
       let rowData = stateRowData.get(key);
       if (data && rowData && data.taskId === rowData.taskId) {
+        // Loop through each objectData of the current row
         let dateFound: boolean = false;
         rowData.objectData.map((item) => {
           let minutes = item.time % 60
+          // If the date of the item matches the selected date
           if (item.date === Date.parse(dates[index])) {
+            // If the new value + the minutes is zero, remove the item from the array
             if (newValue + minutes === 0 && rowData) {
               rowData.objectData = rowData.objectData.filter(
                 (objItem) => objItem.date !== item.date
               );
             } else {
+              // Update the time of the item with the new value
               if (newValue < item.time / 60) {
                 item.time = newValue * 60 + (minutes);
               } else {
@@ -123,6 +144,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
           return item; // just to return something
         });
 
+        // If the date was not found and the new value is greater than zero, push a new objectData to the row
         if (!dateFound && newValue > 0) {
           rowData.objectData.push({ date: Date.parse(dates[index]), time: Math.max(0, newValue * 60) });
         }
@@ -133,26 +155,38 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     }
   }
 
+  /**
+     * This function handles the change event for a time select input. It takes in three parameters:
+     * @param index - the index of the selected option
+     * @param value - the value of the selected option
+     * @param data - an object that represents the row data for a task
+   */
   private handleTimeSelectChange(index: number, value: string, data: TaskRowData | undefined) {
     const { stateRowData, offsetState } = this.state;
 
     let newValue = parseInt(value);
 
+    // gets dates for a week
     let dates: string[] = [];
     getCurrentWeekDates(dates, offsetState);
 
+    // Loop through each task in stateRowData data
     for (const key of Array.from(stateRowData.keys())) {
       let rowData = stateRowData.get(key);
       if (data && rowData && data.taskId === rowData.taskId) {
+        // Loop through each objectData of the current row
         let dateFound: boolean = false;
         rowData.objectData.map((item) => {
           let hoursInMinutes = Math.floor(item.time / 60) * 60
+          // If the date of the item matches the selected date
           if (item.date === Date.parse(dates[index])) {
+            // If the new value + the minutes is zero, remove the item from the array
             if (newValue + hoursInMinutes === 0 && rowData) {
               rowData.objectData = rowData.objectData.filter(
                 (objItem) => objItem.date !== item.date
               );
             } else {
+              // Update the time of the item with the new value
               item.time = newValue + hoursInMinutes;
             }
             dateFound = true;
@@ -160,6 +194,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
           return item; // just to return something
         });
 
+        // If the date was not found and the new value is greater than zero, push a new objectData to the row
         if (!dateFound && newValue > 0) {
           rowData.objectData.push({ date: Date.parse(dates[index]), time: Math.max(0, newValue) });
         }
@@ -170,9 +205,13 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     }
   }
 
+  /**
+   * This function handles the submit button click event. It updates, creates, and deletes time sheet data.
+   */
   private handleSubmitButton() { // The put and post request should console.log more usefull information
     const { stateRowData, prevRowSubmitData } = this.state
     const { userId } = this.props
+    // Create an array of time sheet data objects to update
     let dataToUpdate: TimeSheetData[] = [];
     for (const key of Array.from(stateRowData.keys())) {
       let data = stateRowData.get(key);
@@ -192,19 +231,21 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
         });
       }
     }
+    // Loop through the data to update, send PUT requests for existing data, and POST requests for new data
     dataToUpdate.map((item) => {
       let foundItem = false;
       delete item.projectName;
       item.userId = userId;
+      // Check if the data already exists
       for (let i = 0; i < prevRowSubmitData.length; i++) {
         if (item.taskId === prevRowSubmitData[i].taskId &&
           item.date === prevRowSubmitData[i].date &&
           item.time === prevRowSubmitData[i].time) {
-          //console.log("Previos data:");
+          console.log("Previos data:");
           foundItem = true;
         } else if (item.taskId === prevRowSubmitData[i].taskId &&
           item.date === prevRowSubmitData[i].date) { // Should put data
-          //console.log("Update data:");
+          console.log("Update data:");
           item.managerLogged = false
           console.log(item)
           let apiHandler = new BaseApiHandler();
@@ -214,10 +255,12 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
           foundItem = true;
         }
       }
-      if (!foundItem) {  // else create and post the new data
+
+      // If the data does not exist, create it with a POST request
+      if (!foundItem) {
         delete item.taskName
         item.managerLogged = false
-        //console.log("New data:");
+        console.log("New data:");
         let apiHandler = new BaseApiHandler();
         apiHandler.post(`/api/time/register/post`, { body: item }, (value) => {
           console.log(value);
@@ -225,6 +268,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
       }
       return true;
     });
+    // Find deleted items and update them with PUT requests
     let deletedItem = prevRowSubmitData.filter(delItem =>
       !dataToUpdate.some(delItem2 =>
         delItem2.taskId === delItem.taskId && delItem2.date === delItem.date
@@ -234,17 +278,21 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
       deletedItem[k].time = 60 // Should be 0
       deletedItem[k].userId = userId
       deletedItem[k].managerLogged = false
-      //console.log("Deleted data:")
+      console.log("Deleted data:")
       let apiHandler = new BaseApiHandler();
       apiHandler.put(`/api/time/register/edit/put`, { body: deletedItem[k] }, (value) => {
         console.log(value);
       })
     }
+    // Set the deleted items in state and log the previous row submit data
     this.setState({ deletedItems: deletedItem })
     console.log(prevRowSubmitData)
   }
 
-
+  /**
+   * Handles button click event and updates offset state, header dates, and fetches new data.
+   * @param increment The increment by which to update the offset state.
+   */
   private handleButtonClick = async (increment: number) => {
     const { offsetState } = this.state;
     const updatedOffset = offsetState + increment;
@@ -255,6 +303,11 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     await this.getData(updatedOffset);
   }
 
+  /**
+   * Displays the total time in hours and minutes.
+   * @param value The total time in minutes.
+   * @returns A JSX element containing the total time in hours and minutes.
+   */
   private displayTimeTotal = (value: number): JSX.Element => {
 
     const hours = Math.floor(value / 60);
@@ -266,31 +319,38 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
   }
 
 
-
-  /*
-  
-  ******* Get data function
-  
-  */
+  /**
+   * Retrieves data from an API endpoint and sets the state of the component.
+   * @param timeOffset Optional time offset to retrieve data for a specific week.
+   */
   private getData(timeOffset: number = 0) {
     const { userId } = this.props;
+
+    // Gets the dates for the week
     let timeSheetDate: string[] = []
     getCurrentWeekDates(timeSheetDate, timeOffset);
+
+    // Make the API call to retrieve the user's task data for the current week.
     let apiHandler = new BaseApiHandler();
     apiHandler.get(
-      `/api/time/register/get?user=${userId}&period=${Date.parse(timeSheetDate[0])},${Date.parse(timeSheetDate[6])}&var=taskName,taskId,time,date,approved,managerLogged`, {},
+      `/api/time/register/get?user=${userId}&period=${Date.parse(timeSheetDate[0])},${Date.parse(timeSheetDate[6])}&var=taskName,taskId,time,date,approved,managerLogged,userId`, {},
       (value) => {
+        // Parse the API response into JSON format.
         let json: Api = JSON.parse(JSON.stringify(value));
+        // Create a new Map object to hold the user's task data.
         let taskData: Map<number, TaskRowData> = new Map<number, TaskRowData>();
+        // If the API call was successful (status code 200), process the data.
         if (json.status === 200) {
           for (const task of json.data) {
             if (taskData.has(task.taskId)) {
+              // If the task data is already in the Map, update the objectData array.
               let data = taskData.get(task.taskId);
               if (data) {
                 data?.objectData.push({ date: task.date, time: task.time });
                 taskData.set(task.taskId, data);
               }
             } else {
+              // If the task data is not in the Map, add it with a new objectData array.
               taskData.set(task.taskId, { projectName: task.projectName ?? "", taskName: task.taskName ?? "", taskId: task.taskId, approved: task.approved, managerLogged: task.managerLogged, objectData: [{ date: task.date, time: task.time }] })
             }
           }
@@ -301,14 +361,21 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     );
   }
 
-  // Called once when code is runned
+  /**
+   * Executes when the component mounts.
+   */
   public componentDidMount() {
     const { offsetState } = this.state
+
+    // Get current weeks
     const dates: string[] = [];
     getCurrentWeekDates(dates, offsetState);
     this.setState({ headerDates: dates })
+
+    // Retrieves data and sets it in the state
     this.getData(offsetState);
 
+    // Retrieves user tasks and projects data and sets it in the state
     const { userId } = this.props;
     let apiHandler = new BaseApiHandler();
     apiHandler.get(
@@ -322,24 +389,36 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     );
   }
 
+  /**
+   * Get the time data for a specific task from the state row data
+   * @param id The ID of the task to get the time data for
+   * @param timeArr An array to store the time data for each day of the week
+   * @returns An array of time data for each day of the week
+   */
   private getTimeFromData(id: number, timeArr: number[]): number[] {
     const { stateRowData, offsetState } = this.state;
 
+    // Initialize the time array with 0s for each day of the week
     for (let j = 0; j < 7; j++) {
       timeArr[j] = 0;
     }
 
+    // Get the current week's dates
     let dates: string[] = [];
     getCurrentWeekDates(dates, offsetState);
 
+    // Loop through each task in the state row data
     for (const key of Array.from(stateRowData.keys())) {
       let data = stateRowData.get(key);
       if (data && id === data.taskId) {
+        // If the task ID matches, loop through each object data item
         data.objectData.map((item) => {
+          // Loop through each date in the current week
           for (let i = 0; i < dates.length; i++) {
             const currentDate = dateStringFormatter(item.date);
             const matchDate = dates[i];
             if (currentDate === matchDate) {
+              // If the date matches, set the time for that day in the time array
               timeArr[i] = item.time;
             }
           }
@@ -351,12 +430,19 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     return timeArr;
   }
 
+  /**
+   * This function renders the header row of the table.
+   * @returns The header row JSX.Element
+   */
   renderHeaderRow() {
     const { headerDates } = this.state
 
     let i: number = 0;
 
+    // The days of the week
     const weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
+    // Get the current date and format it to a string
     const today = new Date();
     const stringToday = dateStringFormatter(dateToNumber(today));
     return (
@@ -364,10 +450,15 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
         <tr>
           <th>Project Name</th>
           <th>Task Name</th>
+          {/* Loop over the dates and render each one in a table header cell */}
           {headerDates.map((date, index) => {
             const weekday = weekdays[i];
             i = i + 1;
-            return (<th key={index} style={{ textAlign: "center", verticalAlign: "buttom" }} className={date === stringToday ? "bg-light" : ""}><div style={{ lineHeight: "1em" }}>{weekday}</div><div style={{ lineHeight: "1em" }}>{date}</div></th>)
+            // Add a "bg-light" class to the header cell if it corresponds to today's date
+            return (<th key={index} style={{ textAlign: "center", verticalAlign: "buttom" }} className={date === stringToday ? "bg-light" : ""}>
+              <div style={{ lineHeight: "1em" }}>{weekday}</div>
+              <div style={{ lineHeight: "1em" }}>{date}</div>
+            </th>)
           })}
           <th>Total Time</th>
           <th style={{ textAlign: "center" }}>&#128465;</th>{/* Trashcan, HTML Entity: */}
@@ -376,20 +467,29 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     )
   }
 
+  /**
+   * Renders the table rows for each task based on the current state.
+   * @returns Returns an array of JSX elements representing the rows.
+   */
   renderTaskRows() {
     const { stateRowData, searchDataState } = this.state;
 
+    // Initialize an array for storing the task time data for each day
     let arr: number[] = [];
     let rows: JSX.Element[] = [];
 
+    // Loop through each task in stateRowData and check if it matches any task in searchDataState
     for (const key of Array.from(stateRowData.keys())) {
       let data = stateRowData.get(key);
       if (data) {
         for (let i = 0; i < searchDataState.length; i++) {
+          // If there is a match, get the task name and project name, mark the task as rendered,
+          // and get the task time data for each day
           if (data.taskId === searchDataState[i].taskId) {
             let taskProjectName: string = searchDataState[i].projectName
             searchDataState[i].isRendered = true
             this.getTimeFromData(data.taskId, arr)
+            // Create a JSX element for the row and add it to the rows array
             rows.push((
               <tr key={data.taskId} >
                 <td>{taskProjectName}</td>
@@ -419,7 +519,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
                 <td><Button variant="danger" onClick={() => this.handleShowDelModal(data?.taskId)}>-</Button></td>
               </tr>
             ))
-          } else { searchDataState[i].isRendered = false }
+          } else { searchDataState[i].isRendered = false } // If there is no match, mark the task as not rendered
         }
       }
     }
