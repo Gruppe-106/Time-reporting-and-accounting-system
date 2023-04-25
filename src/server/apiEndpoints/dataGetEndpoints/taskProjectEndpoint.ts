@@ -1,11 +1,15 @@
-import GetEndpointBase from "../getEndpointBase";
-import {MySQLResponse, Where} from "../../database/mysqlHandler";
-import {Request, Response} from "express";
+import GetEndpointBase, {PrimaryKeyType} from "../getEndpointBase";
+import {MySQLResponse} from "../../database/mysqlHandler";
+import MysqlQueryBuilder, {MySQLJoinTypes} from "../../database/mysqlStringBuilder";
 
 /**
  * Endpoint for .../api/task/project/get
  */
 class TaskProjectEndpoint extends GetEndpointBase {
+    urlPrimaryKey: PrimaryKeyType[] = [
+        {urlKey: "task",    mysqlKey: "taskId",    allowAll: false, throwOnMissing: false},
+        {urlKey: "project", mysqlKey: "projectId", allowAll: false, throwOnMissing: true }
+    ];
     requiredRole: number = 1;
 
     allowedColumns: string[] = [
@@ -16,61 +20,43 @@ class TaskProjectEndpoint extends GetEndpointBase {
         "*"
     ];
 
-    async getData(requestValues: string[], primaryKey: string, keyEqual?: string[], data?: string[]): Promise<object[]> {
-        let select: string[] = [];
-        let join: string = "";
-
+    /**
+     * Retrieves task and project id and name from TASKS_PROJECTS_CONNECTOR
+     * @param requestValues Columns to get data from
+     * @param primaryKey The primary key to match
+     * @param keyEqual What the primary key should match
+     * @returns array of objects containing project task connections and optional names
+     */
+    async getData(requestValues: string[], primaryKey: string, keyEqual?: string[]): Promise<object[]> {
         let allColumns: boolean = requestValues.indexOf("*") !== -1;
 
-        //Find all columns to find in the database
-        if (requestValues.indexOf("taskId")    !== -1 || allColumns) select.push("tp.taskId");
-        if (requestValues.indexOf("projectId") !== -1 || allColumns) select.push("tp.projectId");
+        // Create condition for where table, undefined means all rows
+        let where: [key: string, equals: string[]] = undefined;
+        if (keyEqual !== undefined && allColumns)
+            where = [primaryKey, keyEqual];
+
+        // Create the MysqlQueryBuilder and add base table TASKS_PROJECTS_CONNECTOR
+        let mysqlBuilder: MysqlQueryBuilder = new MysqlQueryBuilder()
+            .from("TASKS_PROJECTS_CONNECTOR", where, undefined, "tp");
+
+        // Add all requested columns
+        if (requestValues.indexOf("taskId")    !== -1 || allColumns) mysqlBuilder.addColumnsToGet(["tp.taskId"]);
+        if (requestValues.indexOf("projectId") !== -1 || allColumns) mysqlBuilder.addColumnsToGet(["tp.projectId"]);
         // The 2 columns below has to be retrieved from a different table, so add a join statement to query
         if (requestValues.indexOf("taskName")  !== -1 || allColumns) {
-            select.push("t.name as taskName");
-            join += " CROSS JOIN TASKS t ON tp.taskId=t.id";
+            mysqlBuilder.addColumnsToGet(["t.name as taskName"]);
+            mysqlBuilder.join(MySQLJoinTypes.CROSS, "TASKS", ["tp.taskId", "t.id"], "t")
         }
         if (requestValues.indexOf("projectName") !== -1 || allColumns) {
-            select.push("p.name as projectName");
-            join += " CROSS JOIN PROJECTS p ON tp.projectId=p.id";
+            mysqlBuilder.addColumnsToGet(["p.name as projectName"]);
+            mysqlBuilder.join(MySQLJoinTypes.CROSS, "PROJECTS", ["tp.projectId", "p.id"], "p")
         }
 
-        //Query the data for all group that satisfies conditions
-        let where: Where = this.createWhere(primaryKey, keyEqual);
-        let query: string = `SELECT ${select} FROM (SELECT * FROM TASKS_PROJECTS_CONNECTOR ${this.mySQL.createWhereString(where)}) tp ${join}`;
-        let response:MySQLResponse = await this.mySQL.sendQuery(query);
-        //Check if there was an error and throw if so
+        // Build query and retrieve data for all task-project connection that satisfies conditions
+        let response:MySQLResponse = await this.mySQL.sendQuery(mysqlBuilder.build());
         if (response.error !== null) throw new Error("[MySQL] Failed to retrieve data");
 
         return response.results;
-    }
-
-    getRoute(req: Request, res: Response) {
-        //Check if tasks where specified
-        let primaryKey:string = "taskId";
-        let requestKeys: string[] = this.urlParamsConversion(req.query.task, false);
-
-        if (requestKeys === undefined) {
-            //If not try projects
-            requestKeys = this.urlParamsConversion(req.query.project, false, true, res);
-            //If not return and send bad request
-            if (requestKeys === undefined) { return this.badRequest(res, req); }
-            primaryKey  = "projectId";
-        }
-
-        //Not allowed to get all, so remove that from the list
-        requestKeys = requestKeys.filter((value:string) => { if (value !== "*") return value});
-        if (requestKeys.length === 0) { return this.badRequest(res, req); }
-
-        //Get vars if any otherwise it will get all
-        let requestedValues:string[] = this.urlParamsConversion(req.query.var);
-
-        this.processRequest(req, requestedValues, primaryKey, requestKeys).then((data) => {
-            if (!res.writableEnded) {
-                res.setHeader('Content-Type', 'application/json');
-                res.status(data.status).json(data);
-            }
-        })
     }
 }
 
