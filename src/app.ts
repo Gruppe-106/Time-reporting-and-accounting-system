@@ -6,6 +6,7 @@ import {Express} from "express";
 import {fsReadJSON} from "./server/utility/jsonReader";
 import {Server} from "./server/server";
 import {insertGeneric} from "./server/database/wipeDB";
+import {createTestDBSetup} from "./server/serverTest/testDBSetup";
 
 // --- Config ---
 const port: number = 8080;
@@ -24,11 +25,22 @@ const mysqlHandler: MysqlHandler = new MysqlHandler(mySQLConnectionConfig, async
     }
 
     // See if any argument where given
-    // Add fake data to database if arg is given
-    if (process.argv.indexOf("fake") !== -1) await insertGeneric();
+    if (process.argv.indexOf("test") !== -1) {
+        // Create test database
+        console.log("[MySQL] Creating test database");
+        if (!(await createTestDBSetup("testdb"))) {
+            console.log("[MySQL] Test database couldn't be created, shutting down");
+            server.kill();
+        }
+        // Select the default database
+        mysqlHandler.selectDatabase("testdb");
+    } else {
+        // Add fake data to database if arg is given
+        if (process.argv.indexOf("fake") !== -1) await insertGeneric();
 
-    // Select the default database
-    mysqlHandler.selectDatabase();
+        // Select the default database
+        mysqlHandler.selectDatabase();
+    }
 
     // Start listening on the server
     server.start(port);

@@ -1,8 +1,11 @@
-import BaseApiHandler from "../../client/src/network/baseApiHandler";
-import {headers} from "./testBaseConfig";
-import {ProjectEditData} from "../apiEndpoints/dataPutEndpoints/projectEditEndpoint";
+import BaseApiHandler from "../../../client/src/network/baseApiHandler";
+import {getConfig} from "../testBaseConfig";
 
-const apiHandler = new BaseApiHandler("http://localhost:8080");
+const apiHandler: BaseApiHandler = new BaseApiHandler("http://localhost:8080");
+let headers: Record<string, string> = getConfig();
+
+import {ProjectEditData} from "../../apiEndpoints/dataPutEndpoints/projectEditEndpoint";
+
 
 interface PostReturnMessage {
     status: number,
@@ -60,12 +63,23 @@ describe("Project API", () => {
         test("Success case 1 id", () => {
             apiHandler.get("/api/project/get?ids=1", {headers: headers}, (value) => {
                 let data: ProjectGetData = JSON.parse(JSON.stringify(value));
+                expect(data.status).toBe(200);
+
                 let project = data.data.pop();
                 expect(project.id).toBe(1);
                 expect(project.superProjectId).toBe(0);
-                expect(project.name).toMatch('Project Alpha');
+                expect(project.name).toMatch('Project Get Test');
                 expect(project.startDate).toBe(1679266800000); // 2023-03-20 00:00:00
                 expect(project.endDate).toBe(1682114400000);   // 2023-04-22 00:00:00
+            });
+        });
+
+        // Try getting project with id 1
+        test("Success case all", () => {
+            apiHandler.get("/api/project/get?ids=*", {headers: headers}, (value) => {
+                let data: ProjectGetData = JSON.parse(JSON.stringify(value));
+                expect(data.status).toBe(200);
+                expect(data.data.length).toBeGreaterThanOrEqual(1);
             });
         });
 
@@ -73,10 +87,12 @@ describe("Project API", () => {
         test("Success case specific variables", () => {
             apiHandler.get("/api/project/get?ids=1&var=name,startDate", {headers: headers}, (value) => {
                 let data: ProjectGetData = JSON.parse(JSON.stringify(value));
+                expect(data.status).toBe(200);
+
                 let project = data.data.pop();
                 expect(project.id).toBeUndefined();
                 expect(project.superProjectId).toBeUndefined();
-                expect(project.name).toMatch('Project Alpha');
+                expect(project.name).toMatch('Project Get Test');
                 expect(project.startDate).toBe(1679266800000); // 2023-03-20 00:00:00
                 expect(project.endDate).toBeUndefined();
             });
@@ -130,14 +146,14 @@ describe("Project API", () => {
 
         test("Success case", () => {
             let bodySuccess: ProjectEditData = {
-                projectId: 1,
-                superProjectId: 2,
-                name: "Project test",
+                projectId: 2,
+                superProjectId: 1,
+                name: "Project Put Test Edited",
                 startDate: 1684706400000,
                 endDate: 1687384800000,
                 projectLeader: 9,
-                taskAdd: [2,10],
-                taskRemove: [1,6]
+                taskAdd: [2, 10],
+                taskRemove: [1, 6]
             }
 
             apiHandler.put("/api/project/edit/put", {headers: headers, body: bodySuccess}, (value) => {
@@ -160,31 +176,18 @@ describe("Project API", () => {
 
     describe("Information api", () => {
         test("Success case", () => {
-            apiHandler.get("/api/project/info/get?ids=5", {headers: headers}, (value) => {
+            apiHandler.get("/api/project/info/get?ids=3", {headers: headers}, (value) => {
                 expect(value).toStrictEqual(
                     {
                         status: 200,
                         data: [
-                            { taskId: 5, id: 8, firstName: 'Sarah', lastName: 'Doe' },
-                            { taskId: 5, id: 9, firstName: 'Alex', lastName: 'Johnson' },
-                            { taskId: 10, id: 1, firstName: 'Matt', lastName: 'Brown' },
-                            { taskId: 10, id: 2, firstName: 'Joe', lastName: 'Smith' }
+                            {taskId: 1, id: 4, firstName: 'Group', lastName: 'User1'},
+                            {taskId: 1, id: 5, firstName: 'Group', lastName: 'User2'}
                         ]
                     }
                 )
             });
         })
-test("Testing project information api", async () => {
-    apiHandler.get("/api/project/info/get?ids=7", {headers: headers}, (value) => {
-        expect(value).toStrictEqual(
-            {
-                status: 200,
-                data: [
-                    { taskId: 13, id: 11, firstName: 'Peter', lastName: 'Johnson' }
-                ]
-            }
-        )
-    });
 
         test("Fail case", () => {
             apiHandler.get("/api/project/info/get", {headers: headers}, (value) => {
@@ -192,4 +195,4 @@ test("Testing project information api", async () => {
             });
         })
     });
-})
+});

@@ -1,21 +1,18 @@
-import BaseApiHandler from "../../client/src/network/baseApiHandler";
-import {headers} from "./testBaseConfig";
+import BaseApiHandler from "../../../client/src/network/baseApiHandler";
 
-const apiHandler = new BaseApiHandler("http://localhost:8080");
+const apiHandler: BaseApiHandler = new BaseApiHandler("http://localhost:8080");
 
 describe("Login API", () => {
     describe("POST API", () => {
         test("Fail case, no body", () => {
            apiHandler.post("/api/login", {}, (value) => {
-               expect(value["status"]).toBe(404);
-               expect(value["data"]["message"]).toMatch("Missing Body");
-               expect(value["data"]["success"]).toMatch("false");
+               expect(value).toStrictEqual({ status: 200, data: [ 'Missing password or email' ] });
            })
         });
 
         test("Fail case, bad password", () => {
             let bodyFail = {
-                email: "dave@example.com",
+                email: "authexpired@example.com",
                 password: "4f31fa50e5bd5ff45684e560fc24aeee527a43739ab611c49c51098a33e2b469"
             }
             apiHandler.post("/api/login", {body: bodyFail}, (value) => {
@@ -25,8 +22,8 @@ describe("Login API", () => {
 
         test("Success case", () => {
             let bodySuccess = {
-                email: "matt@example.com",
-                password: "4f31fa50e5bd5ff45684e560fc24aeee527a43739ab611c49c51098a33e2b469"
+                email: "authexpired@example.com",
+                password: "78675cc176081372c43abab3ea9fb70c74381eb02dc6e93fb6d44d161da6eeb3"
             }
 
             apiHandler.post("/api/login", {body: bodySuccess}, (value) => {

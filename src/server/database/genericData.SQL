@@ -7,17 +7,6 @@
 USE ${db};
 
 # ----------------------------------------------
-# ----------------- Time Type ------------------
-# ----------------------------------------------
-INSERT IGNORE INTO TIMETYPES
-(name)
-VALUES
-    ('billable'),
-    ('non-billable'),
-    ('sick'),
-    ('vacation');
-
-# ----------------------------------------------
 # ----------------- Projects -------------------
 # ----------------------------------------------
 INSERT IGNORE INTO PROJECTS
@@ -134,8 +123,8 @@ VALUES
 INSERT IGNORE INTO USERS_ROLES_CONNECTOR
 (roleId,userID)
 VALUES
-    (3,9),  # Sarah Doe    user 8
-    (3,10); # Alex Johnson user 9
+    (3,8),  # Sarah Doe    user 8
+    (3,9);  # Alex Johnson user 9
 
 INSERT IGNORE INTO PROJECTS_MANAGER_CONNECTOR
 (userId, projectId)
@@ -174,9 +163,9 @@ VALUES
     ('jill@example.com','127ba059404a7145b3d876abfe50a1298dd49deb60eacefc55deb9c9d8261da6','2023-12-30',5,'8cf37351b60f00084392043ce2e6256b96cea92949f90c7abce464cf164fbfa6'), # Jill Jones   user 5
     ('john@example.com','855f96e983f1f8e8be944692b6f719fd54329826cb62e98015efee8e2e071dd4','2023-12-30',6,'96d9632f363564cc3032521409cf22a852f2032eec099ed5967c0d000cec607a'), # John Adams   user 6
     ('dave@example.com','7b34211350ff567970974e1e2b98d319a601969e74fd1a957bc889b8332d00eb','2023-12-30',7,'61ea0803f8853523b777d414ace3130cd4d3f92de2cd7ff8695c337d79c2eeee'), # Dave Brown   user 7
-    ('sam@example.com','cd25a6171969f2a3c6e35c7667e3908ef1bd2424241db04411a0eec454ca6c16','2023-12-30',8,'e96e02d8e47f2a7c03be5117b3ed175c52aa30fb22028cf9c96f261563577605'), # Sam Smith    user 8
-    ('sarah@example.com','1b0df3084513e398249e55cd6fe2b41dda58e0d835f78c6b8d33c08909c3df9e','2023-12-30',9,'d233633d9524e84c71d6fe45eb3836f8919148e4a5fc2234cc9e6494ec0f11c2'), # Sarah Doe    user 9
-    ('alex@example.com','6db61e6dcbcf2390e4a46af426f26a133a3bee45021422fc7ae86e9136f14110','2023-12-30',10,'4135aa9dc1b842a653dea846903ddb95bfb8c5a10c504a7fa16e10bc31d1fdf0'); # Alex Johnson user 10
+    ('sarah@example.com','1b0df3084513e398249e55cd6fe2b41dda58e0d835f78c6b8d33c08909c3df9e','2023-12-30',8,'d233633d9524e84c71d6fe45eb3836f8919148e4a5fc2234cc9e6494ec0f11c2'), # Sarah Doe    user 8
+    ('alex@example.com','6db61e6dcbcf2390e4a46af426f26a133a3bee45021422fc7ae86e9136f14110','2023-12-30',9,'4135aa9dc1b842a653dea846903ddb95bfb8c5a10c504a7fa16e10bc31d1fdf0'), # Alex Johnson user 9
+    ('sam@example.com','cd25a6171969f2a3c6e35c7667e3908ef1bd2424241db04411a0eec454ca6c16','2023-12-30',10,'e96e02d8e47f2a7c03be5117b3ed175c52aa30fb22028cf9c96f261563577605'); # Sam Smith user 10
 
 # Matt Brown user 1
 UPDATE AUTH

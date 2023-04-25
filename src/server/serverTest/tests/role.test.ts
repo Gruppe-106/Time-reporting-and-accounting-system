@@ -1,7 +1,8 @@
-import BaseApiHandler from "../../client/src/network/baseApiHandler";
-import {headers} from "./testBaseConfig";
+import BaseApiHandler from "../../../client/src/network/baseApiHandler";
+import {getConfig} from "../testBaseConfig";
 
-const apiHandler = new BaseApiHandler("http://localhost:8080");
+const apiHandler: BaseApiHandler = new BaseApiHandler("http://localhost:8080");
+let headers: Record<string, string> = getConfig();
 
 describe("Role API", () =>  {
     describe("GET API", () => {
@@ -30,6 +31,21 @@ describe("Role API", () =>  {
                 expect(value).toStrictEqual({
                     "status": 200,
                     "data": [
+                        {"id": 2, "name": "manager"},
+                        {"id": 3, "name": "project-leader"},
+                        {"id": 4, "name": "admin"}
+                    ]
+                });
+            });
+        });
+
+        // Try to get all role
+        test("Success case multiple ids", async () => {
+            await apiHandler.get("/api/role/get?ids=*", {headers: headers}, (value) => {
+                expect(value).toStrictEqual({
+                    "status": 200,
+                    "data": [
+                        {"id": 1, "name": "normal"},
                         {"id": 2, "name": "manager"},
                         {"id": 3, "name": "project-leader"},
                         {"id": 4, "name": "admin"}

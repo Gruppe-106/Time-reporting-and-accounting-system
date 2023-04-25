@@ -1,4 +1,8 @@
-let headers: Record<string, string> = {};
-headers["cookie"] = "auth=b1edd8d44599536a1687546bee7b5ef88ea342b3352302a6322e12ecca19fb86";
+function getConfig() {
+    let headers: Record<string, string> = {};
+    headers["cookie"] = "auth=8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918";
+    return headers;
+}
 
-export {headers};
+
+export {getConfig};

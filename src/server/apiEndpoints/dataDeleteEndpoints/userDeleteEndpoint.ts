@@ -1,12 +1,20 @@
-import GetEndpointBase from "../getEndpointBase";
+import GetEndpointBase, { PrimaryKeyType } from "../getEndpointBase";
 import {Request, Response} from "express";
 import {MySQLResponse} from "../../database/mysqlHandler";
 
 class UserDeleteEndpoint extends GetEndpointBase {
-    allowedColumns: string[];
+    urlPrimaryKey: PrimaryKeyType[] = [
+        {urlKey: "user", mysqlKey: "id", allowAll: false, throwOnMissing: true}
+    ];
     requiredRole: number = 4;
 
-    async getData(requestValues: string[], primaryKey: string, keyEqual?: string[], data?: string[]): Promise<object[]> {
+    /**
+     * Deletes one or more users from the database
+     * @param requestValues Isn't used!
+     * @param primaryKey Isn't used!
+     * @param keyEqual User(s) id(s) to delete
+     */
+    async getData(requestValues: string[], primaryKey: string, keyEqual?: string[]): Promise<object[]> {
         let response: MySQLResponse = await this.mySQL.remove("USERS", [{
             column: "id", equals: keyEqual
         }]);
@@ -16,19 +24,6 @@ class UserDeleteEndpoint extends GetEndpointBase {
 
         return Promise.resolve([]);
     }
-
-    public getRoute(req:Request, res:Response, primaryKey:string = "id", requestKeysName:string = "user") {
-        let requestKeys: string[] = this.urlParamsConversion(req.query[requestKeysName], false, true, res);
-        if (requestKeys === undefined) { return this.badRequest(res, req); }
-
-        this.processRequest(req, undefined, primaryKey, requestKeys).then((data) => {
-            if (!res.writableEnded) {
-                res.setHeader('Content-Type', 'application/json');
-                res.status(data.status).json(data);
-            }
-
-        })
-    };
 }
 
 export default UserDeleteEndpoint;

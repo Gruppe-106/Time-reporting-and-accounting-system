@@ -1,7 +1,10 @@
-import GetEndpointBase from "../getEndpointBase";
+import GetEndpointBase, {PrimaryKeyType} from "../getEndpointBase";
 import {MySQLResponse} from "../../database/mysqlHandler";
-import {Request, Response} from "express";
+import MysqlQueryBuilder, {MySQLJoinTypes} from "../../database/mysqlStringBuilder";
 
+/**
+ * Structure of data returned to client
+ */
 interface ManagerGroupReturnType {
     managerId?: number,
     firstName?: string,
@@ -15,7 +18,10 @@ interface ManagerGroupReturnType {
     }[];
 }
 
-export interface UserReturnType {
+/**
+ * Structure of user data retrieved from database
+ */
+export interface UserDataType {
     id: number,
     email: string,
     firstName: string,
@@ -27,106 +33,123 @@ export interface UserReturnType {
  * Endpoint for .../api/group/manager/get
  */
 class ManagerGroupEndpoint extends GetEndpointBase {
+    urlPrimaryKey: PrimaryKeyType[] = [
+        {urlKey: "manager", mysqlKey: "managerId", allowAll: false, throwOnMissing: false},
+        {urlKey: "group", mysqlKey: "groupId", allowAll: false, throwOnMissing: true}
+    ];
     requiredRole: number = 1;
 
-    //Not used, but required by base class
-    allowedColumns: string[];
-
-    async getData(requestValues: string[], primaryKey: string, keyEqual?: string[], data?: string[]): Promise<object[]> {
+    /**
+     * Retrieves data for manager group and optionally all employees in group
+     * @param requestValues Columns to get data from
+     * @param primaryKey The primary key to match
+     * @param keyEqual What the primary key should match
+     * @returns array of objects containing manager group data, see ManagerGroupReturnType for details
+     */    
+    async getData(requestValues: string[], primaryKey: string, keyEqual?: string[]): Promise<object[]> {
         //A where condition is needed if specific managers or groups is specified
-        let where: string = keyEqual.indexOf("*") !== -1 ? "" : `WHERE ${primaryKey} IN (${keyEqual})`
-
         let allColumns: boolean = requestValues.indexOf("*") !== -1;
 
-        //Find all columns to find in the database
-        let join: string = "";
-        let select: string[] = ["g.groupId"];
-        if (requestValues.indexOf("managerId") !== -1 || allColumns) select.push("g.managerId");
-        // The 2 columns below has to be retrieved from a different table, so add a join statement to query
-        if (requestValues.indexOf("firstName") !== -1 || allColumns) {
-            select.push("u.firstName");
-            join = "CROSS JOIN USERS u ON u.id=g.managerId";
-        }
-        if (requestValues.indexOf("lastName")  !== -1 || allColumns) {
-            select.push("u.lastName");
-            join = "CROSS JOIN USERS u ON u.id=g.managerId";
-        }
+        let query: string = this.createQuery(keyEqual, allColumns, primaryKey, requestValues);
 
         //Query the data for all group that satisfies conditions
-        let query: string = `SELECT ${select} FROM ((SELECT * FROM GROUPS_CONNECTOR ${where}) g ${join}) ORDER BY groupId`;
         let response:MySQLResponse = await this.mySQL.sendQuery(query);
+
         //Check if there was an error and throw if so
         if (response.error !== null) throw new Error("[MySQL] Failed to retrieve data");
-
         let results: ManagerGroupReturnType[] = response.results;
 
+        if (results.length === 0) return [{error: "Failed to get data, couldn't find group"}];
         //Ensure the data sent to client has the correct layout
-        let finalResult: ManagerGroupReturnType[] = [];
-        for (const result of results) {
-            finalResult.push({
-                managerId: result.managerId,
-                firstName: result.firstName,
-                lastName:  result.lastName,
-                groupId:   result.groupId,
-                employees: []
-            })
-        }
+        let finalResult: ManagerGroupReturnType[] = results.map(result => ({
+            managerId: result.managerId,
+            firstName: result.firstName,
+            lastName:  result.lastName,
+            groupId:   result.groupId,
+            employees: []
+        }));
 
         //Add employees if requested
         if (requestValues.indexOf("employees") !== -1 || allColumns) {
-            //Find all group ids to find employees for
-            let groupId: number[] = [];
-            for (const result of finalResult) {
-                groupId.push(result.groupId);
-            }
-
-            //Send query to get all employees with a group id found above
-            let employeeQuery: string = `SELECT id,firstName,lastName,email,groupId from USERS WHERE groupId IN (${groupId}) ORDER BY groupId`;
-            let employeeResponse:MySQLResponse = await this.mySQL.sendQuery(employeeQuery);
-            if (employeeResponse.error !== null) throw new Error("[MySQL] Failed to retrieve data");
-
-            //Loop through all employees and add them to the correct group
-            let employeeResult: UserReturnType[] = employeeResponse.results;
-            let mainIndex = 0;
-            for (const user of employeeResult) {
-                //Get the correct index for the specific user, as the list of users & group is sorted by groupId it's fine to just increment until correct
-                for (;finalResult[mainIndex].groupId !== user.groupId; mainIndex++);
-                //Add the employee to the group
-                finalResult[mainIndex].employees.push({
-                    id: user.id,
-                    firstName: user.firstName,
-                    lastName: user.lastName,
-                    email: user.email
-                })
-            }
+            finalResult = await this.getEmployeeData(finalResult);
         }
+
         return finalResult;
     }
 
-    getRoute(req: Request, res: Response) {
-        //Check if managers are specified
-        let primaryKey:string = "managerId";
-        let requestKeys: string[] = this.urlParamsConversion(req.query.manager, false);
+    /**
+     * Creates a MySQL query to retrieve data for manager group and optionally all employees in group
+     * @param keyEqual What the primary key should match
+     * @param allColumns Whether to retrieve all columns
+     * @param primaryKey The primary key to match
+     * @param requestValues Columns to get data from
+     * @returns MySQL query string
+     */
+    private createQuery(keyEqual: string[], allColumns: boolean, primaryKey: string, requestValues: string[]) {
+        // Check if a where condition is needed
+        let where: [key: string, equals: string[]] = undefined;
+        if (keyEqual !== undefined && allColumns)
+            where = [primaryKey, keyEqual];
 
-        if (requestKeys === undefined) {
-            //If managers wasn't specified check if groups where
-            requestKeys = this.urlParamsConversion(req.query.group, false, true, res);
-            //If not return and send bad request
-            if (requestKeys === undefined) { return this.badRequest(res, req); }
-            primaryKey  = "groupId";
+        // Create a MySQL query builder
+        let mysqlBuilder: MysqlQueryBuilder = new MysqlQueryBuilder()
+            .from("GROUPS_CONNECTOR", where, undefined, "g")
+            .addColumnsToGet(["g.groupId as groupId"]);
+
+        // Add columns to retrieve from GROUPS_CONNECTOR table
+        if (requestValues.indexOf("managerId") !== -1 || allColumns) mysqlBuilder.addColumnsToGet(["g.managerId as managerId"]);
+
+        // Add columns to retrieve from USERS table
+        if (requestValues.indexOf("firstName") !== -1 || allColumns) {
+            mysqlBuilder.join(MySQLJoinTypes.CROSS, "USERS", ["u.id", "g.managerId"], "u")
+                .addColumnsToGet(["u.firstName as firstName"]);
+        }
+        if (requestValues.indexOf("lastName") !== -1 || allColumns) {
+            mysqlBuilder.join(MySQLJoinTypes.CROSS, "USERS", ["u.id", "g.managerId"], "u")
+                .addColumnsToGet(["u.lastName as lastName"]);
         }
 
-        //Get vars if any otherwise it will get all
-        let requestedValues:string[] = this.urlParamsConversion(req.query.var);
-
-        this.processRequest(req, requestedValues, primaryKey, requestKeys).then((data) => {
-            if (!res.writableEnded) {
-                res.setHeader('Content-Type', 'application/json');
-                res.status(data.status).json(data);
-            }
-
-        })
+        // Return the MySQL query string
+        return mysqlBuilder.build();
     }
+
+
+    /**
+     * Retrieves employee data for a manager group
+     * @param finalResult An array of objects containing manager group data
+     * @returns An array of objects containing manager group data with employees added
+     */
+    private async getEmployeeData(finalResult: ManagerGroupReturnType[]) {
+        //Find all group ids to find employees for & create a list mapped to group id as key
+        let groupIds: number[] = [];
+        let groupResult:[key: number, data: ManagerGroupReturnType][] = [];
+        for (const result of finalResult) {
+            groupIds.push(result.groupId);
+            groupResult.push([result.groupId, result]);
+        }
+
+        //Send query to get all employees with a group id found above
+        let employeeQuery: string = `SELECT * from USERS WHERE groupId IN (${groupIds}) ORDER BY groupId`;
+        let employeeResponse: MySQLResponse = await this.mySQL.sendQuery(employeeQuery);
+        if (employeeResponse.error !== null) throw new Error("[MySQL] Failed to retrieve data");
+
+        //Loop through all employees and add them to the correct group
+        let employeeResult: UserDataType[] = employeeResponse.results;
+        for (const user of employeeResult) {
+            groupResult[user.groupId][1].employees.push({
+                id: user.id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email
+            });
+        }
+
+        // Return the result without the group id as key
+        return groupResult.map(value => {
+            return value[1];
+        });
+    }
+
 }
 
 export default ManagerGroupEndpoint;
