@@ -269,9 +269,9 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
   }
 
   /**
-     * Handles the validity of the input form and data from dynamic table.
-     * This disables the button if the form is not correctly inputted
-     */
+   * Handles the validity of the input form and data from dynamic table.
+   * This disables the button if the form is not correctly inputted
+   */
   private handleValidity() {
     const button = document.getElementById("submitbutton") as HTMLInputElement | null;
     const addButton = document.getElementById("addButton") as HTMLInputElement | null;
@@ -281,22 +281,27 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
     const timeType = (document.getElementById("formTimeType") as HTMLInputElement).value
     const user = this.state.assignedToUser
 
-    if ((/^\s/g.test(taskName) || taskName === '' || !/\d/g.test(startDate.toString()) || !/\d/g.test(endDate.toString())
-            || this.state.invalidStartDate || this.state.invalidEndDate || /\D/g.test(timeType) || timeType === ''
-            || user?.name === '' || user?.id == null || /\d/g.test(user.name) || /\D/g.test(user.id.toString()))
-        || this.state.rows.length < 0){
+    let invalidTaskName = /^\s/g.test(taskName) || taskName === ''
+    let invalidDate = !/\d/g.test(startDate.toString()) || !/\d/g.test(endDate.toString())
+    let invalidTimeType = /\D/g.test(timeType) || timeType === ''
+    let invalidUser = user?.name === '' || user?.id == null || /\d/g.test(user.name) || /\D/g.test(user.id.toString())
+
+
+    if ((invalidTaskName || invalidDate || this.state.invalidStartDate || this.state.invalidEndDate || invalidTimeType
+        || invalidUser) || this.state.rows.length < 0){
       addButton?.setAttribute('disabled', '')
     }
     else {
       addButton?.removeAttribute('disabled')
     }
     button?.setAttribute('disabled', '')
+
     if (this.state.rows.length > 0) {
       for (let i = 1; this.state.rows.length >= i; i++) {
+        let invalidRowTaskName = /^\s/g.test(this.state.rows[i - 1].taskName) || this.state.rows[i - 1].taskName === ''
+        let invalidRowDate = !/\d/g.test(this.state.rows[i - 1].startDate.toString()) || !/\d/g.test(this.state.rows[i - 1].endDate.toString())
 
-        if ((/^\s/g.test(this.state.rows[i - 1].taskName) || this.state.rows[i - 1].taskName === ''
-            || !/\d/g.test(this.state.rows[i - 1].startDate.toString()) || !/\d/g.test(this.state.rows[i - 1].endDate.toString())
-            || this.state.invalidStartDate || this.state.invalidEndDate || /\D/g.test(this.state.rows[i - 1].timeType)
+        if ((invalidRowTaskName || invalidRowDate || this.state.invalidStartDate || this.state.invalidEndDate || /\D/g.test(this.state.rows[i - 1].timeType)
             || /\D/g.test(this.state.rows[i - 1].userId)) || this.state.rows.length < 0) {
 
           button?.setAttribute('disabled', '')
@@ -309,18 +314,18 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
   }
 
   /**
-   * This handles the buttonValidity so you can't get through disabled using inspect element
+   * This handles the buttonValidity, so you can't get through disabled using inspect element
    */
-   private handleButtonValidity() {
+  private handleButtonValidity() {
     const button = document.getElementById("submitbutton") as HTMLInputElement | null;
 
     button?.setAttribute('disabled', '')
     if (this.state.rows.length > 0) {
       for (let i = 1; this.state.rows.length >= i; i++) {
+        let invalidRowTaskName = /^\s/g.test(this.state.rows[i - 1].taskName) || this.state.rows[i - 1].taskName === ''
+        let invalidRowDate = !/\d/g.test(this.state.rows[i - 1].startDate.toString()) || !/\d/g.test(this.state.rows[i - 1].endDate.toString())
 
-        if ((/^\s/g.test(this.state.rows[i - 1].taskName) || this.state.rows[i - 1].taskName === ''
-            || !/\d/g.test(this.state.rows[i - 1].startDate.toString()) || !/\d/g.test(this.state.rows[i - 1].endDate.toString())
-            || this.state.invalidStartDate || this.state.invalidEndDate || /\D/g.test(this.state.rows[i - 1].timeType)
+        if ((invalidRowTaskName || invalidRowDate || this.state.invalidStartDate || this.state.invalidEndDate || /\D/g.test(this.state.rows[i - 1].timeType)
             || /\D/g.test(this.state.rows[i - 1].userId)) || this.state.rows.length < 0) {
 
           button?.setAttribute('disabled', '')
@@ -335,8 +340,8 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
   }
 
   /**
-     * Handles the endDate, this is used for validating if the endDate is valid
-     */
+   * Handles the endDate, this is used for validating if the endDate is valid
+   */
   private handleEndDate(){
     const startDate = new Date((document.getElementById("formStartDate") as HTMLInputElement).value)
     const endDate = new Date((document.getElementById("formEndDate") as HTMLInputElement).value)
@@ -352,8 +357,8 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
   }
 
   /**
-     * Handles the startDate, this is used for validating if the startDate is valid
-     */
+   * Handles the startDate, this is used for validating if the startDate is valid
+   */
   private handleStartDate(){
     const startDate = new Date((document.getElementById("formStartDate") as HTMLInputElement).value)
     const endDate = new Date((document.getElementById("formEndDate") as HTMLInputElement).value)
@@ -369,9 +374,9 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
   }
 
   /**
-     * This handles the Submit.
-     * Submits the data to the table, creating a new row
-     */
+   * This handles the Submit.
+   * Submits the data to the table, creating a new row
+   */
   handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const newRows = [...this.state.rows, this.state.formData];
@@ -426,10 +431,10 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
   }
 
   /**
-     * This handles the post data request.
-     * Posts the data to the database.
-     * Also changes formSubmitted state, so it shows an alert
-     */
+   * This handles the post data request.
+   * Posts the data to the database.
+   * Also changes formSubmitted state, so it shows an alert
+   */
   handlePostData = () => {
     // eslint-disable-next-line array-callback-return
     this.state.rows.map((row => {
@@ -468,16 +473,16 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
       },)
     }))
     setTimeout (()=> {
-        this.setState({formSubmitted: false})
+      this.setState({formSubmitted: false})
 
-      },4000)
+    },4000)
   };
 
   /**
-     * This handles the post data request.
-     * Posts the data to the database, which results in deleting a task.
-     * Also changes formSubmitted state, so it shows an alert
-     */
+   * This handles the post data request.
+   * Posts the data to the database, which results in deleting a task.
+   * Also changes formSubmitted state, so it shows an alert
+   */
   handleDeleteData = (event: any) => {
     if (event.target.id !== "deletebutton") {
       this.deleteTaskId =  parseInt(event.target.id)
