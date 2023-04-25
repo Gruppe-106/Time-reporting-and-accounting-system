@@ -116,7 +116,10 @@ class BaseNavBar extends Component<any>{
                                 ]) : this.linkRender("/project/menu", "Project Menu")
                                 }
 
-                                { this.linkRender("/user-register", "Register time") }
+                                { userInfo.isAdmin ? this.dropDownRender("Time Register", [
+                                    {href:"/user-register", title:"Register time"},
+                                    {href:"/user-register/admin"  , title:"Admin"}
+                                ]) : this.linkRender("/user-register", "Register time")}
 
                                 { userInfo.isManager && !userInfo.isAdmin ?
                                         this.linkRender("/group/manager", "Group Manager")

@@ -6,8 +6,7 @@
 import React, {Component} from "react";
 import BaseNavBar from "../../components/navBar";
 import {Container} from "react-bootstrap";
-import TimeSheetPage from "./componentsTime/userCom";
-import UserTimeSheet from "./componentsTime/adminCom";
+import TimeSheetPage from "./components/userCom";
 import { userInfo } from '../../utility/router';
 
 class UserTimeRegister extends Component<any>{
@@ -18,9 +17,7 @@ class UserTimeRegister extends Component<any>{
                 <Container fluid="lg">
                     <h1>User Time Register:</h1>
                 </Container>
-                <TimeSheetPage userId={userInfo.userId} /> 
-                {userInfo.isAdmin ? (<UserTimeSheet/>) : null} {/*Button to adminCom*/}
-                {console.log(userInfo)}
+                <TimeSheetPage key={1} userId={userInfo.userId} adminPicked={false} /> 
             </>
         );
     }
