@@ -1,14 +1,19 @@
 import * as mysql from "mysql2";
-import {Connection, Field, QueryError} from "mysql2";
+import {createConnection, Field, Pool, QueryError} from "mysql2";
 import {wipeDatabase} from "./wipeDB";
 import * as fs from "fs";
 import {mysqlHandler} from "../../app";
 
 export interface MySQLConfig {
-    host     : string,
-    user     : string,
-    password : string,
-    database : string
+    host               : string,
+    user               : string,
+    password           : string,
+    database           : string,
+    waitForConnections : boolean,
+    connectionLimit    : number,
+    maxIdle            : number,
+    idleTimeout        : number,
+    queueLimit         : number
 }
 
 export interface Where {
@@ -28,42 +33,58 @@ export interface MySQLResponse {
 }
 
 class MysqlHandler {
-    private logQueries: boolean = false;
-    private static connectionConfig: MySQLConfig;
-    private static connection: Connection;
-    public static readonly database: string = "timemanagerdatabase";
+    private logQueries                 : boolean = false;
+    private static connectionConfig    : MySQLConfig;
+    private static connectionPool      : Pool;
+    public static readonly database    : string = "timemanagerdatabase";
+    public static readonly testDatabase: string = "testdb";
 
-    constructor(connectionConfig: MySQLConfig, mysqlOnConnectCallback: () => void) {
+    constructor(connectionConfig: MySQLConfig, testMode: boolean = false) {
         if (connectionConfig !== undefined) { MysqlHandler.connectionConfig = connectionConfig; }
-        this.hasOrCreateConnection();
-        this.databaseExists(MysqlHandler.database, process.argv.indexOf("wipe") !== -1).then(() => {
-            mysqlOnConnectCallback();
-        });
+        // Change database if server is in test mode
+        if (testMode) { MysqlHandler.connectionConfig.database = MysqlHandler.testDatabase; }
+    }
+
+    /**
+     * Initializes connection to database and ensures database exists
+     * @param mysqlOnConnectCallback Callback: Callback when successful
+     */
+    public async initConnection(mysqlOnConnectCallback: () => void): Promise<void> {
+        // Check if database exists or create if not
+        let success: boolean = await this.databaseExists(MysqlHandler.database, process.argv.indexOf("wipe") !== -1);
+        if (!success) return;
+        // If successful create a pool connection and run callback
+        if (!await this.hasOrCreatePool()) {
+            MysqlHandler.connectionPool = undefined;
+        }
+        mysqlOnConnectCallback();
     }
 
     /**
      * @return Boolean: Returns whether a MySQL connection is present or not
      */
     public hasConnection(): boolean {
-        return MysqlHandler.connection !== undefined;
+        return MysqlHandler.connectionPool !== undefined;
     }
 
     /** Tries to create a connection to a MySQL database if one doesn't exist
      * @return Boolean: Returns whether a MySQL connection is present or not
      * @private
      */
-    private createConnection(): boolean {
+    private async createPool(): Promise<boolean> {
         if (MysqlHandler.connectionConfig !== undefined) {
-            MysqlHandler.connection = mysql.createConnection(MysqlHandler.connectionConfig);
-
-            MysqlHandler.connection.connect((e: QueryError | null) => {
-                if (e) {
-                    console.log("[MySQL] failed to connect to database. Error: ", e.stack);
-                    return false;
-                }
-                console.log(`[MySQL] Connected to database with id: ${MysqlHandler.connection.threadId}`);
-                return true;
-            });
+            // Create a pool
+            MysqlHandler.connectionPool = mysql.createPool(MysqlHandler.connectionConfig);
+            // Test if pool can connect to database
+            return await new Promise((resolve, reject) => {
+                MysqlHandler.connectionPool.getConnection((err, connection) => {
+                    if (err === null) {
+                        console.log("[MySQL] Successfully created a pool connection to database");
+                        resolve(true);
+                    }
+                    resolve(false);
+                })
+            })
         }
         return false;
     }
@@ -71,9 +92,9 @@ class MysqlHandler {
     /** Checks if connection is present, if not try to create one
      * @return Boolean: Returns true if connection is present otherwise false
      */
-    public hasOrCreateConnection(): boolean {
+    public async hasOrCreatePool(): Promise<boolean> {
         if (!this.hasConnection()) {
-            return this.createConnection();
+            return await this.createPool();
         }
         return true;
     }
@@ -83,14 +104,10 @@ class MysqlHandler {
      */
     public destroyConnection(): void {
         if (this.hasConnection()) {
-            MysqlHandler.connection.destroy();
+            MysqlHandler.connectionPool.destroy();
             return console.log("[MySQL] Connection to database destroyed");
         }
         console.log("[MySQL] No connection to destroy")
-    }
-
-    public selectDatabase(database: string = MysqlHandler.database): void {
-        MysqlHandler.connection.changeUser({database: database});
     }
 
     /**
@@ -99,24 +116,43 @@ class MysqlHandler {
      * @param createClean Boolean: Whether to create a clean database using the wipe SQL
      */
     public async databaseExists(database: string, createClean: boolean = false): Promise<boolean> {
-        return new Promise<boolean>((resolve) => {
-            this.sendQuery(`SHOW DATABASES LIKE '${database}';`).then(async (value) => {
-                // If not and wipe argument weren't given recreate it
-                if (value.results.length === 0 || createClean) {
-                    if (value.results.length === 0) console.log(`[MySQL] Database ${database} doesn't exist`);
-                    console.log(`[MySQL] Creating clean version`);
-                    let success = await wipeDatabase();
-                    if (success) {
-                        console.log(`[MySQL] Database ${database} has been created`);
-                        return resolve(true);
-                    } else {
-                        console.log(`[MySQL] Database ${database} couldn't be created`);
-                        return resolve(false);
+        // Create a config for connection
+        // Other elements in the original config is for pool connections
+        let connectionConfig = {
+            multipleStatements: true,
+            host     : MysqlHandler.connectionConfig.host,
+            user     : MysqlHandler.connectionConfig.user,
+            password : MysqlHandler.connectionConfig.password,
+        }
+        // Create a connection to the database
+        const connection: mysql.Connection = createConnection(connectionConfig);
+        await connection.connect();
+
+        // Test if the database exists or try to create one
+        let result = new Promise<boolean>(async (resolve) => {
+            connection.query(`SHOW DATABASES LIKE '${database}';`,async (err, result, fields) => {
+                // If length of result is not 0, then a database has been found with the specified name
+                if (Array.isArray(result)) {
+                    if (result.length === 0 || createClean) {
+                        if (result.length === 0) console.log(`[MySQL] Database ${database} doesn't exist`);
+                        console.log(`[MySQL] Creating clean version`);
+                        // Try to create database
+                        let success = await wipeDatabase();
+                        if (success) {
+                            console.log(`[MySQL] Database ${database} has been created`);
+                            return resolve(true);
+                        } else {
+                            console.log(`[MySQL] Database ${database} couldn't be created`);
+                            return resolve(false);
+                        }
                     }
                 }
                 return resolve(true);
             });
         });
+        // Destroy connection as it will be not used anymore
+        connection.destroy();
+        return result;
     }
 
     /**
@@ -191,9 +227,9 @@ class MysqlHandler {
      * @private
      */
     public async sendQuery(sqlQuery: string): Promise<MySQLResponse>{
-        if (this.hasOrCreateConnection()) {
+        if (this.hasOrCreatePool()) {
             let promise:Promise<MySQLResponse> = new Promise<MySQLResponse>((resolve) =>  {
-                MysqlHandler.connection.query({ sql: sqlQuery, timeout: 30000 }, (error: QueryError | null, results: any, fields: Field[]) => {
+                MysqlHandler.connectionPool.query({ sql: sqlQuery, timeout: 30000 }, (error: QueryError | null, results: any, fields: Field[]) => {
                     if (error !== null) {
                         console.log("[MySQL] Error retrieving data: ", error);
                     }

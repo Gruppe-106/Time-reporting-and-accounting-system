@@ -132,7 +132,7 @@ class ManagerGroupEndpoint extends GetEndpointBase {
         let employeeQuery: string = `SELECT * from USERS WHERE groupId IN (${groupIds}) ORDER BY groupId`;
         let employeeResponse: MySQLResponse = await this.mySQL.sendQuery(employeeQuery);
         if (employeeResponse.error !== null) throw new Error("[MySQL] Failed to retrieve data");
-        console.log(groupResult);
+
         //Loop through all employees and add them to the correct group
         let employeeResult: UserDataType[] = employeeResponse.results;
         for (const user of employeeResult) {

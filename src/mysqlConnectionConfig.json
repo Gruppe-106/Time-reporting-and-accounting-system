@@ -1,6 +1,10 @@
 {
     "multipleStatements": true,
-    "host"     : "localhost",
-    "user"     : "root",
-    "password" : "CS-23-DAT-01"
+    "waitForConnections": true,
+    "connectionLimit"   : 50,
+    "queueLimit"        : 0,
+    "database"          : "timemanagerdatabase",
+    "host"              : "localhost",
+    "user"              : "root",
+    "password"          : "CS-23-DAT-01"
 }
