@@ -7,7 +7,7 @@ import { BaseRouter } from "./baseRouter";
 export class MainRouter extends BaseRouter {
     public routes():Router {
         this.router.get("/", (req: Request, res: Response): void => {
-            res.send("Timesheet");
+            res.status(200).send("404");
         })
 
         this.router.use("/api", new ApiRouter().routes());

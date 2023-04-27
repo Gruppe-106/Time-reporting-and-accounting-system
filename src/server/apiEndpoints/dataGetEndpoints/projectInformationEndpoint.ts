@@ -1,4 +1,4 @@
-import GetEndpointBase from "../getEndpointBase";
+import GetEndpointBase, { PrimaryKeyType } from "../getEndpointBase";
 import {MySQLResponse} from "../../database/mysqlHandler";
 
 interface ProjectTaskResponse {
@@ -10,6 +10,7 @@ interface ProjectTaskResponse {
  * Endpoint for .../api/task/user/get
  */
 class ProjectInformationEndpoint extends GetEndpointBase {
+    urlPrimaryKey: PrimaryKeyType[];
     allowedColumns: string[] = [
         "taskId",
         "userId",
@@ -32,8 +33,7 @@ class ProjectInformationEndpoint extends GetEndpointBase {
             taskIds.push(value.taskId.toString());
         }
 
-        let join: string = "";
-        join += " CROSS JOIN USERS u ON u.id=ut.userId";
+        let join: string = " CROSS JOIN USERS u ON u.id=ut.userId";
         let userTaskResponse: MySQLResponse = await this.mySQL.sendQuery(`SELECT ut.taskId,u.id,u.firstName,u.lastName FROM (SELECT * FROM USERS_TASKS_CONNECTOR ${this.mySQL.createWhereString({
             column: "taskId",
             equals: taskIds
