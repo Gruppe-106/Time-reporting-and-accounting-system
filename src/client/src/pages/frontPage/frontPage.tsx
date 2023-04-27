@@ -73,9 +73,6 @@ class FrontPage extends Component<any, CustomTypes> {
     }
 
     async componentDidMount(): Promise<void> {
-        await new BaseApiHandler().get("/api/task/get?ids=1", {}, (value) => {
-            console.log(value)
-        });
         this.handleLoader("Getting user info")
         const user: User = (await APICalls.getUser(userInfo.userId)).data[0]
 
