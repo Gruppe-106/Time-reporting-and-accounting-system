@@ -1,5 +1,5 @@
 import * as mysql from "mysql2";
-import {createConnection, Field, Pool, QueryError} from "mysql2";
+import {Connection, createConnection, Field, Pool, Query, QueryError} from "mysql2";
 import {wipeDatabase} from "./wipeDB";
 import * as fs from "fs";
 import {mysqlHandler} from "../../app";
@@ -137,7 +137,7 @@ class MysqlHandler {
                         if (result.length === 0) console.log(`[MySQL] Database ${database} doesn't exist`);
                         console.log(`[MySQL] Creating clean version`);
                         // Try to create database
-                        let success = await wipeDatabase();
+                        let success = await wipeDatabase(database, connection);
                         if (success) {
                             console.log(`[MySQL] Database ${database} has been created`);
                             return resolve(true);
@@ -261,12 +261,18 @@ class MysqlHandler {
      * Reads an SQL file and sends it as a query
      * @param path String: path of file
      * @param database String: name of database to replace with in file
+     * @param connection Connection: connection to use when sending file
      * @constructor
      */
-    public async SQLFileQuery(path: string, database: string = MysqlHandler.database): Promise<MySQLResponse> {
+    public async SQLFileQuery(path: string, database: string = MysqlHandler.database, connection: Connection | Pool = MysqlHandler.connectionPool): Promise<MySQLResponse> {
         if (/.*\.SQL(?!.)/g.test(path)) {
             let query: string = this.fsReadSQL(path, database);
-            return mysqlHandler.sendQuery(query);
+            let response: MySQLResponse = await new Promise((resolve) => {
+                connection.query(query, (err, result, fields) => {
+                    return resolve({error: err, results: result, fields: null});
+                })
+            });
+            return response;
         }
         return {error: {
                 code: "404", errno: 404, fatal: true, name: "File not an SQL file", message: "File cannot be send, as it's not a MySQL file"},
