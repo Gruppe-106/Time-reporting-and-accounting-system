@@ -1,5 +1,5 @@
 import {Express} from "express";
-import {MainRouter} from "./mainRouter";
+import {MainRouter} from "../mainRouter";
 import * as readline from "readline";
 import {mysqlHandler} from "../app";
 import * as https from "https";
