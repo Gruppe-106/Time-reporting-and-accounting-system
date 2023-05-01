@@ -11,7 +11,7 @@ import * as http from "http";
 const privateKey : string = fs.readFileSync(path.join(__dirname, "/SSL/selfsigned.key"), 'utf8');
 const certificate: string = fs.readFileSync(path.join(__dirname, "/SSL/selfsigned.crt"), 'utf8');
 
-const credentials: {key: string, cert: string} = {key: privateKey, cert: certificate};
+export const credentials: {key: string, cert: string} = {key: privateKey, cert: certificate};
 
 export class Server {
     private app: Express;

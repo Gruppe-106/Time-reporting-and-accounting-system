@@ -8,6 +8,7 @@ import {Server} from "./server/server";
 import {insertGeneric} from "./server/database/wipeDB";
 import {createTestDBSetup} from "./server/serverTest/testDBSetup";
 import path from "node:path";
+import {clientServer} from "./clientServer";
 
 // --- Config ---
 const port: number = 8080;
@@ -43,6 +44,7 @@ mysqlHandler.initConnection(async () => {
 
     // Start listening on the server
     server.start(port);
+    clientServer.listen(443, () => { console.log("[Server] Client server is now running")});
 })
 
 export {mysqlHandler, server, mySQLConnectionConfig};
