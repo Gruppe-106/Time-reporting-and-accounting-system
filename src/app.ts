@@ -1,5 +1,5 @@
 //@ts-ignore
-import express from "express";
+import express, {Request, Response} from "express";
 
 import MysqlHandler, {MySQLConfig} from "./server/database/mysqlHandler";
 import {Express} from "express";
@@ -7,6 +7,7 @@ import {fsReadJSON} from "./server/utility/jsonReader";
 import {Server} from "./server/server";
 import {insertGeneric} from "./server/database/wipeDB";
 import {createTestDBSetup} from "./server/serverTest/testDBSetup";
+import path from "node:path";
 
 // --- Config ---
 const port: number = 8080;
