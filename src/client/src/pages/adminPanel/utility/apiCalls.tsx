@@ -19,7 +19,7 @@ export default class APICalls {
         id: number,
         groupId: number
     }[]}> {
-        return fetch(`/api/user/get?ids=${id}`, {
+        return fetch(`https://10.92.1.237:8080/api/user/get?ids=${id}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -53,7 +53,7 @@ export default class APICalls {
         }[]
     }> {
 
-        return fetch(`/api/user/task/project/get?user=${id}`, {
+        return fetch(`https://10.92.1.237:8080/api/user/task/project/get?user=${id}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -82,7 +82,7 @@ export default class APICalls {
         groupId: number;
     }[]}> {
 
-        return fetch(`/api/user/get?ids=*`, {
+        return fetch(`https://10.92.1.237:8080/api/user/get?ids=*`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
