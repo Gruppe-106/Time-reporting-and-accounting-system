@@ -110,7 +110,7 @@ export default class APICalls {
     public static getAllRoles(): Promise<{ status: number, data: { id: number, name: string }[] }> {
         // const apiHandler:BaseApiHandler = new BaseApiHandler()
 
-        return fetch(`/api/role/get?ids=*`, {
+        return fetch(`https://10.92.1.237:8080/api/role/get?ids=*`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -138,7 +138,7 @@ export default class APICalls {
     public static getAllManagers(): Promise<{ status: number, data: { id: number, name: string }[] }> {
         // const apiHandler:BaseApiHandler = new BaseApiHandler()
 
-        return fetch(`/api/role/user/get?role=2`, {
+        return fetch(`https://10.92.1.237:8080/api/role/user/get?role=2`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -173,7 +173,7 @@ export default class APICalls {
         }[]
     }> {
 
-        return fetch("/api/group/manager/get?manager=*", {
+        return fetch("https://10.92.1.237:8080/api/group/manager/get?manager=*", {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
