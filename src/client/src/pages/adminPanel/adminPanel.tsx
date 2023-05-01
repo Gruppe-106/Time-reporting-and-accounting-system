@@ -159,7 +159,7 @@ class AdminPanel extends Component<any, CustomTypes> {
 
         const dbManagers: Manager[] = (await APICalls.getAllManagerGroups()).data
         const dbUsers: User[] = (await APICalls.getAllUsers()).data
-        console.log(dbUsers)
+
         const groups: number[] = []
         dbUsers.forEach((ele: User) => groups.push(ele.groupId))
         dbUsers.forEach((ele: User) => {
@@ -170,7 +170,7 @@ class AdminPanel extends Component<any, CustomTypes> {
             ele.validEmail = true
             ele.validFirstName = true
             ele.validLastName = true
-            ele.manager = this.state.dbManagers.filter((man: Manager) => man.groupId === ele.groupId && man.managerId !== ele.id).concat(this.state.dbManagers.filter((man: Manager) => man.groupId !== ele.groupId))
+            ele.manager = dbManagers.filter((man: Manager) => man.groupId === ele.groupId && man.managerId !== ele.id).concat(this.state.dbManagers.filter((man: Manager) => man.groupId !== ele.groupId))
         })
 
 
