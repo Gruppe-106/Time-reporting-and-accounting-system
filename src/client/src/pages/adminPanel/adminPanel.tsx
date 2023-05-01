@@ -159,10 +159,10 @@ class AdminPanel extends Component<any, CustomTypes> {
 
         const dbManagers: Manager[] = (await APICalls.getAllManagerGroups()).data
         const dbUsers: User[] = (await APICalls.getAllUsers()).data
-
+        
         const groups: number[] = []
-        dbUsers.forEach((ele: User) => groups.push(ele.groupId))
         dbUsers.forEach((ele: User) => {
+            groups.push(ele.groupId)
             ele.orginalGroupId = ele.groupId
             ele.orginalEmail = ele.email
             ele.orginalFirstName = ele.firstName
@@ -170,10 +170,9 @@ class AdminPanel extends Component<any, CustomTypes> {
             ele.validEmail = true
             ele.validFirstName = true
             ele.validLastName = true
-            ele.manager = dbManagers.filter((man: Manager) => man.groupId === ele.groupId && man.managerId !== ele.id).concat(this.state.dbManagers.filter((man: Manager) => man.groupId !== ele.groupId))
+            ele.manager = dbManagers.filter((man: Manager) => man.groupId === ele.groupId && man.managerId !== ele.id).concat(dbManagers.filter((man: Manager) => man.groupId !== ele.groupId))
+            console.log(ele.manager)
         })
-
-
 
         this.handleLoader("All done")
         this.setState(
@@ -185,9 +184,6 @@ class AdminPanel extends Component<any, CustomTypes> {
                 loading: false
             });
 
-        console.log(this.state.dbManagers)
-
-        console.log(dbManagers)
     }
 
 
@@ -286,8 +282,7 @@ class AdminPanel extends Component<any, CustomTypes> {
         * @returns {JSX.Element | undefined} - A JSX Element for the row, or undefined if user has no manager.
    */
     private renderEditingRow(user: User): JSX.Element | undefined {
-
-
+        console.log(user)
         return (
 
             <tr key={user.id}   >
