@@ -185,6 +185,8 @@ class AdminPanel extends Component<any, CustomTypes> {
                 loading: false
             });
 
+        console.log(this.state.dbManagers)
+
         console.log(dbManagers)
     }
 
