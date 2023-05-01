@@ -6,7 +6,7 @@ describe("Login API", () => {
     describe("POST API", () => {
         test("Fail case, no body", () => {
            apiHandler.post("/api/login", {}, (value) => {
-               expect(value).toStrictEqual({ status: 200, data: [ 'Missing password or email' ] });
+               expect(value).toStrictEqual({ status: 200, data: [ "Missing password or email" ] });
            })
         });
 
