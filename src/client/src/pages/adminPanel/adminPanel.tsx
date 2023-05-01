@@ -640,7 +640,7 @@ class AdminPanel extends Component<any, CustomTypes> {
         })
         const user: User = this.state.userToDelete!
         this.handleLoader("Deleting user")
-        const response = await fetch(`api/user/remove?user=${user.id}`, {
+        const response = await fetch(`https://10.92.1.237:8080/api/user/remove?user=${user.id}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json'
