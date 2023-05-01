@@ -135,11 +135,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
               );
             } else {
               // Update the time of the item with the new value
-              if (newValue < item.time / 60) {
-                item.time = newValue * 60 + (minutes);
-              } else {
-                item.time = newValue * 60 + (minutes);
-              }
+              item.time = newValue * 60 + (minutes);
             }
             dateFound = true;
           }
@@ -208,12 +204,11 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
   }
 
   /**
-   * This function handles the submit button click event. It updates, creates, and deletes time sheet data.
+   * Create an array of time sheet data objects to update
+   * @returns all new and old data in array
    */
-  private handleSubmitButton() { // The put and post request should console.log more usefull information
-    const { stateRowData, prevRowSubmitData } = this.state
-    const { userId } = this.props
-    // Create an array of time sheet data objects to update
+  private findDataToUpdate() {
+    const { stateRowData } = this.state
     let dataToUpdate: TimeSheetData[] = [];
     for (const key of Array.from(stateRowData.keys())) {
       let data = stateRowData.get(key);
@@ -233,45 +228,18 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
         });
       }
     }
-    // Loop through the data to update, send PUT requests for existing data, and POST requests for new data
-    dataToUpdate.map((item) => {
-      let foundItem = false;
-      delete item.projectName;
-      item.userId = userId;
-      // Check if the data already exists
-      for (let i = 0; i < prevRowSubmitData.length; i++) {
-        if (item.taskId === prevRowSubmitData[i].taskId &&
-          item.date === prevRowSubmitData[i].date &&
-          item.time === prevRowSubmitData[i].time) {
-          console.log("No data submitted, for:" + item.date + "" + item.taskId);
-          foundItem = true;
-        } else if (item.taskId === prevRowSubmitData[i].taskId &&
-          item.date === prevRowSubmitData[i].date) { // Should put data
-          console.log("Updated data for:" + item.date + "" + item.taskId);
-          item.managerLogged = false
-          console.log(item)
-          let apiHandler = new BaseApiHandler();
-          apiHandler.put(`/api/time/register/edit/put`, { body: item }, (value) => {
-            console.log(value);
-          })
-          foundItem = true;
-        }
-      }
+    return dataToUpdate
+  }
 
-      // If the data does not exist, create it with a POST request
-      if (!foundItem) {
-        delete item.taskName
-        item.managerLogged = false
-        console.log("Added new data for:" + item.date + "" + item.taskId);
-        let apiHandler = new BaseApiHandler();
-        apiHandler.post(`/api/time/register/post`, { body: item }, (value) => {
-          console.log(value);
-        })
-      }
-      return true;
-    });
-    // Find deleted items and update them with PUT requests
-    let deletedItem = prevRowSubmitData.filter(delItem =>
+  /**
+   * Find deleted items and update them with PUT requests
+   * @param prevData all previous data
+   * @param dataToUpdate all data that should be updated
+   * @returns all data that have been deleted
+   */
+  private deleteItems(prevData: TimeSheetData[], dataToUpdate: TimeSheetData[]) {
+    const { userId } = this.props
+    let deletedItem = prevData.filter(delItem =>
       !dataToUpdate.some(delItem2 =>
         delItem2.taskId === delItem.taskId && delItem2.date === delItem.date
       )
@@ -286,6 +254,55 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
         console.log(value);
       })
     }
+    return deletedItem
+  }
+
+  /**
+   * This function handles the submit button click event. It updates, creates, and deletes time sheet data.
+   */
+  private handleSubmitButton() { // The put and post request should console.log more usefull information
+    const { prevRowSubmitData } = this.state
+    const { userId } = this.props
+    // Create an array of time sheet data objects to update
+    let dataToUpdate: TimeSheetData[] = this.findDataToUpdate();
+    // Loop through the data to update, send PUT requests for existing data, and POST requests for new data
+    dataToUpdate.map((item) => {
+      let foundItem = false;
+      delete item.projectName;
+      item.userId = userId;
+      // Check if the data already exists
+      for (let i = 0; i < prevRowSubmitData.length; i++) {
+        let sameTaskId: boolean = item.taskId === prevRowSubmitData[i].taskId
+        let sameDate: boolean = item.date === prevRowSubmitData[i].date
+        let sameTime: boolean = item.time === prevRowSubmitData[i].time
+        if (sameTaskId && sameDate && sameTime) {
+          console.log("No data submitted, for:" + item.date + "" + item.taskId);
+          foundItem = true;
+        } else if (sameTaskId && sameDate) { // Should put data
+          console.log("Updated data for:" + item.date + "" + item.taskId);
+          item.managerLogged = false
+          console.log(item)
+          let apiHandler = new BaseApiHandler();
+          apiHandler.put(`/api/time/register/edit/put`, { body: item }, (value) => {
+            console.log(value);
+          })
+          foundItem = true;
+        }
+      }
+      // If the data does not exist, create it with a POST request
+      if (!foundItem) {
+        delete item.taskName
+        item.managerLogged = false
+        console.log("Added new data for:" + item.date + "" + item.taskId);
+        let apiHandler = new BaseApiHandler();
+        apiHandler.post(`/api/time/register/post`, { body: item }, (value) => {
+          console.log(value);
+        })
+      }
+      return true;
+    });
+    // Find deleted items and update them with PUT requests
+    let deletedItem = this.deleteItems(prevRowSubmitData, dataToUpdate)
     // Set the deleted items in state and log the previous row submit data
     this.setState({ deletedItems: deletedItem })
     console.log(prevRowSubmitData)
@@ -385,7 +402,8 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
       (value) => {
         let json: AddModalApi = JSON.parse(JSON.stringify(value));
         if (json.status === 200) {
-          this.setState({ searchDataState: json.data })
+          const searchDataWithRendered = json.data.map(data => ({...data, isRendered: false}));
+          this.setState({ searchDataState: searchDataWithRendered })
         }
       }
     );
@@ -568,6 +586,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
             </Button>
           </ButtonGroup>
         </center>
+        <Button onClick={() => console.log(searchDataState)}></Button>
         {this.props.adminPicked === true ? null : <p>Delete task at date:</p>}
         {deletedItems.map((item, index) => {
           return <p key={index}>{item.taskName}, at {dateStringFormatter(item.date)}</p>
@@ -583,13 +602,8 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
               <Typeahead
                 id="findProject"
                 labelKey={(option: any) => `${option.projectName}  ${option.taskName}`}
-                options={searchDataState.filter((option: any) => option.isRendered === false)}
+                options={searchDataState}
                 placeholder="Pick a project"
-                filterBy={(option: any, props: any): boolean => {
-                  const query: string = props.text.toLowerCase().trim();
-                  const name: string = option.projectName.toLowerCase() + option.taskName.toLowerCase();
-                  return name.includes(query);
-                }}
                 renderMenuItemChildren={(option: any, props: any) => (
                   <>
                     <Highlighter search={props.text}>
