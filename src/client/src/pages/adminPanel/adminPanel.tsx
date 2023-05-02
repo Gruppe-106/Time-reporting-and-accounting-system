@@ -67,8 +67,7 @@ interface CustomTypes {
     validEmail: boolean
     validName: boolean
     showPopup: boolean
-    showDelete: boolean
-    showError: boolean
+
     //* database varriables
     dbUsers: User[]
     dbManagers: Manager[],
@@ -89,8 +88,6 @@ interface CustomTypes {
     popupTitle: string,
     loadingText: string
     buttonText: string,
-    userToDelete: User | null
-
 
     test: any[]
 }
@@ -105,9 +102,6 @@ class AdminPanel extends Component<any, CustomTypes> {
             validEmail: true,
             validName: true,
             showPopup: false,
-            showDelete: false,
-            showError: false,
-
             //* database varriables
             dbUsers: [],
             dbManagers: [],
@@ -127,8 +121,7 @@ class AdminPanel extends Component<any, CustomTypes> {
             popupTitle: "",
             loadingText: "",
             buttonText: "Edit",
-            test: [],
-            userToDelete: null
+            test: []
 
 
 
@@ -145,24 +138,20 @@ class AdminPanel extends Component<any, CustomTypes> {
         this.handleShowMessage = this.handleShowMessage.bind(this);
         this.handleShowTitle = this.handleShowTitle.bind(this);
         this.handleClose = this.handleClose.bind(this);
-        this.handleDeleteClose = this.handleDeleteClose.bind(this)
         this.postChanges = this.postChanges.bind(this)
         this.renderRow = this.renderRow.bind(this);
 
     }
 
-    /**
-     * Runs after all components have mounted
-    */
     async componentDidMount(): Promise<void> {
         this.handleLoader("Getting users")
 
         const dbManagers: Manager[] = (await APICalls.getAllManagerGroups()).data
         const dbUsers: User[] = (await APICalls.getAllUsers()).data
-        
+        console.log(dbUsers)
         const groups: number[] = []
+        dbUsers.forEach((ele: User) => groups.push(ele.groupId))
         dbUsers.forEach((ele: User) => {
-            groups.push(ele.groupId)
             ele.orginalGroupId = ele.groupId
             ele.orginalEmail = ele.email
             ele.orginalFirstName = ele.firstName
@@ -170,9 +159,10 @@ class AdminPanel extends Component<any, CustomTypes> {
             ele.validEmail = true
             ele.validFirstName = true
             ele.validLastName = true
-            ele.manager = dbManagers.filter((man: Manager) => man.groupId === ele.groupId && man.managerId !== ele.id).concat(dbManagers.filter((man: Manager) => man.groupId !== ele.groupId))
-            console.log(ele.manager)
+            ele.manager = this.state.dbManagers.filter((man: Manager) => man.groupId === ele.groupId && man.managerId !== ele.id).concat(this.state.dbManagers.filter((man: Manager) => man.groupId !== ele.groupId))
         })
+
+
 
         this.handleLoader("All done")
         this.setState(
@@ -184,14 +174,9 @@ class AdminPanel extends Component<any, CustomTypes> {
                 loading: false
             });
 
+        console.log(dbManagers)
     }
 
-
-    /**
-     * Runs whenever a state updates
-     * @param prevProps The previous props
-     * @param prevState The previous state
-    */
     componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<CustomTypes>): void {
         if (this.state.selectedUsersId.length > 1 && this.state.buttonText !== "Bulk edit") {
             this.setState({ buttonText: "Bulk edit" });
@@ -282,7 +267,8 @@ class AdminPanel extends Component<any, CustomTypes> {
         * @returns {JSX.Element | undefined} - A JSX Element for the row, or undefined if user has no manager.
    */
     private renderEditingRow(user: User): JSX.Element | undefined {
-        console.log(user)
+
+
         return (
 
             <tr key={user.id}   >
@@ -373,8 +359,7 @@ class AdminPanel extends Component<any, CustomTypes> {
                         />
                     </Form.Group>
                 </Form></td>
-                {this.state.dbManagers.findIndex((ele: Manager) => ele.managerId === user.id) === -1 ? <td style={{ textAlign: 'center', verticalAlign: 'middle' }}><FontAwesomeIcon style={{ cursor: "pointer" }} onClick={() => this.handleDeleteShow(user)} icon={faTrash} /> </td> :
-                    <td style={{ textAlign: 'center', verticalAlign: 'middle' }}><FontAwesomeIcon icon={faHand} /> </td>}
+                <td style={{ textAlign: 'center', verticalAlign: 'middle' }}><FontAwesomeIcon onClick={() => this.handleDelete(user)} icon={faTrash} /> </td>
             </tr>
         );
     }
@@ -525,6 +510,33 @@ class AdminPanel extends Component<any, CustomTypes> {
         });
     }
 
+    /**
+     * Deletes a user.
+     *
+     * @param user The user to be deleted.
+     */
+    private async handleDelete(user: User): Promise<void> {
+        const test = await fetch(`/api/user/remove?user=${user.id}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then((response: Response) => {
+                if (response.status === 400) {
+                    throw new Error("Status 400 bad request")
+                } else if (response.status === 200) {
+                    return response.json()
+                } else {
+                    throw new Error(`Unexpected response status: ${response.status}`)
+                }
+            })
+            .catch(error => {
+                throw new Error(error.Code);
+            });
+
+        console.log(test)
+    }
 
     /**
      * Toggles the editing state of the component.
@@ -629,117 +641,13 @@ class AdminPanel extends Component<any, CustomTypes> {
             });
     }
 
-    /**
-     * Deletes a user.
-    */
-    private async handleDelete(): Promise<void> {
-
-
-        this.setState({
-            showDelete: false,
-        })
-        const user: User = this.state.userToDelete!
-        this.handleLoader("Deleting user")
-        const response = await fetch(`https://10.92.1.237:8080/api/user/remove?user=${user.id}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-            .then((response: Response) => {
-                if (response.status === 400) {
-                    throw new Error("Status 400 bad request")
-                } else if (response.status === 200) {
-                    return response.json()
-                } else {
-                    throw new Error(`Unexpected response status: ${response.status}`)
-                }
-            })
-            .catch(error => {
-                throw new Error(error.Code);
-            });
-
-
-        if (response.status === 200 && response.data[0].success === "User deleted successfully") {
-            this.handleLoader("Updating table")
-
-            const dbUsers: User[] = (await APICalls.getAllUsers()).data
-            const groups: number[] = []
-            dbUsers.forEach((ele: User) => groups.push(ele.groupId))
-            dbUsers.forEach((ele: User) => {
-                ele.orginalGroupId = ele.groupId
-                ele.orginalEmail = ele.email
-                ele.orginalFirstName = ele.firstName
-                ele.orginalLastName = ele.lastName
-                ele.validEmail = true
-                ele.validFirstName = true
-                ele.validLastName = true
-                ele.manager = this.state.dbManagers.filter((man: Manager) => man.groupId === ele.groupId && man.managerId !== ele.id).concat(this.state.dbManagers.filter((man: Manager) => man.groupId !== ele.groupId))
-            })
-
-            this.handleLoader("All done")
-            this.setState({
-                selectedUsers: this.state.selectedUsers.filter((ele: any) => ele.id !== user.id),
-                dbUsers: dbUsers,
-                loading: false,
-                groupMax: Math.max(...groups),
-                groupMin: Math.min(...groups),
-            })
-        } else {
-            this.handleLoader()
-            this.handleShowTitle("Error")
-            console.log(response)
-            this.handleShowMessage(response.data[0].error)
-            this.setState({
-                showError: true,
-            })
-        }
-
-
-
-
-
-
-
-    }
-
-    /**
-     * Handles the closing of the deletion modal
-    */
-    private async handleDeleteClose(): Promise<void> {
-        this.setState({
-            showDelete: false,
-            selectedUsers: this.state.selectedUsers.filter((user: User) => user.id !== this.state.userToDelete!.id),
-            userToDelete: null,
-        })
-    }
-
-
-    /**
-     * Handles the opening of the deletion modal
-    */
-    private async handleDeleteShow(user: User): Promise<void> {
-        let hasShown: boolean = false;
-
-        if (!hasShown) {
-            this.handleShowTitle("Are you sure?")
-            this.handleShowMessage("Are you sure that you want to delete this user? this action cannot be undone")
-            hasShown = true;
-            this.setState({
-                showDelete: true,
-                userToDelete: user,
-            })
-        }
-
-    }
-
 
     /**
      * Post the new changes to the server
     */
     private async postChanges(): Promise<void> {
         let hasShown: boolean = false;
-        const apiHandler: BaseApiHandler = new BaseApiHandler()
+
         const userData: {
             userId: number,
             firstName: string,
@@ -750,9 +658,7 @@ class AdminPanel extends Component<any, CustomTypes> {
 
 
 
-
         for (const user of this.state.selectedUsers) {
-            console.log(user.id)
             console.log(user.manager![0].managerId)
             userData.push({
                 userId: user.id,
@@ -764,7 +670,7 @@ class AdminPanel extends Component<any, CustomTypes> {
         }
 
 
-
+        const apiHandler: BaseApiHandler = new BaseApiHandler()
 
         this.handleLoader("Posting changes")
         const responses = await Promise.all(userData.map(ele => apiHandler.put("/api/user/edit/put", { body: ele })))
@@ -775,9 +681,7 @@ class AdminPanel extends Component<any, CustomTypes> {
             if (!hasShown) {
                 this.handleShowTitle("Error")
                 this.handleShowMessage("This error should not happen contact IT")
-                this.setState({
-                    showError: true,
-                })
+                this.handleShow()
                 hasShown = true;
             }
         } else {
@@ -887,45 +791,6 @@ class AdminPanel extends Component<any, CustomTypes> {
                         </Modal.Body>
                         <Modal.Footer>
                             <Button variant="secondary" onClick={this.handleClose}>
-                                Close
-                            </Button>
-                        </Modal.Footer>
-                    </Modal>
-
-                    <Modal show={this.state.showDelete}>
-                        <Modal.Header closeButton>
-                            <Modal.Title>{this.state.popupTitle}</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>
-                            {this.state.popupMessage}
-                        </Modal.Body>
-                        <Modal.Footer>
-                            <Button variant="primary" onClick={this.handleDelete}>
-                                Delete user
-                            </Button>
-                            <Button variant="secondary" onClick={this.handleDeleteClose}>
-                                Close
-                            </Button>
-                        </Modal.Footer>
-                    </Modal>
-
-                    <Modal show={this.state.showError} onHide={() => {
-                        this.setState({
-                            showError: false
-                        })
-                    }}>
-                        <Modal.Header closeButton>
-                            <Modal.Title>{this.state.popupTitle}</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>
-                            {this.state.popupMessage}
-                        </Modal.Body>
-                        <Modal.Footer>
-                            <Button variant="secondary" onClick={() => {
-                                this.setState({
-                                    showError: false
-                                })
-                            }}>
                                 Close
                             </Button>
                         </Modal.Footer>

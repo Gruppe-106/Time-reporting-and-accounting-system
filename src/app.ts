@@ -7,7 +7,6 @@ import {fsReadJSON} from "./server/utility/jsonReader";
 import {Server} from "./server/server";
 import {insertGeneric} from "./server/database/wipeDB";
 import {createTestDBSetup} from "./server/serverTest/testDBSetup";
-import path from "node:path";
 import {clientServer} from "./clientServer";
 
 // --- Config ---

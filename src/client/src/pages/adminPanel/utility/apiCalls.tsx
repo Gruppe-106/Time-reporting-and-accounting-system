@@ -21,6 +21,7 @@ export default class APICalls {
     }[]}> {
         return fetch(`https://10.92.1.237:8080/api/user/get?ids=${id}`, {
             method: 'GET',
+            credentials: "include",
             headers: {
                 'Content-Type': 'application/json'
             }
@@ -55,6 +56,7 @@ export default class APICalls {
 
         return fetch(`https://10.92.1.237:8080/api/user/task/project/get?user=${id}`, {
             method: 'GET',
+            credentials: "include",
             headers: {
                 'Content-Type': 'application/json'
             }
@@ -84,6 +86,7 @@ export default class APICalls {
 
         return fetch(`https://10.92.1.237:8080/api/user/get?ids=*`, {
             method: 'GET',
+            credentials: "include",
             headers: {
                 'Content-Type': 'application/json'
             }
@@ -112,6 +115,7 @@ export default class APICalls {
 
         return fetch(`https://10.92.1.237:8080/api/role/get?ids=*`, {
             method: 'GET',
+            credentials: "include",
             headers: {
                 'Content-Type': 'application/json'
             }
@@ -140,6 +144,7 @@ export default class APICalls {
 
         return fetch(`https://10.92.1.237:8080/api/role/user/get?role=2`, {
             method: 'GET',
+            credentials: "include",
             headers: {
                 'Content-Type': 'application/json'
             }
@@ -175,6 +180,7 @@ export default class APICalls {
 
         return fetch("https://10.92.1.237:8080/api/group/manager/get?manager=*", {
             method: 'GET',
+            credentials: "include",
             headers: {
                 'Content-Type': 'application/json'
             }
