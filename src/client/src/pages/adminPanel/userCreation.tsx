@@ -53,8 +53,8 @@ interface CustomTypes {
     submitDisabled: boolean,
     showPopup: boolean,
     loading: boolean,
-    reload:boolean,
-    
+    reload: boolean,
+
     // * Component variables
     popupMessage: string,
     popupTitle: string,
@@ -132,7 +132,7 @@ class UserCreation extends Component<any, CustomTypes>{
 
         this.handleLoader("Getting managers", true)
         const dbManagers: Manager[] = await APICalls.getAllManagerGroups()
-        
+
         this.handleLoader("All done")
         this.setState({
             dbRoles: dbRoles,
@@ -140,9 +140,10 @@ class UserCreation extends Component<any, CustomTypes>{
             loading: false
         })
 
-
-
     }
+
+
+
 
     //TODO: find the types or else i commit the no monster day
 
@@ -324,9 +325,9 @@ class UserCreation extends Component<any, CustomTypes>{
      * Handles modal closing
     */
     private handleClose(): void {
-        if(this.state.reload){
+        if (this.state.reload) {
             window.location.reload()
-        } 
+        }
         this.setState({
             showPopup: false,
             popupTitle: "",
@@ -418,12 +419,12 @@ class UserCreation extends Component<any, CustomTypes>{
 
         console.log(dataToSend)
         const promise = new Promise((resolve, reject) => {
-            apiHandler.post("/api/user/creation/post", { body: dataToSend }, (value:any) => {
+            apiHandler.post("/api/user/creation/post", { body: dataToSend }, (value: any) => {
                 if (value.status === 200) {
                     this.handleShowTitle("Success");
                     this.handleShowMessage("User created");
                     this.setState({
-                        reload:true
+                        reload: true
                     })
                     resolve("User created");
                 } else if (value.status === 400) {
