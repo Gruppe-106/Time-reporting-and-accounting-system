@@ -704,7 +704,7 @@ class AdminPanel extends Component<any, CustomTypes> {
 
         if (!hasShown) {
             this.handleShowTitle("Are you sure?")
-            this.handleShowMessage("Are you sure that you want to delete this user? this action cannot be undone")
+            this.handleShowMessage("Are you sure that you want to delete this user? This action cannot be undone")
             hasShown = true;
             this.setState({
                 showDelete: true,
