@@ -571,9 +571,11 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
 
     return (
       <Container fluid="lg">
-        <Table bordered size="sm" className="fixed-table ellipses">
+        <Table bordered size="sm" className="fixed-table ellipses" responsive style={{whiteSpace: "nowrap"}}>
           {this.renderHeaderRow()}
-          <tbody>{this.renderTaskRows()}</tbody>
+          <tbody>
+            {this.renderTaskRows()}
+          </tbody>
         </Table>
         {this.renderButton()}
         <center>
@@ -631,7 +633,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
           </Modal.Header>
           <Modal.Body>
             <p>Are you sure you want to delete, task Id: {deleteId}</p>
-            <p>{delRowTaskProject.projectName} and {delRowTaskProject.taskName}</p>
+            <p>{delRowTaskProject.taskName}</p>
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={this.handleCloseDelModal}>
