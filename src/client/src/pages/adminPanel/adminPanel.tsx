@@ -641,6 +641,108 @@ class AdminPanel extends Component<any, CustomTypes> {
             });
     }
 
+    /**
+     * Deletes a user.
+    */
+    private async handleDelete(): Promise<void> {
+
+
+        this.setState({
+            showDelete: false,
+        })
+        const user: User = this.state.userToDelete!
+        this.handleLoader("Deleting user")
+        const response = await fetch(`https://10.92.1.237:8080/api/user/remove?user=${user.id}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then((response: Response) => {
+                if (response.status === 400) {
+                    throw new Error("Status 400 bad request")
+                } else if (response.status === 200) {
+                    return response.json()
+                } else {
+                    throw new Error(`Unexpected response status: ${response.status}`)
+                }
+            })
+            .catch(error => {
+                throw new Error(error.Code);
+            });
+
+
+        if (response.status === 200 && response.data[0].success === "User deleted successfully") {
+            this.handleLoader("Updating table")
+
+            const dbUsers: User[] = (await APICalls.getAllUsers()).data
+            const groups: number[] = []
+            dbUsers.forEach((ele: User) => groups.push(ele.groupId))
+            dbUsers.forEach((ele: User) => {
+                ele.orginalGroupId = ele.groupId
+                ele.orginalEmail = ele.email
+                ele.orginalFirstName = ele.firstName
+                ele.orginalLastName = ele.lastName
+                ele.validEmail = true
+                ele.validFirstName = true
+                ele.validLastName = true
+                ele.manager = this.state.dbManagers.filter((man: Manager) => man.groupId === ele.groupId && man.managerId !== ele.id).concat(this.state.dbManagers.filter((man: Manager) => man.groupId !== ele.groupId))
+            })
+
+            this.handleLoader("All done")
+            this.setState({
+                selectedUsers: this.state.selectedUsers.filter((ele: any) => ele.id !== user.id),
+                dbUsers: dbUsers,
+                loading: false,
+                groupMax: Math.max(...groups),
+                groupMin: Math.min(...groups),
+            })
+        } else {
+            this.handleLoader()
+            this.handleShowTitle("Error")
+            console.log(response)
+            this.handleShowMessage(response.data[0].error)
+            this.setState({
+                showError: true,
+            })
+        }
+
+
+
+
+
+
+
+    }
+
+    /**
+     * Handles the closing of the deletion modal
+    */
+    private async handleDeleteClose(): Promise<void> {
+        this.setState({
+            showDelete: false,
+            userToDelete: null,
+        })
+    }
+
+
+    /**
+     * Handles the opening of the deletion modal
+    */
+    private async handleDeleteShow(user: User): Promise<void> {
+        let hasShown: boolean = false;
+
+        if (!hasShown) {
+            this.handleShowTitle("Are you sure?")
+            this.handleShowMessage("Are you sure that you want to delete this user? this action cannot be undone")
+            hasShown = true;
+            this.setState({
+                showDelete: true,
+                userToDelete: user,
+            })
+        }
+
+    }
 
     /**
      * Post the new changes to the server
