@@ -13,7 +13,6 @@ import ProjectManager from "../pages/projectCreation/projectManager";
 import ProjectMenu from "../pages/projectViewer/projectMenu";
 import ProjectViewer from "../pages/projectViewer/projectViewer";
 import GroupManager from "../pages/timeApproval/groupManager";
-import UserTimeApproval from "../pages/timeApproval/userTimeApproval";
 import UserTimeRegister from "../pages/timeRegister/userTimeRegister";
 import AdminTimeRegister from "../pages/timeRegister/adminTimeRegister";
 import BaseApiHandler from "../network/baseApiHandler";
@@ -91,7 +90,6 @@ class Router extends Component<any> {
                                 <Route path={"/project/menu"} Component={ProjectMenu}/>
                                 <Route path={"/project/viewer"} Component={ProjectViewer}/>
                                 { userInfo.isManager && !userInfo.isAdmin ?  <Route path={"/group/manager"} Component={GroupManager}/> : ""}
-                                { userInfo.isManager ?  <Route path={"/group/time-approval"} Component={UserTimeApproval}/> : ""}
                                 <Route path={"/user-register"} Component={UserTimeRegister}/>
                                 { userInfo.isAdmin ? <Route path={"/user-register/admin"} Component={AdminTimeRegister}/> : ""}
                                 <Route path="*" element={<Navigate to="/" replace />} />
