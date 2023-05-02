@@ -1,7 +1,8 @@
-import BaseApiHandler from "../../client/src/network/baseApiHandler";
-import {headers} from "./testBaseConfig";
+import BaseApiHandler from "../../../client/src/network/baseApiHandler";
+import {getConfig} from "../testBaseConfig";
 
-const apiHandler = new BaseApiHandler("http://localhost:8080");
+const apiHandler: BaseApiHandler = new BaseApiHandler("http://localhost:8080");
+let headers: Record<string, string> = getConfig();
 
 describe("Time-type API", () => {
     describe("GET API", () => {

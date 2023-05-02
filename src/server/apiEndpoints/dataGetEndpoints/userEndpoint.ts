@@ -1,11 +1,14 @@
-import GetEndpointBase from "../getEndpointBase";
+import GetEndpointBase, { PrimaryKeyType } from "../getEndpointBase";
 import {MySQLResponse} from "../../database/mysqlHandler";
-import {Request, Response} from "express";
 
 /**
  * Endpoint for .../api/role/get
  */
-class UserEndpoint extends  GetEndpointBase {
+class UserEndpoint extends GetEndpointBase {
+    urlPrimaryKey: PrimaryKeyType[] = [
+        {urlKey: "ids", mysqlKey: "id", allowAll: false},
+        {urlKey: "emails", mysqlKey: "email", allowAll: false, throwOnMissing: true}
+    ];
     requiredRole: number = 1;
 
     allowedColumns: string[] = [
@@ -23,25 +26,6 @@ class UserEndpoint extends  GetEndpointBase {
 
         return response.results;
     }
-
-    public getRoute(req:Request, res:Response) {
-        let primaryKey:string = "id";
-        let requestKeys: string[] = this.urlParamsConversion(req.query.ids, false);
-        if (requestKeys === undefined) {
-            requestKeys = this.urlParamsConversion(req.query.emails, false, true, res, req);
-            if (requestKeys === undefined) { return this.badRequest(res, req); }
-            primaryKey = "email";
-        }
-
-        let requestedValues:string[] = this.urlParamsConversion(req.query.var);
-
-        this.processRequest(req, requestedValues, primaryKey, requestKeys).then((data) => {
-            if (!res.writableEnded) {
-                res.setHeader('Content-Type', 'application/json');
-                res.status(data.status).json({status: 200, data: data.data});
-            }
-        })
-    };
 }
 
 export default UserEndpoint;

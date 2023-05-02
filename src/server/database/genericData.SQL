@@ -4,18 +4,11 @@
 # | Information for admin will be altered last |
 # |--------------- !! Beware !! ---------------|
 
-USE ${db};
 
-# ----------------------------------------------
-# ----------------- Time Type ------------------
-# ----------------------------------------------
-INSERT IGNORE INTO TIMETYPES
-(name)
-VALUES
-    ('billable'),
-    ('non-billable'),
-    ('sick'),
-    ('vacation');
+# Alex need the auth
+
+
+USE ${db};
 
 # ----------------------------------------------
 # ----------------- Projects -------------------
@@ -104,10 +97,6 @@ INSERT IGNORE INTO USERS_ROLES_CONNECTOR
 VALUES
     (2, 4);
 
-UPDATE GROUPS_CONNECTOR
-SET managerId=4
-WHERE groupId=1;
-
 # ------------ Normal-users ------------
 INSERT IGNORE INTO USERS
 (email,firstName,lastName,groupId)
@@ -134,8 +123,8 @@ VALUES
 INSERT IGNORE INTO USERS_ROLES_CONNECTOR
 (roleId,userID)
 VALUES
-    (3,9),  # Sarah Doe    user 8
-    (3,10); # Alex Johnson user 9
+    (3,8),  # Sarah Doe    user 8
+    (3,9);  # Alex Johnson user 9
 
 INSERT IGNORE INTO PROJECTS_MANAGER_CONNECTOR
 (userId, projectId)
@@ -144,7 +133,7 @@ VALUES
 
 # --------------- Admin ---------------
 # Update the default admin to different values
-UPDATE USERS
+    UPDATE USERS
 SET email='matt@example.com',firstName='Matt',lastName='Brown',groupId=2
 WHERE id=1;
 
@@ -164,19 +153,21 @@ INSERT IGNORE INTO GROUPS_CONNECTOR
 values
     (10, 4); # Sam Smith user 10
 
+
 # --------------- Auth ---------------
 INSERT IGNORE INTO  AUTH
 (email, authKey, authKeyEndDate, userId, password)
 VALUES
-    ('joe@example.com','2481f36dfc515ca76451aaadf1399026942a01ee50c6d0a61988b43cef039bc2','2023-12-30',2,'78675cc176081372c43abab3ea9fb70c74381eb02dc6e93fb6d44d161da6eeb3'), # Joe Smith user 2
-    ('jane@example.com','8c87b489ce35cf2e2f39f80e282cb2e804932a56a213983eeeb428407d43b52d','2023-12-30',3,'81f8f6dde88365f3928796ec7aa53f72820b06db8664f5fe76a7eb13e24546a2'), # Jane Doe  user 3
-    ('tom@example.com','72bb75a959e1785b79ffe7230eaeec25880707a91b4a4f98330fc1510bd40e03','2023-12-30',4,'e1608f75c5d7813f3d4031cb30bfb786507d98137538ff8e128a6ff74e84e643'), # Tom Jones user 4
-    ('jill@example.com','127ba059404a7145b3d876abfe50a1298dd49deb60eacefc55deb9c9d8261da6','2023-12-30',5,'8cf37351b60f00084392043ce2e6256b96cea92949f90c7abce464cf164fbfa6'), # Jill Jones   user 5
-    ('john@example.com','855f96e983f1f8e8be944692b6f719fd54329826cb62e98015efee8e2e071dd4','2023-12-30',6,'96d9632f363564cc3032521409cf22a852f2032eec099ed5967c0d000cec607a'), # John Adams   user 6
-    ('dave@example.com','7b34211350ff567970974e1e2b98d319a601969e74fd1a957bc889b8332d00eb','2023-12-30',7,'61ea0803f8853523b777d414ace3130cd4d3f92de2cd7ff8695c337d79c2eeee'), # Dave Brown   user 7
-    ('sam@example.com','cd25a6171969f2a3c6e35c7667e3908ef1bd2424241db04411a0eec454ca6c16','2023-12-30',8,'e96e02d8e47f2a7c03be5117b3ed175c52aa30fb22028cf9c96f261563577605'), # Sam Smith    user 8
-    ('sarah@example.com','1b0df3084513e398249e55cd6fe2b41dda58e0d835f78c6b8d33c08909c3df9e','2023-12-30',9,'d233633d9524e84c71d6fe45eb3836f8919148e4a5fc2234cc9e6494ec0f11c2'), # Sarah Doe    user 9
-    ('alex@example.com','6db61e6dcbcf2390e4a46af426f26a133a3bee45021422fc7ae86e9136f14110','2023-12-30',10,'4135aa9dc1b842a653dea846903ddb95bfb8c5a10c504a7fa16e10bc31d1fdf0'); # Alex Johnson user 10
+    ('joe@example.com','2481f36dfc515ca76451aaadf1399026942a01ee50c6d0a61988b43cef039bc2','2023-12-30',2,'78675cc176081372c43abab3ea9fb70c74381eb02dc6e93fb6d44d161da6eeb3'),   # Joe Smith user 2
+    ('jane@example.com','8c87b489ce35cf2e2f39f80e282cb2e804932a56a213983eeeb428407d43b52d','2023-12-30',3,'81f8f6dde88365f3928796ec7aa53f72820b06db8664f5fe76a7eb13e24546a2'),  # Jane Doe  user 3
+    ('tom@example.com','72bb75a959e1785b79ffe7230eaeec25880707a91b4a4f98330fc1510bd40e03','2023-12-30',4,'e1608f75c5d7813f3d4031cb30bfb786507d98137538ff8e128a6ff74e84e643'),   # Tom Jones user 4
+    ('jill@example.com','127ba059404a7145b3d876abfe50a1298dd49deb60eacefc55deb9c9d8261da6','2023-12-30',5,'8cf37351b60f00084392043ce2e6256b96cea92949f90c7abce464cf164fbfa6'),  # Jill Jones   user 5
+    ('john@example.com','855f96e983f1f8e8be944692b6f719fd54329826cb62e98015efee8e2e071dd4','2023-12-30',6,'96d9632f363564cc3032521409cf22a852f2032eec099ed5967c0d000cec607a'),  # John Adams   user 6
+    ('dave@example.com','7b34211350ff567970974e1e2b98d319a601969e74fd1a957bc889b8332d00eb','2023-12-30',7,'61ea0803f8853523b777d414ace3130cd4d3f92de2cd7ff8695c337d79c2eeee'),  # Dave Brown   user 7
+    ('sarah@example.com','1b0df3084513e398249e55cd6fe2b41dda58e0d835f78c6b8d33c08909c3df9e','2023-12-30',8,'d233633d9524e84c71d6fe45eb3836f8919148e4a5fc2234cc9e6494ec0f11c2'), # Sarah Doe    user 8
+    ('alex@example.com','6db61e6dcbcf2390e4a46af426f26a133a3bee45021422fc7ae86e9136f14110','2023-12-30',9,'4135aa9dc1b842a653dea846903ddb95bfb8c5a10c504a7fa16e10bc31d1fdf0'),  # Alex Johnson user 9
+    ('sam@example.com','cd25a6171969f2a3c6e35c7667e3908ef1bd2424241db04411a0eec454ca6c16','2023-12-30',10,'e96e02d8e47f2a7c03be5117b3ed175c52aa30fb22028cf9c96f261563577605');  # Sam Smith    user 10
+
 
 # Matt Brown user 1
 UPDATE AUTH

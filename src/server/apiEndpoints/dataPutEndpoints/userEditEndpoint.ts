@@ -38,9 +38,7 @@ class UserEditEndpoint extends PostEndpointBase {
             if (groupResponse.error !== null) message.push("Manager data couldn't be retrieved");
             let groupId = groupResponse.results[0].groupId;
             // Check if the group id is different from the altered
-            if (groupId !== user.manager) {
-                userUpdateSet.push({column: "groupId", value: groupId.toString()});
-            }
+            userUpdateSet.push({column: "groupId", value: groupId.toString()});
         }
         // Input validate email address and add if edited
         if (user.email) {
@@ -49,7 +47,6 @@ class UserEditEndpoint extends PostEndpointBase {
                 message.push("Email not valid");
             } else {
                 userUpdateSet.push({column: "email", value: user.email});
-                authUpdateSet.push({column: "email", value: user.email});
             }
         }
         if (userUpdateSet.length !== 0) {

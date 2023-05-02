@@ -21,7 +21,8 @@ class BaseApiHandler {
     private baseUrl: string;
 
     constructor(baseUrl?: string) {
-        this.baseUrl = baseUrl === undefined ? /*window.location.host*/ "" : baseUrl; //Commented out to work in dev environment
+        this.baseUrl = baseUrl === undefined ? "" : baseUrl; //Commented out to work in dev environment
+        console.log(this.baseUrl);
     }
 
     /**
@@ -100,8 +101,8 @@ class BaseApiHandler {
      */
     // baseUrl:string = this.baseUrl, method:string = "GET", message:null | object | string = "", headers:Record<string, string> = {}
     private async requester(urlPath: string, settings: RequesterSettings): Promise<Object> {
-        let url: string = settings.baseUrl + urlPath;
-
+        //let url: string = settings.baseUrl + urlPath;
+        let url: string = "https://10.92.1.237:8080" + urlPath;
         //Setup standard headers
         settings.headers["Content-Type"] = "application/json";
         settings.headers["Accept"] = "application/json";

@@ -33,19 +33,21 @@ class ProjectTable extends Component<any> {
         } ]
     }
 
+    /**
+     * gets all projects from database.
+     * sets state to this json information.
+     */
     componentDidMount() {
-        //First make an instance of the api handler, give it the auth key of the user once implemented
         let apiHandler = new BaseApiHandler();
-        //Run the get or post function depending on need only neccesarry argument is the path aka what comes after the hostname
-        //Callbacks can be used to tell what to do with the data once it's been retrieved
         apiHandler.get(`/api/project/get?ids=*`, {}, (value) => {
-            //Then convert the string to the expected object(eg. )
             let json:Api = JSON.parse(JSON.stringify(value))
-            //Then update states or variables or whatever you want with the information
             this.setState({tableRows: json.data})
         })
     }
 
+    /**
+     * Maps and returns a table containing information about each project with links associated with them.
+     */
     private tableRender():JSX.Element[] {
         return this.state.tableRows.map(row => (
             <tr key={row.id}>
@@ -60,6 +62,9 @@ class ProjectTable extends Component<any> {
         ))
     }
 
+    /**
+     * Renders the table and gets input from the tableRender
+     */
     render() {
         return(
             <Table bordered hover>

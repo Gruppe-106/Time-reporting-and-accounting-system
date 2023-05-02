@@ -9,6 +9,7 @@ interface ProjectMenuState {
     projects: ProjectTableRow[];
 }
 
+//Gets search query, to use id to get correct page
 const queryString = window.location.search;
 const params = new URLSearchParams(queryString);
 const id = parseInt(params.get("id") as string);
@@ -23,6 +24,9 @@ class ProjectCreator extends Component<any, ProjectMenuState> {
         };
     }
 
+    /**
+     * Renders the project creator page using the ProjectCreate component
+     */
     render() {
         return (
             <>

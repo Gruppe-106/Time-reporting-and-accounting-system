@@ -22,6 +22,9 @@ class ProjectMenu extends Component<any, ProjectMenuState>{
         };
     }
 
+    /**
+     * Renders the project manager page using the ProjectManageInformation component
+     */
     render() {
         return (
             <>
