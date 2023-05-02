@@ -33,13 +33,12 @@ class AuthEndpoint {
      * @throws Error if authentication fails
      */
     public async getAuthentication(req: Request): Promise<AuthData> {
-        // Get cookies from request headers
-        let cookies: Map<string, string> = getCookies(req.headers.cookie);
         // Get auth key from cookies
-        let authKey = cookies.get("auth");
+        let authKey = req.headers["auth-token"];
+
         // Throw error if no auth key is provided
-        if (!authKey) {
-            throw new Error("[Auth] No auth cookie provided");
+        if (authKey === undefined || authKey === "") {
+            throw new Error("[Auth] No auth-token provided");
         }
 
         let query: string = `SELECT authKey,authKeyEndDate,userId FROM AUTH WHERE authKey='${authKey}' AND authKeyEndDate >= NOW()`;

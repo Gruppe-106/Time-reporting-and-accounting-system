@@ -1,3 +1,5 @@
+import Cookies from "js-cookie";
+
 interface PostSettings {
     baseUrl?: string,
     body?: object | string,
@@ -106,12 +108,13 @@ class BaseApiHandler {
         //Setup standard headers
         settings.headers["Content-Type"] = "application/json";
         settings.headers["Accept"] = "application/json";
+        settings.headers["Auth-token"] = Cookies.get("auth") ?? "";
 
         let body = settings.body === null ? null : JSON.stringify(settings.body)
 
         //Make request to node server
         return await fetch(url, {
-            credentials: "include",
+            //credentials: "include",
             method: settings.method,
             headers: settings.headers,
             body: body
