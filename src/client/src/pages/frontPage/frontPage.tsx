@@ -5,6 +5,7 @@ import LoadingOverlay from 'react-loading-overlay-ts';
 import { userInfo } from "../../utility/router";
 import APICalls from "../adminPanel/utility/apiCalls";
 import Form from 'react-bootstrap/Form';
+import BaseApiHandler from "../../network/baseApiHandler";
 
 
 interface User {
@@ -74,10 +75,12 @@ class FrontPage extends Component<any, CustomTypes> {
 
     async componentDidMount(): Promise<void> {
         this.handleLoader("Getting user info")
-        const user: User = (await APICalls.getUser(userInfo.userId)).data[0]
+
+
+        const user: User = await APICalls.getUser<User>(userInfo.userId)
 
         this.handleLoader("Getting tasks")
-        const tasks: Tasks[] = (await APICalls.getTasks(userInfo.userId)).data
+        const tasks: Tasks[] = await APICalls.getTasks<Tasks[]>(userInfo.userId)
 
         this.handleLoader("All done")
         this.setState(
