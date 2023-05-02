@@ -709,7 +709,6 @@ class AdminPanel extends Component<any, CustomTypes> {
     private async handleDeleteClose(): Promise<void> {
         this.setState({
             showDelete: false,
-            selectedUsers: this.state.selectedUsers.filter((user: User) => user.id !== this.state.userToDelete!.id),
             userToDelete: null,
         })
     }
