@@ -127,9 +127,9 @@ class DataExport extends Component<any>{
         let csvText: string = this.convertToCSV(convertedData);
         // Convert the string to bytes
         let bytes = new TextEncoder().encode(csvText);
-
+        
         // Create a blob with the bytes
-        let blob = new Blob([bytes], { type: "text/plain" });
+        let blob = new Blob([bytes], { type: "text/plain;charset=utf-8" });
 
         // Create a URL for the blob
         let url = URL.createObjectURL(blob);
@@ -151,7 +151,8 @@ class DataExport extends Component<any>{
     private convertToCSV(convertedData: AllData): string {
         let headerElements = ["Last name", "First name", "Id", "Project", "Id", "Task", "Id", "Total minutes(task)"]
         let delimiter = ';'
-        let headerLine = `"${headerElements.join(`"${delimiter}"`)}"`; // Just joins all the elements above with a ";" in between and at the two ends.
+        let headerLine = `"${headerElements.join(`"${delimiter}"`)}"`; 
+        // Just joins all the elements above with a ' ";" ' in between and at the two ends ' " '.
         let allText = "" + headerLine;
         for (let i = 0; i < convertedData.data.length; i++) {
             const [lastName, userData]: [string, UserData] = convertedData.data[i];
@@ -161,15 +162,13 @@ class DataExport extends Component<any>{
 
                 for (let k = 0; k < projectData.tasks.length; k++) {
                     const [taskName, taskData]: [string, TaskData] = projectData.tasks[k];
-                    console.log(taskData.totalHours);
                     let varList = [lastName, userData.firstName, userData.id, projectName, projectData.projectId, taskName, taskData.taskId, taskData.totalHours];
-                    allText += `\n"${varList.join(`"${delimiter}"`)}"`; // For all tasks we need to create a new line in the csv containing all info. 
+                    allText += `\n"${varList.join(`"${delimiter}"`)}"`; 
+                    // For all tasks we need to create a new line in the csv containing all info. 
                     // Joins the elements the same way the header works.
-                    console.log(`\n"${varList.join(`"${delimiter}"`)}"`);
                 }
             }
         }
-
         return allText;
     }
 
