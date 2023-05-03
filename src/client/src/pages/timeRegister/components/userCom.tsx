@@ -248,7 +248,6 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
       deletedItem[k].time = 60 // Should be 0
       deletedItem[k].userId = userId
       deletedItem[k].managerLogged = false
-      console.log("Deleted data");
       let apiHandler = new BaseApiHandler();
       apiHandler.put(`/api/time/register/edit/put`, { body: deletedItem[k] }, (value) => {
         console.log(value);
@@ -281,7 +280,6 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
         } else if (sameTaskId && sameDate) { // Should put data
           console.log("Updated data for:" + item.date + "" + item.taskId);
           item.managerLogged = false
-          console.log(item)
           let apiHandler = new BaseApiHandler();
           apiHandler.put(`/api/time/register/edit/put`, { body: item }, (value) => {
             console.log(value);
@@ -305,7 +303,6 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     let deletedItem = this.deleteItems(prevRowSubmitData, dataToUpdate)
     // Set the deleted items in state and log the previous row submit data
     this.setState({ deletedItems: deletedItem })
-    console.log(prevRowSubmitData)
   }
 
   /**
@@ -447,7 +444,6 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
         })
       }
     }
-    console.log()
     return timeArr;
   }
 
@@ -571,7 +567,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
 
     return (
       <Container fluid="lg">
-        <Table bordered size="sm" className="fixed-table ellipses" responsive style={{whiteSpace: "nowrap"}}>
+        <Table bordered size="sm" className="fixed-table ellipses" responsive="sm" style={{whiteSpace: "nowrap"}}>
           {this.renderHeaderRow()}
           <tbody>
             {this.renderTaskRows()}
@@ -588,7 +584,6 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
             </Button>
           </ButtonGroup>
         </center>
-        <Button onClick={() => console.log(searchDataState)}></Button>
         {this.props.adminPicked === true ? null : <p>Delete task at date:</p>}
         {deletedItems.map((item, index) => {
           return <p key={index}>{item.taskName}, at {dateStringFormatter(item.date)}</p>
