@@ -24,7 +24,6 @@ class BaseApiHandler {
 
     constructor(baseUrl?: string) {
         this.baseUrl = baseUrl === undefined ? "" : baseUrl; //Commented out to work in dev environment
-        console.log(this.baseUrl);
     }
 
     /**
