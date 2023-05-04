@@ -129,6 +129,7 @@ export class ApiRouter extends BaseRouter {
         this.router.use(function(req, res, next) {
             res.setHeader('Access-Control-Allow-Origin', '*');
             res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, content-type, Auth-token');
+            res.setHeader('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE');
             next();
         });
         this.router.use(express.json());
