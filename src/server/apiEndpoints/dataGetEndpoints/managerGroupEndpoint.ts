@@ -122,10 +122,10 @@ class ManagerGroupEndpoint extends GetEndpointBase {
     private async getEmployeeData(finalResult: ManagerGroupReturnType[]) {
         //Find all group ids to find employees for & create a list mapped to group id as key
         let groupIds: number[] = [];
-        let groupResult:[key: number, data: ManagerGroupReturnType][] = [];
+        let groupResult:Map<number, ManagerGroupReturnType> = new Map<number, ManagerGroupReturnType>();
         for (const result of finalResult) {
             groupIds.push(result.groupId);
-            groupResult.push([result.groupId, result]);
+            groupResult.set(result.groupId, result);
         }
 
         //Send query to get all employees with a group id found above
@@ -136,18 +136,15 @@ class ManagerGroupEndpoint extends GetEndpointBase {
         //Loop through all employees and add them to the correct group
         let employeeResult: UserDataType[] = employeeResponse.results;
         for (const user of employeeResult) {
-            groupResult[user.groupId][1].employees.push({
+            groupResult.get(user.groupId).employees.push({
                 id: user.id,
                 firstName: user.firstName,
                 lastName: user.lastName,
                 email: user.email
             });
         }
-
         // Return the result without the group id as key
-        return groupResult.map(value => {
-            return value[1];
-        });
+        return Array.from(groupResult.values());
     }
 
 }

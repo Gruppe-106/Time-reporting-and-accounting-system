@@ -126,6 +126,11 @@ export class ApiRouter extends BaseRouter {
      * Returns the api router
      */
     public routes(): Router {
+        this.router.use(function(req, res, next) {
+            res.setHeader('Access-Control-Allow-Origin', '*');
+            res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, content-type, Auth-token');
+            next();
+        });
         this.router.use(express.json());
         this.getRoutes();
         this.postRoutes();

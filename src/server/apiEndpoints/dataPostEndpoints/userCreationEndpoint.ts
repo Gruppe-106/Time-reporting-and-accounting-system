@@ -37,14 +37,22 @@ class UserCreationEndpoint extends PostEndpointBase {
         let userId: number = userResponse.results.insertId
 
         // Make a list of all user roles to add to connector
+        let createGroup: boolean = false;
         let userRoles: string[][] = [];
         for (const userRole of user.roles) {
+            if (userRole === 2) createGroup = true;
             userRoles.push([userId.toString(), userRole.toString()])
         }
 
         // Append all roles the user has to the user role connector table
         let userRoleResponse: MySQLResponse = await this.mySQL.insert("USERS_ROLES_CONNECTOR", ["userId", "roleId"], userRoles);
         if (userRoleResponse.error !== null) throw new Error("[MySQL] Failed insert data");
+
+        // Create group for the user if they manager role
+        if (createGroup) {
+            let userGroupResponse: MySQLResponse = await this.mySQL.insert("GROUPS_CONNECTOR", ["managerId"], [userId.toString()]);
+            if (userGroupResponse.error !== null) throw new Error("[MySQL] Failed insert data");
+        }
 
         // Add user to the authentication table
         let authKey: AuthKey = authKeyCreate(userId);

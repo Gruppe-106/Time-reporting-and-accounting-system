@@ -111,6 +111,8 @@ CREATE TABLE AUTH
         ON UPDATE CASCADE,
     FOREIGN KEY (userId)
         REFERENCES USERS (id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
 );
 
 # Add a default admin user

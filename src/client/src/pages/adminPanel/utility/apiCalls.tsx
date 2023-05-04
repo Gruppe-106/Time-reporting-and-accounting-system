@@ -1,3 +1,4 @@
+import BaseApiHandler from "../../../network/baseApiHandler";
 
 
 
@@ -12,31 +13,20 @@ export default class APICalls {
      * @param id If of the user
      * @returns A user object if found
      */
-    public static getUser(id: number): Promise<{status:number, data:{
-        email: string,
-        firstName: string,
-        lastName: string,
-        id: number,
-        groupId: number
-    }[]}> {
-        return fetch(`/api/user/get?ids=${id}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-            .then((response: Response) => {
+    public static getUser<T>(id: number): Promise<T> {
+        const apiHandler: BaseApiHandler = new BaseApiHandler()
+        return new Promise((resolve, reject) => {
+            apiHandler.get(`/api/user/get?ids=${id}`, {}, (value) => {
+                const response = JSON.parse(JSON.stringify(value));
                 if (response.status === 400) {
                     throw new Error("Status 400 bad request")
                 } else if (response.status === 200) {
-                    return response.json()
+                    resolve(response.data[0] as T)
                 } else {
                     throw new Error(`Unexpected response status: ${response.status}`)
                 }
             })
-            .catch(error => {
-                throw new Error(error.Code);
-            });
+        })
     }
 
     /**
@@ -44,62 +34,61 @@ export default class APICalls {
      * @param id The id of the user
      * @returns The tasks and corrosponding projects if any
      */
-    public static getTasks(id: number): Promise<{
-        status: number, data: {
-            projectId: number,
-            projectName: string,
-            taskId: number,
-            taskName: string
-        }[]
-    }> {
+    public static getTasks<T>(id: number): Promise<T> {
+        const apiHandler: BaseApiHandler = new BaseApiHandler()
 
-        return fetch(`/api/user/task/project/get?user=${id}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-            .then((response: Response) => {
+        return new Promise((resolve, reject) => {
+            apiHandler.get(`/api/user/task/project/get?user=${id}`, {}, (value) => {
+                const response = JSON.parse(JSON.stringify(value));
                 if (response.status === 400) {
                     throw new Error("Status 400 bad request")
                 } else if (response.status === 200) {
-                    return response.json()
+                    resolve(response.data as T)
                 } else {
                     throw new Error(`Unexpected response status: ${response.status}`)
                 }
             })
-            .catch(error => {
-                throw new Error(error.Code);
-            });
+        })
     }
 
 
-    public static getAllUsers(): Promise<{status:number,data:{
-        id: number;
-        email: string;
-        firstName: string;
-        lastName: string;
-        groupId: number;
-    }[]}> {
+    public static getAllUsers<T>(): Promise<T> {
 
-        return fetch(`/api/user/get?ids=*`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-            .then((response: Response) => {
+        const apiHandler: BaseApiHandler = new BaseApiHandler()
+
+        return new Promise((resolve, reject) => {
+            apiHandler.get(`/api/user/get?ids=*`, {}, (value) => {
+                const response = JSON.parse(JSON.stringify(value));
                 if (response.status === 400) {
                     throw new Error("Status 400 bad request")
                 } else if (response.status === 200) {
-                    return response.json()
+                    resolve(response.data as T)
                 } else {
                     throw new Error(`Unexpected response status: ${response.status}`)
                 }
             })
-            .catch(error => {
-                throw new Error(error.Code);
-            });
+        })
+    }
+
+    /**
+     * Get all roles from the database
+     * @returns Promise containing all possible roles
+    */
+    public static getAllRoles<T>(): Promise<T> {
+        const apiHandler: BaseApiHandler = new BaseApiHandler()
+
+        return new Promise((resolve, reject) => {
+            apiHandler.get(`/api/role/get?ids=*`, {}, (value) => {
+                const response = JSON.parse(JSON.stringify(value));
+                if (response.status === 400) {
+                    throw new Error("Status 400 bad request")
+                } else if (response.status === 200) {
+                    resolve(response.data as T)
+                } else {
+                    throw new Error(`Unexpected response status: ${response.status}`)
+                }
+            })
+        })
 
     }
 
@@ -107,55 +96,21 @@ export default class APICalls {
      * Get all roles from the database
      * @returns Promise containing all possible roles
     */
-    public static getAllRoles(): Promise<{ status: number, data: { id: number, name: string }[] }> {
-        // const apiHandler:BaseApiHandler = new BaseApiHandler()
+    public static getAllManagers<T>(): Promise<T> {
+        const apiHandler: BaseApiHandler = new BaseApiHandler()
 
-        return fetch(`/api/role/get?ids=*`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-            .then((response: Response) => {
+        return new Promise((resolve, reject) => {
+            apiHandler.get(`/api/role/user/get?role=2`, {}, (value) => {
+                const response = JSON.parse(JSON.stringify(value));
                 if (response.status === 400) {
                     throw new Error("Status 400 bad request")
                 } else if (response.status === 200) {
-                    return response.json()
+                    resolve(response.data as T)
                 } else {
                     throw new Error(`Unexpected response status: ${response.status}`)
                 }
             })
-            .catch(error => {
-                throw new Error(error.Code);
-            });
-
-    }
-
-    /**
-     * Get all roles from the database
-     * @returns Promise containing all possible roles
-    */
-    public static getAllManagers(): Promise<{ status: number, data: { id: number, name: string }[] }> {
-        // const apiHandler:BaseApiHandler = new BaseApiHandler()
-
-        return fetch(`/api/role/user/get?role=2`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
         })
-            .then((response: Response) => {
-                if (response.status === 400) {
-                    throw new Error("Status 400 bad request")
-                } else if (response.status === 200) {
-                    return response.json()
-                } else {
-                    throw new Error(`Unexpected response status: ${response.status}`)
-                }
-            })
-            .catch(error => {
-                throw new Error(error.Code);
-            });
 
     }
 
@@ -164,33 +119,41 @@ export default class APICalls {
      * Gets all manager groups
      * @returns the manager groups object
      */
-    public static getAllManagerGroups(): Promise<{
-        status: number, data: {
-            managerId: number,
-            firstName: string,
-            lastName: string,
-            groupId: number
-        }[]
-    }> {
+    public static getAllManagerGroups<T>(): Promise<T> {
 
-        return fetch("/api/group/manager/get?manager=*", {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-            .then((response: Response) => {
+        const apiHandler: BaseApiHandler = new BaseApiHandler()
+
+        return new Promise((resolve, reject) => {
+            apiHandler.get(`/api/group/manager/get?manager=*`, {}, (value) => {
+                const response = JSON.parse(JSON.stringify(value));
                 if (response.status === 400) {
                     throw new Error("Status 400 bad request")
                 } else if (response.status === 200) {
-                    return response.json()
+                    resolve(response.data as T)
                 } else {
                     throw new Error(`Unexpected response status: ${response.status}`)
                 }
             })
-            .catch(error => {
-                throw new Error(error.Code);
-            });
+        })
+
+    }
+
+
+    public static deleteUser(id:number):Promise<void>{
+        const apiHandler: BaseApiHandler = new BaseApiHandler()
+
+        return new Promise((resolve, reject) => {
+            apiHandler.delete(`/api/user/remove?user=${id}`, {}, (value) => {
+                const response = JSON.parse(JSON.stringify(value));
+                if (response.status === 400) {
+                    throw new Error("Status 400 bad request")
+                } else if (response.status === 200) {
+                    resolve(response)
+                } else {
+                    throw new Error(`Unexpected response status: ${response.status}`)
+                }
+            })
+        })
     }
 
 }

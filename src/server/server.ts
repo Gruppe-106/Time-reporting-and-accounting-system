@@ -1,5 +1,5 @@
 import {Express} from "express";
-import {MainRouter} from "./mainRouter";
+import {MainRouter} from "../mainRouter";
 import * as readline from "readline";
 import {mysqlHandler} from "../app";
 import * as https from "https";
@@ -11,7 +11,7 @@ import * as http from "http";
 const privateKey : string = fs.readFileSync(path.join(__dirname, "/SSL/selfsigned.key"), 'utf8');
 const certificate: string = fs.readFileSync(path.join(__dirname, "/SSL/selfsigned.crt"), 'utf8');
 
-const credentials: {key: string, cert: string} = {key: privateKey, cert: certificate};
+export const credentials: {key: string, cert: string} = {key: privateKey, cert: certificate};
 
 export class Server {
     private app: Express;
