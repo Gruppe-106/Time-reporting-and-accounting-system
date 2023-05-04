@@ -48,6 +48,12 @@ class TaskTimeRegisterEndpoint extends GetEndpointBase {
             if (requestValues.indexOf(value.request) !== -1 || allColumns) mysqlBuilder.addColumnsToGet([value.column]);
         });
 
+        if (requestValues.indexOf("taskTimeType") !== -1 || allColumns) {
+            mysqlBuilder.join(MySQLJoinTypes.CROSS, "TASKS", ["t.id", "ttr.taskId"], "t");
+            mysqlBuilder.join(MySQLJoinTypes.CROSS, "TIMETYPES", ["t.timeType", "tt.id"], "tt");
+            mysqlBuilder.addColumnsToGet(["tt.name as timeTypeName", "tt.id as timeType"]);
+        }
+
         if (requestValues.indexOf("taskName") !== -1 || allColumns) {
             mysqlBuilder.join(MySQLJoinTypes.CROSS, "TASKS", ["t.id", "ttr.taskId"], "t");
             mysqlBuilder.addColumnsToGet(["t.name as taskName"]);
