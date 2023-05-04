@@ -16,3 +16,14 @@ export function arrayOnlyNumeric(arr: string[]) {
         if (!Number.isNaN(parseInt(value))) return value;
     })
 }
+
+/**
+ * Converts and returns a string array, from any array
+ * @param {any[]} arr
+ */
+export function arrayToStringArray(arr: any[]) {
+    // Convert list to list of strings
+    return arr.map((value) => {
+        return value.toString()
+    });
+}
