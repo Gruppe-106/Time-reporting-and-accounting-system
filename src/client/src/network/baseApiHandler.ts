@@ -1,4 +1,5 @@
 import Cookies from "js-cookie";
+import { localMode } from "../utility/router";
 
 interface PostSettings {
     baseUrl?: string,
@@ -102,8 +103,8 @@ class BaseApiHandler {
      */
     // baseUrl:string = this.baseUrl, method:string = "GET", message:null | object | string = "", headers:Record<string, string> = {}
     private async requester(urlPath: string, settings: RequesterSettings): Promise<Object> {
-        //let url: string = settings.baseUrl + urlPath;
         let url: string = "https://10.92.1.237:8080" + urlPath;
+        if (localMode) url = "https://localhost:8080" + urlPath;
         //Setup standard headers
         settings.headers["Content-Type"] = "application/json";
         settings.headers["Accept"] = "application/json";

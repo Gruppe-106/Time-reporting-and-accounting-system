@@ -30,7 +30,7 @@ interface AuthApi {
         }[]
     }
 }
-
+const localMode = true;
 const userInfo = {
     userId: -1,
     isAdmin: false,
@@ -38,7 +38,7 @@ const userInfo = {
     isManager: false
 }
 
-export {userInfo};
+export {userInfo, localMode};
 
 class Router extends Component<any> {
     state = {

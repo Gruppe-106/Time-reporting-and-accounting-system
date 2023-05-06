@@ -44,7 +44,7 @@ describe("User API", () => {
     });
 
     describe("User POST API", () => {
-        test("Success case", () => {
+        test.concurrent("Success case", async () => {
             let bodySuccess = {
                 firstName   : "Test",
                 lastName    : "Test",
@@ -54,10 +54,11 @@ describe("User API", () => {
                 roles       : [1]
             }
 
-            apiHandler.post("/api/user/creation/post", {headers: headers, body: bodySuccess}, (value) => {
-                expect(value).toStrictEqual({ status: 200, data: { success: 'true', message: [ 'success' ] } });
-            });
-        })
+            let value = await new Promise((resolve) => { apiHandler.post("/api/user/creation/post", {headers: headers, body: bodySuccess}, (value) => {
+                resolve(value);
+            })});
+            expect(value).toStrictEqual({ status: 200, data: { success: 'true', message: [ 'success' ] } });
+        }, 10000);
 
         test("Fail case bad email", () => {
             let bodyFail = {

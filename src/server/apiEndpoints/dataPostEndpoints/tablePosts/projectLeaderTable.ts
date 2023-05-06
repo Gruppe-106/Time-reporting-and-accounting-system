@@ -1,7 +1,7 @@
 import {MySQLResponse} from "../../../database/mysqlHandler";
 import MysqlQueryBuilder from "../../../database/mysqlStringBuilder";
 import {mysqlHandler} from "../../../../app";
-import {arrayToStringArray} from "../../../utility/array";
+import "../../../utility/array";
 
 /**
  * Adds project leaders to the PROJECTS_MANAGER_CONNECTOR table
@@ -36,7 +36,7 @@ export async function validateProjectLeaders(projectLeaders: number[]) {
 
     // Filter by role id and user id, so results will only be valid project leaders
     let baseWhere: string = mysqlStringBuilder.where(["roleId", ["3"]]);
-    mysqlStringBuilder.from("USERS_ROLES_CONNECTOR", ["userId", arrayToStringArray(projectLeaders)], baseWhere)
+    mysqlStringBuilder.from("USERS_ROLES_CONNECTOR", ["userId", projectLeaders.toStringArray()], baseWhere)
         .addColumnsToGet(["roleId"]);
 
     // Retrieve data from database and check if list is equally long, meaning all users are project leaders
