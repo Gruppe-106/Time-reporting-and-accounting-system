@@ -28,15 +28,17 @@ export function dateValid(date: number) {
  * @param {any} obj - The project creation data to validate.
  * @returns {Promise<boolean>} - True if the data is valid, false otherwise.
  */
-async function isValidProjectCreationData(obj: any): Promise<boolean> {
+async function isValidProjectCreationData(obj: any): Promise<string[]> {
+    let missing: string[] = [];
     // Check if all required objects are present
-    if (!("name" in obj && "startDate" in obj && "endDate" in obj && "projectLeader" in obj)) return false;
+    if (!("name" in obj && "startDate" in obj && "endDate" in obj && "projectLeader" in obj)) return ["Object invalid"];
     // Check if dates are valid
-    if (!dateValid(obj.startDate) || !dateValid(obj.endDate)) return false;
+    if (!dateValid(obj.startDate) || !dateValid(obj.endDate)) missing.push("Date invalid");
     // Check if name is a string and is at least one character
-    if (typeof obj.name !== "string" || obj.name.length < 1) return false;
+    if (typeof obj.name !== "string" || obj.name.length < 1) missing.push("Name invalid");
     // Validate all users are project leaders
-    return await validateProjectLeaders(obj.projectLeader);
+    if (!await validateProjectLeaders(obj.projectLeader)) missing.push("Project leaders invalid");
+    return missing;
 }
 
 class ProjectCreationEndpoint extends PostEndpointBase {
@@ -52,8 +54,9 @@ class ProjectCreationEndpoint extends PostEndpointBase {
         let project: ProjectCreationData = req.body;
 
         // Check if the project creation data is valid
-        if (!await isValidProjectCreationData(project)) {
-            return ["Invalid data"];
+        let missing: string[] = await isValidProjectCreationData(project);
+        if (missing.length !== 0) {
+            return missing;
         }
 
         // Format column data

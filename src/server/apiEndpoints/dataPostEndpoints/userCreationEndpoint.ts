@@ -4,6 +4,7 @@ import { MySQLResponse } from "../../database/mysqlHandler";
 import { AuthKey, authKeyCreate } from "../../utility/authKeyCreator";
 
 import "../../utility/array";
+import {mysqlHandler} from "../../../app";
 
 interface UserCreationData {
     firstName: string,
@@ -21,7 +22,7 @@ interface UserCreationData {
 */
 async function getGroupIdFromManagerId(mangerId: number): Promise<number> {
     // Retrieve group information from database
-    let groupResponse: MySQLResponse = await this.mySQL.select("GROUPS_CONNECTOR", ["groupId"], {
+    let groupResponse: MySQLResponse = await mysqlHandler.select("GROUPS_CONNECTOR", ["groupId"], {
         column: "managerId",
         equals: [mangerId.toString()]
     });
@@ -46,7 +47,7 @@ async function validateUserCreationData(user: UserCreationData): Promise<[number
 
     // Input validate email address
     const emailValid: boolean = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(user.email);
-    if (emailValid) missing.push("Email not valid");
+    if (!emailValid) missing.push("Email not valid");
 
     // Validate that password is a sha-256, at least within reason
     if (typeof user.password !== "string" || user.password.length !== 64) missing.push("Password invalid");
@@ -71,12 +72,14 @@ async function validateUserCreationData(user: UserCreationData): Promise<[number
  */
 async function insertUser(user: UserCreationData, groupId: number): Promise<number> {
     // Insert new user into USERS table
-    let userResponse: MySQLResponse = await this.mySQL.insert("USERS",
+    let userResponse: MySQLResponse = await mysqlHandler.insert("USERS",
         ["email", "firstName", "lastName", "groupId"],
         [user.email, user.firstName, user.lastName, groupId.toString()])
 
     // Check for errors and throw if needed
-    if (userResponse.error !== null) throw new Error("[MySQL] Failed insert data");
+    if (userResponse.error !== null) {
+        throw new Error("[MySQL] Failed insert data");
+    }
 
     // Return the ID of the inserted user
     return userResponse.results.insertId;

@@ -30,7 +30,7 @@ interface AuthApi {
         }[]
     }
 }
-const localMode = true;
+
 const userInfo = {
     userId: -1,
     isAdmin: false,

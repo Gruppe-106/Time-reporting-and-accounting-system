@@ -42,9 +42,9 @@ mysqlHandler.initConnection(async () => {
         // Add fake data to database if arg is given
         if (process.argv.contains("fake")) await insertGeneric();
         // Start listening on the server
-        server.start(port);
         clientServer.listen(443, () => { console.log("[Server] Client server is now running")});
     }
+    server.start(port);
 })
 
 

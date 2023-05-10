@@ -30,16 +30,18 @@ export async function addProjectLeader(projectLeaders: number[], projectId: numb
  * @param {number[]} projectLeaders List of users to check
  * @return {boolean} True if all project leaders, otherwise false
  */
-export async function validateProjectLeaders(projectLeaders: number[]) {
+export async function validateProjectLeaders(projectLeaders: number[]): Promise<boolean> {
     // Check if the provided users are actual project leaders
     let mysqlStringBuilder: MysqlQueryBuilder = new MysqlQueryBuilder();
 
     // Filter by role id and user id, so results will only be valid project leaders
-    let baseWhere: string = mysqlStringBuilder.where(["roleId", ["3"]]);
-    mysqlStringBuilder.from("USERS_ROLES_CONNECTOR", ["userId", projectLeaders.toStringArray()], baseWhere)
-        .addColumnsToGet(["roleId"]);
+    let where: string = mysqlStringBuilder.where(["roleId", ["3"]]);
+    where = mysqlStringBuilder.where(["userId", projectLeaders.toStringArray()], where);
 
+    mysqlStringBuilder.from("USERS_ROLES_CONNECTOR", undefined, where)
+        .addColumnsToGet(["roleId"]);
     // Retrieve data from database and check if list is equally long, meaning all users are project leaders
     let response: MySQLResponse = await mysqlHandler.sendQuery(mysqlStringBuilder.build());
+
     return response.results.length === projectLeaders.length;
 }

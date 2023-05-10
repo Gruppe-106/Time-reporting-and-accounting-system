@@ -9,7 +9,7 @@
     "build": "npx tsc",
     "test-server:run": "npx ts-node app.ts test",
     "test": "jest",
-    "server-test": "start-server-and-test test-server:run http://localhost:8080 test",
+    "server-test": "start-server-and-test test-server:run http://localhost:8080/ test",
     "update-node": "npm install && cd client && npm install"
   },
   "repository": {
