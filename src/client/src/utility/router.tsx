@@ -38,7 +38,7 @@ const userInfo = {
     isManager: false
 }
 
-export {userInfo, localMode};
+export {userInfo};
 
 class Router extends Component<any> {
     state = {
