@@ -2,7 +2,6 @@ import * as mysql from "mysql2";
 import {Connection, createConnection, Field, Pool, Query, QueryError} from "mysql2";
 import {wipeDatabase} from "./wipeDB";
 import * as fs from "fs";
-import {mysqlHandler} from "../../app";
 
 export interface MySQLConfig {
     host               : string,
@@ -129,29 +128,26 @@ class MysqlHandler {
         await connection.connect();
 
         // Test if the database exists or try to create one
-        let result = new Promise<boolean>(async (resolve) => {
+        let result = await new Promise<boolean>(async (resolve) => {
             connection.query(`SHOW DATABASES LIKE '${database}';`,async (err, result, fields) => {
                 // If length of result is not 0, then a database has been found with the specified name
-                if (Array.isArray(result)) {
-                    if (result.length === 0 || createClean) {
-                        if (result.length === 0) console.log(`[MySQL] Database ${database} doesn't exist`);
-                        console.log(`[MySQL] Creating clean version`);
-                        // Try to create database
-                        let success = await wipeDatabase(database, connection);
-                        if (success) {
-                            console.log(`[MySQL] Database ${database} has been created`);
-                            return resolve(true);
-                        } else {
-                            console.log(`[MySQL] Database ${database} couldn't be created`);
-                            return resolve(false);
-                        }
+                let isArray = Array.isArray(result) && result.length === 0;
+                if (createClean || isArray) {
+                    if (isArray) console.log(`[MySQL] Database ${database} doesn't exist`);
+                    console.log(`[MySQL] Creating clean version`);
+                    // Try to create database
+                    let success = await wipeDatabase(database, connection);
+                    if (success) {
+                        console.log(`[MySQL] Database ${database} has been created`);
+                        return resolve(true);
+                    } else {
+                        console.log(`[MySQL] Database ${database} couldn't be created`);
+                        return resolve(false);
                     }
                 }
                 return resolve(true);
             });
         });
-        // Destroy connection as it will be not used anymore
-        connection.destroy();
         return result;
     }
 
