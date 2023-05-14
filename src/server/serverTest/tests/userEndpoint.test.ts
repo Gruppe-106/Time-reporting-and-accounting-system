@@ -85,7 +85,7 @@ describe("User API", () => {
             await new Promise((resolve) => {
                 apiHandler.post("/api/user/creation/post", {authKey: authKey, body: bodyFail}, (value) => {
                     expect(value["status"]).toBe(404);
-                    expect(value["data"]["error"]).toBe("Failed to submit data");
+                    expect(value["data"]).toStrictEqual({ success: 'false', reasons: [ 'Email not valid' ] });
                     resolve(true);
                 });
             });

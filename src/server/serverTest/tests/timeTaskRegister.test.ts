@@ -2,7 +2,7 @@ import BaseApiHandler from "../../../client/src/network/baseApiHandler";
 import {authKey} from "../testBaseConfig";
 const apiHandler: BaseApiHandler = new BaseApiHandler("http://localhost:8080");
 
-describe("Time-type API", () => {
+describe("Time-register API", () => {
     describe("GET API", () => {
         // Try to get a role without an id
         test("Fail case", async () => {
@@ -119,6 +119,7 @@ describe("Time-type API", () => {
                     expect(value["status"]).toBe(404);
                     expect(value["data"]["message"]).toMatch("Missing Body");
                     expect(value["data"]["success"]).toMatch("false");
+                    resolve(true);
                 });
             });
         });
@@ -138,7 +139,7 @@ describe("Time-type API", () => {
         });
 
         let bodySuccess = {
-            date   : 1692403200000,
+            date   : 1681948800000,
             taskId : 1,
             userId : 1,
             time   : 30

@@ -215,6 +215,7 @@ describe("Project API", () => {
                         {
                             status: 200,
                             data: [
+                                {taskId: 1, id: 1, firstName: "Admin", lastName: "Default"},
                                 {taskId: 1, id: 4, firstName: 'Group', lastName: 'User1'},
                                 {taskId: 1, id: 5, firstName: 'Group', lastName: 'User2'}
                             ]
