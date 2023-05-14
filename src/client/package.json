@@ -32,6 +32,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "start:local": "react-scripts start local",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -54,7 +55,6 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "https://10.92.1.237:8080",
   "devDependencies": {
     "@types/jest": "^29.5.1",
     "@types/mocha": "^10.0.1"

@@ -197,6 +197,11 @@ INSERT IGNORE INTO USERS_TASKS_TIME_REGISTER
 VALUES
     ('2023-01-01',4,10,30,0,0);
 
+INSERT IGNORE INTO USERS_ROLES_CONNECTOR
+(roleId, userId)
+values
+    (2, 1);
+
 # ----------------------------------------
 # ---------- Time task register ----------
 # ----------------------------------------
@@ -213,6 +218,11 @@ INSERT INTO USERS
 (email,firstName,lastName,groupId)
 VALUES
     ('userput@example.com','User','Put', 1); # Id 13
+
+INSERT IGNORE INTO USERS_TASKS_CONNECTOR
+(userId,taskId)
+VALUES
+    (1,1);
 
 # ----------------------------------------
 # ----------------- Role -----------------
