@@ -9,7 +9,8 @@ interface Api{
         name?: string,
         startDate?: number,
         endDate?: number,
-        timeType?: number
+        timeType?: number,
+        timeName?: string
     }[]
 }
 
@@ -20,6 +21,14 @@ interface TaskProjectApi{
         taskName?: string,
         projectId?: number,
         projectName?: string
+    }[]
+}
+
+interface TimeTypes{
+    status: number,
+    data: {
+        id?: number,
+        name?: string
     }[]
 }
 
@@ -35,14 +44,15 @@ class ProjectTaskTable extends Component<any> {
             name: "",
             startDate: -1,
             endDate: -1,
-            timeType: -1
+            timeType: -1,
+            timeName: ""
         } ],
         task:[{
             taskId: -1,
             taskName: "",
             projectId: -1,
             projectName: ""
-        }]
+        }],
     }
 
     /**
@@ -60,9 +70,20 @@ class ProjectTaskTable extends Component<any> {
                 id.push(task.taskId)
             }
             apiHandler.get(`/api/task/get?ids=${id}`, {}, (tasks) => {
-                let json:Api = JSON.parse(JSON.stringify(tasks))
-                this.setState({tableRows: json.data})
+                let taskData:Api = JSON.parse(JSON.stringify(tasks))
+                apiHandler.get(`/api/timetype/get?ids=*`, {}, (timeType) => {
+                    let json:TimeTypes = JSON.parse(JSON.stringify(timeType));
+                    let timeTypes = Array.from(json.data);
+                    for (let i = 0; i < taskData.data.length; i++) {
+                        let id = taskData.data[i].timeType ?? 0;
+                        let name = timeTypes[id - 1].name;
+                        taskData.data[i].timeName = name === undefined ? "" : name;
+                    }
+                    this.setState({tableRows: taskData.data})
+                })
+
             })
+
         })
     }
 
@@ -77,7 +98,7 @@ class ProjectTaskTable extends Component<any> {
                 <td>{row.name ?? ''}</td>
                 <td>{row.startDate ? new Date(row.startDate).toLocaleDateString() : ''}</td>
                 <td>{row.endDate ? new Date(row.endDate).toLocaleDateString() : ''}</td>
-                <td>{row.timeType ?? ''}</td>
+                <td>{row.timeType ?? ''} - {row.timeName ?? ''}</td>
             </tr>
         ))
     }
