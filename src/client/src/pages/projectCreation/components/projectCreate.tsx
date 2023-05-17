@@ -157,10 +157,12 @@ class ProjectCreate extends Component<ProjectCreateProp> {
         const endDate = new Date((document.getElementById("formBasicEndDate") as HTMLInputElement).value)
         const teamLeader = this.state.assignedToManager
 
+        //Uses RegEx to determine valid inputs
         let invalidProjectName = /^\s/g.test(projectName) || projectName === ''
         let invalidDate = !/\d/g.test(startDate.toString()) || !/\d/g.test(endDate.toString())
         let invalidTeamLeader = teamLeader?.name === '' || teamLeader?.id == null || /\d/g.test(teamLeader.name) || /\D/g.test(teamLeader.id.toString())
 
+        //Checks if the input is invalid
         if (invalidProjectName
             || invalidDate
             || invalidTeamLeader

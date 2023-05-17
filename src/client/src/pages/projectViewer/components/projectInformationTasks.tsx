@@ -69,8 +69,10 @@ class ProjectTaskTable extends Component<any> {
             for (const task of json.data) {
                 id.push(task.taskId)
             }
+            //Gets the tasks on the current project
             apiHandler.get(`/api/task/get?ids=${id}`, {}, (tasks) => {
                 let taskData:Api = JSON.parse(JSON.stringify(tasks))
+                //Gets the timetypes
                 apiHandler.get(`/api/timetype/get?ids=*`, {}, (timeType) => {
                     let json:TimeTypes = JSON.parse(JSON.stringify(timeType));
                     let timeTypes = Array.from(json.data);

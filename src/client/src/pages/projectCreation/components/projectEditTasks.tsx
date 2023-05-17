@@ -176,18 +176,22 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
       for (const task of json.data) {
         id.push(task.taskId)
       }
+      //Gets tasks for those on the project
       apiHandler.get(`/api/task/get?ids=${id}`, {}, (tasks) => {
         let json:Api = JSON.parse(JSON.stringify(tasks))
         this.setState({task: json})
       })
+      //Gets information about the current project
       apiHandler.get(`/api/project/info/get?ids=${id}`,{}, (value) => {
         let member:MemberApi = JSON.parse(JSON.stringify(value))
         this.setState({member: member})
       })
+      //Gets all users in the database
       apiHandler.get(`/api/user/get?ids=*`,{}, (value) => {
         let user:UserApi = JSON.parse(JSON.stringify(value))
         this.setState({users: user})
       })
+      //Gets all the available timetypes
       apiHandler.get(`/api/timetype/get?ids=*`,{}, (value) => {
         let timeType:TimeApi = JSON.parse(JSON.stringify(value))
         this.setState({timeTypes: timeType})
@@ -281,12 +285,13 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
     const timeType = (document.getElementById("formTimeType") as HTMLInputElement).value
     const user = this.state.assignedToUser
 
+    //RegEx to determine invalid inputs
     let invalidTaskName = /^\s/g.test(taskName) || taskName === ''
     let invalidDate = !/\d/g.test(startDate.toString()) || !/\d/g.test(endDate.toString())
     let invalidTimeType = /\D/g.test(timeType) || timeType === ''
     let invalidUser = user?.name === '' || user?.id == null || /\d/g.test(user.name) || /\D/g.test(user.id.toString())
 
-
+    //Checks if the input fields contains an invalid input
     if ((invalidTaskName || invalidDate || this.state.invalidStartDate || this.state.invalidEndDate || invalidTimeType
         || invalidUser) || this.state.rows.length < 0){
       addButton?.setAttribute('disabled', '')
@@ -296,6 +301,7 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
     }
     button?.setAttribute('disabled', '')
 
+    //This checks if the table rows inputted are invalid if they somehow got past the other invalid check
     if (this.state.rows.length > 0) {
       for (let i = 1; this.state.rows.length >= i; i++) {
         let invalidRowTaskName = /^\s/g.test(this.state.rows[i - 1].taskName) || this.state.rows[i - 1].taskName === ''
@@ -379,7 +385,9 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
    */
   handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    //Sets the New rows to the data inputted
     const newRows = [...this.state.rows, this.state.formData];
+    //Sets the state of the rows to the newRows, and the formData to default
     this.setState({
       rows: newRows,
       formData: {
@@ -461,6 +469,7 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
       })
       this.setState({formSubmitted: true})
       this.handleAddClose()
+      //After submitting sets the table and formData to default values
       this.setState({ rows: this.props.initialRows,
         formData: {
           taskName: "",
