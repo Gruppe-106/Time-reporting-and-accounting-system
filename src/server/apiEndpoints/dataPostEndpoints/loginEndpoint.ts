@@ -51,8 +51,8 @@ class LoginEndpoint extends PostEndpointBase{
             // Otherwise create a new one and add it to the database
             let authKey:AuthKey = authKeyCreate(authResponse.results[0].userId);
             let authUpdateResponse: MySQLResponse = await this.mySQL.update("AUTH", [
-                {column: "authKey", value: authKey.key}, {column: "authKeyEndDate", value: this.mySQL.dateFormatter(authKey.valid)}],
-                {column: "userId", equals: [authResponse.results[0].userId.toString()]});
+                    {column: "authKey", value: authKey.key}, {column: "authKeyEndDate", value: this.mySQL.dateFormatter(authKey.valid)}
+                ], {column: "userId", equals: [authResponse.results[0].userId.toString()]});
             if (authUpdateResponse.error !== null) return Promise.resolve(["Couldn't get authkey"]);
 
             return Promise.resolve(["success", authKey.key, authKey.valid.toString()]);

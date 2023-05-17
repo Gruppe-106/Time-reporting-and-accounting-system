@@ -17,7 +17,8 @@ class UserTaskProjectEndpoint extends getEndpointBase {
      */
     async getData(requestValues: string[], primaryKey: string, keyEqual?: string[]): Promise<object[]> {
         // Base query
-        let query: string = `SELECT t.name AS taskName,t.id AS taskId,p.id AS projectId,p.name AS projectName  FROM (SELECT * FROM USERS_TASKS_CONNECTOR WHERE userId IN ('${keyEqual[0]}')) utc`;
+        let select: string = "t.name AS taskName,t.id AS taskId,p.id AS projectId,p.name AS projectName";
+        let query : string = `SELECT ${select}  FROM (SELECT * FROM USERS_TASKS_CONNECTOR WHERE userId IN ('${keyEqual[0]}')) utc`;
 
         // Add joined tables to query
         query += ` CROSS JOIN TASKS t ON t.id=utc.taskId`;

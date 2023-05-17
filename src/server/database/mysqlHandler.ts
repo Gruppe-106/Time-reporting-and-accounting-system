@@ -209,6 +209,12 @@ class MysqlHandler {
         return valuesString;
     }
 
+    /**
+     * Create a list of update set string
+     * @param {UpdateSet[]} updateSet List of update set
+     * @return A list of update set string
+     * @private
+     */
     private createUpdateSetString(updateSet: UpdateSet[]): string[] {
         let setString: string[] = [];
         for (const set of updateSet) {
@@ -223,7 +229,7 @@ class MysqlHandler {
      * @private
      */
     public async sendQuery(sqlQuery: string): Promise<MySQLResponse>{
-        if (this.hasOrCreatePool()) {
+        if (await this.hasOrCreatePool()) {
             let promise:Promise<MySQLResponse> = new Promise<MySQLResponse>((resolve) =>  {
                 MysqlHandler.connectionPool.query({ sql: sqlQuery, timeout: 30000 }, (error: QueryError | null, results: any, fields: Field[]) => {
                     if (error !== null) {
