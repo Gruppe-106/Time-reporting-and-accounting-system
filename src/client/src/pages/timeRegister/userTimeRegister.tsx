@@ -17,7 +17,7 @@ class UserTimeRegister extends Component<any>{
                 <Container fluid="lg">
                     <h1>User Time Register:</h1>
                 </Container>
-                <TimeSheetPage userId={userInfo.userId} adminPicked={userInfo.isAdmin}/>
+                <TimeSheetPage userId={userInfo.userId}/>
             </>
         );
     }

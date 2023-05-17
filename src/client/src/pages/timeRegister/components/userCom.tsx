@@ -38,7 +38,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
         projectId: Infinity,
         projectName: "",
       },
-      offsetState: 0,
+      offsetState: -49,
       isUpdating: false,
       showAddRowModal: false,
       headerDates: [],
@@ -317,6 +317,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     await getCurrentWeekDates(newDates, updatedOffset);
     this.setState({ headerDates: newDates });
     await this.getData(updatedOffset);
+    await this.getTaskAndProjectData();
   }
 
   /**
@@ -378,6 +379,25 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
   }
 
   /**
+   * Retrieves all project and task data from an API endpoint and sets the state of the component.
+   */
+  private getTaskAndProjectData() {
+    // Retrieves user tasks and projects data and sets it in the state
+    const { userId } = this.props;
+    let apiHandler = new BaseApiHandler();
+    apiHandler.get(
+      `/api/user/task/project/get?user=${userId}&var=taskId,taskName,projectId,projectName`, {},
+      (value) => {
+        let json: AddModalApi = JSON.parse(JSON.stringify(value));
+        if (json.status === 200) {
+          const searchDataWithRendered = json.data.map(data => ({ ...data, isRendered: false }));
+          this.setState({ searchDataState: searchDataWithRendered })
+        }
+      }
+    );
+  }
+
+  /**
    * Executes when the component mounts.
    */
   public componentDidMount() {
@@ -392,18 +412,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     this.getData(offsetState);
 
     // Retrieves user tasks and projects data and sets it in the state
-    const { userId } = this.props;
-    let apiHandler = new BaseApiHandler();
-    apiHandler.get(
-      `/api/user/task/project/get?user=${userId}&var=taskId,taskName,projectId,projectName`, {},
-      (value) => {
-        let json: AddModalApi = JSON.parse(JSON.stringify(value));
-        if (json.status === 200) {
-          const searchDataWithRendered = json.data.map(data => ({...data, isRendered: false}));
-          this.setState({ searchDataState: searchDataWithRendered })
-        }
-      }
-    );
+    this.getTaskAndProjectData();
   }
 
   /**
@@ -502,7 +511,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
         for (let i = 0; i < searchDataState.length; i++) {
           // If there is a match, get the task name and project name, mark the task as rendered,
           // and get the task time data for each day
-          if (data.taskId === searchDataState[i].taskId) {
+          if (data.taskId === searchDataState[i].taskId && searchDataState[i].isRendered === false) {
             let taskProjectName: string = searchDataState[i].projectName
             searchDataState[i].isRendered = true
             this.getTimeFromData(data.taskId, arr)
@@ -537,10 +546,14 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
                 <td><Button variant="danger" onClick={() => this.handleShowDelModal(data?.taskId)}>-</Button></td>
               </tr>
             ))
-          } else { searchDataState[i].isRendered = false } // If there is no match, mark the task as not rendered
+          } // If there is no match, mark the task as not rendered
         }
       }
     }
+    console.log("StateRowData:")
+    console.log(stateRowData)
+    console.log("SearchDataState:")
+    console.log(searchDataState)
     return rows;
   }
 
@@ -567,7 +580,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
 
     return (
       <Container fluid="lg">
-        <Table bordered size="sm" className="fixed-table ellipses" responsive="sm" style={{whiteSpace: "nowrap"}}>
+        <Table bordered size="sm" className="fixed-table ellipses" responsive="sm" style={{ whiteSpace: "nowrap" }}>
           {this.renderHeaderRow()}
           <tbody>
             {this.renderTaskRows()}

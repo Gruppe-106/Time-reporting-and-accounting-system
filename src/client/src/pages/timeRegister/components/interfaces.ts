@@ -43,7 +43,7 @@ export interface TaskRowData {
 // Props used in TimeSheetPage
 export interface TimeSheetProp {
     userId: number;
-    adminPicked: boolean;
+    adminPicked?: boolean;
 }
 
 // Variable states in TimeSheetPage
