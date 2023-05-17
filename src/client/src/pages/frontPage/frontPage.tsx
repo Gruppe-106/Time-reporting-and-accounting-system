@@ -5,45 +5,11 @@ import LoadingOverlay from 'react-loading-overlay-ts';
 import { userInfo } from "../../utility/router";
 import APICalls from "../adminPanel/utility/apiCalls";
 import Form from 'react-bootstrap/Form';
-import BaseApiHandler from "../../network/baseApiHandler";
+
+import type { User, Tasks, StateTypes } from "./frontPageTypes"
 
 
-interface User {
-    email: string,
-    firstName: string,
-    lastName: string,
-    id: number,
-    groupId: number
-}
-
-
-interface Tasks {
-    projectId: number,
-    projectName: string,
-    taskId: number,
-    taskName: string
-}
-
-/**
- * Custom types
- */
-interface CustomTypes {
-
-    //Database
-    user: User
-    tasks: Tasks[]
-
-    // * Controlling components
-    loading: boolean
-
-    // * Component variables
-    loadingText: string
-    searchQuery: string
-
-}
-
-
-class FrontPage extends Component<any, CustomTypes> {
+class FrontPage extends Component<any, StateTypes> {
 
     constructor(props: any) {
         super(props);
