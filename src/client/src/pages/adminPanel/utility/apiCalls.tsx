@@ -139,7 +139,7 @@ export default class APICalls {
     }
 
 
-    public static deleteUser(id:number):Promise<void>{
+    public static deleteUser(id: number): Promise<void> {
         const apiHandler: BaseApiHandler = new BaseApiHandler()
 
         return new Promise((resolve, reject) => {

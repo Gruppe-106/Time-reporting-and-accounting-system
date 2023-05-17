@@ -42,7 +42,6 @@ class FrontPage extends Component<any, StateTypes> {
     async componentDidMount(): Promise<void> {
         this.handleLoader("Getting user info")
 
-
         const user: User = await APICalls.getUser<User>(userInfo.userId)
 
         this.handleLoader("Getting tasks")
@@ -118,8 +117,6 @@ class FrontPage extends Component<any, StateTypes> {
                     <Container style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }} >
                         <div style={{ justifyContent: "center", display: "flex" }}>
                             <h1>Welcome {this.state.user.firstName + " " + this.state.user.lastName}</h1>
-
-
                         </div>
                         <Form>
                             <Form.Group className="mb-3" controlId="search">
@@ -148,7 +145,7 @@ class FrontPage extends Component<any, StateTypes> {
                                     task.projectId.toString().trim().toLowerCase().includes(this.state.searchQuery.trim()) ||
                                     task.projectName.toString().trim().toLowerCase().includes(this.state.searchQuery.trim())
 
-                                ).map((user) => this.renderRow(user))}
+                                ).map((userTask:Tasks) => this.renderRow(userTask))}
                             </tbody>
 
                         </Table>
