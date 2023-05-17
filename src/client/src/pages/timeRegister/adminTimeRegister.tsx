@@ -12,7 +12,7 @@ class AdminTimeRegister extends Component<any>{
                 <Container fluid="lg">
                     <h1>User Time Register:</h1>
                 </Container>
-                {userInfo.isAdmin ? (<UserTimeSheet />) : null} {/*Button to adminCom*/}
+                {userInfo.isAdmin ? (<UserTimeSheet />) : null}
             </>
         );
     }

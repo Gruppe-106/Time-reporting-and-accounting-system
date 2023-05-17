@@ -9,14 +9,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { Api, AddModalApi, TaskRowData, TimeSheetData, TimeSheetProp, TimeSheetState } from "./interfaces"
 
 type NumberWithBoolean = [number, boolean];
-
-/*
-
-    * TODO: User timeSheet
-    * 
-
-*/
-
 /*
 
     * Creating the full Timesheet page
@@ -31,6 +23,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
       stateRowData: new Map<number, TaskRowData>(),
       prevRowSubmitData: [],
       searchDataState: [],
+      notRenderedTasks: [],
       deletedItems: [],
       selectedProject: {
         taskId: Infinity,
@@ -38,7 +31,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
         projectId: Infinity,
         projectName: "",
       },
-      offsetState: -49,
+      offsetState: 7,
       isUpdating: false,
       showAddRowModal: false,
       headerDates: [],
@@ -245,7 +238,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
       )
     );
     for (let k = 0; k < deletedItem.length; k++) { // should be able to delete, but for now updates time
-      deletedItem[k].time = 60 // Should be 0
+      deletedItem[k].time = 1 // Should be 0
       deletedItem[k].userId = userId
       deletedItem[k].managerLogged = false
       let apiHandler = new BaseApiHandler();
@@ -391,7 +384,10 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
         let json: AddModalApi = JSON.parse(JSON.stringify(value));
         if (json.status === 200) {
           const searchDataWithRendered = json.data.map(data => ({ ...data, isRendered: false }));
-          this.setState({ searchDataState: searchDataWithRendered })
+          this.setState({
+            searchDataState: searchDataWithRendered,
+            notRenderedTasks: json.data
+          })
         }
       }
     );
@@ -498,7 +494,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
    * @returns Returns an array of JSX elements representing the rows.
    */
   renderTaskRows() {
-    const { stateRowData, searchDataState } = this.state;
+    const { stateRowData, searchDataState, notRenderedTasks } = this.state;
 
     // Initialize an array for storing the task time data for each day
     let rows: JSX.Element[] = [];
@@ -511,9 +507,13 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
         for (let i = 0; i < searchDataState.length; i++) {
           // If there is a match, get the task name and project name, mark the task as rendered,
           // and get the task time data for each day
-          if (data.taskId === searchDataState[i].taskId && searchDataState[i].isRendered === false) {
+          if (data.taskId === searchDataState[i].taskId) {
             let taskProjectName: string = searchDataState[i].projectName
             searchDataState[i].isRendered = true
+            for (let j = 0; j < notRenderedTasks.length; j++) {
+              if (notRenderedTasks[j].taskId === searchDataState[i].taskId)
+                notRenderedTasks.splice(j, 1);
+            }
             this.getTimeFromData(data.taskId, arr)
             // Create a JSX element for the row and add it to the rows array
             rows.push((
@@ -524,7 +524,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
                   return (
                     <td key={index} style={{ textAlign: "center", verticalAlign: "middle" }}>
                       <InputGroup size="sm">
-                        <Form.Control disabled={arr[index][1]} type="number" placeholder="0" value={Math.floor(arr[index][0] / 60)} onChange={(e) => this.handleTimeChange(index, e.target.value, data)} />
+                        <Form.Control disabled={arr[index][1]} max={24} type="number" placeholder="0" value={Math.floor(arr[index][0] / 60)} onChange={(e) => this.handleTimeChange(index, e.target.value, data)} />
                         <InputGroup.Text id={`basic-addon-${index}`}>:</InputGroup.Text>
                         <Form.Select
                           style={{ fontSize: '14px', border: '1px solid #ccc', borderRadius: '0 4px 4px 0', fontFamily: 'Helvetica', color: "#212529", backgroundColor: arr[index][1] ? '#e9ecef' : '#fff' }}
@@ -546,14 +546,16 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
                 <td><Button variant="danger" onClick={() => this.handleShowDelModal(data?.taskId)}>-</Button></td>
               </tr>
             ))
-          } // If there is no match, mark the task as not rendered
+          } else { 
+            searchDataState[i].isRendered = false
+           } // If there is no match, mark the task as not rendered
         }
       }
     }
-    console.log("StateRowData:")
-    console.log(stateRowData)
-    console.log("SearchDataState:")
+    console.log("SearchData:")
     console.log(searchDataState)
+    console.log("RenderedTasks:")
+    console.log(notRenderedTasks)
     return rows;
   }
 
@@ -576,7 +578,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
   }
 
   render() {
-    const { showAddRowModal, showDeleteRowModal, deleteId, delRowTaskProject, searchDataState, deletedItems } = this.state;
+    const { showAddRowModal, showDeleteRowModal, deleteId, delRowTaskProject, notRenderedTasks, deletedItems } = this.state;
 
     return (
       <Container fluid="lg">
@@ -608,16 +610,16 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
           </Modal.Header>
           <Modal.Body>
             <p>Which task do you want to add?</p>
-            <Form.Group className="mb-3" controlId="formBasicAssignManager">
+            <Form.Group className="mb-3">
               <Typeahead
                 id="findProject"
                 labelKey={(option: any) => `${option.projectName}  ${option.taskName}`}
-                options={searchDataState}
-                placeholder="Pick a project"
+                options={notRenderedTasks}
+                placeholder="Pick a task"
                 renderMenuItemChildren={(option: any, props: any) => (
                   <>
                     <Highlighter search={props.text}>
-                      {option.projectName + ", " + option.taskName}
+                      {option.projectName + ", " + option.taskName + ":" + option.taskId}
                     </Highlighter>
                   </>
                 )}
