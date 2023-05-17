@@ -14,6 +14,11 @@ export interface ProjectEditData {
     taskRemove?: number[]
 }
 
+/**
+ * Adds multiple tasks to a project
+ * @param {number} taskIds List of task ids to add to project
+ * @param {number} projectId Project id to add tasks to
+ */
 export async function addMultiTaskToProject(taskIds: number[], projectId: number) {
     for (const taskId of taskIds) {
         try {
@@ -24,6 +29,11 @@ export async function addMultiTaskToProject(taskIds: number[], projectId: number
     }
 }
 
+/**
+ * Removes entry/entries from task project connector table
+ * @param {number[]} taskIds List of task ids to remove from connector
+ * @param {number} projectId Project id to remove tasks from
+ */
 export async function removeTaskFromProject(taskIds: number[], projectId: number) {
     let taskIdsString: string[] = taskIds.map<string>((value) => { return value.toString(); })
     let taskProjectResponse: MySQLResponse = await this.mySQL.remove("TASKS_PROJECTS_CONNECTOR", [
