@@ -1,5 +1,4 @@
 import {Request, Response} from "express";
-import {getCookies} from "../../utility/cookie";
 import {MySQLResponse} from "../../database/mysqlHandler";
 import {mysqlHandler} from "../../../app";
 

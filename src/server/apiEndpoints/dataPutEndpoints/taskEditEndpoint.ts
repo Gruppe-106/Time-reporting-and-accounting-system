@@ -1,7 +1,8 @@
 import PostEndpointBase from "../postEndpointBase";
 import {Request, Response} from "express";
-import {addUsersToTask, taskProjectConnector} from "../dataPostEndpoints/projectCreationEndpoint";
 import {MySQLResponse, UpdateSet} from "../../database/mysqlHandler";
+import {taskProjectConnector} from "../dataPostEndpoints/tablePosts/taskProject";
+import {addUsersToTask} from "../dataPostEndpoints/tablePosts/taskTable";
 
 export interface TaskEditData {
     taskId     : number,
