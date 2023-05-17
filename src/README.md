@@ -785,7 +785,7 @@ Optional:
 Required:
     user=number | number,number,...
 Optional:
-    var=taskId,taskName,projectName,projectId,date,userId,time,approved,managerLogged
+    var=taskId,taskName,projectName,projectId,date,userId,time,approved,managerLogged,taskTimeType
     period=number,number
     Can be any and/or all
 ```
@@ -804,7 +804,9 @@ Optional:
         userId?: number,
         time?: number,
         approved?: boolean,
-        managerLogged?: boolean
+        managerLogged?: boolean,
+        timeTypeName?: string,
+        timeType?: string
     }[]
   }
 ```

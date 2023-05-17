@@ -1,21 +1,28 @@
 import Cookies from "js-cookie";
 
+// For testing on local Database
+// TODO: Change to an environment variable
+const localMode = false;
+
 interface PostSettings {
     baseUrl?: string,
     body?: object | string,
-    headers?: Record<string, string>
+    headers?: Record<string, string>,
+    authKey?: string
 }
 
 interface GetSettings {
     baseUrl?: string,
-    headers?: Record<string, string>
+    headers?: Record<string, string>,
+    authKey?: string
 }
 
 interface RequesterSettings {
     baseUrl: string,
     method: string,
     body: null | object | string,
-    headers: Record<string, string>
+    headers: Record<string, string>,
+    authKey?: string
 }
 
 class BaseApiHandler {
@@ -23,8 +30,7 @@ class BaseApiHandler {
     private baseUrl: string;
 
     constructor(baseUrl?: string) {
-        this.baseUrl = baseUrl === undefined ? "" : baseUrl; //Commented out to work in dev environment
-        console.log(this.baseUrl);
+        this.baseUrl = baseUrl === undefined ? "https://10.92.1.237:8080" : baseUrl; //Commented out to work in dev environment
     }
 
     /**
@@ -38,7 +44,8 @@ class BaseApiHandler {
             baseUrl: settings.baseUrl || this.baseUrl,
             method: "GET",
             body: null,
-            headers: settings.headers || {}
+            headers: settings.headers || {},
+            authKey: settings.authKey
         }).then(callback);
         return true;
     }
@@ -55,7 +62,8 @@ class BaseApiHandler {
                 baseUrl: settings.baseUrl || this.baseUrl,
                 method: "POST",
                 body: settings.body || null,
-                headers: settings.headers || {}
+                headers: settings.headers || {},
+                authKey: settings.authKey
             })
             .then(callback);
         return true;
@@ -73,7 +81,8 @@ class BaseApiHandler {
                 baseUrl: settings.baseUrl || this.baseUrl,
                 method: "PUT",
                 body: settings.body || null,
-                headers: settings.headers || {}
+                headers: settings.headers || {},
+                authKey: settings.authKey
             })
             .then(callback);
         return true;
@@ -90,7 +99,8 @@ class BaseApiHandler {
             baseUrl: settings.baseUrl || this.baseUrl,
             method: "DELETE",
             body: null,
-            headers: settings.headers || {}
+            headers: settings.headers || {},
+            authKey: settings.authKey
         }).then(callback);
         return true;
     }
@@ -103,12 +113,12 @@ class BaseApiHandler {
      */
     // baseUrl:string = this.baseUrl, method:string = "GET", message:null | object | string = "", headers:Record<string, string> = {}
     private async requester(urlPath: string, settings: RequesterSettings): Promise<Object> {
-        //let url: string = settings.baseUrl + urlPath;
-        let url: string = "https://10.92.1.237:8080" + urlPath;
+        let url: string = this.baseUrl + urlPath;
+        if (localMode) url = "https://localhost:8080" + urlPath;
         //Setup standard headers
         settings.headers["Content-Type"] = "application/json";
         settings.headers["Accept"] = "application/json";
-        settings.headers["Auth-token"] = Cookies.get("auth") ?? "";
+        settings.headers["Auth-token"] = settings.authKey ?? Cookies.get("auth") ?? "";
 
         let body = settings.body === null ? null : JSON.stringify(settings.body)
 

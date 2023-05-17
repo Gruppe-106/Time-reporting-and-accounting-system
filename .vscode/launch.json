@@ -13,6 +13,14 @@
             "runtimeArgs": ["run-script", "start"]
         },
         {
+            "name": "React Dev Server Local",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/src/client",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": ["run-script", "start:local"]
+        },
+        {
             "name": "React Build",
             "type": "node",
             "request": "launch",
@@ -27,6 +35,30 @@
             "cwd": "${workspaceFolder}/src",
             "runtimeExecutable": "npm",
             "runtimeArgs": ["run-script", "start"]
+        },
+        {
+                "name": "Test",
+                "type": "node",
+                "request": "launch",
+                "cwd": "${workspaceFolder}/src",
+                "runtimeExecutable": "npm",
+                "runtimeArgs": ["run-script", "test"]
+        },
+        {
+                "name": "Test-server",
+                "type": "node",
+                "request": "launch",
+                "cwd": "${workspaceFolder}/src",
+                "runtimeExecutable": "npm",
+                "runtimeArgs": ["run-script", "test-server:run"]
+        },
+        {
+                "name": "Run test-server and test",
+                "type": "node",
+                "request": "launch",
+                "cwd": "${workspaceFolder}/src",
+                "runtimeExecutable": "npm",
+                "runtimeArgs": ["run-script", "server-test"]
         },
         {
             "name": "Node build",

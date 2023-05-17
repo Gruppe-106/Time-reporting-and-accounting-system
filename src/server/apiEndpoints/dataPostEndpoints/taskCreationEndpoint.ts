@@ -1,14 +1,7 @@
 import PostEndpointBase from "../postEndpointBase";
 import {Request, Response} from "express";
-import {addTaskToProject} from "./projectCreationEndpoint";
-
-export interface TaskData {
-    name      : string,
-    userId    : number[],
-    startDate : number,
-    endDate   : number,
-    timeType  : number
-}
+import {createAndAddTasksToProject} from "./tablePosts/taskProject";
+import {TaskData} from "./tablePosts/taskTable";
 
 export interface TaskCreationData {
     projectId: number,
@@ -18,11 +11,23 @@ export interface TaskCreationData {
 class TaskCreationEndpoint extends PostEndpointBase {
     requiredRole: number = 3;
 
+    /**
+     * @brief Submits task creation data to the server
+     * @param req - The request object
+     * @param res - The response object
+     * @return A promise that resolves to an array of strings, with "success" if successful
+     */
     async submitData(req: Request, res: Response): Promise<string[]> {
+        // Extract task creation data from request body
         let tasksData: TaskCreationData = req.body;
-        if (tasksData.task) await addTaskToProject.call(this, [tasksData.task], tasksData.projectId);
-        else return ["Task data not given"];
 
+        // If task data is not provided, return an error message
+        if (!tasksData.task) return ["Task data not given"];
+
+        // If task data is provided, create and add tasks to project
+        await createAndAddTasksToProject.call(this, [tasksData.task], tasksData.projectId);
+
+        // Return success message
         return Promise.resolve(["success"]);
     }
 }

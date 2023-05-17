@@ -1,55 +1,62 @@
 import BaseApiHandler from "../../../client/src/network/baseApiHandler";
-import {getConfig} from "../testBaseConfig";
 import {TaskCreationData} from "../../apiEndpoints/dataPostEndpoints/taskCreationEndpoint";
-
+import {authKey} from "../testBaseConfig";
 const apiHandler: BaseApiHandler = new BaseApiHandler("http://localhost:8080");
-let headers: Record<string, string> = getConfig();
 
 describe("Task API", () => {
     describe("Task GET API", () => {
         test("Fail get message", async () => {
-            apiHandler.get("/api/task/get", {headers: headers}, (value) => {
-                expect(value["message"]).toMatch("Bad Request");
-            });
-        });
-
-        test("Success get message with single ID", async () => {
-            apiHandler.get("/api/task/get?ids=1", {headers: headers}, (value) => {
-                expect(value).toStrictEqual({
-                    status: 200,
-                    data: [
-                        {
-                            name: 'Project Info Task',
-                            id: 1,
-                            startDate: 1679266800000,
-                            endDate: 1682460000000,
-                            timeType: 1
-                        }
-                    ]
+            await new Promise((resolve) => {
+                apiHandler.get("/api/task/get", {authKey: authKey}, (value) => {
+                    expect(value["message"]).toMatch("Bad Request");
+                    resolve(true);
                 });
             });
         });
 
+        test("Success get message with single ID", async () => {
+            await new Promise((resolve) => {
+                apiHandler.get("/api/task/get?ids=1", {authKey: authKey}, (value) => {
+                    expect(value).toStrictEqual({
+                        status: 200,
+                        data: [
+                            {
+                                name: 'Project Info Task',
+                                id: 1,
+                                startDate: 1679266800000,
+                                endDate: 1682460000000,
+                                timeType: 1
+                            }
+                        ]
+                    });
+                });
+                resolve(true);
+            });
+        });
+
         test("Success get message with multiple IDs", async () => {
-            apiHandler.get("/api/task/get?ids=1,2", {headers: headers}, (value) => {
-                expect(value).toStrictEqual({
-                    status: 200,
-                    data: [
-                        {
-                            name: 'Project Info Task',
-                            id: 1,
-                            startDate: 1679266800000,
-                            endDate: 1682460000000,
-                            timeType: 1
-                        },
-                        {
-                            name: 'Task Get Task',
-                            id: 2,
-                            startDate: 1679266800000,
-                            endDate: 1682460000000,
-                            timeType: 1
-                        }
-                    ]
+            await new Promise((resolve) => {
+                apiHandler.get("/api/task/get?ids=1,2", {authKey: authKey}, (value) => {
+                    expect(value).toStrictEqual({
+                        status: 200,
+                        data: [
+                            {
+                                name: 'Project Info Task',
+                                id: 1,
+                                startDate: 1679266800000,
+                                endDate: 1682460000000,
+                                timeType: 1
+                            },
+                            {
+                                name: 'Task Get Task',
+                                id: 2,
+                                startDate: 1679266800000,
+                                endDate: 1682460000000,
+                                timeType: 1
+                            }
+                        ]
+                    });
+                    resolve(true);
                 });
             });
         });
@@ -67,8 +74,11 @@ describe("Task API", () => {
                     timeType: 1
                 }
             }
-            apiHandler.post("/api/task/creation/post", {headers: headers, body: bodySuccess}, (value) => {
-                expect(value["data"]["success"]).toMatch("true");
+            await new Promise((resolve) => {
+                apiHandler.post("/api/task/creation/post", {authKey: authKey, body: bodySuccess}, (value) => {
+                    expect(value["data"]["success"]).toMatch("true");
+                    resolve(true);
+                });
             });
         });
 
@@ -79,9 +89,11 @@ describe("Task API", () => {
                 endDate: 1682460000000,
                 timeType: 1
             }
-
-            apiHandler.post("/api/task/creation/post", {headers: headers, body: bodyFail}, (value) => {
-                expect(value["status"]).toBe(404);
+            await new Promise((resolve) => {
+                apiHandler.post("/api/task/creation/post", {authKey: authKey, body: bodyFail}, (value) => {
+                    expect(value["status"]).toBe(404);
+                    resolve(true);
+                });
             });
         });
     });
