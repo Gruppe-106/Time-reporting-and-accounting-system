@@ -83,10 +83,12 @@ class ProjectManageInformation extends Component<ProjectInformationProp> {
             let json:Api = JSON.parse(JSON.stringify(value))
             this.setState({pageInformation: json.data[0]})
         })
+        //Gets all projects to use for super projects
         apiHandler.get(`/api/project/get?ids=*`, {},(value) => {
             let json:SuperProjects = JSON.parse(JSON.stringify(value))
             this.setState({parentProjects: json.data})
         })
+        //Gets all users with Project Leader role
         apiHandler.get(`/api/role/user/get?role=3`, {},(value) => {
             let json:ProjectLeaders = JSON.parse(JSON.stringify(value))
             this.setState({projectLeaders: json.data})
@@ -181,7 +183,7 @@ class ProjectManageInformation extends Component<ProjectInformationProp> {
 
     /**
      * This handles the formSubmit.
-     * Submits the data to the database
+     * Submits the data to the database which edits the existing information
      */
     handleFormSubmit = () =>{
         const projectName = (document.getElementById("formBasicProjectName") as HTMLInputElement).value !== null ? (document.getElementById("formBasicProjectName") as HTMLInputElement).value : undefined

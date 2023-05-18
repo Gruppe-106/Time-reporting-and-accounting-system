@@ -30,7 +30,6 @@ class ProjectMenu extends Component<any, ProjectMenuState>{
                         <ProjectTable/>
                     }
                 </Container>
-
             </>
         );
     }
