@@ -91,7 +91,6 @@ class ProjectInformation extends Component<ProjectInformationProp> {
                         <Tab.Content>
                             <Tab.Pane eventKey="first">
                                 {this.state.pageInformation.name !== "" ? (<h1>{this.state.pageInformation.name}</h1>) : ""}
-                                <h3>Description</h3>
                                 <Table>
                                     <thead>
                                     <tr>
