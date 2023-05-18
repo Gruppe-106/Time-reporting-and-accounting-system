@@ -42,7 +42,7 @@ export class ApiRouter extends BaseRouter {
         this.router.get("/auth",             (req: Request, res: Response) => new AuthEndpoint().getRoute(req, res));
 
         this.router.get("/project/get",          (req: Request, res: Response) => new ProjectEndpoint().getRoute(req, res));
-        this.router.get("/project/info/get",     (req:Request, res: Response) => new ProjectInformationEndpoint().getRoute(req, res))
+        this.router.get("/project/info/get",     (req: Request, res: Response) => new ProjectInformationEndpoint().getRoute(req, res))
         this.router.get("/user/get",             (req: Request, res: Response) => new UserEndpoint().getRoute(req, res));
         this.router.get("/task/get",             (req: Request, res: Response) => new TaskEndpoint().getRoute(req, res));
         this.router.get("/task/user/get",        (req: Request, res: Response) => new UserTaskEndpoint().getRoute(req, res));
