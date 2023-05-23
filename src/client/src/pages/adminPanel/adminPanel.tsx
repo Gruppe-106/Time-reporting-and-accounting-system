@@ -28,74 +28,11 @@ import BaseApiHandler from "../../network/baseApiHandler";
 
 import APICalls from "./utility/apiCalls";
 
-
-interface User {
-    id: number;
-    email: string;
-    firstName: string;
-    lastName: string;
-    groupId: number;
-    orginalGroupId?: number,
-    orginalEmail?: string,
-    orginalFirstName?: string,
-    orginalLastName?: string,
-    validEmail?: boolean
-    validFirstName?: boolean
-    validLastName?: boolean
-    manager?: Manager[]
-
-}
+import type { StateTypesAP, Manager, User, UserDataPost } from "./adminPanelTypes";
 
 
-interface Manager {
-    managerId: number,
-    firstName: string,
-    lastName: string,
-    groupId: number
-}
 
-/**
- * Custom types
- */
-interface CustomTypes {
-
-    //Input varriables
-
-    // * Controlling components
-    loading: boolean
-    editing: boolean
-    validEmail: boolean
-    validName: boolean
-    showPopup: boolean
-    showDelete: boolean
-    showError: boolean
-    //* database varriables
-    dbUsers: User[]
-    dbManagers: Manager[],
-    groupMin: number | undefined,
-    groupMax: number | undefined,
-
-
-    // * Search Varriables
-    searchQuery: string;
-
-    // * Row operations
-    selectedUsers: User[]
-    selectedUsersId: number[]
-
-
-    // * Component variables
-    popupMessage: string,
-    popupTitle: string,
-    loadingText: string
-    buttonText: string,
-    userToDelete: User | null
-
-
-    test: any[]
-}
-
-class AdminPanel extends Component<any, CustomTypes> {
+class AdminPanel extends Component<any, StateTypesAP> {
     constructor(props: any) {
         super(props);
         this.state = {
@@ -139,7 +76,6 @@ class AdminPanel extends Component<any, CustomTypes> {
         this.handleCancel = this.handleCancel.bind(this)
         this.handleSubmit = this.handleSubmit.bind(this)
         this.handleDelete = this.handleDelete.bind(this)
-        this.handleGroupInput = this.handleGroupInput.bind(this)
         this.handleEmailInput = this.handleEmailInput.bind(this)
         this.handleShow = this.handleShow.bind(this);
         this.handleShowMessage = this.handleShowMessage.bind(this);
@@ -156,6 +92,7 @@ class AdminPanel extends Component<any, CustomTypes> {
     */
     async componentDidMount(): Promise<void> {
         this.handleLoader("Getting users")
+
 
         const dbManagers: Manager[] = await APICalls.getAllManagerGroups()
         const dbUsers: User[] = await APICalls.getAllUsers()
@@ -192,7 +129,7 @@ class AdminPanel extends Component<any, CustomTypes> {
      * @param prevProps The previous props
      * @param prevState The previous state
     */
-    componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<CustomTypes>): void {
+    componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<StateTypesAP>): void {
         if (this.state.selectedUsersId.length > 1 && this.state.buttonText !== "Bulk edit") {
             this.setState({ buttonText: "Bulk edit" });
         } else if (this.state.selectedUsersId.length === 1 && this.state.buttonText !== "Edit") {
@@ -228,8 +165,8 @@ class AdminPanel extends Component<any, CustomTypes> {
      * @returns {void}
     */
     private handleRowClick(id: number, user: User): void {
-        const { selectedUsersId, selectedUsers } = this.state;
-        const index = selectedUsersId.indexOf(id);
+        const { selectedUsersId, selectedUsers }: { selectedUsersId: number[], selectedUsers: User[] } = this.state;
+        const index: number = selectedUsersId.indexOf(id);
         console.log(selectedUsersId)
         console.log(selectedUsers)
         if (index === -1) {
@@ -253,11 +190,11 @@ class AdminPanel extends Component<any, CustomTypes> {
      * @returns {JSX.Element | undefined} - A JSX Element for the row, or undefined if user has no manager.
     */
     private renderRow(user: User): JSX.Element | undefined {
-        const { selectedUsersId } = this.state;
+        const { selectedUsersId }: { selectedUsersId: number[] } = this.state;
 
-        const isSelected = selectedUsersId.indexOf(user.id) !== -1;
-        const rowClassNames = document.getElementById(user.id.toString())?.className;
-        const className = rowClassNames?.includes('table-primary') ? rowClassNames : isSelected ? 'table-primary' : '';
+        const isSelected: boolean = selectedUsersId.indexOf(user.id) !== -1;
+        const rowClassNames: string | undefined = document.getElementById(user.id.toString())?.className;
+        const className: string = rowClassNames?.includes('table-primary') ? rowClassNames : isSelected ? 'table-primary' : '';
 
         if (user.manager?.length !== 0) {
             return (
@@ -367,7 +304,6 @@ class AdminPanel extends Component<any, CustomTypes> {
                             placeholder="Enter group"
                             style={{ textAlign: 'center' }}
                             defaultValue={user.groupId}
-                            onChange={(e) => this.handleGroupInput(user, e)}
                             disabled={true}
                         />
                     </Form.Group>
@@ -413,34 +349,6 @@ class AdminPanel extends Component<any, CustomTypes> {
 
     }
 
-
-    /**
-        Handles updating the group ID of a given user.
-
-        @param {User} user - The user to update.
-
-        @param {any} inputField - The input field containing the new group ID.
-
-        @returns {void}
-    */
-    private handleGroupInput(user: User, inputField: any): void {
-        const newValue: number = parseInt(inputField.target.value)
-
-        if (isNaN(newValue) && inputField.target.value !== "") {
-            inputField.target.value = user.orginalGroupId
-        } else if (newValue > this.state.groupMax!) {
-            inputField.target.value = user.orginalGroupId
-        } else if (newValue < this.state.groupMin!) {
-            inputField.target.value = user.orginalGroupId
-        } else {
-            const updatedUser = { ...user, groupId: newValue };
-            this.setState({
-                selectedUsers: this.state.selectedUsers.map((u) => u.id === user.id ? updatedUser : u)
-            });
-        }
-
-
-    }
 
 
     /**
@@ -704,7 +612,7 @@ class AdminPanel extends Component<any, CustomTypes> {
 
         if (!hasShown) {
             this.handleShowTitle("Are you sure?")
-            this.handleShowMessage("Are you sure that you want to delete this user? this action cannot be undone")
+            this.handleShowMessage("Are you sure that you want to delete this user? This action cannot be undone")
             hasShown = true;
             this.setState({
                 showDelete: true,
@@ -721,13 +629,7 @@ class AdminPanel extends Component<any, CustomTypes> {
     private async postChanges(): Promise<void> {
         let hasShown: boolean = false;
         const apiHandler: BaseApiHandler = new BaseApiHandler()
-        const userData: {
-            userId: number,
-            firstName: string,
-            lastName: string,
-            email: string,
-            manager: number
-        }[] = []
+        const userData: UserDataPost[] = []
 
 
 
@@ -746,11 +648,11 @@ class AdminPanel extends Component<any, CustomTypes> {
 
 
         this.handleLoader("Posting changes")
-        const responses = await Promise.all(userData.map(ele => apiHandler.put("/api/user/edit/put", { body: ele })))
+        const responses: boolean[] = await Promise.all(userData.map(ele => apiHandler.put("/api/user/edit/put", { body: ele })))
         this.handleLoader("All done")
 
 
-        if (responses.filter(ele => ele === false).length > 0) {
+        if (responses.filter((ele: boolean) => ele === false).length > 0) {
             if (!hasShown) {
                 this.handleShowTitle("Error")
                 this.handleShowMessage("This error should not happen contact IT")
@@ -790,7 +692,7 @@ class AdminPanel extends Component<any, CustomTypes> {
                 >
                     <BaseNavBar />
                     <Container className="py-3">
-                        <h1>Admin</h1>
+                        <h1>Edit users</h1>
                         <Form>
                             <Form.Group className="mb-3" controlId="search">
                                 <Form.Label>Search Users</Form.Label>
