@@ -114,7 +114,7 @@ class FrontPage extends Component<any, StateTypes> {
                 >
                     <BaseNavBar />
 
-                    <Container style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }} >
+                    <Container >
                         <div style={{ justifyContent: "center", display: "flex" }}>
                             <h1>Welcome {this.state.user.firstName + " " + this.state.user.lastName}</h1>
                         </div>
