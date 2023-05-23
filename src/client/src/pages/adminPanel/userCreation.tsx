@@ -20,53 +20,16 @@ import forge from 'node-forge';
 
 //Custom import
 import BaseApiHandler from "../../network/baseApiHandler";
-import Utility from './utility/userCreation/userCreation'
+import Utility from './utility/userCreation/userCreationUtility'
 import APICalls from "./utility/apiCalls";
 
-interface Manager {
-    managerId: number,
-    firstName: string,
-    lastName: string,
-    groupId: number
-}
-
-/**
- * Custom types
- */
-interface CustomTypes {
-    // * Input variables
-    firstName: string | null,
-    lastName: string | null,
-    email: string | null,
-    password: string | null,
-    assignedToManager: Manager | null,
-    selectedRoles: { id: number, name: string }[] | null,
-
-    // * Database variables
-    dbRoles: any[],
-    dbManagers: any[],
-
-    // * Input validation
-    emailValid: boolean,
-
-    // * Controlling components
-    submitDisabled: boolean,
-    showPopup: boolean,
-    loading: boolean,
-    reload:boolean,
-    
-    // * Component variables
-    popupMessage: string,
-    popupTitle: string,
-    loadingText: string
-
-}
+import type { StateTypesUC, Manager, CheckFieldsReturn, UserObject, DataToSendType, DBroles } from "./adminPanelTypes";
 
 
 /**
  * The user creation page it self
 */
-class UserCreation extends Component<any, CustomTypes>{
+class UserCreation extends Component<any, StateTypesUC>{
     constructor(props: any) {
         super(props);
         this.state = {
@@ -125,14 +88,12 @@ class UserCreation extends Component<any, CustomTypes>{
     async componentDidMount() {
 
         this.handleLoader("Getting roles")
-        const dbRoles: {
-            id: number;
-            name: string;
-        }[] = await APICalls.getAllRoles()
+        const dbRoles: DBroles[] = await APICalls.getAllRoles()
 
         this.handleLoader("Getting managers", true)
         const dbManagers: Manager[] = await APICalls.getAllManagerGroups()
-        
+        console.log(dbManagers)
+
         this.handleLoader("All done")
         this.setState({
             dbRoles: dbRoles,
@@ -140,11 +101,7 @@ class UserCreation extends Component<any, CustomTypes>{
             loading: false
         })
 
-
-
     }
-
-    //TODO: find the types or else i commit the no monster day
 
 
     /**
@@ -241,20 +198,12 @@ class UserCreation extends Component<any, CustomTypes>{
         let hasShown: boolean = false;
         const sha256: any = forge.md.sha256.create();
 
-        const userObject: {
-            [key: string]: any
-            firstName: string | null,
-            lastName: string | null,
-            email: string | null,
-            password: string | null,
-            assignedToManager: number | null
-            roles: { id: number, name: string }[] | null
-        } = {
+        const userObject: UserObject = {
             firstName: this.state.firstName,
             lastName: this.state.lastName,
             email: this.state.email,
             password: this.state.password ? sha256.update(this.state.password).digest().toHex() : null,
-            assignedToManager: this.state.assignedToManager!.managerId,
+            assignedToManager: this.state.assignedToManager !== null ? this.state.assignedToManager.managerId : null,
             roles: this.state.selectedRoles
         }
 
@@ -263,11 +212,7 @@ class UserCreation extends Component<any, CustomTypes>{
             this.handleShowMessage("Please enter a valid e-mail adress")
             this.handleShow()
         } else {
-            const validCheck: {
-                valid: boolean;
-                missingFields: number;
-                errorString: string;
-            } = Utility.CheckFields(userObject)
+            const validCheck: CheckFieldsReturn = Utility.checkFields(userObject)
 
             if (!validCheck.valid) {
 
@@ -324,9 +269,9 @@ class UserCreation extends Component<any, CustomTypes>{
      * Handles modal closing
     */
     private handleClose(): void {
-        if(this.state.reload){
+        if (this.state.reload) {
             window.location.reload()
-        } 
+        }
         this.setState({
             showPopup: false,
             popupTitle: "",
@@ -380,28 +325,13 @@ class UserCreation extends Component<any, CustomTypes>{
      * Handles the sending of the user object to server
      * @param uerObject
      */
-    private async sendUser(userObject: {
-        [key: string]: any,
-        firstName: string | null,
-        lastName: string | null,
-        email: string | null
-        password: string | null,
-        assignedToManager: number | null
-        roles: { id: number, name: string }[] | null
-    }) {
+    private async sendUser(userObject: UserObject) {
         const apiHandler: BaseApiHandler = new BaseApiHandler()
 
         let roles: number[] = []
-        userObject.roles?.forEach((ele: { id: number, name: string }) => roles.push(ele.id))
+        userObject.roles?.forEach((ele: DBroles) => roles.push(ele.id))
 
-        let dataToSend: {
-            firstName: string | null,
-            lastName: string | null,
-            email: string | null,
-            password: string | null,
-            manager: number | null | undefined,
-            roles: number[] | null
-        }
+        let dataToSend: DataToSendType
             = {
             firstName: userObject.firstName,
             lastName: userObject.lastName,
@@ -418,12 +348,12 @@ class UserCreation extends Component<any, CustomTypes>{
 
         console.log(dataToSend)
         const promise = new Promise((resolve, reject) => {
-            apiHandler.post("/api/user/creation/post", { body: dataToSend }, (value:any) => {
+            apiHandler.post("/api/user/creation/post", { body: dataToSend }, (value: any) => {
                 if (value.status === 200) {
                     this.handleShowTitle("Success");
                     this.handleShowMessage("User created");
                     this.setState({
-                        reload:true
+                        reload: true
                     })
                     resolve("User created");
                 } else if (value.status === 400) {

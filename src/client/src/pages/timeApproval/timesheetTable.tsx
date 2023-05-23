@@ -163,7 +163,7 @@ class TimesheetTable extends Component<any, TimesheetPropTypes> {
         api.get(request, {},(apiData) => {
             let recData: TimesheetRecData = JSON.parse(JSON.stringify(apiData));
 
-            let tasksParsed: ParsedTask[] = []
+            let tasksParsed: ParsedTask[] = [];
             // We need to parse the data now!
             for (let i = 0; i < recData.data.length; i++) {
                 let data_task: Task = recData.data[i];
@@ -181,8 +181,7 @@ class TimesheetTable extends Component<any, TimesheetPropTypes> {
                 if (found_i < 0) { // An object wasn't found.
                     tasksParsed.push(this.taskDataToParsedTask(data_task))
                 } else {
-                    tasksParsed[found_i].days[this.dateNumberToDayIndex(data_task.date)] =
-                        this.taskDataToParsedDay(data_task);
+                    tasksParsed[found_i].days[this.dateNumberToDayIndex(data_task.date)] = this.taskDataToParsedDay(data_task);
                 }
             }
             

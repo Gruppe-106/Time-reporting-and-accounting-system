@@ -124,8 +124,9 @@ class DataExport extends Component<any>{
         let userRecData: RecUserData = await this.getAllUsers();
         userRecData.data.sort(this.comparerFuncRecUserData);
 
-        let userIds: number[] = [];
         let [monthStart, monthEnd]: [number, number] = getCurrentMonthInterval();
+
+        let userIds: number[] = [];
         for (let i = 0; i < userRecData.data.length; i++) userIds.push(userRecData.data[i].id);
         let timesheetRecData: RecTimesheetData = await this.getAllTimesheets([monthStart, monthEnd], userIds);
         timesheetRecData.data.sort(this.comparerFuncRecTimesheetData);
@@ -161,7 +162,7 @@ class DataExport extends Component<any>{
             let tCount = 1;
             while (index <= range[1]) {
                 let currTimesheet = data[index];
-                if (currTimesheet.managerLogged && currTimesheet.approved) {
+                if (!currTimesheet.managerLogged || !currTimesheet.approved) {
                     index++;
                     continue;
                 }
@@ -211,7 +212,6 @@ class DataExport extends Component<any>{
         // Simulate a click on the link to trigger the download
         link.click();
     }
-
     private convertToCSV(convertedData: UserData[]): string {
         let headerElements = ["Last name", "First name", "Id", "Project", "Id", "Task", "Id", "Total minutes(task)"]
         let delimiter = ';'
