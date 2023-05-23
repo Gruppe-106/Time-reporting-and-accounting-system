@@ -65,6 +65,7 @@ export interface TimeSheetState {
         projectName: string | undefined,
         taskName: string | undefined,
     },
+    currentWeeks: string[],
 }
 
 // State of UserTimeSheet
