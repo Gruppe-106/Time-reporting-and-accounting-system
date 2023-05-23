@@ -6,6 +6,18 @@ This project is the second semester project for the group **CS-23-DAT-01**
 To access the site you must either be connected to Aalborg university's internet or connected to the Aalborg university's VPN service https://www.en.its.aau.dk/instructions/vpn.
 When this is done go to the site https://10.92.1.237/, notice that your browser will give a warning. This is because of some problems that we have encountered with the permission files. Ignore the warning and enter the site, here you will encounter a login page, below can be seen some different logins with different roles.
 
+**Admin**:
+
+email: matt@example.com
+
+
+password: matt
+
+**Manager**:
+
+email: jane@example.com
+
+password: jane
 
 
 # Plan
