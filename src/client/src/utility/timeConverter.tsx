@@ -41,6 +41,14 @@ export function numberToWeekDay(day: number) : string {
     return weekdays[date.getDay()];
 }
 
+export function getIndexOfWeek(day: number) : number {
+    const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const date = new Date(day);
+    let index = (date.getDay() - 1);
+    if (index == -1) index = 6;
+    return index;
+}
+
 export function getCurrentMonthInterval(): [number, number] {
   const today = new Date(); // Get the current date
   const startMonth: number = new Date(today.getFullYear(), today.getMonth(), 1).getTime();
