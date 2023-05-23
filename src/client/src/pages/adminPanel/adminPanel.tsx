@@ -692,7 +692,7 @@ class AdminPanel extends Component<any, StateTypesAP> {
                 >
                     <BaseNavBar />
                     <Container className="py-3">
-                        <h1>Admin</h1>
+                        <h1>Edit users</h1>
                         <Form>
                             <Form.Group className="mb-3" controlId="search">
                                 <Form.Label>Search Users</Form.Label>
