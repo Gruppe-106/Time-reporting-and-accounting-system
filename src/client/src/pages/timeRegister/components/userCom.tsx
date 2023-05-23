@@ -214,12 +214,11 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
    */
   private deleteItems(prevData: TimeSheetData[], dataToUpdate: TimeSheetData[]) {
     const { userId } = this.props
-    let deletedItem = prevData.filter(delItem => delItem.time === 0);
+    let deletedItem = dataToUpdate.filter(item => item.time === 0);
     for (let k = 0; k < deletedItem.length; k++) { // should be able to delete, but for now updates time
-      deletedItem[k].time = 0 // Should be 0
+      deletedItem[k].time = 0
       deletedItem[k].userId = userId
       deletedItem[k].managerLogged = false
-      console.log(deletedItem)
       let apiHandler = new BaseApiHandler();
       apiHandler.put(`/api/time/register/edit/put`, { body: deletedItem[k] }, (value) => {
         console.log(value);
@@ -271,9 +270,9 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
       }
       return true;
     });
+
     // Find deleted items and update them with PUT requests
     let deletedItem = this.deleteItems(prevRowSubmitData, dataToUpdate)
-    console.log(deletedItem)
     // Set the deleted items in state and log the previous row submit data
     this.setState({ deletedItems: deletedItem })
   }
