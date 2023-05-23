@@ -6,6 +6,7 @@ import * as https from "https";
 import * as fs from "fs";
 import * as path from "path";
 import * as http from "http";
+import {clientServer} from "../clientServer";
 
 // Load in the SSL credentials for HTTPS
 const privateKey : string = fs.readFileSync(path.join(__dirname, "/SSL/selfsigned.key"), 'utf8');
@@ -52,6 +53,7 @@ export class Server {
      * Kills the server and the main mysql connection
      */
     public kill(): void {
+        clientServer.close();
         this.stop();
         mysqlHandler.destroyConnection();
         console.log("[Process] Everything shutdown, ending process");
