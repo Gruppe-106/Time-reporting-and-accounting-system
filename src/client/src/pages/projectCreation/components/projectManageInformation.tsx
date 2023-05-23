@@ -173,7 +173,7 @@ class ProjectManageInformation extends Component<ProjectInformationProp> {
         const button = document.getElementById("submitbutton") as HTMLInputElement | null;
         const projectName = (document.getElementById("formBasicProjectName") as HTMLInputElement).value
 
-        if (/\d/g.test(projectName) ||this.state.invalidStartDate || this.state.invalidEndDate){
+        if (/^\s/g.test(projectName) ||this.state.invalidStartDate || this.state.invalidEndDate){
             button?.setAttribute('disabled', '')
         }
         else{

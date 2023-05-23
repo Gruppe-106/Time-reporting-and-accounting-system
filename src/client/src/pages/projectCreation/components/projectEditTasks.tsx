@@ -11,7 +11,7 @@ interface TableRow {
   startDate: string;
   endDate: string;
   timeType: string;
-  userId: string;
+  userId: string[];
 }
 
 interface DynamicTableState {
@@ -103,7 +103,7 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
         startDate: "",
         endDate: "",
         timeType: "1",
-        userId: ""
+        userId: [""]
       },
       task: {
         status: -1,
@@ -283,17 +283,17 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
     const startDate = new Date((document.getElementById("formStartDate") as HTMLInputElement).value)
     const endDate = new Date((document.getElementById("formEndDate") as HTMLInputElement).value)
     const timeType = (document.getElementById("formTimeType") as HTMLInputElement).value
-    const user = this.state.assignedToUser
+    const user = this.state.formData.userId
 
     //RegEx to determine invalid inputs
     let invalidTaskName = /^\s/g.test(taskName) || taskName === ''
     let invalidDate = !/\d/g.test(startDate.toString()) || !/\d/g.test(endDate.toString())
     let invalidTimeType = /\D/g.test(timeType) || timeType === ''
-    let invalidUser = user?.name === '' || user?.id == null || /\d/g.test(user.name) || /\D/g.test(user.id.toString())
+    let invalidUser = !(user.length > 0)
 
     //Checks if the input fields contains an invalid input
     if ((invalidTaskName || invalidDate || this.state.invalidStartDate || this.state.invalidEndDate || invalidTimeType
-        || invalidUser) || this.state.rows.length < 0){
+    || invalidUser) || this.state.rows.length < 0){
       addButton?.setAttribute('disabled', '')
     }
     else {
@@ -308,7 +308,7 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
         let invalidRowDate = !/\d/g.test(this.state.rows[i - 1].startDate.toString()) || !/\d/g.test(this.state.rows[i - 1].endDate.toString())
 
         if ((invalidRowTaskName || invalidRowDate || this.state.invalidStartDate || this.state.invalidEndDate || /\D/g.test(this.state.rows[i - 1].timeType)
-            || /\D/g.test(this.state.rows[i - 1].userId)) || this.state.rows.length < 0) {
+        ) || this.state.rows.length < 0) {
 
           button?.setAttribute('disabled', '')
         }
@@ -332,7 +332,7 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
         let invalidRowDate = !/\d/g.test(this.state.rows[i - 1].startDate.toString()) || !/\d/g.test(this.state.rows[i - 1].endDate.toString())
 
         if ((invalidRowTaskName || invalidRowDate || this.state.invalidStartDate || this.state.invalidEndDate || /\D/g.test(this.state.rows[i - 1].timeType)
-            || /\D/g.test(this.state.rows[i - 1].userId)) || this.state.rows.length < 0) {
+        ) || this.state.rows.length < 0) {
 
           button?.setAttribute('disabled', '')
           this.handleButtonDisable()
@@ -395,9 +395,8 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
         startDate: "",
         endDate: "",
         timeType: "1",
-        userId: ""
+        userId: this.state.formData.userId
       },
-      assignedToUser: {id: -1, name: ""},
     });
     if (this.props.onRowsUpdate) {
       this.props.onRowsUpdate(newRows);
@@ -426,15 +425,16 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
   /**
    * This handles the currently selected manager while still retaining the correct formData
    */
-  private HandleManager(user: any): void {
+  private handleManager(user: {id: number, name: string}[]): void {
     this.setState({
-      assignedToUser: user[0] ? user[0] : null,
       formData: {
         taskName: this.state.formData.taskName,
         startDate: this.state.formData.startDate,
         endDate: this.state.formData.endDate,
         timeType: this.state.formData.timeType,
-        userId: user[0]?.id}
+        userId: user.map((value) =>{
+          return value.id.toString()
+        })}
     })
   }
 
@@ -450,7 +450,9 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
       let startDate = row.startDate
       let endDate = row.endDate
       let timeType = parseInt(row.timeType)
-      let userId = [parseInt(row.userId)]
+      let userId = row.userId.filter((value) =>{
+        return parseInt(value)
+      })
 
       let post_data = {
         projectId: id,
@@ -476,7 +478,7 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
           startDate: "",
           endDate: "",
           timeType: "1",
-          userId: ""
+          userId: [""]
         },
         assignedToUser: {id: 1, name: ''}
       },)
@@ -640,12 +642,13 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
                             <Typeahead
                                 id="chooseUser"
                                 labelKey="name"
-                                placeholder="Choose User..."
+                                multiple
+                                placeholder="Choose User(s)..."
                                 options={
                                   this.state.users.data.map(row =>({id: row.id, name: row.firstName + " " + row.lastName}))
                                 }
                                 onMenuToggle={() => {this.handleValidity.call(this)}}
-                                onChange={(value) => {this.HandleManager.call(this, value);
+                                onChange={(value) => {this.handleManager.call(this, value as {id: number, name:string}[]);
                                   this.handleValidity.call(this);}}
                                 filterBy={(option: any, props: any): boolean => {
                                   const query: string = props.text.toLowerCase().trim();
@@ -784,7 +787,7 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
                     {this.state.formSubmitted ? (<Alert variant="danger" id="alert">
                       <Alert.Heading>Task(s) deleted!</Alert.Heading>
                       <p>
-                        Your task has been successfully deleted, it can be viewed under <a href={`project/viewer?id=${id}`}>project</a>
+                        Your task has been successfully deleted!
                       </p>
                     </Alert>) : ""}
                   </Col>
