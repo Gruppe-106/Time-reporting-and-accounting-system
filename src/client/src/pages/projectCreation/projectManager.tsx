@@ -37,7 +37,6 @@ class ProjectMenu extends Component<any, ProjectMenuState>{
                 <Container>
                     <ProjectManageInformation id={id}/>
                 </Container>
-
             </>
         );
     }
