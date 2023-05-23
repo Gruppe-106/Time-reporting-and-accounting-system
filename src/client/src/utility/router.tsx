@@ -81,15 +81,15 @@ class Router extends Component<any> {
                         <BrowserRouter>
                             <Routes>
                                 <Route path={"/"} Component={FrontPage}/>
-                                { userInfo.isAdmin ? <Route path={"/admin"} Component={AdminPanel}/> : ""}
+                                { userInfo.isAdmin ? <Route path={"/admin/edit-user"} Component={AdminPanel}/> : ""}
                                 { userInfo.isAdmin ? <Route path={"/admin/create-user"} Component={UserCreation}/> : ""}
-                                { userInfo.isManager ?  <Route path={"/data-export"} Component={DataExport}/> : ""}
+                                { userInfo.isAdmin ?  <Route path={"/data-export"} Component={DataExport}/> : ""}
                                 { userInfo.isProjectLeader ?  <Route path={"/project/create"} Component={ProjectCreator}/> : ""}
                                 { userInfo.isProjectLeader ? <Route path={"/project/manage"} Component={ProjectManager}/> : ""}
                                 { userInfo.isProjectLeader ? <Route path={"/project/create/task"} Component={TaskCreator}/> : ""}
                                 <Route path={"/project/menu"} Component={ProjectMenu}/>
                                 <Route path={"/project/viewer"} Component={ProjectViewer}/>
-                                { userInfo.isManager && !userInfo.isAdmin ?  <Route path={"/group/manager"} Component={GroupManager}/> : ""}
+                                { userInfo.isManager && !userInfo.isAdmin ?  <Route path={"/group/time-approval"} Component={GroupManager}/> : ""}
                                 <Route path={"/user-register"} Component={UserTimeRegister}/>
                                 { userInfo.isAdmin ? <Route path={"/user-register/admin"} Component={AdminTimeRegister}/> : ""}
                                 <Route path="*" element={<Navigate to="/" replace />} />
