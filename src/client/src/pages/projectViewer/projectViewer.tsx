@@ -31,7 +31,6 @@ class ProjectViewer extends Component<any>{
                 <Container>
                     <ProjectInformation id={id}/>
                 </Container>
-
             </>
         );
     }

@@ -41,10 +41,8 @@ class ProjectCreator extends Component<any, ProjectMenuState> {
                         <Col sm={11}>
                             <ProjectCreate id={id}/>
                         </Col>
-
                     </Row>
                 </Container>
-
             </>
         );
     }
