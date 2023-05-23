@@ -4,7 +4,7 @@ import {faAngleDown, faTrash} from "@fortawesome/free-solid-svg-icons";
 import {Dropdown, Stack} from "react-bootstrap";
 import {faAngleUp} from "@fortawesome/free-solid-svg-icons/faAngleUp";
 
-interface AnonValue {
+export interface AnonValue {
     hours: number,
     minutes: number
 }
