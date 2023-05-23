@@ -43,7 +43,7 @@ export interface TaskRowData {
 // Props used in TimeSheetPage
 export interface TimeSheetProp {
     userId: number;
-    adminPicked: boolean;
+    adminPicked?: boolean;
 }
 
 // Variable states in TimeSheetPage
@@ -51,8 +51,9 @@ export interface TimeSheetState {
     stateRowData: Map<number, TaskRowData>;
     prevRowSubmitData: TimeSheetData[];
     deletedItems: TimeSheetData[];
-    searchDataState: SearchData[]
-    selectedProject: SearchData
+    searchDataState: SearchData[];
+    notRenderedTasks: SearchData[];
+    selectedProject: SearchData;
     offsetState: number;
     isUpdating: boolean;
     showAddRowModal: boolean;

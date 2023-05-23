@@ -9,14 +9,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { Api, AddModalApi, TaskRowData, TimeSheetData, TimeSheetProp, TimeSheetState } from "./interfaces"
 
 type NumberWithBoolean = [number, boolean];
-
-/*
-
-    * TODO: User timeSheet
-    * 
-
-*/
-
 /*
 
     * Creating the full Timesheet page
@@ -31,6 +23,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
       stateRowData: new Map<number, TaskRowData>(),
       prevRowSubmitData: [],
       searchDataState: [],
+      notRenderedTasks: [],
       deletedItems: [],
       selectedProject: {
         taskId: Infinity,
@@ -38,7 +31,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
         projectId: Infinity,
         projectName: "",
       },
-      offsetState: 0,
+      offsetState: 7,
       isUpdating: false,
       showAddRowModal: false,
       headerDates: [],
@@ -107,12 +100,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
    */
   private handleTimeChange(index: number, value: string, data: TaskRowData | undefined) {
     const { stateRowData, offsetState } = this.state;
-
-    // Changes the value to a number and checks if number is under 0
     let newValue: number = parseInt(value);
-    if (isNaN(newValue)) {
-      newValue = 0
-    }
 
     // gets dates for a week
     let dates: string[] = [];
@@ -128,15 +116,8 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
           let minutes = item.time % 60
           // If the date of the item matches the selected date
           if (item.date === Date.parse(dates[index])) {
-            // If the new value + the minutes is zero, remove the item from the array
-            if (newValue + minutes === 0 && rowData) {
-              rowData.objectData = rowData.objectData.filter(
-                (objItem) => objItem.date !== item.date
-              );
-            } else {
-              // Update the time of the item with the new value
-              item.time = newValue * 60 + (minutes);
-            }
+            // Update the time of the item with the new value
+            item.time = newValue * 60 + (minutes);
             dateFound = true;
           }
           return item; // just to return something
@@ -179,14 +160,8 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
           // If the date of the item matches the selected date
           if (item.date === Date.parse(dates[index])) {
             // If the new value + the minutes is zero, remove the item from the array
-            if (newValue + hoursInMinutes === 0 && rowData) {
-              rowData.objectData = rowData.objectData.filter(
-                (objItem) => objItem.date !== item.date
-              );
-            } else {
-              // Update the time of the item with the new value
-              item.time = newValue + hoursInMinutes;
-            }
+            // Update the time of the item with the new value
+            item.time = newValue + hoursInMinutes;
             dateFound = true;
           }
           return item; // just to return something
@@ -239,13 +214,9 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
    */
   private deleteItems(prevData: TimeSheetData[], dataToUpdate: TimeSheetData[]) {
     const { userId } = this.props
-    let deletedItem = prevData.filter(delItem =>
-      !dataToUpdate.some(delItem2 =>
-        delItem2.taskId === delItem.taskId && delItem2.date === delItem.date
-      )
-    );
+    let deletedItem = dataToUpdate.filter(item => item.time === 0);
     for (let k = 0; k < deletedItem.length; k++) { // should be able to delete, but for now updates time
-      deletedItem[k].time = 60 // Should be 0
+      deletedItem[k].time = 0
       deletedItem[k].userId = userId
       deletedItem[k].managerLogged = false
       let apiHandler = new BaseApiHandler();
@@ -277,7 +248,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
         if (sameTaskId && sameDate && sameTime) {
           console.log("No data submitted, for:" + item.date + "" + item.taskId);
           foundItem = true;
-        } else if (sameTaskId && sameDate) { // Should put data
+        } else if (sameTaskId && sameDate && item.time > 0) { // Should put data
           console.log("Updated data for:" + item.date + "" + item.taskId);
           item.managerLogged = false
           let apiHandler = new BaseApiHandler();
@@ -288,7 +259,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
         }
       }
       // If the data does not exist, create it with a POST request
-      if (!foundItem) {
+      if (!foundItem && item.time !== 0) {
         delete item.taskName
         item.managerLogged = false
         console.log("Added new data for:" + item.date + "" + item.taskId);
@@ -299,6 +270,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
       }
       return true;
     });
+
     // Find deleted items and update them with PUT requests
     let deletedItem = this.deleteItems(prevRowSubmitData, dataToUpdate)
     // Set the deleted items in state and log the previous row submit data
@@ -317,6 +289,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     await getCurrentWeekDates(newDates, updatedOffset);
     this.setState({ headerDates: newDates });
     await this.getData(updatedOffset);
+    await this.getTaskAndProjectData();
   }
 
   /**
@@ -378,6 +351,28 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
   }
 
   /**
+   * Retrieves all project and task data from an API endpoint and sets the state of the component.
+   */
+  private getTaskAndProjectData() {
+    // Retrieves user tasks and projects data and sets it in the state
+    const { userId } = this.props;
+    let apiHandler = new BaseApiHandler();
+    apiHandler.get(
+      `/api/user/task/project/get?user=${userId}&var=taskId,taskName,projectId,projectName`, {},
+      (value) => {
+        let json: AddModalApi = JSON.parse(JSON.stringify(value));
+        if (json.status === 200) {
+          const searchDataWithRendered = json.data.map(data => ({ ...data, isRendered: false }));
+          this.setState({
+            searchDataState: searchDataWithRendered,
+            notRenderedTasks: json.data
+          })
+        }
+      }
+    );
+  }
+
+  /**
    * Executes when the component mounts.
    */
   public componentDidMount() {
@@ -392,18 +387,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     this.getData(offsetState);
 
     // Retrieves user tasks and projects data and sets it in the state
-    const { userId } = this.props;
-    let apiHandler = new BaseApiHandler();
-    apiHandler.get(
-      `/api/user/task/project/get?user=${userId}&var=taskId,taskName,projectId,projectName`, {},
-      (value) => {
-        let json: AddModalApi = JSON.parse(JSON.stringify(value));
-        if (json.status === 200) {
-          const searchDataWithRendered = json.data.map(data => ({...data, isRendered: false}));
-          this.setState({ searchDataState: searchDataWithRendered })
-        }
-      }
-    );
+    this.getTaskAndProjectData();
   }
 
   /**
@@ -489,7 +473,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
    * @returns Returns an array of JSX elements representing the rows.
    */
   renderTaskRows() {
-    const { stateRowData, searchDataState } = this.state;
+    const { stateRowData, searchDataState, notRenderedTasks } = this.state;
 
     // Initialize an array for storing the task time data for each day
     let rows: JSX.Element[] = [];
@@ -505,6 +489,10 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
           if (data.taskId === searchDataState[i].taskId) {
             let taskProjectName: string = searchDataState[i].projectName
             searchDataState[i].isRendered = true
+            for (let j = 0; j < notRenderedTasks.length; j++) {
+              if (notRenderedTasks[j].taskId === searchDataState[i].taskId)
+                notRenderedTasks.splice(j, 1); // Remove all rendered Tasks
+            }
             this.getTimeFromData(data.taskId, arr)
             // Create a JSX element for the row and add it to the rows array
             rows.push((
@@ -515,7 +503,7 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
                   return (
                     <td key={index} style={{ textAlign: "center", verticalAlign: "middle" }}>
                       <InputGroup size="sm">
-                        <Form.Control disabled={arr[index][1]} type="number" placeholder="0" value={Math.floor(arr[index][0] / 60)} onChange={(e) => this.handleTimeChange(index, e.target.value, data)} />
+                        <Form.Control disabled={arr[index][1]} min={0} max={24} type="number" placeholder="0" value={Math.floor(arr[index][0] / 60)} onChange={(e) => this.handleTimeChange(index, e.target.value, data)} />
                         <InputGroup.Text id={`basic-addon-${index}`}>:</InputGroup.Text>
                         <Form.Select
                           style={{ fontSize: '14px', border: '1px solid #ccc', borderRadius: '0 4px 4px 0', fontFamily: 'Helvetica', color: "#212529", backgroundColor: arr[index][1] ? '#e9ecef' : '#fff' }}
@@ -537,7 +525,9 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
                 <td><Button variant="danger" onClick={() => this.handleShowDelModal(data?.taskId)}>-</Button></td>
               </tr>
             ))
-          } else { searchDataState[i].isRendered = false } // If there is no match, mark the task as not rendered
+          } else {
+            searchDataState[i].isRendered = false
+          } // If there is no match, mark the task as not rendered
         }
       }
     }
@@ -563,11 +553,11 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
   }
 
   render() {
-    const { showAddRowModal, showDeleteRowModal, deleteId, delRowTaskProject, searchDataState, deletedItems } = this.state;
+    const { showAddRowModal, showDeleteRowModal, deleteId, delRowTaskProject, notRenderedTasks, deletedItems } = this.state;
 
     return (
       <Container fluid="lg">
-        <Table bordered size="sm" className="fixed-table ellipses" responsive="sm" style={{whiteSpace: "nowrap"}}>
+        <Table bordered size="sm" className="fixed-table ellipses" responsive="sm" style={{ whiteSpace: "nowrap" }}>
           {this.renderHeaderRow()}
           <tbody>
             {this.renderTaskRows()}
@@ -595,16 +585,16 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
           </Modal.Header>
           <Modal.Body>
             <p>Which task do you want to add?</p>
-            <Form.Group className="mb-3" controlId="formBasicAssignManager">
+            <Form.Group className="mb-3">
               <Typeahead
                 id="findProject"
                 labelKey={(option: any) => `${option.projectName}  ${option.taskName}`}
-                options={searchDataState}
-                placeholder="Pick a project"
+                options={notRenderedTasks}
+                placeholder="Pick a task"
                 renderMenuItemChildren={(option: any, props: any) => (
                   <>
                     <Highlighter search={props.text}>
-                      {option.projectName + ", " + option.taskName}
+                      {option.projectName + ", " + option.taskName + ":" + option.taskId}
                     </Highlighter>
                   </>
                 )}
