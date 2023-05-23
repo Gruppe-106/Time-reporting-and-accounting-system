@@ -19,6 +19,7 @@ import BaseApiHandler from "../network/baseApiHandler";
 import {Col, Row} from "react-bootstrap";
 import Spinner from "react-bootstrap/Spinner";
 import TaskCreator from "../pages/projectCreation/taskCreator";
+import TimeRegister from "../pages/timeRegister2/timeRegister";
 
 interface AuthApi {
     status: number,
@@ -90,7 +91,7 @@ class Router extends Component<any> {
                                 <Route path={"/project/menu"} Component={ProjectMenu}/>
                                 <Route path={"/project/viewer"} Component={ProjectViewer}/>
                                 { userInfo.isManager && !userInfo.isAdmin ?  <Route path={"/group/time-approval"} Component={GroupManager}/> : ""}
-                                <Route path={"/user-register"} Component={UserTimeRegister}/>
+                                <Route path={"/user-register"} Component={TimeRegister}/>
                                 { userInfo.isAdmin ? <Route path={"/user-register/admin"} Component={AdminTimeRegister}/> : ""}
                                 <Route path="*" element={<Navigate to="/" replace />} />
                             </Routes>

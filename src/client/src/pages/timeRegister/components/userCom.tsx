@@ -92,47 +92,54 @@ class TimeSheetPage extends Component<TimeSheetProp, TimeSheetState> {
     this.handleCloseAddModal();
   }
 
-  /**
-   * Changes the time value for a specific task row data at a given date index in the TimeSheet.
-   * @param index - The index of the date for which the time value needs to be changed.
-   * @param value - The new time value to be set.
-   * @param data - The task row data object to which the time value belongs.
-   */
-  private handleTimeChange(index: number, value: string, data: TaskRowData | undefined) {
-    const { stateRowData, offsetState } = this.state;
-    let newValue: number = parseInt(value);
+    /**
+     * Changes the time value for a specific task row data at a given date index in the TimeSheet.
+     * @param index - The index of the date for which the time value needs to be changed.
+     * @param value - The new time value to be set.
+     * @param data - The task row data object to which the time value belongs.
+     */
+    private handleTimeChange(index: number, value: string, data: TaskRowData | undefined) {
+        const { stateRowData, offsetState } = this.state;
+        let newValue: number = parseInt(value);
 
-    // gets dates for a week
-    let dates: string[] = [];
-    getCurrentWeekDates(dates, offsetState);
+        // gets dates for a week
+        let dates: string[] = [];
+        getCurrentWeekDates(dates, offsetState);
 
-    // Loop through each task in stateRowData data
-    for (const key of Array.from(stateRowData.keys())) {
-      let rowData = stateRowData.get(key);
-      if (data && rowData && data.taskId === rowData.taskId) {
-        // Loop through each objectData of the current row
-        let dateFound: boolean = false;
-        rowData.objectData.map((item) => {
-          let minutes = item.time % 60
-          // If the date of the item matches the selected date
-          if (item.date === Date.parse(dates[index])) {
-            // Update the time of the item with the new value
-            item.time = newValue * 60 + (minutes);
-            dateFound = true;
-          }
-          return item; // just to return something
-        });
+        // Loop through each task in stateRowData data
+        for (const key of Array.from(stateRowData.keys())) {
+            let rowData = stateRowData.get(key);
+            if (data && rowData && data.taskId === rowData.taskId) {
+                // Loop through each objectData of the current row
+                let dateFound: boolean = false;
+                rowData.objectData.map((item) => {
+                    let minutes = item.time % 60
+                    // If the date of the item matches the selected date
+                    if (item.date === Date.parse(dates[index])) {
+                        // Update the time of the item with the new value
+                        item.time = newValue * 60 + (minutes);
+                        dateFound = true;
+                    }
+                    return item; // just to return something
+                });
 
-        // If the date was not found and the new value is greater than zero, push a new objectData to the row
-        if (!dateFound && newValue > 0) {
-          rowData.objectData.push({ date: Date.parse(dates[index]), time: Math.max(0, newValue * 60), approved: false, managerLogged: false });
+                // If the date was not found and the new value is greater than zero, push a new objectData to the row
+                if (!dateFound && newValue > 0) {
+                    rowData.objectData.push(
+                        { 
+                            date: Date.parse(dates[index]), 
+                            time: Math.max(0, newValue * 60), 
+                            approved: false, 
+                            managerLogged: false 
+                        }
+                    );
+                }
+
+                this.setState({ stateRowData });
+                break; // Break out of the map function if date matches or if a new object was pushed.
+            }
         }
-
-        this.setState({ stateRowData });
-        break; // Break out of the map function if date matches or if a new object was pushed.
-      }
     }
-  }
 
   /**
      * This function handles the change event for a time select input. It takes in three parameters:
