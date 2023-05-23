@@ -1,3 +1,5 @@
+import { mysqlHandler } from "../../app";
+
 /**
  * Enum for different types of SQL joins
  */
@@ -84,6 +86,19 @@ class MysqlQueryBuilder {
     }
 
     /**
+     * Generate a WHERE clause for the query
+     * @param date - An optional number date
+     * @param currentWhere - An optional where string to append to
+     * @returns A string representing the WHERE clause of the query
+     */
+    whereDatesInPeriod(date?: number, currentWhere?: string): string {
+        if (date === undefined) return currentWhere;
+        let dateString: string = mysqlHandler.dateFormatter(date);
+        if (currentWhere !== undefined) return currentWhere + ` AND '${dateString}' BETWEEN startDate AND endDate`;
+        return `WHERE '${dateString}' BETWEEN startDate AND endDate`;
+    }
+
+    /**
      * Add a JOIN clause to the query
      * @param type - The type of JOIN to add
      * @param table - The name of the table to join
@@ -91,13 +106,16 @@ class MysqlQueryBuilder {
      * @param tableIdentifier - An optional identifier for the table
      * @returns The current instance of the MysqlQueryBuilder
      */
-    join(type: MySQLJoinTypes, table: string, condition: [key: string, equals: string], tableIdentifier: string): MysqlQueryBuilder {
+    join(type: MySQLJoinTypes, table: string, condition: [key: string, equals: string] | string, tableIdentifier: string): MysqlQueryBuilder {
         const tableAlreadyJoined: boolean = this.query.join.some(join => join.table === table);
+        let where: string;
+        if (typeof condition === "string") where = condition;
+        else where = `${condition[0]}=${condition[1]}`
         if (!tableAlreadyJoined) {
             this.query.join.push({
                 type: type,
                 table: table,
-                condition: `${condition[0]}=${condition[1]}`,
+                condition: where,
                 identifier: tableIdentifier
             });
         }

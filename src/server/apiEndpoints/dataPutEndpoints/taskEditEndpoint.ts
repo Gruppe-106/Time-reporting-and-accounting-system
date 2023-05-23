@@ -1,7 +1,8 @@
 import PostEndpointBase from "../postEndpointBase";
 import {Request, Response} from "express";
-import {addUsersToTask, taskProjectConnector} from "../dataPostEndpoints/projectCreationEndpoint";
 import {MySQLResponse, UpdateSet} from "../../database/mysqlHandler";
+import {taskProjectConnector} from "../dataPostEndpoints/tablePosts/taskProject";
+import {addUsersToTask} from "../dataPostEndpoints/tablePosts/taskTable";
 
 export interface TaskEditData {
     taskId     : number,
@@ -15,6 +16,11 @@ export interface TaskEditData {
     projects  ?: number[]
 }
 
+/**
+ * Add task to multiple projects
+ * @param {number} projectIds List of project ids to add task to
+ * @param {number} taskId Task id to add to projects
+ */
 export async function addTaskToMultiProject(taskId:number, projectIds: number[]): Promise<void> {
     for (const projectId of projectIds) {
         try {
@@ -25,6 +31,11 @@ export async function addTaskToMultiProject(taskId:number, projectIds: number[])
     }
 }
 
+/**
+ * Removes users from a task
+ * @param {number[]} users list of user to remove from task
+ * @param {number} taskId Task id to remove users from
+ */
 export async function removeUsersTFromTask(users: number[], taskId: number): Promise<string[]> {
     let message: string[] = [];
     for (const user of users) {

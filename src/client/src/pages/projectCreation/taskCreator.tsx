@@ -33,7 +33,6 @@ class TaskCreator extends Component<any, ProjectMenuState>{
                 <Container>
                     <CreateTaskTable initialRows={[]}></CreateTaskTable>
                 </Container>
-
             </>
         );
     }

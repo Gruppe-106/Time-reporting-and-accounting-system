@@ -9,15 +9,18 @@ import {insertGeneric} from "./server/database/wipeDB";
 import {createTestDBSetup} from "./server/serverTest/testDBSetup";
 import {clientServer} from "./clientServer";
 
-// --- Config ---
-const port: number = 8080;
+import "./server/utility/array";
 
-const app: Express = express();
+// --- Config ---
+const apiPort: number = 8080;
+const clientPort: number = 443;
 const mySQLConnectionConfig: MySQLConfig = fsReadJSON("mysqlConnectionConfig.json");
 
-const server: Server = new Server(app);
+let testMode: boolean = process.argv.contains("test");
 
-let testMode: boolean = process.argv.indexOf("test") !== -1;
+// --- Server initialisation ---
+const app: Express = express();
+const server: Server = new Server(app);
 
 // First create the mysql connection before listening on the server to insure database is reachable
 const mysqlHandler: MysqlHandler = new MysqlHandler(mySQLConnectionConfig, testMode);
@@ -38,12 +41,13 @@ mysqlHandler.initConnection(async () => {
         }
     } else {
         // Add fake data to database if arg is given
-        if (process.argv.indexOf("fake") !== -1) await insertGeneric();
+        if (process.argv.contains("fake")) await insertGeneric();
+        // Start listening on the server
+        clientServer.listen(clientPort, () => { console.log("[Server] Client server is now running")});
     }
-
-    // Start listening on the server
-    server.start(port);
-    clientServer.listen(443, () => { console.log("[Server] Client server is now running")});
+    server.start(apiPort);
 })
+
+
 
 export {mysqlHandler, server, mySQLConnectionConfig};
