@@ -20,9 +20,10 @@ class UserTimeRegisterEndpoint extends PostEndpointBase {
         if (timeRegisterData.userId === undefined || timeRegisterData.taskId === undefined || timeRegisterData.date === undefined) return ["Missing data"];
 
         let timeRegisterUpdateSet: UpdateSet[] = [];
-        if (timeRegisterData.time)          timeRegisterUpdateSet.push({column: "time", value: timeRegisterData.time.toString()});
-        if (timeRegisterData.approved)      timeRegisterUpdateSet.push({column: "approved", value: timeRegisterData.approved ? "1" : "0"});
-        if (timeRegisterData.managerLogged) timeRegisterUpdateSet.push({column: "managerLogged", value: timeRegisterData.managerLogged ? "1" : "0"});
+        if (timeRegisterData.time !== undefined && timeRegisterData.time >= 0)
+            timeRegisterUpdateSet.push({column: "time", value: timeRegisterData.time.toString()});
+        if (timeRegisterData.approved !== undefined)      timeRegisterUpdateSet.push({column: "approved", value: timeRegisterData.approved ? "1" : "0"});
+        if (timeRegisterData.managerLogged !== undefined) timeRegisterUpdateSet.push({column: "managerLogged", value: timeRegisterData.managerLogged ? "1" : "0"});
 
         let timeRegisterResponse: MySQLResponse = await this.mySQL.update("USERS_TASKS_TIME_REGISTER",
             timeRegisterUpdateSet,

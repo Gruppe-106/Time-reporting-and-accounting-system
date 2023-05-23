@@ -122,11 +122,6 @@ class BaseNavBar extends Component<any>{
                                 ]) : this.linkRender("/user-register", "Register time")}
 
                                 { userInfo.isManager && !userInfo.isAdmin ?
-                                        this.linkRender("/group/manager", "Group Manager")
-                                    : ""
-                                }
-
-                                { userInfo.isManager ?
                                     this.linkRender("/group/time-approval", "Time Approval")
                                     : ""
                                 }
@@ -134,7 +129,7 @@ class BaseNavBar extends Component<any>{
                                 { userInfo.isProjectLeader ? this.linkRender("/data-export", "Data") : "" }
                             </Nav>
                             { userInfo.isAdmin ? <Nav className="me-auto">
-                                { this.linkRender("/admin", "Admin") }
+                                { this.linkRender("/admin/edit-user", "Edit users") }
                                 { this.linkRender("/admin/create-user", "Create User") }
                             </Nav> : "" }
                             <Nav>
