@@ -12,14 +12,15 @@ import {clientServer} from "./clientServer";
 import "./server/utility/array";
 
 // --- Config ---
-const port: number = 8080;
-
-const app: Express = express();
+const apiPort: number = 8080;
+const clientPort: number = 443;
 const mySQLConnectionConfig: MySQLConfig = fsReadJSON("mysqlConnectionConfig.json");
 
-const server: Server = new Server(app);
-
 let testMode: boolean = process.argv.contains("test");
+
+// --- Server initialisation ---
+const app: Express = express();
+const server: Server = new Server(app);
 
 // First create the mysql connection before listening on the server to insure database is reachable
 const mysqlHandler: MysqlHandler = new MysqlHandler(mySQLConnectionConfig, testMode);
@@ -42,9 +43,9 @@ mysqlHandler.initConnection(async () => {
         // Add fake data to database if arg is given
         if (process.argv.contains("fake")) await insertGeneric();
         // Start listening on the server
-        clientServer.listen(443, () => { console.log("[Server] Client server is now running")});
+        clientServer.listen(clientPort, () => { console.log("[Server] Client server is now running")});
     }
-    server.start(port);
+    server.start(apiPort);
 })
 
 

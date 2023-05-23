@@ -2,6 +2,7 @@ import GetEndpointBase, {PrimaryKeyType} from "../getEndpointBase";
 import {MySQLResponse} from "../../database/mysqlHandler";
 import MysqlStringBuilder from "../../database/mysqlStringBuilder";
 import MysqlQueryBuilder, {MySQLJoinTypes} from "../../database/mysqlStringBuilder";
+import "../../utility/array";
 
 /**
  * Endpoint for .../api/time/register/get
@@ -48,22 +49,22 @@ class TaskTimeRegisterEndpoint extends GetEndpointBase {
             if (requestValues.indexOf(value.request) !== -1 || allColumns) mysqlBuilder.addColumnsToGet([value.column]);
         });
 
-        if (requestValues.indexOf("taskTimeType") !== -1 || allColumns) {
+        if (requestValues.contains("taskTimeType") || allColumns) {
             mysqlBuilder.join(MySQLJoinTypes.CROSS, "TASKS", ["t.id", "ttr.taskId"], "t");
             mysqlBuilder.join(MySQLJoinTypes.CROSS, "TIMETYPES", ["t.timeType", "tt.id"], "tt");
             mysqlBuilder.addColumnsToGet(["tt.name as timeTypeName", "tt.id as timeType"]);
         }
 
-        if (requestValues.indexOf("taskName") !== -1 || allColumns) {
+        if (requestValues.contains("taskName") || allColumns) {
             mysqlBuilder.join(MySQLJoinTypes.CROSS, "TASKS", ["t.id", "ttr.taskId"], "t");
             mysqlBuilder.addColumnsToGet(["t.name as taskName"]);
         }
 
-        if (requestValues.indexOf("projectName") !== -1 || requestValues.indexOf("projectId") !== -1|| allColumns) {
+        if (requestValues.contains("projectName") || requestValues.contains("projectId") || allColumns) {
             mysqlBuilder.join(MySQLJoinTypes.CROSS, "TASKS_PROJECTS_CONNECTOR", ["ttr.taskId", "tp.taskId"], "tp");
             mysqlBuilder.join(MySQLJoinTypes.CROSS, "PROJECTS", ["tp.projectId", "p.id"], "p");
-            if (requestValues.indexOf("projectId")   || allColumns) mysqlBuilder.addColumnsToGet(["p.id as projectId"]);
-            if (requestValues.indexOf("projectName") || allColumns) mysqlBuilder.addColumnsToGet(["p.name as projectName"]);
+            if (requestValues.contains("projectId")   || allColumns) mysqlBuilder.addColumnsToGet(["p.id as projectId"]);
+            if (requestValues.contains("projectName") || allColumns) mysqlBuilder.addColumnsToGet(["p.name as projectName"]);
         }
 
         //Query the data for all group that satisfies conditions

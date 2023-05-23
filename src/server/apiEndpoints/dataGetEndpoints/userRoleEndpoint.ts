@@ -2,7 +2,7 @@ import GetEndpointBase, {PrimaryKeyType} from "../getEndpointBase";
 import {MySQLResponse} from "../../database/mysqlHandler";
 import MysqlStringBuilder from "../../database/mysqlStringBuilder";
 import MysqlQueryBuilder, {MySQLJoinTypes} from "../../database/mysqlStringBuilder";
-
+import "../../utility/array";
 /**
  * Endpoint for .../api/role/user/get
  */
@@ -14,7 +14,7 @@ class UserRoleEndpoint extends GetEndpointBase {
     requiredRole: number = 1;
 
     async getData(requestValues: string[], primaryKey: string, keyEqual?: string[]): Promise<object[]> {
-        let allColumns: boolean = requestValues.indexOf("*") !== -1;
+        let allColumns: boolean = requestValues.contains("*");
 
         // Check if a where condition is needed
         let where: [key: string, equals: string[]] = undefined;
@@ -25,18 +25,18 @@ class UserRoleEndpoint extends GetEndpointBase {
             .from("USERS_ROLES_CONNECTOR", where, undefined, "ur");
 
         // Add all columns to find in the database
-        if (requestValues.indexOf("userId") !== -1 || allColumns) mysqlBuilder.addColumnsToGet(["ur.userId"]);
-        if (requestValues.indexOf("roleId") !== -1 || allColumns) mysqlBuilder.addColumnsToGet(["ur.roleId"]);
+        if (requestValues.contains("userId") || allColumns) mysqlBuilder.addColumnsToGet(["ur.userId"]);
+        if (requestValues.contains("roleId") || allColumns) mysqlBuilder.addColumnsToGet(["ur.roleId"]);
         // The 2 columns below has to be retrieved from a different table, so add a join statement to query
-        if (requestValues.indexOf("firstName")  !== -1 || allColumns) {
+        if (requestValues.contains("firstName") || allColumns) {
             mysqlBuilder.join(MySQLJoinTypes.CROSS, "USERS", ["u.id", "ur.userId"], "u");
             mysqlBuilder.addColumnsToGet(["u.firstName"]);
         }
-        if (requestValues.indexOf("lastName")  !== -1 || allColumns) {
+        if (requestValues.contains("lastName") || allColumns) {
             mysqlBuilder.join(MySQLJoinTypes.CROSS, "USERS", ["u.id", "ur.userId"], "u");
             mysqlBuilder.addColumnsToGet(["u.lastName"]);
         }
-        if (requestValues.indexOf("roleName") !== -1 || allColumns) {
+        if (requestValues.contains("roleName") || allColumns) {
             mysqlBuilder.join(MySQLJoinTypes.CROSS, "ROLES", ["r.id", "ur.roleId"], "r");
             mysqlBuilder.addColumnsToGet(["r.name"]);
         }
