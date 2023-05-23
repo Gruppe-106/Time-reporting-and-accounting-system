@@ -114,7 +114,7 @@ class FrontPage extends Component<any, StateTypes> {
                 >
                     <BaseNavBar />
 
-                    <Container >
+                    <Container style={{paddingTop: "10px"}} >
                         <div style={{ justifyContent: "center", display: "flex" }}>
                             <h1>Welcome {this.state.user.firstName + " " + this.state.user.lastName}</h1>
                         </div>
