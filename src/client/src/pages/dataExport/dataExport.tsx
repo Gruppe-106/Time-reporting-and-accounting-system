@@ -149,44 +149,42 @@ class DataExport extends Component<any>{
             return pData;
         }
 
-        pData.push(this.createProjectDataFromTimesheet(data[range[0]]))
-
-        if (range[0] == range[1]) {
-            return pData;
-        }
-
-        if (range[0] < range[1]) {
-            let index: number = range[0] + 1;
-            let prevTimesheet = data[range[0]];
-            let pCount = 1;
-            let tCount = 1;
-            while (index <= range[1]) {
-                let currTimesheet = data[index];
-                if (!currTimesheet.managerLogged || !currTimesheet.approved) {
-                    index++;
-                    continue;
-                }
-
-                if (prevTimesheet.taskId === currTimesheet.taskId) {
-                    // Append information to same task.
-                    this.appendInfoToTask(currTimesheet, pData[pCount - 1].tasks[tCount - 1]);
-                }
-                else if (
-                    prevTimesheet.projectId === currTimesheet.projectId &&
-                    prevTimesheet.taskId !== currTimesheet.taskId
-                ) {
-                    // Same project but new task. Append new task info.
-                    this.appendNewTaskToProject(currTimesheet, pData[pCount - 1]);
-                    tCount++;
-                }
-                else {
-                    // New project. Create a new project.
-                    pData.push(this.createProjectDataFromTimesheet(currTimesheet));
-                    pCount++;
-                    tCount = 1;
-                }
-                index++;
+        let leftIndex = range[0];
+        let pCount = 1;
+        let tCount = 1;
+        let prevTimesheet: RecTimesheetModel | null = null;
+        console.log("Start " + leftIndex);
+        while (leftIndex <= range[1] && data[leftIndex].approved && data[leftIndex].managerLogged && data[leftIndex].time) 
+        {
+            let currTimesheet: RecTimesheetModel = data[leftIndex];
+            if (prevTimesheet === null) 
+            {
+                pData.push(this.createProjectDataFromTimesheet(data[range[0]]));
+                prevTimesheet = data[leftIndex];
+                leftIndex++;
+                continue;
             }
+            
+            if (prevTimesheet.taskId === currTimesheet.taskId) {
+                // Append information to same task.
+                this.appendInfoToTask(currTimesheet, pData[pCount - 1].tasks[tCount - 1]);
+            }
+            else if (prevTimesheet.projectId === currTimesheet.projectId &&
+                        prevTimesheet.taskId !== currTimesheet.taskId) {
+                // Same project but new task. Append new task info.
+                this.appendNewTaskToProject(currTimesheet, pData[pCount - 1]);
+                tCount++;
+            }
+            else 
+            {
+                // New project. Create a new project.
+                pData.push(this.createProjectDataFromTimesheet(currTimesheet));
+                pCount++;
+                tCount = 1;
+            }
+
+            prevTimesheet = data[leftIndex];
+            leftIndex++;
         }
 
         return pData;
@@ -218,6 +216,9 @@ class DataExport extends Component<any>{
         let headerLine = `"${headerElements.join(`"${delimiter}"`)}"`;
         // Just joins all the elements above with a ' ";" ' in between and at the two ends ' " '.
         let allText = "" + headerLine;
+
+        console.log(convertedData);
+
         for (let i = 0; i < convertedData.length; i++) {
             const userData: UserData = convertedData[i];
 
@@ -228,6 +229,7 @@ class DataExport extends Component<any>{
                     const taskData: TaskData = projectData.tasks[k];
                     let varList = [userData.lastName, userData.firstName, userData.id, projectData.projectName, projectData.projectId, taskData.taskName, taskData.taskId, taskData.totalHours];
                     allText += `\n"${varList.join(`"${delimiter}"`)}"`;
+                    console.log(`\n"${varList.join(`"${delimiter}"`)}"`);
                     // For all tasks we need to create a new line in the csv containing all info.
                     // Joins the elements the same way the header works.
                 }
