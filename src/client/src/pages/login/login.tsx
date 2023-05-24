@@ -27,12 +27,11 @@ class Login extends Component<any>{
         let apiHandler = new BaseApiHandler();
         apiHandler.post("/api/login", {body: {email: this.state.email, password: forge.md.sha256.create().update(this.state.password).digest().toHex()}}, (value) => {
             let response: AuthApi = JSON.parse(JSON.stringify(value));
-            if (response.status === 200) {
+            if (response.status === 200 && response.data[1] !== undefined) {
                 Cookies.set("auth", response.data[1], {expires: Number(response.data[2])});
                 window.location.reload();
-            } else {
-                this.setState({failed: true, submitting: false})
             }
+            this.setState({failed: true, submitting: false})
         })
     }
 

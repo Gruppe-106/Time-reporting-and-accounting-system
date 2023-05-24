@@ -447,8 +447,8 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
     // eslint-disable-next-line array-callback-return
     this.state.rows.map((row => {
       let taskName = row.taskName
-      let startDate = row.startDate
-      let endDate = row.endDate
+      let startDate = new Date(row.startDate).getTime();
+      let endDate = new Date(row.endDate).getTime();
       let timeType = parseInt(row.timeType)
       let userId = row.userId.filter((value) =>{
         return parseInt(value)

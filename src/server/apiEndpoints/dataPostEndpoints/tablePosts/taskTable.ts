@@ -1,5 +1,6 @@
 import {MySQLResponse} from "../../../database/mysqlHandler";
 import {dateValid} from "../projectCreationEndpoint";
+import {mysqlHandler} from "../../../../app";
 
 export interface TaskData {
     name       : string,
@@ -47,7 +48,7 @@ function validateTaskData(task: TaskData): boolean {
     if (task.timeType < 1 || task.timeType > 4) return false;
     // Check if dates are valid
     if (!dateValid(task.startDate) || !dateValid(task.endDate)) return false;
-    return false;
+    return true;
 }
 
 /**
@@ -59,9 +60,9 @@ function validateTaskData(task: TaskData): boolean {
 export async function insertTask(task: TaskData): Promise<number> {
     if (!validateTaskData(task)) return -1;
     // Insert the task data into the database
-    let taskResponse: MySQLResponse = await this.mySQL.insert("TASKS",
+    let taskResponse: MySQLResponse = await mysqlHandler.insert("TASKS",
         ["name", "startDate", "endDate", "timeType"],
-        [task.name, this.mySQL.dateFormatter(task.startDate), this.mySQL.dateFormatter(task.endDate), task.timeType.toString()]);
+        [task.name, mysqlHandler.dateFormatter(task.startDate), mysqlHandler.dateFormatter(task.endDate), task.timeType.toString()]);
     // Throw an error if the insert fails
     if (taskResponse.error !== null) throw new Error("[MySQL] Failed insert data");
     // Return id of the inserted task
