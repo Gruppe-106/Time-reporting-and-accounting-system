@@ -109,7 +109,9 @@ class EmployeeTable extends Component<TableProps, EmployeeTableTypes> {
                             ))}
                         </tbody>
                     </Table>
-                ):null}
+                ):<>
+                    <h1>There are no users managed by you.</h1>
+                </>}
                 <TimesheetTable ref={this.timesheetRef}></TimesheetTable>
             </>
         )
