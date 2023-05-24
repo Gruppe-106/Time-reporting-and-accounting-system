@@ -1,7 +1,7 @@
 # Time-reporting-and-accounting-system
-Project by **CS-23-DAT-01**
+Project by **CS-23-DAT-2-01**
 # About
-This project is the second semester project for the group **CS-23-DAT-01**
+This project is the second semester project for the group **CS-23-DAT-2-01**
 ## How to access site
 To access the site you must either be connected to Aalborg university's internet or connected to the Aalborg university's VPN service https://www.en.its.aau.dk/instructions/vpn.
 When this is done go to the site https://10.92.1.237/, notice that your browser will give a warning. This is because of some problems that we have encountered with the permission files. Ignore the warning and enter the site, here you will encounter a login page, below can be seen some different logins with different roles.
