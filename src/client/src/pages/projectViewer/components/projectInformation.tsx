@@ -53,17 +53,18 @@ class ProjectInformation extends Component<ProjectInformationProp> {
      * gets project information and stores it in a json file
      * sets the state of pageInformation to the data of the json file
      */
-    componentDidMount():void {
+    async componentDidMount():Promise<void> {
         let apiHandler = new BaseApiHandler();
-        apiHandler.get(`/api/project/get?ids=${this.state.pageInformation.id}`, {},(value) => {
+        await new Promise((resolve) => { apiHandler.get(`/api/project/get?ids=${this.state.pageInformation.id}`, {}, async (value) => {
             let json:Api = JSON.parse(JSON.stringify(value))
-            this.setState({pageInformation: json.data[0]})
-
-            apiHandler.get(`/api/project/get?ids=${this.state.pageInformation.superProjectId}`, {},(value) => {
+            this.setState({pageInformation: json.data[0]},  () => {
+                resolve(true);
+            })
+        })})
+        await apiHandler.get(`/api/project/get?ids=${this.state.pageInformation.superProjectId}`, {},(value) => {
             let superJson:Api = JSON.parse(JSON.stringify(value))
             this.setState({superProjectInfo: superJson.data[0]})
-        })
-        })
+            })
     }
 
     /**
@@ -102,7 +103,7 @@ class ProjectInformation extends Component<ProjectInformationProp> {
                                         {this.state.pageInformation.superProjectId !== 0 ?(<th>Parent Project: {this.state.pageInformation.superProjectId} - {this.state.superProjectInfo?.name}</th>) : null}
                                     </tr>
                                     <tr>
-                                        <th>Project Leader: {this.state.pageInformation.projectLeader.firstName} {this.state.pageInformation.projectLeader.lastName} - ID: {this.state.pageInformation.projectLeader.id}</th>
+                                        {this.state.pageInformation.projectLeader !== undefined ?(<th>Project Leader: {this.state.pageInformation.projectLeader?.firstName} {this.state.pageInformation.projectLeader?.lastName} - ID: {this.state.pageInformation.projectLeader?.id}</th>): null}
                                     </tr>
                                     </thead>
                                 </Table>
