@@ -23,7 +23,9 @@ interface TimeInputProp {
     // Should the input fields be set to 0 when deleted
     zeroedOnDelete?: boolean,
     // Enable input dropdown (Required for delete button)
-    enableDropDown?: boolean
+    enableDropDown?: boolean,
+    // Background color
+    backgroundColor?: string
 }
 
 interface TimeInputState {
@@ -87,6 +89,8 @@ class TimeInput extends Component<TimeInputProp, TimeInputState>{
                 this.locked = true;
             }
         }
+
+        if (props.backgroundColor !== undefined) this.backgroundColor = props.backgroundColor;
 
         this.minutesRef = createRef();
         this.hoursRef   = createRef();
