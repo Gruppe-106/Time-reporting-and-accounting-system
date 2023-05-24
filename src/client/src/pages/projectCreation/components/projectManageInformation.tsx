@@ -297,7 +297,7 @@ class ProjectManageInformation extends Component<ProjectInformationProp> {
                                             options={
                                                 this.state.projectLeaders.map(row =>({id: row.userId, name: row.firstName + " " + row.lastName}))
                                             }
-                                            placeholder={this.state.pageInformation.projectLeader.firstName + " " + this.state.pageInformation.projectLeader.lastName}
+                                            placeholder={"Choose Project Leader..."}
                                             onMenuToggle={() => {this.handleValidity.call(this)}}
                                             onChange={(value) => {this.HandleManager.call(this, value);
                                                 this.handleValidity.call(this)}}
