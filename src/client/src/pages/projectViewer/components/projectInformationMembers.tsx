@@ -45,8 +45,8 @@ class ProjectMemberTable extends Component<any> {
      * returns table data with the information stored
      */
     private tableRender():JSX.Element[] {
-        return this.state.tableRows.map(row => (
-            <tr key={row.id}>
+        return this.state.tableRows.map((row, key) => (
+            <tr key={key}>
                 <td>{row.id ?? ''}</td>
                 <td>{row.firstName ?? ''}</td>
                 <td>{row.lastName ?? ''}</td>

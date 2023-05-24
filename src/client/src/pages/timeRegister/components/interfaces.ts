@@ -71,10 +71,10 @@ export interface TimeSheetState {
 // State of UserTimeSheet
 export interface UserState {
     userId: number;
-    dataOfUser: userData[]
+    dataOfUser: UserData[]
 }
 
-export interface userData {
+export interface UserData {
     id: number
     firstName?: string,
     lastName?: string,
@@ -82,5 +82,5 @@ export interface userData {
 
 export interface UserAPI {
     status: number,
-    data: userData[]
+    data: UserData[]
 }
