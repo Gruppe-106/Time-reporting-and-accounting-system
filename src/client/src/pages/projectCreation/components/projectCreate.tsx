@@ -183,8 +183,8 @@ class ProjectCreate extends Component<ProjectCreateProp> {
         //event.preventDefault();
         const projectName = (document.getElementById("formBasicProjectName") as HTMLInputElement).value
         const parentProject = this.state.selectedParentProject.id
-        const startDate = new Date((document.getElementById("formBasicStartDate") as HTMLInputElement).value)
-        const endDate = new Date((document.getElementById("formBasicEndDate") as HTMLInputElement).value)
+        const startDate = new Date((document.getElementById("formBasicStartDate") as HTMLInputElement).value).getTime()
+        const endDate = new Date((document.getElementById("formBasicEndDate") as HTMLInputElement).value).getTime()
         const teamLeader = this.state.assignedToManager.id
         const tasks = this.state.tasks
 

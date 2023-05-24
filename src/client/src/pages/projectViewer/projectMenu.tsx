@@ -24,7 +24,7 @@ class ProjectMenu extends Component<any, ProjectMenuState>{
         return (
             <>
                 <BaseNavBar/>
-                <Container>
+                <Container className={"py-3"}>
                     <h1>Project Menu</h1>
                     {
                         <ProjectTable/>

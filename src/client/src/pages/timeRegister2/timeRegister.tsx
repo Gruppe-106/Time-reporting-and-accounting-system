@@ -70,6 +70,16 @@ interface RegisterPost {
     time   : number,
 }
 
+interface RegisterApiResponse {
+    status: number,
+    data: {
+        success? : boolean,
+        error?   : string,
+        message? : string[],
+        reason?  : string[]
+    }
+}
+
 class TimeRegister extends Component<any> 
 {
     tasksRegistrations: Map<number, TaskRegistration> = new Map<number, TaskRegistration>();
@@ -113,7 +123,6 @@ class TimeRegister extends Component<any>
     private getRegistrationData() {
         let handler: BaseApiHandler = new BaseApiHandler();
         let period: [number, number] = this.getPeriod(this.weekOffset);
-        console.log(this.userId);
         handler.get(`/api/time/register/get?user=${this.userId}&period=${period[0]},${period[1]}`, {}, async (value) => {
             console.log(value);
             let recData: ApiResponse = JSON.parse(JSON.stringify(value));
@@ -176,7 +185,8 @@ class TimeRegister extends Component<any>
                 <td>{this.tasksRegistrations.get(taskKey)?.taskName}</td>
                 {inputElements}
                 <td>
-                    <TimeInput defaultValue={totalTime}
+                    <TimeInput key={totalTime}
+                               defaultValue={totalTime}
                                managerLogged={true}
                                approved={true}
                                backgroundColor={"#5798F9"}
@@ -209,7 +219,7 @@ class TimeRegister extends Component<any>
         )
     }
 
-    private onInputBlur(taskKey: number, dayIndex: number, value: AnonValue) {
+    private async onInputBlur(taskKey: number, dayIndex: number, value: AnonValue) {
         let task: TaskRegistration | undefined = this.tasksRegistrations.get(taskKey);
         if (task !== undefined) {
             let registration: TimeRegistration = task.registrations.get(dayIndex) ?? {
@@ -220,45 +230,57 @@ class TimeRegister extends Component<any>
                 fromServer: false
             };
 
-            registration.minutes = value.minutes;
-            registration.hours = value.hours;
-
-            task.registrations.set(dayIndex, registration);
-            this.tasksRegistrations.set(taskKey, task);
-
             let apiHandler = new BaseApiHandler();
-            // This do be cursed
+
             let sundayOffset = 0;
             let weekDay = dayIndex + 1
             if (weekDay > 6) {
                 weekDay = 0;
                 sundayOffset = 1;
             }
-            // Thank you for coming to my ted talk
-            if ( registration.fromServer ) {
-                let body: RegisterPut = {
-                    date: getDayThisWeek(weekDay, this.weekOffset + sundayOffset),
-                    time: value.hours * 60 + value.minutes,
-                    taskId: taskKey,
-                    managerLogged: false,
-                    userId: this.userId
+
+            new Promise((resolve) => {
+                let apiCallback = (response: object) => {
+                    let res: RegisterApiResponse = JSON.parse(JSON.stringify(response));
+                    if (res.status !== 200) {
+                        alert("Outside task period");
+                        resolve(false);
+                    }
+                    resolve(true);
                 }
-                console.log("put", body, weekDay);
-                apiHandler.put("/api/time/register/edit/put", {body: body}, (value) => {
-                    console.log(value);
-                });
-            } else {
-                let body: RegisterPost = {
-                    date: getDayThisWeek(weekDay, this.weekOffset + sundayOffset),
-                    time: value.hours * 60 + value.minutes,
-                    taskId: taskKey,
-                    userId: this.userId
+
+                if ( registration.fromServer ) {
+                    let body: RegisterPut = {
+                        date: getDayThisWeek(weekDay, this.weekOffset + sundayOffset),
+                        time: value.hours * 60 + value.minutes,
+                        taskId: taskKey,
+                        managerLogged: false,
+                        userId: this.userId
+                    }
+                    apiHandler.put("/api/time/register/edit/put", {body: body}, apiCallback);
+                } else {
+                    let body: RegisterPost = {
+                        date: getDayThisWeek(weekDay, this.weekOffset + sundayOffset),
+                        time: value.hours * 60 + value.minutes,
+                        taskId: taskKey,
+                        userId: this.userId
+                    }
+                    apiHandler.post("/api/time/register/post", {body: body}, apiCallback);
                 }
-                console.log("post", body, weekDay);
-                apiHandler.post("/api/time/register/post", {body: body}, (value) => {
-                    console.log(value);
-                });
-            }
+            }).then((success) => {
+                if (success) {
+                    registration.minutes = value.minutes;
+                    registration.hours   = value.hours;
+                } else {
+                    registration.minutes = 0;
+                    registration.hours   = 0;
+                }
+                if (task !== undefined) {
+                    task.registrations.set(dayIndex, registration);
+                    this.tasksRegistrations.set(taskKey, task);
+                    this.forceUpdate();
+                }
+            });
         }
     }
 
@@ -276,8 +298,9 @@ class TimeRegister extends Component<any>
                 approved: registration.approved
             }
         }
+
         return [data.time, (
-            <TimeInput defaultValue={data.time} managerLogged={data.managerLogged} approved={data.approved} enableDropDown={true}
+            <TimeInput key={Date.now()} defaultValue={data.time} managerLogged={data.managerLogged} approved={data.approved} enableDropDown={true}
             onBlur={(value) => {this.onInputBlur(taskKey, dayIndex, value)}}/>
         )];
     }

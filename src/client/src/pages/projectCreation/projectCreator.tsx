@@ -31,7 +31,7 @@ class ProjectCreator extends Component<any, ProjectMenuState> {
         return (
             <>
                 <BaseNavBar/>
-                <Container>
+                <Container className={"py-3"}>
                     <h1>Project Creator</h1>
                     <Button href="/project/menu" variant="outline-secondary">Back</Button>{''}
                 </Container>

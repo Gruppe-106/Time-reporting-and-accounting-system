@@ -247,29 +247,9 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
    * This handles the modal showing whenever you click the submit button
    */
   private handleAddShow(){
-    if (this.state.buttonDisabled === false){
       this.setState({
         showAdd: true
       })
-    }
-  }
-
-  /**
-   * This handles the button being disabled
-   */
-  private handleButtonDisable() {
-    this.setState({
-      buttonDisabled: true
-    })
-  }
-
-  /**
-   * This handles the button being enabled
-   */
-  private handleButtonEnable() {
-    this.setState({
-      buttonDisabled: false
-    })
   }
 
   /**
@@ -289,7 +269,7 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
     let invalidTaskName = /^\s/g.test(taskName) || taskName === ''
     let invalidDate = !/\d/g.test(startDate.toString()) || !/\d/g.test(endDate.toString())
     let invalidTimeType = /\D/g.test(timeType) || timeType === ''
-    let invalidUser = !(user.length > 0)
+    let invalidUser = !(user.length > 0) || user[0] === ''
 
     //Checks if the input fields contains an invalid input
     if ((invalidTaskName || invalidDate || this.state.invalidStartDate || this.state.invalidEndDate || invalidTimeType
@@ -335,11 +315,11 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
         ) || this.state.rows.length < 0) {
 
           button?.setAttribute('disabled', '')
-          this.handleButtonDisable()
+          this.setState({buttonDisabled: true})
         }
         else {
           button?.removeAttribute('disabled')
-          this.handleButtonEnable()
+          this.setState({buttonDisabled: false})
         }
       }
     }
@@ -447,8 +427,8 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
     // eslint-disable-next-line array-callback-return
     this.state.rows.map((row => {
       let taskName = row.taskName
-      let startDate = row.startDate
-      let endDate = row.endDate
+      let startDate = new Date(row.startDate).getTime();
+      let endDate = new Date(row.endDate).getTime();
       let timeType = parseInt(row.timeType)
       let userId = row.userId.filter((value) =>{
         return parseInt(value)
@@ -739,7 +719,7 @@ class CreateTaskTable extends Component<DynamicTableProps, DynamicTableState, Ta
                       </Modal>
                     </Container>
                     <center>
-                      <Button variant="success" id="submitbutton" onClick={() =>{this.handleAddShow.call(this); this.handleButtonValidity()}} className="px-5">Submit task(s)</Button>
+                      <Button variant="success" id="submitbutton" onClick={() =>{if (this.state.buttonDisabled) this.handleAddShow.call(this); this.handleButtonValidity()}} className="px-5">Submit task(s)</Button>
                     </center>
                     {this.state.formSubmitted ? (<Alert variant="success" id="alert">
                       <Alert.Heading>Task(s) added</Alert.Heading>

@@ -13,8 +13,6 @@ import ProjectManager from "../pages/projectCreation/projectManager";
 import ProjectMenu from "../pages/projectViewer/projectMenu";
 import ProjectViewer from "../pages/projectViewer/projectViewer";
 import GroupManager from "../pages/timeApproval/groupManager";
-import UserTimeRegister from "../pages/timeRegister/userTimeRegister";
-import AdminTimeRegister from "../pages/timeRegister/adminTimeRegister";
 import BaseApiHandler from "../network/baseApiHandler";
 import {Col, Row} from "react-bootstrap";
 import Spinner from "react-bootstrap/Spinner";
@@ -90,9 +88,8 @@ class Router extends Component<any> {
                                 { userInfo.isProjectLeader ? <Route path={"/project/create/task"} Component={TaskCreator}/> : ""}
                                 <Route path={"/project/menu"} Component={ProjectMenu}/>
                                 <Route path={"/project/viewer"} Component={ProjectViewer}/>
-                                { userInfo.isManager && !userInfo.isAdmin ?  <Route path={"/group/time-approval"} Component={GroupManager}/> : ""}
+                                { userInfo.isManager ?  <Route path={"/group/time-approval"} Component={GroupManager}/> : ""}
                                 <Route path={"/user-register"} Component={TimeRegister}/>
-                                { userInfo.isAdmin ? <Route path={"/user-register/admin"} Component={AdminTimeRegister}/> : ""}
                                 <Route path="*" element={<Navigate to="/" replace />} />
                             </Routes>
                         </BrowserRouter>
