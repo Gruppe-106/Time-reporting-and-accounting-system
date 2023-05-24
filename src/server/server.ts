@@ -9,10 +9,10 @@ import * as http from "http";
 import {clientServer} from "../clientServer";
 
 // Load in the SSL credentials for HTTPS
-const privateKey : string = fs.readFileSync(path.join(__dirname, "/SSL/selfsigned.key"), 'utf8');
-const certificate: string = fs.readFileSync(path.join(__dirname, "/SSL/selfsigned.crt"), 'utf8');
+const privateKey : string = fs.readFileSync(path.join(__dirname, "/SSL/server/selfsigned.key"), 'utf8');
+const certificate: string = fs.readFileSync(path.join(__dirname, "/SSL/server/selfsigned.crt"), 'utf8');
 
-export const credentials: {key: string, cert: string} = {key: privateKey, cert: certificate};
+const credentials: {key: string, cert: string} = {key: privateKey, cert: certificate};
 
 export class Server {
     private app: Express;
