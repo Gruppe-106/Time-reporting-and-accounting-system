@@ -51,7 +51,7 @@ class ProjectTable extends Component<any> {
     private tableRender():JSX.Element[] {
         return this.state.tableRows.map(row => (
             <tr key={row.id}>
-                <td> <a href={`/project/viewer?id=${row.id}`}>{row.id}</a> </td>
+                <td><Button href={`/project/viewer?id=${row.id}`}>{row.id}</Button></td>
                 <td>{row.superProjectId ?? ''}</td>
                 <td>{row.name ?? ''}</td>
                 <td>{row.startDate ? new Date(row.startDate).toLocaleDateString() : ''}</td>
